@@ -7,10 +7,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function deleteAccount() {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.email) redirect("/login");
+  if (!session?.user?.id) redirect("/login");
 
   await prisma.user.delete({
-    where: { email: session.user.email },
+    where: { id: session.user.id },
   });
 
   redirect("/login");

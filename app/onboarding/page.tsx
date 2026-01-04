@@ -7,10 +7,10 @@ import OnboardingClient from "./OnboardingClient";
 
 export default async function OnboardingPage() {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.email) redirect("/login");
+  if (!session?.user?.id) redirect("/login");
 
   const bikeCount = await prisma.bike.count({
-    where: { user: { email: session.user.email } },
+    where: { user: { id: session.user.id } },
   });
 
   if (bikeCount > 0) {

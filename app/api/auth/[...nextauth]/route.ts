@@ -37,6 +37,13 @@ export const authOptions: AuthOptions = {
       }
       return session;
     },
+    async signIn({ account }) {
+      if (account?.provider === "strava") {
+        // ❌ Prisma nie zna pola athlete
+        delete (account as any).athlete;
+      }
+      return true;
+    },
   },
 };
 

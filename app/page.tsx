@@ -16,7 +16,7 @@ export default async function HomePage() {
   }
 
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
+    where: { id: session.user.id },
     include: { bikes: true },
   });
 

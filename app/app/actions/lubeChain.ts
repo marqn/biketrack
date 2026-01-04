@@ -7,10 +7,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function lubeChain() {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.email) redirect("/login");
+  if (!session?.user?.id) redirect("/login");
 
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
+    where: { id: session.user.id },
     include: { bikes: true },
   });
 
