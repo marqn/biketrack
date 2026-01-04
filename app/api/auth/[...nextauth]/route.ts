@@ -3,7 +3,14 @@ import GoogleProvider from "next-auth/providers/google";
 import StravaProvider from "next-auth/providers/strava";
 import Email from "next-auth/providers/email";
 
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { prisma } from "@/lib/prisma";
+
 export const authOptions: AuthOptions = {
+  adapter: PrismaAdapter(prisma),
+  session: {
+    strategy: "database",
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -19,14 +26,14 @@ export const authOptions: AuthOptions = {
     // }),
   ],
   pages: {
-    signIn: "/login",
+    signIn: "/",
     signOut: "/",
     error: "/auth/error",
   },
   callbacks: {
-    async session({ session, token }) {
+    async session({ session, user }) {
       if (session.user) {
-        session.user.name = token.name;
+        session.user.id = user.id;
       }
       return session;
     },

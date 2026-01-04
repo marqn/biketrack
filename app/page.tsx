@@ -1,25 +1,27 @@
-// import { BikeMaintenanceApp } from "@/components/bike-maintenance-app"
-// import { LoginPage } from "@/components/login-page"
-
-// export default function Page() {
-//   return <BikeMaintenanceApp />
-// }
-
-'use client'
-
-
 import { Button } from '@/components/ui/button'
-import { useSession, signOut } from 'next-auth/react'
+import { signOut } from 'next-auth/react'
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { prisma } from '@/lib/prisma';
+import { authOptions } from './api/auth/[...nextauth]/route';
 
-export default function HomePage() {
-  const { data: session, status } = useSession()
 
-  if (status === 'loading') {
-    return <div>Ładowanie...</div>
+export default async function HomePage() {
+  const session = await getServerSession(authOptions)
+
+  if (!session || !session.user) {
+    redirect("/login");
+  } else {
+    console.log('Session data:', session)
   }
 
-  if (!session) {
-    return <div>Nie jesteś zalogowany</div>
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    include: { bikes: true },
+  });
+
+  if (!user?.bike) {
+    redirect("/onboarding");
   }
 
   return (
@@ -28,7 +30,7 @@ export default function HomePage() {
       <img src={session.user?.image || ''} alt="avatar" />
       <h2>Twój rower</h2>
       <p>Zaraz go dodamy 👌</p>
-      <Button onClick={() => signOut()}>Wyloguj się</Button>
+      {/* <Button onClick={() => signOut()}>Wyloguj się</Button> */}
     </div>
   )
 }

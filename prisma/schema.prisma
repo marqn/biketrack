@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  bikes         Bike[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  access_token      String?
+  refresh_token     String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum BikeType {
+  ROAD
+  GRAVEL
+  MTB
+}
+
+enum PartType {
+  CHAIN
+  CASSETTE
+  PADS_FRONT
+  PADS_REAR
+  TIRE_FRONT
+  TIRE_REAR
+}
+
+enum ServiceType {
+  CHAIN_LUBE
+}
+
+
+
+model Bike {
+  id      String   @id @default(cuid())
+  userId  String
+  type    BikeType
+  totalKm Int      @default(0)
+
+  user     User           @relation(fields: [userId], references: [id])
+  parts    BikePart[]
+  services ServiceEvent[]
+
+  createdAt DateTime @default(now())
+}
+
+model BikePart {
+  id     String   @id @default(cuid())
+  bikeId String
+  type   PartType
+
+  wearKm     Int @default(0)
+  expectedKm Int
+
+  bike Bike @relation(fields: [bikeId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model ServiceEvent {
+  id       String      @id @default(cuid())
+  bikeId   String
+  type     ServiceType
+  kmAtTime Int
+
+  bike Bike @relation(fields: [bikeId], references: [id])
+
+  createdAt DateTime @default(now())
+}
