@@ -4,16 +4,19 @@ import { lubeChain } from "./actions";
 
 export default function LubeButton() {
   return (
-    <button onClick={() => lubeChain()} style={styles.button}>
-      🛠️ Nasmarowałem
-    </button>
+    <form action={lubeChain}>
+      <button
+        type="submit"
+        style={{
+          marginTop: 12,
+          padding: "8px 12px",
+          borderRadius: 6,
+          border: "1px solid #000",
+          cursor: "pointer",
+        }}
+      >
+        🛠️ Smaruj
+      </button>
+    </form>
   );
 }
-
-const styles = {
-  button: {
-    marginTop: 12,
-    padding: "10px 16px",
-    fontSize: 16,
-  },
-};

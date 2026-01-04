@@ -99,7 +99,7 @@ model ServiceEvent {
   type     ServiceType
   kmAtTime Int
 
-  bike Bike @relation(fields: [bikeId], references: [id])
+  bike   Bike @relation(fields: [bikeId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 }
