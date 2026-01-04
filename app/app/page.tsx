@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import LubeButton from "./lube-button";
+import LogoutButton from "./logout-button";
+import DeleteAccountButton from "./delete-account-button";
 
 export default async function AppPage() {
   const session = await getServerSession(authOptions);
@@ -37,7 +39,10 @@ export default async function AppPage() {
 
   return (
     <main style={styles.container}>
-      <h1>🚴 {user.bikes[0].type}</h1>
+      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <LogoutButton />
+        <DeleteAccountButton />
+      </div>
 
       <section style={styles.card}>
         <h2>🔗 Łańcuch</h2>

@@ -1,6 +1,6 @@
 "use client";
 
-import { lubeChain } from "./actions";
+import { lubeChain } from "./actions/lubeChain";
 
 export default function LubeButton() {
   return (

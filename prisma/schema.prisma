@@ -65,15 +65,13 @@ enum ServiceType {
   CHAIN_LUBE
 }
 
-
-
 model Bike {
   id      String   @id @default(cuid())
   userId  String
   type    BikeType
   totalKm Int      @default(0)
 
-  user     User           @relation(fields: [userId], references: [id])
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)  // ← DODAJ onDelete: Cascade
   parts    BikePart[]
   services ServiceEvent[]
 
@@ -88,7 +86,7 @@ model BikePart {
   wearKm     Int @default(0)
   expectedKm Int
 
-  bike Bike @relation(fields: [bikeId], references: [id])
+  bike Bike @relation(fields: [bikeId], references: [id], onDelete: Cascade)  // ← DODAJ onDelete: Cascade
 
   createdAt DateTime @default(now())
 }
@@ -99,7 +97,7 @@ model ServiceEvent {
   type     ServiceType
   kmAtTime Int
 
-  bike   Bike @relation(fields: [bikeId], references: [id], onDelete: Cascade)
+  bike Bike @relation(fields: [bikeId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 }
