@@ -7,6 +7,8 @@ import LogoutButton from "./logout-button";
 import DeleteAccountButton from "./delete-account-button";
 import { BikeMaintenanceApp } from "@/components/bike-maintenance-app";
 import KmForm from "./km-form";
+import PartCard from "./PartCard";
+import { PartType } from "@/lib/generated/prisma";
 
 export default async function AppPage() {
   const session = await getServerSession(authOptions);
@@ -54,16 +56,29 @@ export default async function AppPage() {
           <KmForm bikeId={user.bikes[0].id} initialKm={user.bikes[0].totalKm} />
         </section>
 
-        <section style={styles.card}>
-          <h2>🔗 Łańcuch</h2>
-
-          <p>{kmSinceLube} km od ostatniego smarowania</p>
-
+      
+        <PartCard
+          partName="🔗 Łańcuch"
+          wearKm={bike.totalKm} // tutaj był błąd
+          expectedKm={chain.expectedKm}
+          bikeId={bike.id}
+          partType={PartType.CHAIN}
+        >
           <LubeButton
             bikeId={user.bikes[0].id}
             currentKm={user.bikes[0].totalKm}
+            lastLubeKmInitial={lastLube?.kmAtTime} // <-- przekazujemy ostatnie smarowanie z bazy
           />
-        </section>
+        </PartCard>
+
+        <PartCard
+          partName="Klocki Hamulcowe przód"
+          wearKm={bike.totalKm}
+          expectedKm={9000} 
+          partType={PartType.PADS_FRONT}
+        >
+          {/* <FillTubelessButton bikeId={user.bikes[0].id} /> */}
+        </PartCard>
       </main>
 
       {/* <BikeMaintenanceApp /> */}

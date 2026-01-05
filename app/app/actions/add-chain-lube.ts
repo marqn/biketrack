@@ -1,37 +1,20 @@
 "use server";
 
+import { ServiceType } from "@/lib/generated/prisma";
 import { prisma } from "@/lib/prisma";
-import { z } from "zod";
 
-const schema = z.object({
-  bikeId: z.string().cuid(),
-});
-
-export async function addChainLube(formData: FormData) {
-  const parsed = schema.safeParse({
-    bikeId: formData.get("bikeId"),
-  });
-
-  if (!parsed.success) {
-    return { error: "Nieprawidłowe ID roweru" };
-  }
-
-  const { bikeId } = parsed.data;
-
-  const bike = await prisma.bike.findUnique({
-    where: { id: bikeId },
-    select: { totalKm: true },
-  });
-
-  if (!bike) return { error: "Brak roweru" };
-
+export async function addChainLube(bikeId: string) {
+  // 🔹 tylko dodaj event, nie zmieniaj wearKm
   await prisma.serviceEvent.create({
     data: {
+      type: ServiceType.CHAIN_LUBE,
+      kmAtTime: (
+        await prisma.bike.findUnique({ where: { id: bikeId } })
+      )!.totalKm,
       bikeId,
-      type: "CHAIN_LUBE",
-      kmAtTime: bike.totalKm,
     },
   });
 
-  return { success: true, kmAtTime: bike.totalKm };
+  // 🔹 nic nie resetujemy
+  return true;
 }
