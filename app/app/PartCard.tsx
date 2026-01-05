@@ -60,7 +60,6 @@ export default function PartCard({
 
       <button
         onClick={() => {
-          console.log("Replace button clicked", bikeId, partType)
           startTransition(async () => {
             const formData = new FormData();
             formData.set("bikeId", bikeId); // upewnij się, że to prawidłowy CUID

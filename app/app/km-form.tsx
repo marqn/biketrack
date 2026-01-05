@@ -2,6 +2,7 @@
 
 import { useOptimistic, useState, useTransition } from "react";
 import { updateBikeKm } from "./actions/update-bike-km";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   bikeId: string;
@@ -42,7 +43,7 @@ export default function KmForm({ bikeId, initialKm }: Props) {
         disabled={isPending}
       />
 
-      <button disabled={isPending}>Zapisz km</button>
+      <Button disabled={isPending}>Zapisz km</Button>
 
       <p style={{ opacity: 0.6 }}>
         Aktualnie zapisane: {optimisticKm} km

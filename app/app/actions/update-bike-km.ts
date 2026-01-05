@@ -16,17 +16,34 @@ export async function updateBikeKm(formData: FormData) {
   });
 
   if (!parsed.success) {
-    return { error: "Nieprawidłowe kilometry" };
+    throw new Error("Nieprawidłowe dane");
   }
 
   const { bikeId, newKm } = parsed.data;
 
-  await prisma.bike.update({
+  const bike = await prisma.bike.findUnique({
     where: { id: bikeId },
-    data: { totalKm: newKm },
+    include: { parts: true },
   });
 
-  revalidatePath("/app");
+  if (!bike) throw new Error("Bike not found");
 
-  return { success: true, newKm };
+  const diffKm = newKm - bike.totalKm;
+  if (diffKm <= 0) return;
+
+  await prisma.$transaction([
+    prisma.bike.update({
+      where: { id: bikeId },
+      data: { totalKm: newKm },
+    }),
+
+    prisma.bikePart.updateMany({
+      where: { bikeId },
+      data: {
+        wearKm: { increment: diffKm },
+      },
+    }),
+  ]);
+
+  revalidatePath("/app");
 }

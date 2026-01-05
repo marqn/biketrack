@@ -33,7 +33,9 @@ export default async function AppPage() {
   if (!user?.bikes?.[0]) redirect("/onboarding");
 
   const chain = user.bikes[0].parts.find((p) => p.type === PartType.CHAIN);
-  const padsFront = user.bikes[0].parts.find((p) => p.type === PartType.PADS_FRONT);
+  const padsFront = user.bikes[0].parts.find(
+    (p) => p.type === PartType.PADS_FRONT
+  );
   if (!chain) return null;
   if (!padsFront) return null;
 
@@ -50,29 +52,28 @@ export default async function AppPage() {
 
         <section style={styles.card}>
           <h2>🚲 Rower</h2>
-
           <KmForm bikeId={user.bikes[0].id} initialKm={user.bikes[0].totalKm} />
         </section>
 
-      
         <PartCard
-          partName="🔗 Łańcuch"
-          wearKm={bike.totalKm} // tutaj był błąd
+          partName={`🔗 Łańcuch (${chain.expectedKm} km)`}
+          wearKm={chain.wearKm} // tutaj był błąd
           expectedKm={chain.expectedKm}
           bikeId={bike.id}
           partType={PartType.CHAIN}
         >
           <LubeButton
-            bikeId={user.bikes[0].id}
-            currentKm={user.bikes[0].totalKm}
-            lastLubeKmInitial={lastLube?.kmAtTime} // <-- przekazujemy ostatnie smarowanie z bazy
+            bikeId={bike.id}
+            currentKm={bike.totalKm}
+            lastLubeKmInitial={lastLube?.kmAtTime}
           />
         </PartCard>
 
         <PartCard
-          partName="Klocki Hamulcowe przód"
-          wearKm={bike.totalKm}
-          expectedKm={9000} 
+          partName={`🔗 Klocki Hamulcowe przód (${padsFront.expectedKm} km)`}
+          wearKm={padsFront.wearKm}
+          expectedKm={padsFront.expectedKm}
+          bikeId={bike.id}
           partType={PartType.PADS_FRONT}
         >
           {/* <FillTubelessButton bikeId={user.bikes[0].id} /> */}

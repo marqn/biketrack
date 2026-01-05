@@ -20,16 +20,16 @@ export async function replacePart(formData: FormData) {
 
   const { bikeId, partType } = parsed.data;
 
-  // Resetujemy wearKm tylko dla podanej części
   await prisma.bikePart.updateMany({
-    where: { bikeId, type: partType },
-    data: { wearKm: 0 },
+    where: {
+      bikeId,
+      type: partType,
+    },
+    data: {
+      wearKm: 0,
+      createdAt: new Date(), // opcjonalnie
+    },
   });
 
-  // Odświeżenie strony
   revalidatePath("/app");
-
-  return { success: true };
 }
-
-// nie aktualizuje się wearKm w BikePart
