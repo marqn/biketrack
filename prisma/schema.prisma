@@ -63,6 +63,7 @@ enum PartType {
 
 enum ServiceType {
   CHAIN_LUBE
+  CHAIN_REPLACE
 }
 
 model Bike {

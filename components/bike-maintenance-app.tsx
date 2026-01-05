@@ -336,7 +336,12 @@ const components: BikeComponent[] = [
 ]
 
 export function BikeMaintenanceApp() {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null>({
+      id: "1",
+      name: "Jan Kowalski",
+      email: "email@w.pl",
+      plan: "free",
+    })
   const [showPaywall, setShowPaywall] = useState(false)
 
   const [selectedBike, setSelectedBike] = useState(bikes[0])
@@ -604,20 +609,16 @@ export function BikeMaintenanceApp() {
     )
   }
 
-  if (!user) {
-    return <LoginPage onLogin={handleLogin} />
-  }
-
   return (
     <div className="min-h-screen bg-background">
-      <BikeHeader
+      {/* <BikeHeader
         bike={selectedBike}
         bikes={availableBikes}
         onBikeChange={handleBikeChange}
         user={user}
         onLogout={handleLogout}
         onUpgrade={() => setShowPaywall(true)}
-      />
+      /> */}
 
       <main className="container mx-auto px-4 pt-24 pb-8 space-y-6">
         <AlertsSection components={bikeComponents} />

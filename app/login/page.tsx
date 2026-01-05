@@ -36,7 +36,8 @@ export default function Page() {
         </CardHeader>
         <CardContent>
           <form className="space-y-4">
-            <div className="space-y-2">
+            
+            {/* <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
@@ -60,7 +61,7 @@ export default function Page() {
             </div>
             <Button type="submit" className="w-full">
               Zaloguj się
-            </Button>
+            </Button> */}
 
             <Button
               onClick={(e) => {

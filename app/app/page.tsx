@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import LubeButton from "./lube-button";
 import LogoutButton from "./logout-button";
 import DeleteAccountButton from "./delete-account-button";
+import { BikeMaintenanceApp } from "@/components/bike-maintenance-app";
+import KmForm from "./km-form";
 
 export default async function AppPage() {
   const session = await getServerSession(authOptions);
@@ -25,32 +27,47 @@ export default async function AppPage() {
       },
     },
   });
-  
 
   if (!user?.bikes?.[0]) redirect("/onboarding");
 
   const chain = user.bikes[0].parts.find((p) => p.type === "CHAIN");
   if (!chain) return null;
 
-  const lastLube = user.bikes[0].services[0];
+  const bike = user.bikes[0];
+
+  const lastLube = bike.services[0];
+
   const kmSinceLube = lastLube
-    ? user.bikes[0].totalKm - lastLube.kmAtTime
-    : user.bikes[0].totalKm;
-
+    ? bike.totalKm - lastLube.kmAtTime
+    : bike.totalKm;
   return (
-    <main style={styles.container}>
-      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-        <LogoutButton />
-        <DeleteAccountButton />
-      </div>
+    <>
+      <main style={styles.container}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <LogoutButton />
+          <DeleteAccountButton />
+        </div>
 
-      <section style={styles.card}>
-        <h2>🔗 Łańcuch</h2>
-        <p>{kmSinceLube} km od ostatniego smarowania</p>
+        <section style={styles.card}>
+          <h2>🚲 Rower</h2>
 
-        <LubeButton />
-      </section>
-    </main>
+          <KmForm bikeId={user.bikes[0].id} initialKm={user.bikes[0].totalKm} />
+        </section>
+
+        <section style={styles.card}>
+          <h2>🔗 Łańcuch</h2>
+
+          <p>{kmSinceLube} km od ostatniego smarowania</p>
+
+          <LubeButton
+            bikeId={user.bikes[0].id}
+            currentKm={user.bikes[0].totalKm}
+          />
+        </section>
+      </main>
+
+      {/* <BikeMaintenanceApp /> */}
+    </>
   );
 }
 

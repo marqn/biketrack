@@ -1,21 +1,29 @@
 "use client";
 
-import { lubeChain } from "./actions/lubeChain";
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { addChainLube } from "./actions/add-chain-lube";
 
-export default function LubeButton() {
+export default function LubeButton({
+  bikeId,
+}: {
+  bikeId: string;
+}) {
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  async function action(formData: FormData) {
+    startTransition(async () => {
+      await addChainLube(formData);
+      router.refresh(); // 🔑 TO JEST KLUCZ
+    });
+  }
+
   return (
-    <form action={lubeChain}>
-      <button
-        type="submit"
-        style={{
-          marginTop: 12,
-          padding: "8px 12px",
-          borderRadius: 6,
-          border: "1px solid #000",
-          cursor: "pointer",
-        }}
-      >
-        🛠️ Smaruj
+    <form action={action}>
+      <input type="hidden" name="bikeId" value={bikeId} />
+      <button disabled={isPending}>
+        {isPending ? "Smarowanie..." : "🛢️ Smaruj"}
       </button>
     </form>
   );
