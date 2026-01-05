@@ -1,6 +1,7 @@
 // app/onboarding/OnboardingClient.tsx
 "use client";
 
+import { BikeType } from "@/lib/generated/prisma";
 import { createBike } from "./actions";
 
 export default function OnboardingClient() {
@@ -9,16 +10,20 @@ export default function OnboardingClient() {
     <main style={styles.container}>
       <h1>Jaki masz rower?</h1>
 
-      <button onClick={() => createBike("ROAD")} style={styles.button}>
+      <button onClick={() => createBike(BikeType.ROAD)} style={styles.button}>
         🚴 Szosa
       </button>
 
-      <button onClick={() => createBike("GRAVEL")} style={styles.button}>
+      <button onClick={() => createBike(BikeType.GRAVEL)} style={styles.button}>
         🚵 Gravel
       </button>
 
-      <button onClick={() => createBike("MTB")} style={styles.button}>
+      <button onClick={() => createBike(BikeType.MTB)} style={styles.button}>
         🚵‍♂️ MTB
+      </button>
+
+      <button onClick={() => createBike(BikeType.OTHER)} style={styles.button}>
+        🚲 Inny
       </button>
     </main>
   );

@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
+import { ServiceType } from "@/lib/generated/prisma";
 
 export async function lubeChain() {
   const session = await getServerSession(authOptions);
@@ -20,7 +21,7 @@ export async function lubeChain() {
 
   await prisma.serviceEvent.create({
     data: {
-      type: "CHAIN_LUBE",
+      type: ServiceType.CHAIN_LUBE,
       kmAtTime: bike.totalKm,
       bikeId: bike.id,
     },

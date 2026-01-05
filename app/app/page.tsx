@@ -8,7 +8,7 @@ import DeleteAccountButton from "./delete-account-button";
 import { BikeMaintenanceApp } from "@/components/bike-maintenance-app";
 import KmForm from "./km-form";
 import PartCard from "./PartCard";
-import { PartType } from "@/lib/generated/prisma";
+import { PartType, ServiceType } from "@/lib/generated/prisma";
 
 export default async function AppPage() {
   const session = await getServerSession(authOptions);
@@ -21,7 +21,7 @@ export default async function AppPage() {
         include: {
           parts: true,
           services: {
-            where: { type: "CHAIN_LUBE" },
+            where: { type: ServiceType.CHAIN_LUBE },
             orderBy: { createdAt: "desc" },
             take: 1,
           },
@@ -32,16 +32,14 @@ export default async function AppPage() {
 
   if (!user?.bikes?.[0]) redirect("/onboarding");
 
-  const chain = user.bikes[0].parts.find((p) => p.type === "CHAIN");
+  const chain = user.bikes[0].parts.find((p) => p.type === PartType.CHAIN);
+  const padsFront = user.bikes[0].parts.find((p) => p.type === PartType.PADS_FRONT);
   if (!chain) return null;
+  if (!padsFront) return null;
 
   const bike = user.bikes[0];
-
   const lastLube = bike.services[0];
 
-  const kmSinceLube = lastLube
-    ? bike.totalKm - lastLube.kmAtTime
-    : bike.totalKm;
   return (
     <>
       <main style={styles.container}>

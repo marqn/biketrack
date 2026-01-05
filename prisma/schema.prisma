@@ -50,6 +50,7 @@ enum BikeType {
   ROAD
   GRAVEL
   MTB
+  OTHER
 }
 
 enum PartType {

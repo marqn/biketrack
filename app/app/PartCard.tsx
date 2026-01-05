@@ -64,7 +64,7 @@ export default function PartCard({
           startTransition(async () => {
             const formData = new FormData();
             formData.set("bikeId", bikeId); // upewnij się, że to prawidłowy CUID
-            formData.set("partType", partType); // np. "CHAIN" (dokładnie jak w enum)
+            formData.set("partType", partType); // np. PartType.CHAIN (dokładnie jak w enum)
 
             await replacePart(formData);
             router.refresh();
