@@ -1,77 +1,67 @@
 "use client";
 
 import { useTransition } from "react";
-import { replacePart } from "./actions/replace-part";
 import { useRouter } from "next/navigation";
+import { replacePart } from "./actions/replace-part";
+import { PartType } from "@/lib/generated/prisma";
 
 export default function PartCard({
   partName,
   wearKm,
   expectedKm,
-  children,
   bikeId,
   partType,
-}: any) {
+  children,
+}: {
+  partName: string;
+  wearKm: number;
+  expectedKm: number;
+  bikeId: string;
+  partType: PartType;
+  children?: React.ReactNode;
+}) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   async function handleReplace() {
-    startTransition(async () => {
-      const formData = new FormData();
-      formData.set("bikeId", bikeId);
-      formData.set("partType", partType);
+    const formData = new FormData();
+    formData.set("bikeId", bikeId);
+    formData.set("partType", partType);
 
+    startTransition(async () => {
       await replacePart(formData);
-      router.refresh(); // możesz też użyć revalidatePath w akcji
+      router.refresh(); // 🔑 aktualizacja UI
     });
   }
 
-  return (
-    <div
-      style={{
-        border: "1px solid #ddd",
-        borderRadius: 8,
-        padding: 16,
-        marginTop: 16,
-      }}
-    >
-      <h3>{partName}</h3>
+  const progressPercent = Math.min((wearKm / expectedKm) * 100, 100);
 
-      <div
-        style={{
-          background: "#eee",
-          height: 12,
-          borderRadius: 6,
-          overflow: "hidden",
-          marginBottom: 8,
-        }}
-      >
+  return (
+    <section style={{ border: "1px solid #ddd", padding: 16, borderRadius: 8, marginTop: 16 }}>
+      <h3>{partName}</h3>
+      <div style={{ background: "#eee", borderRadius: 4, height: 12, margin: "8px 0" }}>
         <div
           style={{
-            width: `${Math.min((wearKm / expectedKm) * 100, 100)}%`,
+            width: `${progressPercent}%`,
+            background: "#4caf50",
             height: "100%",
-            background: "green",
+            borderRadius: 4,
           }}
         />
       </div>
-      <p>{Math.round((wearKm / expectedKm) * 100)}% zużycia</p>
+      <p>
+        Zużycie: {wearKm} / {expectedKm} km
+      </p>
 
       {children}
 
       <button
-        onClick={() => {
-          startTransition(async () => {
-            const formData = new FormData();
-            formData.set("bikeId", bikeId); // upewnij się, że to prawidłowy CUID
-            formData.set("partType", partType); // np. PartType.CHAIN (dokładnie jak w enum)
-
-            await replacePart(formData);
-            router.refresh();
-          });
-        }}
+        onClick={handleReplace}
+        disabled={isPending}
+        style={{ marginTop: 8 }}
       >
-        🔄 Wymień
+        {isPending ? "Wymieniam..." : "🔄 Wymień"}
       </button>
-    </div>
+    </section>
   );
 }
