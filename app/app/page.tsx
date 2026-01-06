@@ -54,10 +54,7 @@ export default async function AppPage() {
           <DeleteAccountButton />
         </div>
 
-        <section style={styles.card}>
-          <h2>🚲 Rower</h2>
-          <KmForm bikeId={user.bikes[0].id} initialKm={user.bikes[0].totalKm} />
-        </section>
+        <KmForm bikeId={user.bikes[0].id} initialKm={user.bikes[0].totalKm} />
 
         <PartCard
           partName={`🔗 Łańcuch`}

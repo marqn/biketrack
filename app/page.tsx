@@ -20,17 +20,8 @@ export default async function HomePage() {
     include: { bikes: true },
   });
 
-  if (!user?.bike) {
+  if (!user?.bikes || user.bikes.length === 0) {
     redirect("/onboarding");
   }
 
-  return (
-    <div>
-      <h1>Witaj, {session.user?.name}!</h1>
-      <img src={session.user?.image || ''} alt="avatar" />
-      <h2>Twój rower</h2>
-      <p>Zaraz go dodamy 👌</p>
-      {/* <Button onClick={() => signOut()}>Wyloguj się</Button> */}
-    </div>
-  )
 }

@@ -18,11 +18,10 @@ export default function LubeButton({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const [lastLubeKm, setLastLubeKm] = useOptimistic<number | null>(
+  const [lastLubeKm, setLastLubeKm] = useOptimistic(
     lastLubeKmInitial ?? null,
-    (_, km) => km
+    (_currentState, newKm: number) => newKm
   );
-
   const kmSinceLube = lastLubeKm !== null ? currentKm - lastLubeKm : currentKm;
 
   const progressPercent = Math.min((kmSinceLube / 200) * 100, 100); // zakładam smarowanie co 200 km

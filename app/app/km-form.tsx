@@ -3,6 +3,8 @@
 import { useOptimistic, useState, useTransition } from "react";
 import { updateBikeKm } from "./actions/update-bike-km";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
 type Props = {
   bikeId: string;
@@ -12,13 +14,11 @@ type Props = {
 export default function KmForm({ bikeId, initialKm }: Props) {
   const [isPending, startTransition] = useTransition();
 
-  // optimistic = to co pokazujemy PO zapisie
   const [optimisticKm, setOptimisticKm] = useOptimistic(
     initialKm,
     (_, newKm: number) => newKm
   );
 
-  // local state = input
   const [inputKm, setInputKm] = useState(optimisticKm);
 
   async function action(formData: FormData) {
@@ -32,22 +32,35 @@ export default function KmForm({ bikeId, initialKm }: Props) {
   }
 
   return (
-    <form action={action}>
-      <input type="hidden" name="bikeId" value={bikeId} />
+    <Card className="mt-4">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base font-medium">
+          🚲 Aktualny przebieg roweru
+        </CardTitle>
+      </CardHeader>
 
-      <input
-        type="number"
-        name="newKm"
-        value={inputKm}
-        onChange={(e) => setInputKm(Number(e.target.value))}
-        disabled={isPending}
-      />
+      <form action={action} className="flex flex-col gap-3 p-6 pt-0">
+        <input type="hidden" name="bikeId" value={bikeId} />
 
-      <Button disabled={isPending}>Zapisz km</Button>
+        <div className="flex items-center gap-2">
+          <Input
+            type="number"
+            name="newKm"
+            value={inputKm}
+            onChange={(e) => setInputKm(Number(e.target.value))}
+            disabled={isPending}
+            className="flex-1"
+          />
 
-      <p style={{ opacity: 0.6 }}>
-        Aktualnie zapisane: {optimisticKm} km
-      </p>
-    </form>
+          <Button disabled={isPending} size="sm">
+            {isPending ? "Zapisuję..." : "💾 Zapisz km"}
+          </Button>
+        </div>
+
+        <p className="text-center text-sm text-muted-foreground">
+          Aktualnie zapisane: {optimisticKm} km
+        </p>
+      </form>
+    </Card>
   );
 }
