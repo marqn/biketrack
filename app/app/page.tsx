@@ -68,8 +68,8 @@ export default async function AppPage() {
     [PartType.TIRE_REAR]: "🛞➡️ | Opona tył",
     [PartType.HANDLEBAR_TAPE]: "🪢 | Taśma kierownicy",
     [PartType.SUSPENSION_FORK]: "🪵 | Wspornik zawieszenia",
-    [PartType.DROPPER_POST]: "🪵 | Kierownica z opuszką",
-    [PartType.TUBELESS_SEALANT]: "🧼 | Środek do opon bezkółowych",
+    [PartType.DROPPER_POST]: "🪵 | Sztyca regulowana",
+    [PartType.TUBELESS_SEALANT]: "🧼 | Mleko do opon bezdentkowych",
     [PartType.SUSPENSION_SEATPOST]: "🪵 | Siedzenie z zawieszeniem",
   };
 
