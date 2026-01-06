@@ -5,41 +5,9 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { BikeType, PartType } from "@/lib/generated/prisma";
+import { DEFAULT_PARTS } from "@/lib/default-parts";
 
-export const DEFAULT_PARTS = {
-  ROAD: [
-    { type: PartType.CHAIN, expectedKm: 2500 },
-    { type: PartType.CASSETTE, expectedKm: 8000 },
-    { type: PartType.PADS_FRONT, expectedKm: 3000 },
-    { type: PartType.PADS_REAR, expectedKm: 3000 },
-    { type: PartType.TIRE_FRONT, expectedKm: 4000 },
-    { type: PartType.TIRE_REAR, expectedKm: 4000 },
-  ],
-  GRAVEL: [
-    { type: PartType.CHAIN, expectedKm: 2000 },
-    { type: PartType.CASSETTE, expectedKm: 6000 },
-    { type: PartType.PADS_FRONT, expectedKm: 2500 },
-    { type: PartType.PADS_REAR, expectedKm: 2500 },
-    { type: PartType.TIRE_FRONT, expectedKm: 3500 },
-    { type: PartType.TIRE_REAR, expectedKm: 3500 },
-  ],
-  MTB: [
-    { type: PartType.CHAIN, expectedKm: 1800 },
-    { type: PartType.CASSETTE, expectedKm: 5000 },
-    { type: PartType.PADS_FRONT, expectedKm: 2000 },
-    { type: PartType.PADS_REAR, expectedKm: 2000 },
-    { type: PartType.TIRE_FRONT, expectedKm: 3000 },
-    { type: PartType.TIRE_REAR, expectedKm: 3000 },
-  ],
-  OTHER: [
-    { type: PartType.CHAIN, expectedKm: 1800 },
-    { type: PartType.CASSETTE, expectedKm: 5000 },
-    { type: PartType.PADS_FRONT, expectedKm: 2000 },
-    { type: PartType.PADS_REAR, expectedKm: 2000 },
-    { type: PartType.TIRE_FRONT, expectedKm: 3000 },
-    { type: PartType.TIRE_REAR, expectedKm: 3000 },
-  ],
-};
+
 
 export async function createBike(type: BikeType) {
   const session = await getServerSession(authOptions);

@@ -9,6 +9,7 @@ import { BikeMaintenanceApp } from "@/components/bike-maintenance-app";
 import KmForm from "./km-form";
 import PartCard from "./PartCard";
 import { PartType, ServiceType } from "@/lib/generated/prisma";
+import { DEFAULT_PARTS } from "@/lib/default-parts";
 
 export default async function AppPage() {
   const session = await getServerSession(authOptions);
@@ -52,26 +53,42 @@ export default async function AppPage() {
   if (!padsFront) return null;
   if (!padsRear) return null;
   if (!cassette) return null;
-  console.log("TIRE FRONT:", tire_front);
   if (!tire_front) return null;
   if (!tire_rear) return null;
 
   const bike = user.bikes[0];
   const lastLube = bike.services[0];
 
+  const PART_UI = {
+    [PartType.CHAIN]: "⛓️ | Łańcuch",
+    [PartType.CASSETTE]: "⚙️ | Kaseta",
+    [PartType.PADS_FRONT]: "🧱⬅️ | Klocki przód",
+    [PartType.PADS_REAR]: "🧱➡️ | Klocki tył",
+    [PartType.TIRE_FRONT]: "🛞⬅️ | Opona przód",
+    [PartType.TIRE_REAR]: "🛞➡️ | Opona tył",
+    [PartType.HANDLEBAR_TAPE]: "🪢 | Taśma kierownicy",
+    [PartType.SUSPENSION_FORK]: "🪵 | Wspornik zawieszenia",
+    [PartType.DROPPER_POST]: "🪵 | Kierownica z opuszką",
+    [PartType.TUBELESS_SEALANT]: "🧼 | Środek do opon bezkółowych",
+    [PartType.SUSPENSION_SEATPOST]: "🪵 | Siedzenie z zawieszeniem",
+  };
+
   return (
     <>
       <main style={styles.container}>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
+          <span>Typ roweru: {bike.type}</span>
           <LogoutButton />
           <DeleteAccountButton />
         </div>
+
+        
 
         <KmForm bikeId={user.bikes[0].id} initialKm={user.bikes[0].totalKm} />
 
         <PartCard
           partName={`⛓️ | Łańcuch`}
-          wearKm={chain.wearKm} // tutaj był błąd
+          wearKm={chain.wearKm}
           expectedKm={chain.expectedKm}
           bikeId={bike.id}
           partType={PartType.CHAIN}
@@ -83,44 +100,23 @@ export default async function AppPage() {
           />
         </PartCard>
 
-        <PartCard
-          partName={`⚙️ | Kaseta`}
-          wearKm={cassette.wearKm}
-          expectedKm={cassette.expectedKm}
-          bikeId={bike.id}
-          partType={PartType.CASSETTE}
-        />
+        {DEFAULT_PARTS[bike.type]
+          .filter((part) => part.type !== PartType.CHAIN)
+          .map((part) => {
+            // Znajdź odpowiednią część w bike.parts
+            const existingPart = bike.parts.find((p) => p.type === part.type);
 
-        <PartCard
-          partName={`🛞 | Opona przód`}
-          wearKm={tire_front.wearKm}
-          expectedKm={tire_front.expectedKm}
-          bikeId={bike.id}
-          partType={PartType.TIRE_FRONT}
-        />
-
-        <PartCard
-          partName={`🛞 | Opona tył`}
-          wearKm={tire_rear.wearKm}
-          expectedKm={tire_rear.expectedKm}
-          bikeId={bike.id}
-          partType={PartType.TIRE_REAR}
-        />
-
-        <PartCard
-          partName={`🧱⬅️ | Klocki hamulcowe przód`}
-          wearKm={padsFront.wearKm}
-          expectedKm={padsFront.expectedKm}
-          bikeId={bike.id}
-          partType={PartType.PADS_FRONT}
-        />
-        <PartCard
-          partName={`🧱➡️ | Klocki hamulcowe tył`}
-          wearKm={padsRear.wearKm}
-          expectedKm={padsFront.expectedKm}
-          bikeId={bike.id}
-          partType={PartType.PADS_REAR}
-        />
+            return (
+              <PartCard
+                key={part.type}
+                partName={PART_UI[part.type]}
+                expectedKm={part.expectedKm}
+                wearKm={existingPart?.wearKm || 0}
+                bikeId={bike.id}
+                partType={part.type}
+              />
+            );
+          })}
       </main>
 
       {/* <BikeMaintenanceApp /> */}

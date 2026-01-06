@@ -60,6 +60,12 @@ enum PartType {
   PADS_REAR
   TIRE_FRONT
   TIRE_REAR
+  CHAINRING_1X
+  SUSPENSION_FORK
+  DROPPER_POST
+  TUBELESS_SEALANT
+  HANDLEBAR_TAPE
+  SUSPENSION_SEATPOST
 }
 
 enum ServiceType {
@@ -73,7 +79,7 @@ model Bike {
   type    BikeType
   totalKm Int      @default(0)
 
-  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)  // ← DODAJ onDelete: Cascade
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade) // ← DODAJ onDelete: Cascade
   parts    BikePart[]
   services ServiceEvent[]
 
@@ -88,7 +94,7 @@ model BikePart {
   wearKm     Int @default(0)
   expectedKm Int
 
-  bike Bike @relation(fields: [bikeId], references: [id], onDelete: Cascade)  // ← DODAJ onDelete: Cascade
+  bike Bike @relation(fields: [bikeId], references: [id], onDelete: Cascade) // ← DODAJ onDelete: Cascade
 
   createdAt DateTime @default(now())
 }
