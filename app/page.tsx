@@ -20,7 +20,7 @@ export default async function HomePage() {
     include: { bikes: true },
   });
 
-  if (!user?.bikes || user.bikes.length === 0) {
+  if (!user?.bikes || user.bikes.length === 1) {
     redirect("/onboarding");
   }
 

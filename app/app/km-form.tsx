@@ -110,10 +110,10 @@ export default function KmForm({ bikeId, initialKm }: Props) {
           </Button>
 
           <Input
-            type="number"
             name="newKm"
             value={inputKm}
             onChange={(e) => setInputKm(Number(e.target.value))}
+            onFocus={(e) => e.target.select()}
             disabled={isPending}
             className="flex-1 text-center"
           />

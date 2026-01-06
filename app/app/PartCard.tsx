@@ -54,19 +54,23 @@ export default function PartCard({
   return (
     <Card className="mt-4">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-medium">
-          {partName}
-        </CardTitle>
+        <CardTitle className="text-base font-medium">{partName}</CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-3">
-        <Progress value={progressPercent} />
+        <Progress
+          value={progressPercent}
+          className={
+            progressPercent >= 90
+              ? "[&>div]:bg-red-500"
+              : progressPercent >= 70
+              ? "[&>div]:bg-yellow-500"
+              : ""
+          }
+        />
 
         <div className="text-sm text-muted-foreground">
-          Zużycie:{" "}
-          <span className="font-medium text-foreground">
-            {wearKm}
-          </span>{" "}
+          Zużycie: <span className="font-medium text-foreground">{wearKm}</span>{" "}
           / {expectedKm} km
         </div>
 
@@ -74,11 +78,7 @@ export default function PartCard({
       </CardContent>
 
       <CardFooter className="justify-end">
-        <Button
-          variant="outline"
-          onClick={handleReplace}
-          disabled={isPending}
-        >
+        <Button variant="outline" onClick={handleReplace} disabled={isPending}>
           {isPending ? "Wymieniam..." : "🔄 Wymień"}
         </Button>
       </CardFooter>
