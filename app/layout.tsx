@@ -3,6 +3,12 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { JetBrains_Mono } from "next/font/google";
+
+const font = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 const fontSans = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -19,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pl" className={fontSans.variable}>
+    <html lang="pl" className={font.variable}>
       <body className="antialiased">
         <Providers>{children}</Providers>
       </body>

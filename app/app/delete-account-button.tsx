@@ -6,11 +6,6 @@ export default function DeleteAccountButton() {
   return (
     <form
       action={deleteAccount}
-      onSubmit={(e) => {
-        if (!confirm("Na pewno chcesz usunąć konto? Tej operacji nie można cofnąć.")) {
-          e.preventDefault();
-        }
-      }}
     >
       <button
         type="submit"
