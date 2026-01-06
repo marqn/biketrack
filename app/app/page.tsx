@@ -66,6 +66,7 @@ export default async function AppPage() {
     [PartType.PADS_REAR]: "🧱➡️ | Klocki tył",
     [PartType.TIRE_FRONT]: "🛞⬅️ | Opona przód",
     [PartType.TIRE_REAR]: "🛞➡️ | Opona tył",
+    [PartType.CHAINRING_1X]: "🦀 | Zębatka 1x",
     [PartType.HANDLEBAR_TAPE]: "🪢 | Taśma kierownicy",
     [PartType.SUSPENSION_FORK]: "🪵 | Wspornik zawieszenia",
     [PartType.DROPPER_POST]: "🪵 | Sztyca regulowana",
