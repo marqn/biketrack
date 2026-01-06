@@ -76,7 +76,6 @@ export default function PartCard({
       <CardFooter className="justify-end">
         <Button
           variant="outline"
-          size="sm"
           onClick={handleReplace}
           disabled={isPending}
         >

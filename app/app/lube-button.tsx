@@ -38,11 +38,16 @@ export default function LubeButton({
     <div className="flex flex-col gap-2">
       <div className="flex justify-between items-center">
         <span>{kmSinceLube} km od ostatniego smarowania</span>
-        <Button size="sm" onClick={action} disabled={isPending}>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={action}
+          disabled={isPending}
+        >
           {isPending ? "Smarowanie..." : "🛢️ Smaruj"}
         </Button>
       </div>
-      <Progress value={progressPercent}  />
+      <Progress value={progressPercent} />
     </div>
   );
 }

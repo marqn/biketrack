@@ -52,7 +52,7 @@ export default function KmForm({ bikeId, initialKm }: Props) {
             className="flex-1"
           />
 
-          <Button disabled={isPending} size="sm">
+          <Button disabled={isPending} variant="outline">
             {isPending ? "Zapisuję..." : "💾 Zapisz km"}
           </Button>
         </div>
