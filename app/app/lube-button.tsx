@@ -44,7 +44,7 @@ export default function LubeButton({
           onClick={action}
           disabled={isPending}
         >
-          {isPending ? "Smarowanie..." : "🛢️ Smaruj"}
+          {isPending ? "Smarowanie..." : "💧 Smaruj"}
         </Button>
       </div>
       <ColoredProgress value={progressPercent} />

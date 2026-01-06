@@ -57,7 +57,7 @@ export default async function AppPage() {
         <KmForm bikeId={user.bikes[0].id} initialKm={user.bikes[0].totalKm} />
 
         <PartCard
-          partName={`🔗 Łańcuch`}
+          partName={`⛓️ Łańcuch`}
           wearKm={chain.wearKm} // tutaj był błąd
           expectedKm={chain.expectedKm}
           bikeId={bike.id}
@@ -71,14 +71,14 @@ export default async function AppPage() {
         </PartCard>
 
         <PartCard
-          partName={`🔗 Klocki Hamulcowe przód`}
+          partName={`🧱⬅️ Klocki Hamulcowe przód`}
           wearKm={padsFront.wearKm}
           expectedKm={padsFront.expectedKm}
           bikeId={bike.id}
           partType={PartType.PADS_FRONT}
         />
         <PartCard
-          partName={`🔗 Klocki Hamulcowe tył`}
+          partName={`🧱➡️ Klocki Hamulcowe tył`}
           wearKm={padsRear.wearKm}
           expectedKm={padsFront.expectedKm}
           bikeId={bike.id}

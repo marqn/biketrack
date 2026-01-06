@@ -13,6 +13,7 @@ import {
   CardTitle,
   CardContent,
   CardFooter,
+  CardAction,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ColoredProgress from "@/components/ui/colored-progress";
@@ -55,24 +56,31 @@ export default function PartCard({
     <Card className="mt-4">
       <CardHeader className="pb-2">
         <CardTitle className="text-base font-medium">{partName}</CardTitle>
+        {progressPercent >= 100 && <CardAction>🚨</CardAction>}
       </CardHeader>
 
       <CardContent className="space-y-3">
         <ColoredProgress value={progressPercent} />
 
-        <div className="text-sm text-muted-foreground">
-          Zużycie: <span className="font-medium text-foreground">{wearKm}</span>{" "}
-          / {expectedKm} km
-        </div>
+        <div className="text-sm text-muted-foreground items-center flex justify-between">
+          <span>
+            Zużycie:{" "}
+            <span className="font-medium text-foreground">{wearKm}</span>
+            {" km "}/ {expectedKm} km
+          </span>
 
-        {children}
+          <Button
+            size={"sm"}
+            variant="outline"
+            onClick={handleReplace}
+            disabled={isPending}
+          >
+            {isPending ? "Wymieniam..." : "🔄 Wymień"}
+          </Button>
+        </div>
       </CardContent>
 
-      <CardFooter className="justify-end">
-        <Button variant="outline" onClick={handleReplace} disabled={isPending}>
-          {isPending ? "Wymieniam..." : "🔄 Wymień"}
-        </Button>
-      </CardFooter>
+      <CardContent className="space-y-3">{children}</CardContent>
     </Card>
   );
 }
