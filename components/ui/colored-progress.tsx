@@ -1,4 +1,5 @@
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "./badge";
 
 interface ColoredProgressProps {
   value: number;
@@ -24,14 +25,10 @@ export default function ColoredProgress({
     <div className="relative">
       <Progress value={value} className={`${colorClass} ${className}`} />
       {showPercentage && (
-        <span 
+        <span
           className="absolute inset-0 flex items-center justify-center text-xs font-bold z-10 pointer-events-none"
-          style={{ 
-            textShadow: '0 0 3px black, 0 0 3px black',
-            color: 'white'
-          }}
         >
-          {Math.round(value)}%
+          <Badge variant="secondary">{Math.round(value)}%</Badge>
         </span>
       )}
     </div>

@@ -76,13 +76,13 @@ export default async function AppPage() {
   return (
     <>
       <main style={styles.container}>
-        <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
           <span>Typ roweru: {bike.type}</span>
-          <LogoutButton />
-          <DeleteAccountButton />
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <LogoutButton />
+            <DeleteAccountButton />
+          </div>
         </div>
-
-        
 
         <KmForm bikeId={user.bikes[0].id} initialKm={user.bikes[0].totalKm} />
 
