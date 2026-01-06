@@ -50,15 +50,7 @@ export default function OnboardingClient() {
                 key={type}
                 value={type}
                 onClick={() => handleSelect(type)}
-                className="
-                  h-20
-                  text-lg
-                  flex
-                  items-center
-                  justify-center
-                  text-center
-                  rounded-xl
-                "
+                className="h-20 text-lg flex items-center justify-center text-center rounded-xl"
               >
                 {bikeTypeLabels[type]}
               </ToggleGroupItem>
