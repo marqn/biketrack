@@ -1,9 +1,21 @@
 "use client";
 
+import * as React from "react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+
 import { replacePart } from "./actions/replace-part";
 import { PartType } from "@/lib/generated/prisma";
+
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 
 export default function PartCard({
   partName,
@@ -23,45 +35,54 @@ export default function PartCard({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  async function handleReplace() {
+  const progressPercent = Math.min(
+    Math.round((wearKm / expectedKm) * 100),
+    100
+  );
+
+  function handleReplace() {
     const formData = new FormData();
     formData.set("bikeId", bikeId);
     formData.set("partType", partType);
 
     startTransition(async () => {
       await replacePart(formData);
-      router.refresh(); // 🔑 aktualizacja UI
+      router.refresh();
     });
   }
 
-  const progressPercent = Math.min((wearKm / expectedKm) * 100, 100);
-
   return (
-    <section style={{ border: "1px solid #ddd", padding: 16, borderRadius: 8, marginTop: 16 }}>
-      <h3>{partName}</h3>
-      <div style={{ background: "#eee", borderRadius: 4, height: 12, margin: "8px 0" }}>
-        <div
-          style={{
-            width: `${progressPercent}%`,
-            background: "#4caf50",
-            height: "100%",
-            borderRadius: 4,
-          }}
-        />
-      </div>
-      <p>
-        Zużycie: {wearKm} / {expectedKm} km
-      </p>
+    <Card className="mt-4">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base font-medium">
+          {partName}
+        </CardTitle>
+      </CardHeader>
 
-      {children}
+      <CardContent className="space-y-3">
+        <Progress value={progressPercent} />
 
-      <button
-        onClick={handleReplace}
-        disabled={isPending}
-        style={{ marginTop: 8 }}
-      >
-        {isPending ? "Wymieniam..." : "🔄 Wymień"}
-      </button>
-    </section>
+        <div className="text-sm text-muted-foreground">
+          Zużycie:{" "}
+          <span className="font-medium text-foreground">
+            {wearKm}
+          </span>{" "}
+          / {expectedKm} km
+        </div>
+
+        {children}
+      </CardContent>
+
+      <CardFooter className="justify-end">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleReplace}
+          disabled={isPending}
+        >
+          {isPending ? "Wymieniam..." : "🔄 Wymień"}
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }

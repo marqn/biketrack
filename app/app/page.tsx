@@ -36,8 +36,12 @@ export default async function AppPage() {
   const padsFront = user.bikes[0].parts.find(
     (p) => p.type === PartType.PADS_FRONT
   );
+  const padsRear = user.bikes[0].parts.find(
+    (p) => p.type === PartType.PADS_REAR
+  );
   if (!chain) return null;
   if (!padsFront) return null;
+  if (!padsRear) return null;
 
   const bike = user.bikes[0];
   const lastLube = bike.services[0];
@@ -56,7 +60,7 @@ export default async function AppPage() {
         </section>
 
         <PartCard
-          partName={`🔗 Łańcuch (${chain.expectedKm} km)`}
+          partName={`🔗 Łańcuch`}
           wearKm={chain.wearKm} // tutaj był błąd
           expectedKm={chain.expectedKm}
           bikeId={bike.id}
@@ -70,14 +74,19 @@ export default async function AppPage() {
         </PartCard>
 
         <PartCard
-          partName={`🔗 Klocki Hamulcowe przód (${padsFront.expectedKm} km)`}
+          partName={`🔗 Klocki Hamulcowe przód`}
           wearKm={padsFront.wearKm}
           expectedKm={padsFront.expectedKm}
           bikeId={bike.id}
           partType={PartType.PADS_FRONT}
-        >
-          {/* <FillTubelessButton bikeId={user.bikes[0].id} /> */}
-        </PartCard>
+        />
+        <PartCard
+          partName={`🔗 Klocki Hamulcowe tył`}
+          wearKm={padsRear.wearKm}
+          expectedKm={padsFront.expectedKm}
+          bikeId={bike.id}
+          partType={PartType.PADS_REAR}
+        />
       </main>
 
       {/* <BikeMaintenanceApp /> */}
