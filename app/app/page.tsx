@@ -39,9 +39,22 @@ export default async function AppPage() {
   const padsRear = user.bikes[0].parts.find(
     (p) => p.type === PartType.PADS_REAR
   );
+  const cassette = user.bikes[0].parts.find(
+    (p) => p.type === PartType.CASSETTE
+  );
+  const tire_front = user.bikes[0].parts.find(
+    (p) => p.type === PartType.TIRE_FRONT
+  );
+  const tire_rear = user.bikes[0].parts.find(
+    (p) => p.type === PartType.TIRE_REAR
+  );
   if (!chain) return null;
   if (!padsFront) return null;
   if (!padsRear) return null;
+  if (!cassette) return null;
+  console.log("TIRE FRONT:", tire_front);
+  if (!tire_front) return null;
+  if (!tire_rear) return null;
 
   const bike = user.bikes[0];
   const lastLube = bike.services[0];
@@ -69,6 +82,30 @@ export default async function AppPage() {
             lastLubeKmInitial={lastLube?.kmAtTime}
           />
         </PartCard>
+
+        <PartCard
+          partName={`⚙️ | Kaseta`}
+          wearKm={cassette.wearKm}
+          expectedKm={cassette.expectedKm}
+          bikeId={bike.id}
+          partType={PartType.CASSETTE}
+        />
+
+        <PartCard
+          partName={`🛞 | Opona przód`}
+          wearKm={tire_front.wearKm}
+          expectedKm={tire_front.expectedKm}
+          bikeId={bike.id}
+          partType={PartType.TIRE_FRONT}
+        />
+
+        <PartCard
+          partName={`🛞 | Opona tył`}
+          wearKm={tire_rear.wearKm}
+          expectedKm={tire_rear.expectedKm}
+          bikeId={bike.id}
+          partType={PartType.TIRE_REAR}
+        />
 
         <PartCard
           partName={`🧱⬅️ | Klocki hamulcowe przód`}
