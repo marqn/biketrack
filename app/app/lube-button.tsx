@@ -43,6 +43,7 @@ export default function LubeButton({
           variant="outline"
           onClick={action}
           disabled={isPending}
+          className="text-muted-foreground"
         >
           {isPending ? "Smarowanie..." : "💧 Smaruj"}
         </Button>
