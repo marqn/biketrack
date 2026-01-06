@@ -49,3 +49,18 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.SUSPENSION_SEATPOST, expectedKm: 10000 },
   ],
 };
+
+  export const PART_UI = {
+    [PartType.CHAIN]: "⛓️ | Łańcuch",
+    [PartType.CASSETTE]: "⚙️ | Kaseta",
+    [PartType.PADS_FRONT]: "🧱⬅️ | Klocki przód",
+    [PartType.PADS_REAR]: "🧱➡️ | Klocki tył",
+    [PartType.TIRE_FRONT]: "🛞⬅️ | Opona przód",
+    [PartType.TIRE_REAR]: "🛞➡️ | Opona tył",
+    [PartType.CHAINRING_1X]: "🦀 | Zębatka 1x",
+    [PartType.HANDLEBAR_TAPE]: "🪢 | Owijka kierownicy",
+    [PartType.SUSPENSION_FORK]: "🪵 | Wspornik zawieszenia",
+    [PartType.DROPPER_POST]: "🪵 | Sztyca regulowana",
+    [PartType.TUBELESS_SEALANT]: "🧼 | Mleko do opon bezdentkowych",
+    [PartType.SUSPENSION_SEATPOST]: "🪵 | Siedzenie z zawieszeniem",
+  };
