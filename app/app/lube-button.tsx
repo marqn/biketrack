@@ -4,7 +4,7 @@ import { useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { addChainLube } from "./actions/add-chain-lube";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import ColoredProgress from "@/components/ui/colored-progress";
 
 export default function LubeButton({
   bikeId,
@@ -47,7 +47,7 @@ export default function LubeButton({
           {isPending ? "Smarowanie..." : "🛢️ Smaruj"}
         </Button>
       </div>
-      <Progress value={progressPercent} />
+      <ColoredProgress value={progressPercent} />
     </div>
   );
 }

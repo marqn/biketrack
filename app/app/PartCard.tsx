@@ -15,7 +15,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import ColoredProgress from "@/components/ui/colored-progress";
 
 export default function PartCard({
   partName,
@@ -58,16 +58,7 @@ export default function PartCard({
       </CardHeader>
 
       <CardContent className="space-y-3">
-        <Progress
-          value={progressPercent}
-          className={
-            progressPercent >= 90
-              ? "[&>div]:bg-red-500"
-              : progressPercent >= 70
-              ? "[&>div]:bg-yellow-500"
-              : ""
-          }
-        />
+        <ColoredProgress value={progressPercent} />
 
         <div className="text-sm text-muted-foreground">
           Zużycie: <span className="font-medium text-foreground">{wearKm}</span>{" "}
