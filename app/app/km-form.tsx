@@ -70,7 +70,7 @@ export default function KmForm({ bikeId, initialKm }: Props) {
   return (
     <Card className="mt-4 mx-auto max-w-md">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-medium">
+        <CardTitle className="text-sm">
           🚲 Aktualny przebieg roweru
         </CardTitle>
       </CardHeader>

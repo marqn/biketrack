@@ -83,6 +83,10 @@
   --sidebar-ring: oklch(0.62 0.24 264);
 }
 
+body {
+  scrollbar-gutter: stable;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

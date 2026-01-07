@@ -10,6 +10,7 @@ import KmForm from "./km-form";
 import PartCard from "./PartCard";
 import { PartType, ServiceType } from "@/lib/generated/prisma";
 import { DEFAULT_PARTS, PART_UI } from "@/lib/default-parts";
+import { BikeHeader } from "./bike-header";
 
 export default async function AppPage() {
   const session = await getServerSession(authOptions);
@@ -34,45 +35,40 @@ export default async function AppPage() {
   if (!user?.bikes?.[0]) redirect("/onboarding");
 
   const chain = user.bikes[0].parts.find((p) => p.type === PartType.CHAIN);
-  const padsFront = user.bikes[0].parts.find(
-    (p) => p.type === PartType.PADS_FRONT
-  );
-  const padsRear = user.bikes[0].parts.find(
-    (p) => p.type === PartType.PADS_REAR
-  );
-  const cassette = user.bikes[0].parts.find(
-    (p) => p.type === PartType.CASSETTE
-  );
-  const tire_front = user.bikes[0].parts.find(
-    (p) => p.type === PartType.TIRE_FRONT
-  );
-  const tire_rear = user.bikes[0].parts.find(
-    (p) => p.type === PartType.TIRE_REAR
-  );
-  if (!chain) return null;
-  if (!padsFront) return null;
-  if (!padsRear) return null;
-  if (!cassette) return null;
-  if (!tire_front) return null;
-  if (!tire_rear) return null;
 
   const bike = user.bikes[0];
   const lastLube = bike.services[0];
+
+  const headerBike = {
+    id: bike.id,
+    name: bike.type,
+    totalKm: bike.totalKm,
+    syncStatus: "synced", // TODO: z DB
+  };
+
+  const headerBikes = user.bikes.map((b) => ({
+    id: b.id,
+    name: b.type,
+    totalKm: b.totalKm,
+    syncStatus: "synced",
+  }));
 
   return (
     <>
       <main className="container mx-auto px-2 pt-24 pb-2 space-y-6">
         {
           // tu dodaj <BikeHeader>
+          <BikeHeader
+            bike={headerBike}
+            bikes={headerBikes}
+            user={{
+              name: user.name!,
+              email: user.email!,
+              image: user.image,
+              plan: user.plan,
+            }}
+          />
         }
-
-        <div className="flex justify-between items-center mb-4">
-          <span>Typ roweru: {bike.type}</span>
-          <div className="flex gap-2 items-center">
-            <LogoutButton />
-            <DeleteAccountButton />
-          </div>
-        </div>
 
         <KmForm bikeId={user.bikes[0].id} initialKm={user.bikes[0].totalKm} />
 
@@ -115,17 +111,3 @@ export default async function AppPage() {
     </>
   );
 }
-
-const styles = {
-  container: {
-    padding: 24,
-    maxWidth: 480,
-    margin: "0 auto",
-  },
-  card: {
-    marginTop: 24,
-    padding: 16,
-    border: "1px solid #ddd",
-    borderRadius: 8,
-  },
-};

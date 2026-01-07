@@ -61,6 +61,6 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     [PartType.HANDLEBAR_TAPE]: "🪢 | Owijka kierownicy",
     [PartType.SUSPENSION_FORK]: "🪵 | Wspornik zawieszenia",
     [PartType.DROPPER_POST]: "🪵 | Sztyca regulowana",
-    [PartType.TUBELESS_SEALANT]: "🧼 | Mleko do opon bezdentkowych",
+    [PartType.TUBELESS_SEALANT]: "🧼 | Mleko do opon bezdętkowych",
     [PartType.SUSPENSION_SEATPOST]: "🪵 | Siedzenie z zawieszeniem",
   };

@@ -1,9 +1,4 @@
-export interface User {
-  id: string
-  name: string
-  email: string
-  plan: "free" | "premium"
-}
+
 
 export interface Bike {
   id: string

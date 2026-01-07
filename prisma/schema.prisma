@@ -8,12 +8,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Plan {
+  FREE
+  PREMIUM
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
   emailVerified DateTime? @map("email_verified")
   image         String?
+  plan          Plan      @default(FREE)
   accounts      Account[]
   sessions      Session[]
   bikes         Bike[]
@@ -52,7 +58,11 @@ enum BikeType {
   MTB
   OTHER
 }
-
+enum SyncStatus {
+  synced
+  syncing
+  error
+}
 enum PartType {
   CHAIN
   CASSETTE

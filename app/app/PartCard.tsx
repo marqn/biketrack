@@ -12,7 +12,6 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-  CardFooter,
   CardAction,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -55,7 +54,7 @@ export default function PartCard({
   return (
     <Card className="mt-4">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-medium">{partName}</CardTitle>
+        <CardTitle className="text-sm">{partName}</CardTitle>
         {progressPercent >= 100 && <CardAction>🚨</CardAction>}
       </CardHeader>
 

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import type { User } from "@/lib/types"
+import { Plan } from "@/lib/generated/prisma"
 
 interface Bike {
   id: string
@@ -125,10 +125,10 @@ export function BikeHeader({ bike, bikes, onBikeChange, user, onLogout, onUpgrad
                     <div className="flex items-center gap-2">
                       <p className="text-xs text-muted-foreground">{user.email}</p>
                       <Badge
-                        variant={user.plan === "premium" ? "default" : "secondary"}
+                        variant={user.plan === Plan.PREMIUM ? "default" : "secondary"}
                         className="text-[10px] px-1 py-0"
                       >
-                        {user.plan === "premium" ? "Premium" : "Free"}
+                        {user.plan === Plan.PREMIUM ? Plan.PREMIUM : Plan.FREE}
                       </Badge>
                     </div>
                   </div>
@@ -138,7 +138,7 @@ export function BikeHeader({ bike, bikes, onBikeChange, user, onLogout, onUpgrad
                   <UserIcon className="mr-2 h-4 w-4" />
                   <span>Profil</span>
                 </DropdownMenuItem>
-                {user.plan === "free" && (
+                {user.plan === Plan.FREE && (
                   <DropdownMenuItem onClick={onUpgrade}>
                     <CreditCard className="mr-2 h-4 w-4" />
                     <span>Przejdź na Premium</span>

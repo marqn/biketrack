@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { deleteAccount } from "./actions/delete-account";
 
 export default function DeleteAccountButton() {
+  const handleDeleteAccount = async () => {
+    await deleteAccount();
+  };
+
   return (
-    <form action={deleteAccount}>
-      <Button size={"sm"} variant="destructive">
-        🗑️ Usuń konto
-      </Button>
-    </form>
+    <Button size={"sm"} variant="destructive" onClick={handleDeleteAccount}>
+      🗑️ Usuń konto
+    </Button>
   );
 }

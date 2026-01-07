@@ -611,14 +611,14 @@ export function BikeMaintenanceApp() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* <BikeHeader
+      <BikeHeader
         bike={selectedBike}
         bikes={availableBikes}
         onBikeChange={handleBikeChange}
         user={user}
         onLogout={handleLogout}
         onUpgrade={() => setShowPaywall(true)}
-      /> */}
+      />
 
       <main className="container mx-auto px-4 pt-24 pb-8 space-y-6">
         <AlertsSection components={bikeComponents} />
