@@ -12,6 +12,7 @@ import {
   Delete,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +22,14 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
@@ -42,6 +51,8 @@ interface BikeHeaderProps {
 
 export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
   const router = useRouter();
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const syncIcon: Record<SyncStatus, JSX.Element> = {
     synced: <Wifi className="h-4 w-4 text-emerald-500" />,
@@ -64,11 +75,12 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
 
   const handleDeleteAccount = async () => {
     await deleteAccount();
+    setIsDeleteDialogOpen(false);
   };
 
   return (
     <header className="fixed top-0 left-0 z-50 w-screen border-b bg-card">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+      <div className="container mx-auto px-8 py-3 flex items-center justify-between">
         {/* BIKE SWITCHER */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -117,9 +129,13 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
             </span> */}
           </div>
 
-          <DropdownMenu>
+          <DropdownMenu open={isUserMenuOpen} onOpenChange={setIsUserMenuOpen}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="p-0">
+              <Button 
+                variant="ghost" 
+                className="p-0"
+                onMouseEnter={() => setIsUserMenuOpen(true)}
+              >
                 <Avatar className="h-9 w-9">
                   <AvatarImage src={user.image ?? undefined} />
                   <AvatarFallback>{initials}</AvatarFallback>
@@ -127,7 +143,11 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent 
+              align="end" 
+              className="w-56"
+              onMouseLeave={() => setIsUserMenuOpen(false)}
+            >
               <div className="p-2 ">
                 <p className="text-sm font-medium justify-center">
                   {user.name}{" "}
@@ -165,7 +185,7 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
                 <LogOut className="mr-2 h-4 w-4" />
                 Wyloguj
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleDeleteAccount}>
+              <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)}>
                 <Delete className="mr-2 h-4 w-4" />
                 Usuń konto
               </DropdownMenuItem>
@@ -173,6 +193,32 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
           </DropdownMenu>
         </div>
       </div>
+
+      {/* DELETE ACCOUNT DIALOG */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Czy na pewno chcesz usunąć konto?</DialogTitle>
+            <DialogDescription>
+              Ta akcja jest nieodwracalna. Wszystkie Twoje dane, w tym rowery i historia serwisów, zostaną trwale usunięte.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Anuluj
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteAccount}
+            >
+              Usuń konto
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }
