@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ColoredProgress from "@/components/ui/colored-progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function PartCard({
   partName,
@@ -32,6 +33,7 @@ export default function PartCard({
   partType: PartType;
   children?: React.ReactNode;
 }) {
+  const [activeDialog, setActiveDialog] = React.useState<DialogType>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -54,7 +56,17 @@ export default function PartCard({
   return (
     <Card className="mt-4">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm">{partName}</CardTitle>
+        <CardTitle className="text-base">
+          {partName}
+          <p>
+            <button
+              onClick={() => setActiveDialog("bike-details")} // lub jak nazwiesz ten dialog
+              className="text-xs text-muted-foreground relative after:absolute after:bottom-0 after:left-1/2 after:h-[2px] after:w-0 after:bg-current after:transition-all after:duration-300 after:-translate-x-1/2 hover:after:w-full cursor-pointer"
+            >
+              Shimano GRX 820, 48/31
+            </button>
+          </p>
+        </CardTitle>
         {progressPercent >= 100 && <CardAction>🚨</CardAction>}
       </CardHeader>
 
@@ -80,6 +92,19 @@ export default function PartCard({
       </CardContent>
 
       <CardContent className="space-y-3">{children}</CardContent>
+
+      {/* Dialog */}
+      <Dialog
+        open={activeDialog === "bike-details"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Szczegóły roweru</DialogTitle>
+          </DialogHeader>
+          {/* Treść dialogu */}
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
