@@ -39,11 +39,21 @@ import {
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-import { Bike, Plan } from "@/lib/generated/prisma";
+import { Bike, BikeType, Plan } from "@/lib/generated/prisma";
 import { JSX } from "react";
 import { signOut } from "next-auth/react";
 import { deleteAccount } from "./actions/delete-account";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { bikeTypeLabels } from "../onboarding/OnboardingClient";
 
 interface BikeHeaderProps {
   bike: Bike;
@@ -52,14 +62,33 @@ interface BikeHeaderProps {
     name: string;
     email: string;
     image?: string | null;
-    plan: Plan;
+    // plan: Plan;
   };
 }
 
-export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
+type DialogType = "delete-account" | "rename-bike" | null;
+
+type MenuItemType = {
+  name: string;
+  path?: string;
+  dialog?: DialogType;
+};
+
+const menuItems: MenuItemType[] = [
+  { name: "Twój rower", path: "/app" },
+  { name: "Zmień Nazwę", dialog: "rename-bike" },
+  { name: "Test", path: "/app/test" },
+];
+
+export function BikeHeader({ bike, user }: BikeHeaderProps) {
   const router = useRouter();
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [activeDialog, setActiveDialog] = useState<DialogType>(null);
   const [hasSeenTooltip, setHasSeenTooltip] = useState(false);
+  const [newBikeName, setNewBikeName] = useState(bike.name);
+
+  const [bikeBrand, setBikeBrand] = useState(bike.brand ?? "");
+  const [bikeModel, setBikeModel] = useState(bike.model ?? "");
+  const [bikeType, setBikeType] = useState<BikeType | "">(bike.type ?? "");
 
   const syncIcon: Record<SyncStatus, JSX.Element> = {
     synced: <Wifi className="h-4 w-4 text-emerald-500" />,
@@ -80,9 +109,23 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
     .slice(0, 2)
     .toUpperCase();
 
+  const handleMenuClick = (item: MenuItemType) => {
+    if (item.dialog) {
+      setActiveDialog(item.dialog);
+    } else if (item.path) {
+      router.push(item.path);
+    }
+  };
+
   const handleDeleteAccount = async () => {
     await deleteAccount();
-    setIsDeleteDialogOpen(false);
+    setActiveDialog(null);
+  };
+
+  const handleRenameBike = async () => {
+    // TODO: Dodaj akcję do zmiany nazwy roweru
+    console.log("Nowa nazwa:", newBikeName);
+    setActiveDialog(null);
   };
 
   return (
@@ -113,16 +156,14 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
                   </DropdownMenuTrigger>
 
                   <DropdownMenuContent align="start" className="w-64">
-                    <DropdownMenuItem
-                      onClick={() => console.log("change bike")}
-                    >
-                      Zmień nazwę
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => console.log("change bike")}
-                    >
-                      Zmień rower
-                    </DropdownMenuItem>
+                    {menuItems.map((item) => (
+                      <DropdownMenuItem
+                        key={item.name}
+                        onClick={() => handleMenuClick(item)}
+                      >
+                        {item.name}
+                      </DropdownMenuItem>
+                    ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -137,9 +178,6 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-sm">
             {syncIcon[bike.syncStatus]}
-            {/* <span className="hidden sm:inline text-muted-foreground">
-              {syncText[bike.syncStatus]}
-            </span> */}
           </div>
 
           <DropdownMenu>
@@ -157,13 +195,8 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
               <div className="p-2 ">
                 <p className="text-sm font-medium justify-center">
                   {user.name}{" "}
-                  <Badge
-                    className="mt-1"
-                    variant={
-                      user.plan === Plan.PREMIUM ? "default" : "secondary"
-                    }
-                  >
-                    {user.plan}
+                  <Badge className="mt-1" variant={"default"}>
+                    FREE
                   </Badge>
                 </p>
                 <p className="text-xs text-muted-foreground">{user.email}</p>
@@ -176,12 +209,12 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
                 Profil
               </DropdownMenuItem>
 
-              {user.plan === Plan.FREE && (
+              {/* {user.plan === Plan.FREE && ( */}
                 <DropdownMenuItem onClick={() => router.push("/upgrade")}>
                   <CreditCard className="mr-2 h-4 w-4" />
                   Premium
                 </DropdownMenuItem>
-              )}
+              {/* )} */}
 
               <DropdownMenuSeparator />
 
@@ -191,7 +224,9 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
                 <LogOut className="mr-2 h-4 w-4" />
                 Wyloguj
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)}>
+              <DropdownMenuItem
+                onClick={() => setActiveDialog("delete-account")}
+              >
                 <Delete className="mr-2 h-4 w-4" />
                 Usuń konto
               </DropdownMenuItem>
@@ -200,22 +235,103 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
         </div>
       </div>
 
-      {/* DELETE ACCOUNT DIALOG */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      {/* RENAME BIKE DIALOG */}
+      <Dialog
+        open={activeDialog === "rename-bike"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+      >
         <DialogContent>
           <DialogHeader>
-            <p className="text-center"><AlertCircle className="text-destructive w-10 h-20 inline" /></p>
-            <DialogTitle className="text-xl text-center">Czy na pewno chcesz usunąć swoje konto?</DialogTitle>
+            <DialogTitle>Zmień nazwę roweru</DialogTitle>
+            <DialogDescription>
+              Nazwa jest wymagana. Marka i model są opcjonalne, ale pomagają w
+              dopasowaniu komponentów.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* NAZWA */}
+            <div className="space-y-2">
+              <Label htmlFor="bike-name">Nazwa roweru</Label>
+              <Input
+                id="bike-name"
+                value={newBikeName}
+                onChange={(e) => setNewBikeName(e.target.value)}
+                placeholder="Mój rower"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="bike-type">Typ roweru (opcjonalnie)</Label>
+              <Select
+                value={bikeType}
+                onValueChange={(value) => setBikeType(value as BikeType)}
+              >
+                <SelectTrigger id="bike-type">
+                  <SelectValue placeholder="Wybierz typ roweru" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(bikeTypeLabels).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* MARKA + MODEL */}
+            <div className="space-y-2">
+              <Label>Marka (opcjonalnie)</Label>
+              <Input
+                value={bikeBrand}
+                onChange={(e) => setBikeBrand(e.target.value)}
+                placeholder="Cannondale"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Model (opcjonalnie)</Label>
+              <Input
+                value={bikeModel}
+                onChange={(e) => setBikeModel(e.target.value)}
+                placeholder="Topstone Carbon LTD Di2"
+              />
+              <p className="text-xs text-muted-foreground">
+                Dzięki temu będziemy mogli zaproponować konkretne komponenty
+                (np. korba, przerzutki, kaseta) dopasowane do tego modelu.
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setActiveDialog(null)}>
+              Anuluj
+            </Button>
+            <Button onClick={handleRenameBike}>Zapisz</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* DELETE ACCOUNT DIALOG */}
+      <Dialog
+        open={activeDialog === "delete-account"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <p className="text-center">
+              <AlertCircle className="text-destructive w-10 h-20 inline" />
+            </p>
+            <DialogTitle className="text-xl text-center">
+              Czy na pewno chcesz usunąć swoje konto?
+            </DialogTitle>
             <DialogDescription className="py-2 text-center">
               Ta akcja jest nieodwracalna. Wszystkie Twoje dane, w tym rowery i
               historia serwisów, zostaną trwale usunięte.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsDeleteDialogOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setActiveDialog(null)}>
               Anuluj
             </Button>
             <Button variant="destructive" onClick={handleDeleteAccount}>

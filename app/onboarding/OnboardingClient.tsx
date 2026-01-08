@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-const bikeTypeLabels: Record<BikeType, string> = {
+export const bikeTypeLabels: Record<BikeType, string> = {
   ROAD: "🚴 Szosa",
   GRAVEL: "🚵 Gravel",
   MTB: "🚵‍♂️ MTB",
