@@ -30,6 +30,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
@@ -51,8 +57,8 @@ interface BikeHeaderProps {
 
 export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
   const router = useRouter();
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [hasSeenTooltip, setHasSeenTooltip] = useState(false);
 
   const syncIcon: Record<SyncStatus, JSX.Element> = {
     synced: <Wifi className="h-4 w-4 text-emerald-500" />,
@@ -82,43 +88,56 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
     <header className="fixed top-0 left-0 z-50 w-screen border-b bg-card">
       <div className="container mx-auto px-8 py-3 flex items-center justify-between">
         {/* BIKE SWITCHER */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="p-0 h-auto">
-              <div className="text-left">
-                <div className="flex items-center gap-2">
-                  <h1 className="text-lg font-semibold">{bike.name}</h1>
-                  {bikes.length > 1 && (
-                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {bike.totalKm.toLocaleString("pl-PL")} km
-                </p>
-              </div>
-            </Button>
-          </DropdownMenuTrigger>
+        <TooltipProvider>
+          <Tooltip
+          open={!hasSeenTooltip}
+            onOpenChange={(open) => {
+              if (!open) setHasSeenTooltip(true);
+            }}>
+            <TooltipTrigger asChild>
+              <div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="p-0 h-auto">
+                      <div className="text-left">
+                        <div className="flex items-center gap-2">
+                          <h1 className="text-lg font-semibold">{bike.name}</h1>
+                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {bike.totalKm.toLocaleString("pl-PL")} km
+                        </p>
+                      </div>
+                    </Button>
+                  </DropdownMenuTrigger>
 
-          {bikes.length > 1 ? (
-            <DropdownMenuContent align="start" className="w-64">
-              {bikes.map((b) => (
-                <DropdownMenuItem
-                  key={b.id}
-                  onClick={() => router.push(`/app/bike/${b.id}`)}
-                  className="flex justify-between"
-                >
-                  <div>
-                    <div className="font-medium">{b.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {b.totalKm.toLocaleString("pl-PL")} km
-                    </div>
-                  </div>
-                  {b.id === bike.id && <Check className="h-4 w-4" />}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          ) : null}
-        </DropdownMenu>
+                  {bikes.length > 1 ? (
+                    <DropdownMenuContent align="start" className="w-64">
+                      {bikes.map((b) => (
+                        <DropdownMenuItem
+                          key={b.id}
+                          onClick={() => router.push(`/app/bike/${b.id}`)}
+                          className="flex justify-between"
+                        >
+                          <div>
+                            <div className="font-medium">{b.name}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {b.totalKm.toLocaleString("pl-PL")} km
+                            </div>
+                          </div>
+                          {b.id === bike.id && <Check className="h-4 w-4" />}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  ) : null}
+                </DropdownMenu>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent >
+              <p>Kliknij, aby zmienić nazwę lub wybrać inny rower</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
         {/* RIGHT SIDE */}
         <div className="flex items-center gap-4">
@@ -129,25 +148,18 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
             </span> */}
           </div>
 
-          <DropdownMenu open={isUserMenuOpen} onOpenChange={setIsUserMenuOpen}>
+          <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                className="p-0"
-                onMouseEnter={() => setIsUserMenuOpen(true)}
-              >
+              <Button variant="ghost" className="p-0">
                 <Avatar className="h-9 w-9">
                   <AvatarImage src={user.image ?? undefined} />
                   <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent 
-              align="end" 
-              className="w-56"
-              onMouseLeave={() => setIsUserMenuOpen(false)}
-            >
+            <DropdownMenuContent align="end" className="w-56">
               <div className="p-2 ">
                 <p className="text-sm font-medium justify-center">
                   {user.name}{" "}
@@ -200,7 +212,8 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
           <DialogHeader>
             <DialogTitle>Czy na pewno chcesz usunąć konto?</DialogTitle>
             <DialogDescription>
-              Ta akcja jest nieodwracalna. Wszystkie Twoje dane, w tym rowery i historia serwisów, zostaną trwale usunięte.
+              Ta akcja jest nieodwracalna. Wszystkie Twoje dane, w tym rowery i
+              historia serwisów, zostaną trwale usunięte.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -210,10 +223,7 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
             >
               Anuluj
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDeleteAccount}
-            >
+            <Button variant="destructive" onClick={handleDeleteAccount}>
               Usuń konto
             </Button>
           </DialogFooter>
