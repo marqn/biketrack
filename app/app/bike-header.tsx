@@ -10,6 +10,7 @@ import {
   LogOut,
   CreditCard,
   Delete,
+  AlertCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -90,7 +91,7 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
         {/* BIKE SWITCHER */}
         <TooltipProvider>
           <Tooltip
-          open={!hasSeenTooltip}
+            open={!hasSeenTooltip}
             onOpenChange={(open) => {
               if (!open) setHasSeenTooltip(true);
             }}>
@@ -111,30 +112,23 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
                     </Button>
                   </DropdownMenuTrigger>
 
-                  {bikes.length > 1 ? (
-                    <DropdownMenuContent align="start" className="w-64">
-                      {bikes.map((b) => (
-                        <DropdownMenuItem
-                          key={b.id}
-                          onClick={() => router.push(`/app/bike/${b.id}`)}
-                          className="flex justify-between"
-                        >
-                          <div>
-                            <div className="font-medium">{b.name}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {b.totalKm.toLocaleString("pl-PL")} km
-                            </div>
-                          </div>
-                          {b.id === bike.id && <Check className="h-4 w-4" />}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  ) : null}
+                  <DropdownMenuContent align="start" className="w-64">
+                    <DropdownMenuItem
+                      onClick={() => console.log("change bike")}
+                    >
+                      Zmień nazwę
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => console.log("change bike")}
+                    >
+                      Zmień rower
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
                 </DropdownMenu>
               </div>
             </TooltipTrigger>
-            <TooltipContent >
-              <p>Kliknij, aby zmienić nazwę lub wybrać inny rower</p>
+            <TooltipContent>
+              <p>Kliknij, aby zmienić nazwę lub dodać inny rower</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -210,8 +204,9 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Czy na pewno chcesz usunąć konto?</DialogTitle>
-            <DialogDescription>
+            <p className="text-center"><AlertCircle className="text-destructive w-10 h-20 inline" /></p>
+            <DialogTitle className="text-xl text-center">Czy na pewno chcesz usunąć swoje konto?</DialogTitle>
+            <DialogDescription className="py-2 text-center">
               Ta akcja jest nieodwracalna. Wszystkie Twoje dane, w tym rowery i
               historia serwisów, zostaną trwale usunięte.
             </DialogDescription>

@@ -33,7 +33,8 @@ export default function OnboardingClient() {
     <main className="min-h-screen flex items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">🚲 Jaki masz rower?</CardTitle>
+          <CardTitle className="text-2xl">Witaj</CardTitle>
+          <CardTitle className="text-2xl">Jaki masz rower ? 🚲</CardTitle>
           <CardDescription className="text-base">
             Wybierz typ roweru, a automatycznie dodamy odpowiednie komponenty do
             śledzenia.
