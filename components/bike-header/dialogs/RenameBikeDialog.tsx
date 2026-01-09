@@ -47,7 +47,6 @@ export function RenameBikeDialog({
   bike,
   onSave,
 }: RenameBikeDialogProps) {
-
   const [name, setName] = useState(bike.name);
   const [brand, setBrand] = useState(bike.brand ?? "");
   const [model, setModel] = useState(bike.model ?? "");
@@ -68,13 +67,13 @@ export function RenameBikeDialog({
 
     setIsLoading(true);
     try {
-      const result = await onSave({ 
-        name, 
-        brand, 
-        model, 
-        type // ← Już nie trzeba konwertować
+      const result = await onSave({
+        name,
+        brand,
+        model,
+        type, // ← Już nie trzeba konwertować
       });
-      
+
       if (result.success) {
         toast({
           title: "Sukces",
@@ -116,8 +115,8 @@ export function RenameBikeDialog({
         <DialogHeader>
           <DialogTitle>Edytuj rower</DialogTitle>
           <DialogDescription>
-            Nazwa i typ roweru są wymagane. Marka i model są opcjonalne, ale pomagają w
-            dopasowaniu komponentów.
+            Nazwa i typ roweru są wymagane. Marka i model są opcjonalne, ale
+            pomagają w dopasowaniu komponentów.
           </DialogDescription>
         </DialogHeader>
 
