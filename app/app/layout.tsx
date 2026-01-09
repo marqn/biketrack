@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
-import { BikeHeader } from "./bike-header";
+import { BikeHeader } from "../../components/bike-header/bike-header";
 
 export default async function RootLayout({
   children,
