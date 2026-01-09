@@ -28,7 +28,7 @@ interface RenameBikeDialogProps {
   onOpenChange: (open: boolean) => void;
   bike: {
     id: string;
-    name: string;
+    name: string | null;
     brand?: string | null;
     model?: string | null;
     type: BikeType; // ← Nie jest nullable
@@ -57,7 +57,7 @@ export function RenameBikeDialog({
   const { toast } = useToast();
 
   const handleSave = async () => {
-    if (!name.trim()) {
+    if (!name?.trim()) {
       toast({
         title: "Błąd",
         description: "Nazwa roweru jest wymagana",
@@ -128,7 +128,7 @@ export function RenameBikeDialog({
             </Label>
             <Input
               id="bike-name"
-              value={name}
+              value={name ?? ""}
               onChange={(e) => setName(e.target.value)}
               placeholder="Mój rower"
               disabled={isLoading}
@@ -192,7 +192,7 @@ export function RenameBikeDialog({
           >
             Anuluj
           </Button>
-          <Button onClick={handleSave} disabled={isLoading || !name.trim()}>
+          <Button onClick={handleSave} disabled={isLoading || !name?.trim()}>
             {isLoading ? "Zapisywanie..." : "Zapisz zmiany"}
           </Button>
         </DialogFooter>

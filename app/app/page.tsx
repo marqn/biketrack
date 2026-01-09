@@ -41,8 +41,8 @@ export default async function AppPage() {
       <div className="grid gap-4 md:grid-cols-2">
         <PartCard
           partName={`⛓️ | Łańcuch`}
-          wearKm={chain.wearKm}
-          expectedKm={chain.expectedKm}
+          wearKm={chain?.wearKm || 0}
+          expectedKm={chain?.expectedKm || 0}
           bikeId={bike.id}
           partType={PartType.CHAIN}
         >

@@ -22,7 +22,7 @@ export interface ProductRating {
 
 export interface ComponentProduct {
   id: string
-  name: string
+  name?: string
   type: string // e.g., "cassette", "chainring", "derailleur", "brake-pads", "tire", "sealant"
   brand?: string
   model?: string

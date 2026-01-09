@@ -49,7 +49,7 @@ interface BikeHeaderProps {
   };
 }
 
-type DialogType = "delete-account" | "rename-bike" | null;
+export type DialogType = "delete-account" | "rename-bike" | "bike-details" | null;
 
 type MenuItemType = {
   name: string;
@@ -69,6 +69,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
   const router = useRouter();
   const [activeDialog, setActiveDialog] = useState<DialogType>(null);
   const [hasSeenTooltip, setHasSeenTooltip] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>("synced");
 
   const syncIcon: Record<SyncStatus, JSX.Element> = {
     synced: <Wifi className="h-4 w-4 text-emerald-500" />,
@@ -159,7 +160,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
         {/* RIGHT SIDE */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-sm">
-            {syncIcon[bike.syncStatus as SyncStatus]}
+            {syncIcon[syncStatus]}
           </div>
 
           <DropdownMenu>
