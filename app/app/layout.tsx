@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
-import { BikeHeader } from "../../components/bike-header/bike-header";
+import { BikeHeader } from "../../components/bike-header/BikeHeader";
 
 export default async function RootLayout({
   children,
@@ -23,7 +23,10 @@ export default async function RootLayout({
     if (user?.bikes?.[0]) {
       const headerBike = {
         id: user.bikes[0].id,
-        name: user.bikes[0].type,
+        name: user.bikes[0].name,
+        type: user.bikes[0].type,
+        brand: user.bikes[0].brand,
+        model: user.bikes[0].model,
         totalKm: user.bikes[0].totalKm,
         syncStatus: "synced",
       };
@@ -39,6 +42,7 @@ export default async function RootLayout({
         bike: headerBike,
         bikes: headerBikes,
         user: {
+          id: user.id,
           name: user.name!,
           email: user.email!,
           image: user.image,

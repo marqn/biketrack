@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Check,
   ChevronDown,
   Wifi,
   WifiOff,
@@ -9,7 +10,6 @@ import {
   LogOut,
   CreditCard,
   Delete,
-  AlertCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -23,14 +23,6 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -38,36 +30,26 @@ import {
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
-import { Bike, BikeType, Plan } from "@/lib/generated/prisma";
+import { Bike, BikeType } from "@/lib/generated/prisma";
 import { JSX } from "react";
 import { signOut } from "next-auth/react";
 import { deleteAccount } from "./actions/delete-account";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { bikeTypeLabels } from "../../app/onboarding/OnboardingClient";
+import { updateBike } from "./actions/update-bike";
 import { RenameBikeDialog, DeleteAccountDialog } from "./dialogs";
 
 interface BikeHeaderProps {
   bike: Bike;
   bikes: Bike[];
   user: {
+    id: string;
     name: string;
     email: string;
     image?: string | null;
-    // plan: Plan;
   };
 }
 
 type DialogType = "delete-account" | "rename-bike" | null;
-
 
 type MenuItemType = {
   name: string;
@@ -77,30 +59,21 @@ type MenuItemType = {
 
 const menuItems: MenuItemType[] = [
   { name: "Twój rower", path: "/app" },
-  { name: "Zmień Nazwę", dialog: "rename-bike" },
+  { name: "Edytuj rower", dialog: "rename-bike" },
   { name: "Test", path: "/app/test" },
 ];
+
+type SyncStatus = "synced" | "syncing" | "error";
 
 export function BikeHeader({ bike, user }: BikeHeaderProps) {
   const router = useRouter();
   const [activeDialog, setActiveDialog] = useState<DialogType>(null);
   const [hasSeenTooltip, setHasSeenTooltip] = useState(false);
-  const [newBikeName, setNewBikeName] = useState(bike.name);
-
-  const [bikeBrand, setBikeBrand] = useState(bike.brand ?? "");
-  const [bikeModel, setBikeModel] = useState(bike.model ?? "");
-  const [bikeType, setBikeType] = useState<BikeType | "">(bike.type ?? "");
 
   const syncIcon: Record<SyncStatus, JSX.Element> = {
     synced: <Wifi className="h-4 w-4 text-emerald-500" />,
     syncing: <Loader2 className="h-4 w-4 animate-spin text-yellow-500" />,
     error: <WifiOff className="h-4 w-4 text-destructive" />,
-  };
-
-  const syncText: Record<SyncStatus, string> = {
-    synced: "Zsynchronizowany",
-    syncing: "Synchronizacja…",
-    error: "Błąd synchronizacji",
   };
 
   const initials = user.name
@@ -118,15 +91,17 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    await deleteAccount();
-    setActiveDialog(null);
+  const handleUpdateBike = async (data: {
+    name: string;
+    brand: string;
+    model: string;
+    type: BikeType; // ← Bez pustego stringa
+  }) => {
+    return await updateBike(bike.id, user.id, data);
   };
 
-  const handleRenameBike = async () => {
-    // TODO: Dodaj akcję do zmiany nazwy roweru
-    console.log("Nowa nazwa:", newBikeName);
-    setActiveDialog(null);
+  const handleDeleteAccount = async () => {
+    await deleteAccount();
   };
 
   return (
@@ -151,7 +126,10 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
                           <ChevronDown className="h-4 w-4 text-muted-foreground" />
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          {bike.totalKm.toLocaleString("pl-PL")} km
+                          {bike.brand} {bike.model}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {bike.type} {bike.totalKm.toLocaleString("pl-PL")} km
                         </p>
                       </div>
                     </Button>
@@ -170,16 +148,18 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
                 </DropdownMenu>
               </div>
             </TooltipTrigger>
-            <TooltipContent>
-              <p>Kliknij, aby zmienić nazwę lub dodać inny rower</p>
-            </TooltipContent>
+            {bike.brand || bike.model ? null : (
+              <TooltipContent>
+                <p>Kliknij, aby edytować rower lub dodać nowy</p>
+              </TooltipContent>
+            )}
           </Tooltip>
         </TooltipProvider>
 
         {/* RIGHT SIDE */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-sm">
-            {syncIcon[bike.syncStatus]}
+            {syncIcon[bike.syncStatus as SyncStatus]}
           </div>
 
           <DropdownMenu>
@@ -194,10 +174,10 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="w-56">
-              <div className="p-2 ">
-                <p className="text-sm font-medium justify-center">
+              <div className="p-2">
+                <p className="text-sm font-medium">
                   {user.name}{" "}
-                  <Badge className="mt-1" variant={"default"}>
+                  <Badge className="mt-1" variant="default">
                     FREE
                   </Badge>
                 </p>
@@ -211,12 +191,10 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
                 Profil
               </DropdownMenuItem>
 
-              {/* {user.plan === Plan.FREE && ( */}
               <DropdownMenuItem onClick={() => router.push("/upgrade")}>
                 <CreditCard className="mr-2 h-4 w-4" />
                 Premium
               </DropdownMenuItem>
-              {/* )} */}
 
               <DropdownMenuSeparator />
 
@@ -237,11 +215,12 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
         </div>
       </div>
 
+      {/* DIALOGS */}
       <RenameBikeDialog
         open={activeDialog === "rename-bike"}
         onOpenChange={(open) => !open && setActiveDialog(null)}
         bike={bike}
-        onSave={handleRenameBike}
+        onSave={handleUpdateBike}
       />
 
       <DeleteAccountDialog

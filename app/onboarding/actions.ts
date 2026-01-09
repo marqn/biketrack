@@ -28,6 +28,7 @@ export async function createBike(type: BikeType) {
   await prisma.bike.create({
     data: {
       type,
+      name: `${type} Bike`,
       userId: user.id,
       parts: {
         create: DEFAULT_PARTS[type],
