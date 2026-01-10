@@ -83,7 +83,7 @@ export default function PartCard({
           {partName}
           <p>
             <button
-              onClick={() => setActiveDialog("bike-details")} // lub jak nazwiesz ten dialog
+              onClick={() => setActiveDialog("bike-details")}
               className="text-xs text-muted-foreground relative after:absolute after:bottom-0 after:left-1/2 after:h-[2px] after:w-0 after:bg-current after:transition-all after:duration-300 after:-translate-x-1/2 hover:after:w-full cursor-pointer"
             >
               Shimano GRX 820, 48/31
@@ -116,20 +116,23 @@ export default function PartCard({
 
       <CardContent className="space-y-3">{children}</CardContent>
 
-      {/* Dialog */}
+      {/* Dialog z poprawkami */}
       <Dialog
         open={activeDialog === "bike-details"}
         onOpenChange={(open) => !open && setActiveDialog(null)}
       >
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
+        <DialogContent className="max-w-2xl max-h-[90vh]">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>Dodaj część rowerową</DialogTitle>
             <DialogDescription>
               Określ model części oraz jej parametry użytkowe
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-6">
+          <div 
+            className="custom-scrollbar space-y-6 overflow-y-auto -mx-6 pl-6 pr-8" 
+            style={{maxHeight: 'calc(90vh - 200px)'}}
+          >
             {/* === Podstawowe informacje === */}
             <div className="space-y-4">
               <h4 className="text-sm font-medium">Podstawowe informacje</h4>
@@ -162,16 +165,18 @@ export default function PartCard({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="700c">700c</SelectItem>
-                    <SelectItem value="29">29”</SelectItem>
-                    <SelectItem value="27.5">27.5”</SelectItem>
+                    <SelectItem value="29">29"</SelectItem>
+                    <SelectItem value="27.5">27.5"</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              <Checkbox id="tubeless" />
-              <label htmlFor="tubeless" className="text-sm">
-                Tubeless
-              </label>
+              <div className="flex items-center gap-2">
+                <Checkbox id="tubeless" />
+                <label htmlFor="tubeless" className="text-sm">
+                  Tubeless
+                </label>
+              </div>
             </div>
 
             {/* === Użytkowanie === */}
@@ -214,9 +219,11 @@ export default function PartCard({
             </Collapsible>
           </div>
 
-          <DialogFooter>
-            <Button variant="ghost">Anuluj</Button>
-            <Button>Zapisz</Button>
+          <DialogFooter className="flex-shrink-0">
+            <Button variant="ghost" onClick={() => setActiveDialog(null)}>
+              Anuluj
+            </Button>
+            <Button onClick={() => setActiveDialog(null)}>Zapisz</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

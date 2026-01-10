@@ -44,7 +44,7 @@ export function DeleteAccountDialog({
           <p className="text-center">
             <AlertCircle className="text-destructive w-10 h-20 inline" />
           </p>
-          <DialogTitle className="text-xl text-center">
+          <DialogTitle>
             Czy na pewno chcesz usunąć swoje konto?
           </DialogTitle>
           <DialogDescription className="py-2 text-center">

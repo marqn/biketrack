@@ -123,7 +123,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
                     <Button variant="ghost" className="p-0 h-auto">
                       <div className="text-left">
                         <div className="flex items-center gap-2">
-                          <h1 className="text-lg font-semibold">{bike.name}</h1>
+                          <h1 className="text-lg">{bike.name}</h1>
                           <ChevronDown className="h-4 w-4 text-muted-foreground" />
                         </div>
                         <p className="text-sm text-muted-foreground">
