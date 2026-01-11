@@ -4,7 +4,7 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import LubeButton from "./lube-button";
 import KmForm from "./km-form";
-import PartCard from "./PartCard";
+import PartCard from "../../components/part-card/PartCard";
 import { PartType, ServiceType } from "@/lib/generated/prisma";
 import { DEFAULT_PARTS, PART_UI } from "@/lib/default-parts";
 

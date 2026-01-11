@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/select";
 import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels } from "@/app/onboarding/OnboardingClient";
-import { useToast } from "@/hooks/use-toast";
 
 interface RenameBikeDialogProps {
   open: boolean;
@@ -53,15 +52,9 @@ export function RenameBikeDialog({
   const [type, setType] = useState<BikeType>(bike.type); // ← Bez "NONE"
 
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
 
   const handleSave = async () => {
     if (!name?.trim()) {
-      toast({
-        title: "Błąd",
-        description: "Nazwa roweru jest wymagana",
-        variant: "destructive",
-      });
       return;
     }
 
@@ -75,24 +68,10 @@ export function RenameBikeDialog({
       });
 
       if (result.success) {
-        toast({
-          title: "Sukces",
-          description: "Rower został zaktualizowany",
-        });
         onOpenChange(false);
-      } else {
-        toast({
-          title: "Błąd",
-          description: result.error || "Nie udało się zaktualizować roweru",
-          variant: "destructive",
-        });
       }
     } catch (error) {
-      toast({
-        title: "Błąd",
-        description: "Wystąpił nieoczekiwany błąd",
-        variant: "destructive",
-      });
+      console.error("Błąd:", error);
     } finally {
       setIsLoading(false);
     }
