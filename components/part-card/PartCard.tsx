@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import ColoredProgress from "@/components/ui/colored-progress";
 import { DialogType } from "@/components/bike-header/BikeHeader";
 import PartDetailsDialog from "./PartDetailsDialog";
+import { replacePart } from "@/app/app/actions/replace-part";
 
 export default function PartCard({
   partName,
@@ -49,7 +50,7 @@ export default function PartCard({
     formData.set("partType", partType);
 
     startTransition(async () => {
-      // await replacePart(formData);
+      await replacePart(formData);
       router.refresh();
     });
   }

@@ -20,8 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BikeType } from "@/lib/generated/prisma";
-import { bikeTypeLabels } from "@/app/onboarding/OnboardingClient";
-
+import { bikeTypeLabels } from "@/lib/types";
 interface RenameBikeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;

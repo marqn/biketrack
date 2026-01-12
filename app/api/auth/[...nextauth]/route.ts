@@ -1,8 +1,6 @@
 import NextAuth, { type AuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import StravaProvider from "next-auth/providers/strava";
-import Email from "next-auth/providers/email";
-
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 
@@ -19,11 +17,13 @@ export const authOptions: AuthOptions = {
     StravaProvider({
       clientId: process.env.STRAVA_CLIENT_ID!,
       clientSecret: process.env.STRAVA_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          scope: "read,activity:read_all,profile:read_all",
+          approval_prompt: "auto",
+        },
+      },
     }),
-    // Email({
-    //   server: process.env.EMAIL_SERVER!,
-    //   from: process.env.EMAIL_FROM!,
-    // }),
   ],
   pages: {
     signIn: "/",
@@ -34,12 +34,18 @@ export const authOptions: AuthOptions = {
     async session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
+
+        const account = await prisma.account.findFirst({
+          where: { userId: user.id },
+          select: { provider: true },
+        });
+
+        session.user.provider = account?.provider;
       }
       return session;
     },
     async signIn({ account }) {
       if (account?.provider === "strava") {
-        // ❌ Prisma nie zna pola athlete
         delete (account as any).athlete;
       }
       return true;
@@ -48,5 +54,4 @@ export const authOptions: AuthOptions = {
 };
 
 const handler = NextAuth(authOptions);
-
 export { handler as GET, handler as POST };

@@ -19,7 +19,21 @@ export default async function HomePage() {
     include: { bikes: true },
   });
 
+  const bikeCount = await prisma.bike.count({
+    where: { user: { id: session.user.id } },
+  });
+
+  if (bikeCount > 0) {
+    redirect("/app");
+  }
+
   if (user?.bikes.length === 0 || user?.bikes.length === 1) {
-    redirect("/onboarding");
+    if (session.user.provider === "strava") {
+      redirect("/onboarding/strava-sync");
+    }
+
+    if (session.user.provider === "google") {
+      redirect("/onboarding/google-sync");
+    }
   }
 }

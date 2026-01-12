@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 import { BikeType } from "@/lib/generated/prisma";
-import { createBike } from "./actions";
+import { createBike } from "../google-sync/actions";
 
 import {
   Card,
@@ -20,7 +20,7 @@ export const bikeTypeLabels: Record<BikeType, string> = {
   OTHER: "🚲 Inny",
 };
 
-export default function OnboardingClient() {
+const GooglePage: React.FC = () => {
   const [, startTransition] = useTransition();
 
   function handleSelect(type: BikeType) {
@@ -61,4 +61,6 @@ export default function OnboardingClient() {
       </Card>
     </main>
   );
-}
+};
+
+export default GooglePage;

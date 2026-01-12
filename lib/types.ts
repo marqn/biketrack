@@ -64,3 +64,10 @@ export interface ServiceRecord {
   notes?: string
   product?: ComponentProduct
 }
+
+export const bikeTypeLabels: Record<BikeType, string> = {
+  ROAD: "🚴 Szosa",
+  GRAVEL: "🚵 Gravel",
+  MTB: "🚵‍♂️ MTB",
+  OTHER: "🚲 Inny",
+};
