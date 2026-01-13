@@ -65,7 +65,7 @@ export default function PartCard({
               onClick={() => setActiveDialog("bike-details")}
               className="text-xs text-muted-foreground relative after:absolute after:bottom-0 after:left-1/2 after:h-[2px] after:w-0 after:bg-current after:transition-all after:duration-300 after:-translate-x-1/2 hover:after:w-full cursor-pointer"
             >
-              Shimano GRX 820, 48/31
+              Dodaj model
             </button>
           </p>
         </CardTitle>

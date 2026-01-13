@@ -90,7 +90,7 @@ export default function PartDetailsDialog({
 
           {/* === Użytkowanie === */}
           <div className="space-y-4">
-            <h4 className="text-sm font-medium">Użytkowanie</h4>
+            <h4 className="text-sm font-medium">Data montażu</h4>
 
             <Input type="date" />
 

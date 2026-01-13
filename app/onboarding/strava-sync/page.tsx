@@ -10,7 +10,6 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -20,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { syncStravaBikes } from "../sync-strava-bikes";
+import { syncStravaBikes } from "./sync-strava-bikes";
 import { Loader2 } from "lucide-react";
 import { BikeType } from "@/lib/generated/prisma/wasm";
 import { bikeTypeLabels } from "@/lib/types";
