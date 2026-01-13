@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  // output   = "../lib/generated/prisma"
+  output   = "../lib/generated/prisma"
 }
 
 datasource db {
@@ -22,6 +22,8 @@ model User {
   accounts      Account[]
   sessions      Session[]
   bikes         Bike[]
+
+  notifications Notification[] // 👈 DODAJ TO
 }
 
 model Account {
@@ -57,11 +59,13 @@ enum BikeType {
   MTB
   OTHER
 }
+
 enum SyncStatus {
   synced
   syncing
   error
 }
+
 enum PartType {
   CHAIN
   CASSETTE
@@ -86,7 +90,7 @@ model Bike {
   id      String   @id @default(cuid())
   userId  String
   name    String?
-  brand    String?
+  brand   String?
   model   String?
   type    BikeType
   totalKm Int      @default(0)
@@ -120,4 +124,39 @@ model ServiceEvent {
   bike Bike @relation(fields: [bikeId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
+}
+
+enum NotificationType {
+  PART_WORN
+  PART_NEAR_WORN
+  SERVICE_DUE
+  EMAIL_MISSING
+  SYSTEM
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
+  DISMISSED
+}
+
+model Notification {
+  id     String @id @default(cuid())
+  userId String
+
+  type    NotificationType
+  title   String
+  message String
+
+  bikeId String?
+  partId String?
+
+  status NotificationStatus @default(UNREAD)
+
+  createdAt DateTime  @default(now())
+  readAt    DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
 }

@@ -7,6 +7,7 @@ import KmForm from "./km-form";
 import PartCard from "../../components/part-card/PartCard";
 import { PartType, ServiceType } from "@/lib/generated/prisma";
 import { DEFAULT_PARTS, PART_UI } from "@/lib/default-parts";
+import { NotificationsList } from "@/components/notifications-list/NotificationsList";
 
 export default async function AppPage() {
   const session = await getServerSession(authOptions);
@@ -36,6 +37,9 @@ export default async function AppPage() {
 
   return (
     <div className="space-y-6">
+
+      <NotificationsList />
+
       <KmForm bikeId={bike.id} initialKm={bike.totalKm} />
 
       <div className="grid gap-4 md:grid-cols-2">

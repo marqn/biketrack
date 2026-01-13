@@ -1,5 +1,6 @@
 "use server";
 
+import { checkBikeNotifications } from "@/lib/nofifications/checkBikeNotifications";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -44,6 +45,8 @@ export async function updateBikeKm(formData: FormData) {
       },
     }),
   ]);
+
+  await checkBikeNotifications(bikeId); // Przekaż prisma
 
   revalidatePath("/app");
 }

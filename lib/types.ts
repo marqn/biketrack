@@ -1,3 +1,4 @@
+import { BikeType } from "./generated/prisma"
 
 
 export interface Bike {
@@ -71,3 +72,11 @@ export const bikeTypeLabels: Record<BikeType, string> = {
   MTB: "🚵‍♂️ MTB",
   OTHER: "🚲 Inny",
 };
+
+export const VARIANT_BY_TYPE: Record<string, "default" | "destructive"> = {
+  PART_WORN: "destructive",
+  PART_NEAR_WORN: "default",
+  SERVICE_DUE: "default",
+  EMAIL_MISSING: "default",
+  SYSTEM: "default",
+}
