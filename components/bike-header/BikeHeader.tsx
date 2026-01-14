@@ -12,7 +12,7 @@ import {
   Delete,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -36,7 +36,11 @@ import { JSX } from "react";
 import { signOut } from "next-auth/react";
 import { deleteAccount } from "./actions/delete-account";
 import { updateBike } from "./actions/update-bike";
-import { RenameBikeDialog, DeleteAccountDialog } from "./dialogs";
+import {
+  RenameBikeDialog,
+  DeleteAccountDialog,
+  AddEmailDialog,
+} from "./dialogs";
 
 interface BikeHeaderProps {
   bike: Bike;
@@ -49,7 +53,12 @@ interface BikeHeaderProps {
   };
 }
 
-export type DialogType = "delete-account" | "rename-bike" | "bike-details" | null;
+export type DialogType =
+  | "delete-account"
+  | "rename-bike"
+  | "bike-details"
+  | "add-email"
+  | null;
 
 type MenuItemType = {
   name: string;
@@ -104,6 +113,15 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
   const handleDeleteAccount = async () => {
     await deleteAccount();
   };
+
+  useEffect(() => {
+    const handler = () => {
+      setActiveDialog("add-email");
+    };
+
+    window.addEventListener("open-email-dialog", handler);
+    return () => window.removeEventListener("open-email-dialog", handler);
+  }, []);
 
   return (
     <header className="fixed top-0 left-0 z-50 w-screen border-b bg-card">
@@ -228,6 +246,11 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
         open={activeDialog === "delete-account"}
         onOpenChange={(open) => !open && setActiveDialog(null)}
         onConfirm={handleDeleteAccount}
+      />
+
+      <AddEmailDialog
+        open={activeDialog === "add-email"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
       />
     </header>
   );
