@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Check,
   ChevronDown,
   Wifi,
   WifiOff,
@@ -113,6 +112,11 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
   const handleDeleteAccount = async () => {
     await deleteAccount();
   };
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handler = () => {
@@ -127,53 +131,59 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
     <header className="fixed top-0 left-0 z-50 w-screen border-b bg-card">
       <div className="container mx-auto px-8 py-3 flex items-center justify-between">
         {/* BIKE SWITCHER */}
-        <TooltipProvider>
-          <Tooltip
-            open={!hasSeenTooltip}
-            onOpenChange={(open) => {
-              if (!open) setHasSeenTooltip(true);
-            }}
-          >
-            <TooltipTrigger asChild>
-              <div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="p-0 h-auto">
-                      <div className="text-left">
-                        <div className="flex items-center gap-2">
-                          <h1 className="text-lg">{bike.name}</h1>
-                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        {mounted && (
+          <TooltipProvider>
+            <Tooltip
+              open={mounted && !hasSeenTooltip}
+              onOpenChange={(open) => {
+                if (!open) setHasSeenTooltip(true);
+              }}
+            >
+              <TooltipTrigger asChild>
+                <div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="p-0 h-auto">
+                        <div className="text-left">
+                          <div className="flex items-center gap-2">
+                            <h1 className="text-lg">{bike.name}</h1>
+                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {bike.brand} {bike.model}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {bike.type}{" "}
+                            {mounted
+                              ? bike.totalKm.toLocaleString("pl-PL")
+                              : bike.totalKm}{" "}
+                            km
+                          </p>
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          {bike.brand} {bike.model}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {bike.type} {bike.totalKm.toLocaleString("pl-PL")} km
-                        </p>
-                      </div>
-                    </Button>
-                  </DropdownMenuTrigger>
+                      </Button>
+                    </DropdownMenuTrigger>
 
-                  <DropdownMenuContent align="start" className="w-64">
-                    {menuItems.map((item) => (
-                      <DropdownMenuItem
-                        key={item.name}
-                        onClick={() => handleMenuClick(item)}
-                      >
-                        {item.name}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </TooltipTrigger>
-            {bike.brand || bike.model ? null : (
-              <TooltipContent>
-                <p>Kliknij, aby edytować rower lub dodać nowy</p>
-              </TooltipContent>
-            )}
-          </Tooltip>
-        </TooltipProvider>
+                    <DropdownMenuContent align="start" className="w-64">
+                      {menuItems.map((item) => (
+                        <DropdownMenuItem
+                          key={item.name}
+                          onClick={() => handleMenuClick(item)}
+                        >
+                          {item.name}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </TooltipTrigger>
+              {bike.brand || bike.model ? null : (
+                <TooltipContent>
+                  <p>Kliknij, aby edytować rower lub dodać nowy</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
+        )}
 
         {/* RIGHT SIDE */}
         <div className="flex items-center gap-4">
