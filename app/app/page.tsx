@@ -8,10 +8,13 @@ import PartCard from "../../components/part-card/PartCard";
 import { PartType, ServiceType } from "@/lib/generated/prisma";
 import { DEFAULT_PARTS, PART_UI } from "@/lib/default-parts";
 import { NotificationsList } from "@/components/notifications-list/NotificationsList";
+import { ensureEmailMissingNotification } from "@/lib/nofifications/emailMissing";
 
 export default async function AppPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
+
+  await ensureEmailMissingNotification(session.user.id)
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
