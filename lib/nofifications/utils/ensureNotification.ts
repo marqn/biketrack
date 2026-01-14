@@ -24,7 +24,7 @@ export async function ensureNotification({
       type,
       bikeId,
       partId,
-      status: { in: ["UNREAD", "READ"] },
+      status: "UNREAD", // <- Zmienione: tylko UNREAD
     },
   })
 

@@ -64,3 +64,5 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     [PartType.TUBELESS_SEALANT]: "🧼 | Mleko do opon bezdętkowych",
     [PartType.SUSPENSION_SEATPOST]: "🪵 | Siedzenie z zawieszeniem",
   };
+
+  export const CHAIN_LUBE_INTERVAL_KM = 200

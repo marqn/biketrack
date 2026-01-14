@@ -1,5 +1,7 @@
-import { prisma } from "@/lib/prisma"
-import { partWearRule } from "./rules/partWearRule"
+import { prisma } from "@/lib/prisma";
+import { partWearRule } from "./rules/partWearRule";
+import { chainLubeRule } from "./rules/chainLubeRule";
+import { tubelessSealantRule } from "./rules/tubelessSealantRule";
 
 export async function checkBikeNotifications(bikeId: string) {
   const parts = await prisma.bikePart.findMany({
@@ -12,9 +14,11 @@ export async function checkBikeNotifications(bikeId: string) {
         },
       },
     },
-  })
+  });
 
   for (const part of parts) {
-    await partWearRule(part)
+    await partWearRule(part);
   }
+  await chainLubeRule(bikeId);
+  await tubelessSealantRule(bikeId);
 }

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { addChainLube } from "./actions/add-chain-lube";
 import { Button } from "@/components/ui/button";
 import ColoredProgress from "@/components/ui/colored-progress";
+import { CHAIN_LUBE_INTERVAL_KM } from "@/lib/default-parts";
 
 export default function LubeButton({
   bikeId,
@@ -24,7 +25,7 @@ export default function LubeButton({
   );
   const kmSinceLube = lastLubeKm !== null ? currentKm - lastLubeKm : currentKm;
 
-  const progressPercent = Math.min((kmSinceLube / 200) * 100, 100); // zakładam smarowanie co 200 km
+  const progressPercent = Math.min((kmSinceLube / CHAIN_LUBE_INTERVAL_KM) * 100, 100); // zakładam smarowanie co 200 km
 
   async function action() {
     startTransition(async () => {
