@@ -20,8 +20,10 @@ export async function chainLubeRule(bikeId: string) {
 
   if (!bike) return
 
-  const lastLube = bike.services[0]
-  if (!lastLube) return
+  let lastLube = bike.services[0]
+  if (!lastLube) {
+    lastLube = { kmAtTime: 0 } as typeof lastLube
+  }
 
   const kmSince = bike.totalKm - lastLube.kmAtTime
   if (kmSince < CHAIN_LUBE_INTERVAL_KM) return

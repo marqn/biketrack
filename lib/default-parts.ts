@@ -65,4 +65,5 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     [PartType.SUSPENSION_SEATPOST]: "🪵 | Siedzenie z zawieszeniem",
   };
 
-  export const CHAIN_LUBE_INTERVAL_KM = 200
+  export const CHAIN_LUBE_INTERVAL_KM = 200;
+  export const SEALANT_INTERVAL_DAYS = 90;

@@ -1,8 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { NotificationType, PartType } from '@/lib/generated/prisma';
 import { ensureNotification } from "../utils/ensureNotification"
-
-const SEALANT_INTERVAL_DAYS = 90
+import { SEALANT_INTERVAL_DAYS } from "@/lib/default-parts";
 
 export async function tubelessSealantRule(bikeId: string) {
   const part = await prisma.bikePart.findFirst({
