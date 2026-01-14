@@ -4,8 +4,10 @@ import { authOptions } from "../../auth/[...nextauth]/route"
 
 export async function PATCH(
   _: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params // <- Dodane await
+  
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) {
     return new Response(null, { status: 401 })
@@ -13,7 +15,7 @@ export async function PATCH(
 
   await prisma.notification.updateMany({
     where: {
-      id: params.id,
+      id: id, // <- Używaj zmiennej zamiast params.id
       userId: session.user.id,
     },
     data: {
