@@ -1,6 +1,10 @@
 "use server";
 
-import { PartType } from "@/lib/generated/prisma";
+import {
+  NotificationStatus,
+  PartType,
+  NotificationType,
+} from "@/lib/generated/prisma";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -20,15 +24,40 @@ export async function replacePart(formData: FormData) {
 
   const { bikeId, partType } = parsed.data;
 
-  await prisma.bikePart.updateMany({
-    where: {
-      bikeId,
-      type: partType,
-    },
-    data: {
-      wearKm: 0,
-      createdAt: new Date(), // opcjonalnie
-    },
+  await prisma.$transaction(async (tx) => {
+    // 1️⃣ znajdź części
+    const parts = await tx.bikePart.findMany({
+      where: {
+        bikeId,
+        type: partType,
+      },
+      select: { id: true },
+    });
+
+    const partIds = parts.map((p) => p.id);
+
+    // 2️⃣ reset części
+    await tx.bikePart.updateMany({
+      where: {
+        id: { in: partIds },
+      },
+      data: {
+        wearKm: 0,
+        createdAt: new Date(),
+      },
+    });
+
+    // 3️⃣ zamknij notification
+    await tx.notification.updateMany({
+      where: {
+        partId: { in: partIds },
+        status: NotificationStatus.UNREAD,
+      },
+      data: {
+        status: NotificationStatus.READ,
+        readAt: new Date(),
+      },
+    });
   });
 
   revalidatePath("/app");
