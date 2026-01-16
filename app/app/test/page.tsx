@@ -121,7 +121,7 @@ export default function BikeRideSignup() {
                 <Button 
                   onClick={handleSubmit}
                   className="w-full bg-green-600 hover:bg-green-700"
-                  disabled={!name.trim() || !email.trim()}
+                  
                 >
                   Dołącz
                 </Button>
@@ -157,12 +157,12 @@ export default function BikeRideSignup() {
               <h3 className="text-lg font-semibold mb-4">Komentarze ({comments.length})</h3>
               <div className="space-y-4 mb-4">
                 {comments.map((comment) => (
-                  <div key={comment.id} className="bg-gray-50 rounded-lg p-4">
+                  <div key={comment.id} className="rounded-lg p-4">
                     <div className="flex justify-between items-start mb-2">
                       <span className="font-semibold text-sm">{comment.author}</span>
                       <span className="text-xs text-gray-500">{comment.time}</span>
                     </div>
-                    <p className="text-sm text-gray-700">{comment.text}</p>
+                    <p className="text-sm">{comment.text}</p>
                   </div>
                 ))}
               </div>
