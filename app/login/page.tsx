@@ -1,6 +1,6 @@
 "use client";
 
-// import { useState } from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,10 +13,11 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { signIn } from "next-auth/react";
+import { Apple } from "lucide-react"
 
 export default function Page() {
-  // const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
@@ -36,14 +37,14 @@ export default function Page() {
         </CardHeader>
         <CardContent>
           <form className="space-y-4">
-            
-            {/* <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+            <div className="space-y-2">
+              <Label htmlFor="email">E-mail</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="twoj@email.pl"
-                value={email}
+                // value={email}
+                value={"mm@w.pl"}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
@@ -61,7 +62,7 @@ export default function Page() {
             </div>
             <Button type="submit" className="w-full">
               Zaloguj się
-            </Button> */}
+            </Button>
 
             <Button
               onClick={(e) => {
@@ -91,6 +92,12 @@ export default function Page() {
               </svg>
               Zaloguj przez Google
             </Button>
+
+            <Button variant="outline" className="w-full" onClick={() => signIn("apple")}>
+              <Apple className="mr-2 h-4 w-4" />
+              Zaloguj przez Apple
+            </Button>
+
             <Button
               onClick={(e) => {
                 e.preventDefault();
