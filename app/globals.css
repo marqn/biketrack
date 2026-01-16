@@ -112,3 +112,15 @@ body {
     background: oklch(0.6 0.02 264 / 0.6);
   }
 }
+
+@layer components {
+  [data-slot="tooltip-content"] {
+    background: oklch(53.319% 0.25972 262.653) !important;
+    color: oklch(0.96 0.01 264) !important;
+  }
+  
+  [data-slot="tooltip-content"] .size-2\.5 {
+    background: oklch(53.319% 0.25972 262.653) !important;
+    fill: oklch(53.319% 0.25972 262.653) !important;
+  }
+}

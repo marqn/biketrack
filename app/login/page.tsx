@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { signIn } from "next-auth/react";
-import { Apple } from "lucide-react"
 
 export default function Page() {
   const [email, setEmail] = useState("");
@@ -91,11 +90,6 @@ export default function Page() {
                 />
               </svg>
               Zaloguj przez Google
-            </Button>
-
-            <Button variant="outline" className="w-full" onClick={() => signIn("apple")}>
-              <Apple className="mr-2 h-4 w-4" />
-              Zaloguj przez Apple
             </Button>
 
             <Button
