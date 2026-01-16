@@ -9,12 +9,13 @@ import { PartType, ServiceType } from "@/lib/generated/prisma";
 import { DEFAULT_PARTS, PART_UI } from "@/lib/default-parts";
 import { NotificationsList } from "@/components/notifications-list/NotificationsList";
 import { ensureEmailMissingNotification } from "@/lib/nofifications/emailMissing";
+import CalendarCard from "@/components/calendar-card/CalendarCard";
 
 export default async function AppPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
 
-  await ensureEmailMissingNotification(session.user.id)
+  await ensureEmailMissingNotification(session.user.id);
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -39,13 +40,15 @@ export default async function AppPage() {
   const lastLube = bike.services[0];
 
   return (
-    <div className="space-y-6">
-
+    <div className="space-y-6 lg:px-24 lg:space-6">
       <NotificationsList />
 
-      <KmForm bikeId={bike.id} initialKm={bike.totalKm} />
+      <div className="grid gap-4 grid-cols-2">
+        <KmForm bikeId={bike.id} initialKm={bike.totalKm} />
+        <CalendarCard />
+      </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 grid-cols-2">
         <PartCard
           partName={`⛓️ | Łańcuch`}
           wearKm={chain?.wearKm || 0}
