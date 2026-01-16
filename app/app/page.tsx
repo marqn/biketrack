@@ -43,12 +43,12 @@ export default async function AppPage() {
     <div className="space-y-6 lg:px-24 lg:space-6">
       <NotificationsList />
 
-      <div className="grid gap-4 grid-cols-2">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
         <KmForm bikeId={bike.id} initialKm={bike.totalKm} />
         <CalendarCard />
       </div>
 
-      <div className="grid gap-4 grid-cols-2">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
         <PartCard
           partName={`⛓️ | Łańcuch`}
           wearKm={chain?.wearKm || 0}

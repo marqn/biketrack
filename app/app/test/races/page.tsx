@@ -66,7 +66,7 @@ export default function RacesList() {
               <Button variant="outline" size="sm">
                 Szczegóły
               </Button>
-              <Button size="sm" variant="ghost">Biorę udział</Button>
+              <Button size="sm" variant="outline">Biorę udział</Button>
             </div>
           </div>
         </CardContent>
