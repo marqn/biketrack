@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,42 +11,119 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { signIn } from "next-auth/react";
 
 export default function Page() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("marqn@wp.pl");
+  const [password, setPassword] = useState("zaq!2wsx");
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setIsLoading(true);
+
+    try {
+      if (isLogin) {
+        // Logowanie przez credentials
+        const result = await signIn("credentials", {
+          email,
+          password,
+          redirect: false,
+        });
+
+        if (result?.error) {
+          setError("Nieprawidłowy email lub hasło");
+        } else if (result?.ok) {
+          window.location.href = "/";
+        }
+      } else {
+        // Rejestracja
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password, name }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data.error || "Wystąpił błąd podczas rejestracji");
+        } else {
+          setSuccess("Konto utworzone! Możesz się teraz zalogować.");
+          setIsLogin(true);
+          setPassword("");
+          setName("");
+        }
+      }
+    } catch (err) {
+      setError("Wystąpił nieoczekiwany błąd");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-2xl flex justify-center mb-2">
-            <div className=" h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                🚴
-              </div>
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              🚴
             </div>
           </CardTitle>
           <CardTitle className="text-2xl">BikeTrack</CardTitle>
           <CardDescription>
-            Zaloguj się, aby zarządzać serwisem swoich rowerów
+            {isLogin
+              ? "Zaloguj się, aby zarządzać serwisem swoich rowerów"
+              : "Utwórz konto, aby rozpocząć"}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4">
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {success && (
+            <Alert className="mb-4 border-green-500 text-green-700 bg-green-50">
+              <AlertDescription>{success}</AlertDescription>
+            </Alert>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {!isLogin && (
+              <div className="space-y-2">
+                <Label htmlFor="name">Imię (opcjonalne)</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Jan Kowalski"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="twoj@email.pl"
-                // value={email}
-                value={"mm@w.pl"}
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="password">Hasło</Label>
               <Input
@@ -57,11 +133,33 @@ export default function Page() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={8}
               />
+              {!isLogin && (
+                <p className="text-xs text-muted-foreground">
+                  Minimum 8 znaków
+                </p>
+              )}
             </div>
-            <Button type="submit" className="w-full">
-              Zaloguj się
+
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading
+                ? "Proszę czekać..."
+                : isLogin
+                ? "Zaloguj się"
+                : "Utwórz konto"}
             </Button>
+
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Lub
+                </span>
+              </div>
+            </div>
 
             <Button
               onClick={(e) => {
@@ -70,6 +168,7 @@ export default function Page() {
               }}
               variant="outline"
               className="w-full"
+              type="button"
             >
               <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                 <path
@@ -89,7 +188,7 @@ export default function Page() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              Zaloguj przez Google
+              {isLogin ? "Zaloguj" : "Zarejestruj się"} przez Google
             </Button>
 
             <Button
@@ -98,21 +197,38 @@ export default function Page() {
                 signIn("strava", { callbackUrl: "/" });
               }}
               className="w-full bg-orange-500 hover:bg-orange-600"
+              type="button"
             >
               <svg
-                width="24"
-                height="24"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
-                aria-label="Strava"
+                className="mr-2"
               >
                 <path
                   d="M13.11 4L6.39 18h3.88l2.84-5.54L16 18h3.88L13.11 4z"
-                  fill="#FC4C02"
+                  fill="white"
                 />
               </svg>
-              Zaloguj przez Strava
+              {isLogin ? "Zaloguj" : "Zarejestruj się"} przez Strava
             </Button>
+
+            <div className="text-center mt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setError("");
+                  setSuccess("");
+                }}
+                className="text-sm text-primary hover:underline"
+              >
+                {isLogin
+                  ? "Nie masz konta? Zarejestruj się"
+                  : "Masz już konto? Zaloguj się"}
+              </button>
+            </div>
           </form>
         </CardContent>
       </Card>

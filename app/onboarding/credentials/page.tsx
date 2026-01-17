@@ -1,4 +1,4 @@
-// app/onboarding/google/page.tsx
+// app/onboarding/credentials/page.tsx
 import { createBike } from "../_actions/createBike";
 import BikeTypeSelector from "../_components/BikeTypeSelector";
 import {
@@ -9,7 +9,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 
-export default function GoogleOnboardingPage() {
+export default function CredentialsOnboardingPage() {
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
       <Card className="w-full max-w-md">

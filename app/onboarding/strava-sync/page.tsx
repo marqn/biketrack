@@ -1,7 +1,7 @@
+// app/onboarding/strava/page.tsx
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
-
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -9,7 +9,6 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -19,10 +18,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { syncStravaBikes } from "./sync-strava-bikes";
 import { Loader2 } from "lucide-react";
-import { BikeType } from "@/lib/generated/prisma/wasm";
-import { bikeTypeLabels } from "@/lib/types";
+import { BikeType } from "@/lib/generated/prisma";
+import BikeTypeSelector from "../_components/BikeTypeSelector";
+import { syncStravaBikes } from "./sync-strava-bikes";
 import { createBike } from "./actions";
 
 interface StravaBike {
@@ -36,9 +35,8 @@ interface StravaBike {
   primary: boolean;
 }
 
-const StravaSyncPage: React.FC = () => {
-  const [, startTransition] = useTransition();
-  const [loading, setLoading] = useState(false);
+export default function StravaOnboardingPage() {
+  const [loading, setLoading] = useState(true);
   const [stravaBikes, setStravaBikes] = useState<StravaBike[]>([]);
   const [selectedBikeId, setSelectedBikeId] = useState<string>("");
   const [selectedBike, setSelectedBike] = useState<StravaBike | null>(null);
@@ -52,7 +50,6 @@ const StravaSyncPage: React.FC = () => {
     try {
       const bikes = await syncStravaBikes();
       setStravaBikes(bikes);
-      console.log("Pobrane rowery ze Strava:", bikes);
     } catch (error) {
       console.error("Błąd pobierania rowerów:", error);
     } finally {
@@ -66,16 +63,16 @@ const StravaSyncPage: React.FC = () => {
     setSelectedBike(bike || null);
   }
 
-  function handleSelect(type: BikeType) {
-    startTransition(async () => {
-      await createBike({
-        type,
-        brand: selectedBike?.brand_name || null,
-        model: selectedBike?.model_name || null,
-        totalKm: selectedBike?.distance 
-          ? Math.round(selectedBike.distance / 1000) 
-          : null,
-      });
+  async function handleTypeSelect(type: BikeType) {
+    if (!selectedBike) return;
+
+    await createBike({
+      type,
+      brand: selectedBike.brand_name,
+      model: selectedBike.model_name,
+      totalKm: selectedBike.distance
+        ? Math.round(selectedBike.distance / 1000)
+        : 0,
     });
   }
 
@@ -94,24 +91,30 @@ const StravaSyncPage: React.FC = () => {
     );
   }
 
-  if (stravaBikes.length > 0) {
-    return (
-      <main className="min-h-screen flex items-center justify-center px-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Witaj! 🚴</CardTitle>
-            <CardDescription className="text-base">
-              Znaleźliśmy {stravaBikes.length} rower
-              {stravaBikes.length === 1
-                ? ""
-                : stravaBikes.length < 5
-                ? "y"
-                : "ów"}{" "}
-              w Twoim koncie Strava
-            </CardDescription>
-          </CardHeader>
+  return (
+    <main className="min-h-screen flex items-center justify-center px-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Witaj! 🚴</CardTitle>
+          <CardDescription className="text-base">
+            {stravaBikes.length > 0 ? (
+              <>
+                Znaleźliśmy {stravaBikes.length} rower
+                {stravaBikes.length === 1
+                  ? ""
+                  : stravaBikes.length < 5
+                  ? "y"
+                  : "ów"}{" "}
+                w Twoim koncie Strava
+              </>
+            ) : (
+              "Nie znaleźliśmy rowerów w Twoim koncie Strava. Możesz dodać nowy."
+            )}
+          </CardDescription>
+        </CardHeader>
 
-          <CardContent className="space-y-4">
+        <CardContent className="space-y-4">
+          {stravaBikes.length > 0 && (
             <div className="space-y-2">
               <Label>Wybierz rower</Label>
               <Select value={selectedBikeId} onValueChange={handleBikeSelect}>
@@ -128,93 +131,58 @@ const StravaSyncPage: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
+          )}
 
-            {selectedBike && (
-              <>
-                <div className="space-y-2">
-                  <Label>Marka</Label>
-                  <Input
-                    value={selectedBike.brand_name || ""}
-                    onChange={(e) =>
-                      setSelectedBike({
-                        ...selectedBike,
-                        brand_name: e.target.value,
-                      })
-                    }
-                    placeholder="Np. Trek, Specialized..."
-                  />
-                </div>
+          {selectedBike && (
+            <>
+              <div className="space-y-2">
+                <Label>Marka</Label>
+                <Input
+                  value={selectedBike.brand_name || ""}
+                  onChange={(e) =>
+                    setSelectedBike({
+                      ...selectedBike,
+                      brand_name: e.target.value,
+                    })
+                  }
+                  placeholder="Np. Trek, Specialized..."
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label>Model</Label>
-                  <Input
-                    value={selectedBike.model_name || ""}
-                    onChange={(e) =>
-                      setSelectedBike({
-                        ...selectedBike,
-                        model_name: e.target.value,
-                      })
-                    }
-                    placeholder="Np. Domane SL 7"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label>Model</Label>
+                <Input
+                  value={selectedBike.model_name || ""}
+                  onChange={(e) =>
+                    setSelectedBike({
+                      ...selectedBike,
+                      model_name: e.target.value,
+                    })
+                  }
+                  placeholder="Np. Domane SL 7"
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label>Opis</Label>
-                  <Input
-                    value={selectedBike.description || ""}
-                    onChange={(e) =>
-                      setSelectedBike({
-                        ...selectedBike,
-                        description: e.target.value,
-                      })
-                    }
-                    placeholder="Opcjonalny opis"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label>Przebieg (km)</Label>
+                <Input
+                  type="number"
+                  value={Math.round(selectedBike.distance / 1000)}
+                  disabled
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label>Waga (kg)</Label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    value={selectedBike.weight || ""}
-                    onChange={(e) =>
-                      setSelectedBike({
-                        ...selectedBike,
-                        weight: parseFloat(e.target.value) || null,
-                      })
-                    }
-                    placeholder="Np. 8.5"
-                  />
-                </div>
-
-                <Card className="w-full max-w-md">
-                  <CardContent>
-                    <ToggleGroup
-                      type="single"
-                      className="grid grid-cols-1 sm:grid-cols-2 gap-4 mx-auto"
-                    >
-                      {Object.values(BikeType).map((type) => (
-                        <ToggleGroupItem
-                          key={type}
-                          value={type}
-                          onClick={() => handleSelect(type)}
-                          className="h-20 text-lg flex items-center justify-center text-center rounded-xl"
-                        >
-                          {bikeTypeLabels[type]}
-                        </ToggleGroupItem>
-                      ))}
-                    </ToggleGroup>
-                  </CardContent>
-                </Card>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </main>
-    );
-  }
-};
-
-export default StravaSyncPage;
+              <div className="space-y-2">
+                <Label>Typ roweru</Label>
+                <BikeTypeSelector
+                  onSelectType={handleTypeSelect}
+                  disabled={!selectedBike}
+                />
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </main>
+  );
+}
