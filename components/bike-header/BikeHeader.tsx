@@ -215,7 +215,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem onClick={() => router.push("/profile")}>
+              <DropdownMenuItem onClick={() => router.push("/app/profile")}>
                 <UserIcon className="mr-2 h-4 w-4" />
                 Profil
               </DropdownMenuItem>
