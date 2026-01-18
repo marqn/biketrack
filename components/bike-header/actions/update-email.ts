@@ -13,7 +13,10 @@ const schema = z.object({
 export async function updateEmail(formData: FormData) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
-    throw new Error("Unauthorized")
+    return {
+      success: false,
+      error: "Musisz być zalogowany"
+    }
   }
 
   const parsed = schema.safeParse({
@@ -21,30 +24,58 @@ export async function updateEmail(formData: FormData) {
   })
 
   if (!parsed.success) {
-    throw new Error("Invalid email")
+    return {
+      success: false,
+      error: "Nieprawidłowy format adresu email"
+    }
   }
 
   const { email } = parsed.data
   const userId = session.user.id
 
-  await prisma.$transaction([
-    prisma.user.update({
-      where: { id: userId },
-      data: { email },
-    }),
+  // Sprawdź czy email już istnieje
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+  })
 
-    prisma.notification.updateMany({
-      where: {
-        userId,
-        type: "EMAIL_MISSING",
-        status: { in: ["UNREAD", "READ"] },
-      },
-      data: {
-        status: "READ",
-        readAt: new Date(),
-      },
-    }),
-  ])
+  // Jeśli email należy do innego użytkownika, zwróć błąd
+  if (existingUser && existingUser.id !== userId) {
+    return {
+      success: false,
+      error: "Ten adres email jest już używany przez inne konto"
+    }
+  }
 
-  revalidatePath("/app")
+  try {
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: userId },
+        data: { email },
+      }),
+
+      prisma.notification.updateMany({
+        where: {
+          userId,
+          type: "EMAIL_MISSING",
+          status: { in: ["UNREAD", "READ"] },
+        },
+        data: {
+          status: "READ",
+          readAt: new Date(),
+        },
+      }),
+    ])
+
+    revalidatePath("/app")
+    
+    return {
+      success: true
+    }
+  } catch (error) {
+    console.error("Error updating email:", error)
+    return {
+      success: false,
+      error: "Wystąpił błąd podczas zapisywania adresu email"
+    }
+  }
 }
