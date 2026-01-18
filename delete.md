@@ -3,7 +3,7 @@
 If you want to delete your data associated with this application,
 please contact us at:
 
-**Email:** marqnpl@gmail.com
+**Email:** kontakt@twojadomena.pl
 
 Please include your Facebook user ID or the email address used to log in.
 

@@ -1,16 +1,20 @@
-"use client";
+"use server";
 
-import { Button } from "@/components/ui/button";
-import { deleteAccount } from "./actions/delete-account";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { prisma } from "@/lib/prisma";
 
-export default function DeleteAccountButton() {
-  const handleDeleteAccount = async () => {
-    await deleteAccount();
-  };
+export async function deleteAccount() {
+  const session = await getServerSession(authOptions);
+  
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
+  }
 
-  return (
-    <Button size={"sm"} variant="destructive" onClick={handleDeleteAccount}>
-      🗑️ Usuń konto
-    </Button>
-  );
+  // Usuń konto użytkownika
+  await prisma.user.delete({
+    where: { id: session.user.id },
+  });
+
+  return { success: true };
 }

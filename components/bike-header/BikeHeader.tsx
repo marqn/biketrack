@@ -110,8 +110,20 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
   };
 
   const handleDeleteAccount = async () => {
+  try {
+    // 1. Usuń konto z bazy danych
     await deleteAccount();
-  };
+    
+    // 2. Wyloguj użytkownika i przekieruj na /login
+    await signOut({ 
+      callbackUrl: "/login",
+      redirect: true 
+    });
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    alert("Wystąpił błąd podczas usuwania konta");
+  }
+};
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

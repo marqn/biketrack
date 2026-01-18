@@ -1,6 +1,7 @@
 import NextAuth, { type AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import FacebookProvider from "next-auth/providers/facebook";
 import StravaProvider from "next-auth/providers/strava";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
@@ -15,10 +16,17 @@ export const authOptions: AuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true, // Dodane!
+    }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID!,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true, // Dodane!
     }),
     StravaProvider({
       clientId: process.env.STRAVA_CLIENT_ID!,
       clientSecret: process.env.STRAVA_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true, // Dodane!
       authorization: {
         params: {
           scope: "read,activity:read_all,profile:read_all",
@@ -64,7 +72,7 @@ export const authOptions: AuthOptions = {
     }),
   ],
   pages: {
-    signIn: "/app",
+    signIn: "/login",
     signOut: "/",
     error: "/auth/error",
   },
@@ -96,21 +104,55 @@ export const authOptions: AuthOptions = {
       return session;
     },
 
-    // 👇 DODAJ TEN CALLBACK
     async redirect({ url, baseUrl }) {
       // Jeśli URL zawiera callbackUrl, użyj go
       if (url.startsWith("/")) return `${baseUrl}${url}`;
       
-      // Jeśli URL jest na tym samym baseUrl
-      if (url.startsWith(baseUrl)) return url;
+      // Jeśli URL jest na tym samym baseUrl, zwróć go
+      else if (new URL(url).origin === baseUrl) return url;
       
-      // W przeciwnym razie przekieruj na onboarding
-      return `${baseUrl}/onboarding`;
+      // W przeciwnym razie przekieruj na /app
+      return `${baseUrl}/app`;
     },
 
-    async signIn({ account, user }) {
+    async signIn({ account, user, profile }) {
       if (account?.provider === "strava") {
         delete (account as any).athlete;
+      }
+
+      // Automatyczne łączenie kont OAuth z tym samym emailem
+      if (account?.provider !== "credentials" && user?.email) {
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email },
+        });
+
+        if (existingUser) {
+          // Sprawdź czy konto już jest połączone
+          const existingAccount = await prisma.account.findFirst({
+            where: {
+              userId: existingUser.id,
+              provider: account.provider,
+            },
+          });
+
+          // Jeśli konto nie jest połączone, połącz je
+          if (!existingAccount && account) {
+            await prisma.account.create({
+              data: {
+                userId: existingUser.id,
+                type: account.type,
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+                access_token: account.access_token,
+                expires_at: account.expires_at,
+                token_type: account.token_type,
+                scope: account.scope,
+                id_token: account.id_token,
+                refresh_token: account.refresh_token,
+              },
+            });
+          }
+        }
       }
 
       return true;
