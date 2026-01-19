@@ -95,7 +95,7 @@ export default function PartHistoryDialog({
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-sm font-medium">
-                            {index === 0 ? "Obecny komponent" : `Wymiana #${index}`}
+                            {index === 0 ? "Obecny komponent" : `Wymiana #${sortedReplacements.length - index}`}
                           </span>
                           <span className="text-xs text-muted-foreground">
                             {format(new Date(replacement.createdAt), "d MMM yyyy", {
