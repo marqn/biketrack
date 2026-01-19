@@ -22,7 +22,14 @@ export default async function AppPage() {
     include: {
       bikes: {
         include: {
-          parts: true,
+          parts: {
+            include: {
+              // 👇 DODANE: Dołącz historię wymian
+              replacements: {
+                orderBy: { createdAt: "desc" },
+              },
+            },
+          },
           services: {
             where: { type: ServiceType.CHAIN_LUBE },
             orderBy: { createdAt: "desc" },
@@ -50,11 +57,13 @@ export default async function AppPage() {
 
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
         <PartCard
+          partId={chain?.id || ""} // 👈 DODANE
           partName={`⛓️ | Łańcuch`}
           wearKm={chain?.wearKm || 0}
           expectedKm={chain?.expectedKm || 0}
           bikeId={bike.id}
           partType={PartType.CHAIN}
+          replacements={chain?.replacements || []} // 👈 DODANE
         >
           <LubeButton
             bikeId={bike.id}
@@ -71,11 +80,13 @@ export default async function AppPage() {
             return (
               <PartCard
                 key={part.type}
+                partId={existingPart?.id || ""} // 👈 DODANE
                 partName={PART_UI[part.type]}
                 expectedKm={part.expectedKm}
                 wearKm={existingPart?.wearKm || 0}
                 bikeId={bike.id}
                 partType={part.type}
+                replacements={existingPart?.replacements || []} // 👈 DODANE
               />
             );
           })}

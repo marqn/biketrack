@@ -1,64 +1,83 @@
 "use server";
 
-import {
-  NotificationStatus,
-  PartType,
-  NotificationType,
-} from "@/lib/generated/prisma";
-import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
-
-const schema = z.object({
-  bikeId: z.string().cuid(),
-  partType: z.nativeEnum(PartType),
-});
+import { prisma } from "@/lib/prisma";
+import { PartType } from "@/lib/generated/prisma";
 
 export async function replacePart(formData: FormData) {
-  const parsed = schema.safeParse({
-    bikeId: formData.get("bikeId"),
-    partType: formData.get("partType"),
+  const bikeId = formData.get("bikeId") as string;
+  const partType = formData.get("partType") as PartType;
+  const brand = formData.get("brand") as string | null;
+  const model = formData.get("model") as string | null;
+  const notes = formData.get("notes") as string | null;
+
+  if (!bikeId || !partType) {
+    throw new Error("Brak wymaganych danych");
+  }
+
+  // Pobierz aktualny stan roweru i części
+  const bike = await prisma.bike.findUnique({
+    where: { id: bikeId },
+    include: {
+      parts: {
+        where: { type: partType },
+      },
+    },
   });
 
-  if (!parsed.success) throw new Error("Nieprawidłowe dane");
+  if (!bike || bike.parts.length === 0) {
+    throw new Error("Nie znaleziono roweru lub części");
+  }
 
-  const { bikeId, partType } = parsed.data;
+  const part = bike.parts[0];
 
-  await prisma.$transaction(async (tx) => {
-    // 1️⃣ znajdź części
-    const parts = await tx.bikePart.findMany({
-      where: {
-        bikeId,
-        type: partType,
-      },
-      select: { id: true },
-    });
-
-    const partIds = parts.map((p) => p.id);
-
-    // 2️⃣ reset części
-    await tx.bikePart.updateMany({
-      where: {
-        id: { in: partIds },
-      },
-      data: {
-        wearKm: 0,
-        createdAt: new Date(),
-      },
-    });
-
-    // 3️⃣ zamknij notification
-    await tx.notification.updateMany({
-      where: {
-        partId: { in: partIds },
-        status: NotificationStatus.UNREAD,
-      },
-      data: {
-        status: NotificationStatus.READ,
-        readAt: new Date(),
-      },
-    });
+  // Zapisz historię wymiany
+  await prisma.partReplacement.create({
+    data: {
+      bikeId,
+      partId: part.id,
+      partType,
+      brand: brand?.trim() || null,
+      model: model?.trim() || null,
+      notes: notes?.trim() || null,
+      kmAtReplacement: bike.totalKm,
+      kmUsed: part.wearKm,
+    },
   });
 
-  revalidatePath("/app");
+  // Zresetuj licznik zużycia części
+  await prisma.bikePart.update({
+    where: { id: part.id },
+    data: { wearKm: 0 },
+  });
+
+  revalidatePath(`/app/bikes/${bikeId}`);
+}
+
+export async function deletePartReplacement(replacementId: string) {
+  await prisma.partReplacement.delete({
+    where: { id: replacementId },
+  });
+
+  revalidatePath("/app/bikes");
+}
+
+export async function updatePartReplacement(
+  replacementId: string,
+  data: {
+    brand?: string;
+    model?: string;
+    notes?: string;
+  }
+) {
+  await prisma.partReplacement.update({
+    where: { id: replacementId },
+    data: {
+      brand: data.brand?.trim() || null,
+      model: data.model?.trim() || null,
+      notes: data.notes?.trim() || null,
+    },
+  });
+
+  revalidatePath("/app/bikes");
 }

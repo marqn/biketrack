@@ -19,7 +19,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime? @map("email_verified")
   image         String?
-  password      String?   // 👈 DODAJ TO
+  password      String?
   accounts      Account[]
   sessions      Session[]
   bikes         Bike[]
@@ -95,9 +95,10 @@ model Bike {
   type    BikeType
   totalKm Int      @default(0)
 
-  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade) // ← DODAJ onDelete: Cascade
-  parts    BikePart[]
-  services ServiceEvent[]
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parts            BikePart[]
+  services         ServiceEvent[]
+  partReplacements PartReplacement[]
 
   createdAt DateTime @default(now())
 }
@@ -110,9 +111,33 @@ model BikePart {
   wearKm     Int @default(0)
   expectedKm Int
 
-  bike Bike @relation(fields: [bikeId], references: [id], onDelete: Cascade) // ← DODAJ onDelete: Cascade
+  bike         Bike              @relation(fields: [bikeId], references: [id], onDelete: Cascade)
+  replacements PartReplacement[]
 
   createdAt DateTime @default(now())
+}
+
+// 👇 NOWY MODEL - Historia wymian
+model PartReplacement {
+  id     String   @id @default(cuid())
+  bikeId String
+  partId String
+
+  partType PartType
+  brand    String?
+  model    String?
+  notes    String?
+
+  kmAtReplacement Int // Przebieg roweru w momencie wymiany
+  kmUsed          Int // Ile km przejechał komponent (wearKm w momencie wymiany)
+
+  bike Bike     @relation(fields: [bikeId], references: [id], onDelete: Cascade)
+  part BikePart @relation(fields: [partId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([bikeId, partType])
+  @@index([partId])
 }
 
 model ServiceEvent {
