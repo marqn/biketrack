@@ -46,6 +46,15 @@ export default async function AppPage() {
   const bike = user.bikes[0];
   const lastLube = bike.services[0];
 
+  // Funkcja pomocnicza do pobierania najnowszej wymiany
+  const getLatestReplacement = (partId: string | undefined) => {
+    if (!partId) return null;
+    const part = bike.parts.find((p) => p.id === partId);
+    return part?.replacements?.[0] || null; // Już posortowane desc
+  };
+
+  const latestChainReplacement = getLatestReplacement(chain?.id);
+
   return (
     <div className="space-y-6 lg:px-24 lg:space-6">
       <NotificationsList />

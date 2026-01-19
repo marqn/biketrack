@@ -40,9 +40,11 @@ interface PartCardProps {
   wearKm: number;
   expectedKm: number;
   bikeId: string;
-  partId?: string; // 👈 Opcjonalne, bo czasem możesz nie mieć
+  partId?: string;
   partType: PartType;
   replacements?: PartReplacement[];
+  currentBrand?: string | null;
+  currentModel?: string | null;
   children?: React.ReactNode;
 }
 
@@ -54,6 +56,8 @@ export default function PartCard({
   partId,
   partType,
   replacements = [],
+  currentBrand,
+  currentModel,
   children,
 }: PartCardProps) {
   const [activeDialog, setActiveDialog] = React.useState<DialogType | "replace" | "history">(null);
@@ -164,6 +168,8 @@ export default function PartCard({
         open={activeDialog === "replace"}
         onOpenChange={(open) => !open && setActiveDialog(null)}
         partName={partName}
+        currentBrand={currentBrand}
+        currentModel={currentModel}
         onReplace={handleReplace}
       />
 
