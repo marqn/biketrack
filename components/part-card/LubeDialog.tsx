@@ -22,7 +22,7 @@ interface LubeDialogProps {
   currentKm: number;
   lastLubricantBrand?: string | null;
   lastLubricantName?: string | null;
-  onLube: (data: { lubricantBrand?: string; lubricantName?: string; notes?: string }) => Promise<void>;
+  onLube: (data: { lubricantBrand?: string; notes?: string }) => Promise<void>;
 }
 
 export default function LubeDialog({
@@ -52,7 +52,6 @@ export default function LubeDialog({
     try {
       await onLube({
         lubricantBrand: brand.trim() || undefined,
-        lubricantName: name.trim() || undefined,
         notes: notes.trim() || undefined,
       });
       // Reset form
@@ -87,16 +86,6 @@ export default function LubeDialog({
               placeholder="np. Squirt, Muc-Off, Finish Line"
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="name">Nazwa produktu</Label>
-            <Input
-              id="name"
-              placeholder="np. Long Lasting Dry Lube, C3 Ceramic Wet"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
             />
           </div>
 

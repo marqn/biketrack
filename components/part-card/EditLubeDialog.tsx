@@ -18,7 +18,6 @@ import { Textarea } from "@/components/ui/textarea";
 interface LubeEvent {
   id: string;
   lubricantBrand: string | null;
-  lubricantName: string | null;
   notes: string | null;
   kmAtTime: number;
 }
@@ -27,7 +26,7 @@ interface EditLubeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   lubeEvent: LubeEvent;
-  onSave: (data: { lubricantBrand?: string; lubricantName?: string; notes?: string }) => Promise<void>;
+  onSave: (data: { lubricantBrand?: string; notes?: string }) => Promise<void>;
 }
 
 export default function EditLubeDialog({
@@ -37,7 +36,6 @@ export default function EditLubeDialog({
   onSave,
 }: EditLubeDialogProps) {
   const [brand, setBrand] = useState(lubeEvent.lubricantBrand || "");
-  const [name, setName] = useState(lubeEvent.lubricantName || "");
   const [notes, setNotes] = useState(lubeEvent.notes || "");
   const [isSaving, setIsSaving] = useState(false);
 
@@ -46,7 +44,6 @@ export default function EditLubeDialog({
     try {
       await onSave({
         lubricantBrand: brand.trim() || undefined,
-        lubricantName: name.trim() || undefined,
         notes: notes.trim() || undefined,
       });
     } finally {
@@ -69,16 +66,6 @@ export default function EditLubeDialog({
               placeholder="np. Squirt, Muc-Off, Finish Line"
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="name">Nazwa produktu</Label>
-            <Input
-              id="name"
-              placeholder="np. Long Lasting Dry Lube, C3 Ceramic Wet"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
             />
           </div>
 

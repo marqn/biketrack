@@ -148,7 +148,6 @@ model ServiceEvent {
   
   // 👇 DODANE: Szczegóły smarowania
   lubricantBrand String?
-  lubricantName  String?
   notes          String?
 
   bike Bike @relation(fields: [bikeId], references: [id], onDelete: Cascade)

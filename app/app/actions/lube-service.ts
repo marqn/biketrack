@@ -8,7 +8,6 @@ export async function lubeChain(formData: FormData) {
   const bikeId = formData.get("bikeId") as string;
   const currentKm = parseInt(formData.get("currentKm") as string);
   const lubricantBrand = formData.get("lubricantBrand") as string | null;
-  const lubricantName = formData.get("lubricantName") as string | null;
   const notes = formData.get("notes") as string | null;
 
   if (!bikeId || isNaN(currentKm)) {
@@ -21,7 +20,6 @@ export async function lubeChain(formData: FormData) {
       type: ServiceType.CHAIN_LUBE,
       kmAtTime: currentKm,
       lubricantBrand: lubricantBrand?.trim() || null,
-      lubricantName: lubricantName?.trim() || null,
       notes: notes?.trim() || null,
     },
   });
@@ -42,7 +40,6 @@ export async function updateLubeEvent(
   eventId: string,
   data: {
     lubricantBrand?: string;
-    lubricantName?: string;
     notes?: string;
   }
 ) {
@@ -50,7 +47,6 @@ export async function updateLubeEvent(
     where: { id: eventId },
     data: {
       lubricantBrand: data.lubricantBrand?.trim() || null,
-      lubricantName: data.lubricantName?.trim() || null,
       notes: data.notes?.trim() || null,
     },
   });

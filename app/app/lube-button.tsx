@@ -17,7 +17,6 @@ import {
 interface LubeEvent {
   id: string;
   lubricantBrand: string | null;
-  lubricantName: string | null;
   notes: string | null;
   kmAtTime: number;
   createdAt: Date;
@@ -56,7 +55,6 @@ export default function LubeButton({
 
   async function handleLube(data: {
     lubricantBrand?: string;
-    lubricantName?: string;
     notes?: string;
   }) {
     const formData = new FormData();
@@ -64,7 +62,6 @@ export default function LubeButton({
     formData.set("currentKm", currentKm.toString());
     if (data.lubricantBrand)
       formData.set("lubricantBrand", data.lubricantBrand);
-    if (data.lubricantName) formData.set("lubricantName", data.lubricantName);
     if (data.notes) formData.set("notes", data.notes);
 
     startTransition(async () => {
@@ -84,7 +81,7 @@ export default function LubeButton({
 
   async function handleEdit(
     eventId: string,
-    data: { lubricantBrand?: string; lubricantName?: string; notes?: string }
+    data: { lubricantBrand?: string; notes?: string }
   ) {
     startTransition(async () => {
       await updateLubeEvent(eventId, data);
@@ -112,6 +109,8 @@ export default function LubeButton({
                 size="sm"
                 variant="outline"
                 onClick={() => setActiveDialog("history")}
+                className="text-muted-foreground"
+                disabled={isPending}
               >
                 <NotebookText className="h-4 w-4" />
               </Button>
@@ -126,7 +125,6 @@ export default function LubeButton({
         onOpenChange={(open) => !open && setActiveDialog(null)}
         currentKm={currentKm}
         lastLubricantBrand={lastLubeEvent?.lubricantBrand}
-        lastLubricantName={lastLubeEvent?.lubricantName}
         onLube={handleLube}
       />
 

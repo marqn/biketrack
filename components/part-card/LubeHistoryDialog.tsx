@@ -29,7 +29,6 @@ import EditLubeDialog from "./EditLubeDialog";
 interface LubeEvent {
   id: string;
   lubricantBrand: string | null;
-  lubricantName: string | null;
   notes: string | null;
   kmAtTime: number;
   createdAt: Date;
@@ -41,7 +40,7 @@ interface LubeHistoryDialogProps {
   lubeEvents: LubeEvent[];
   currentKm: number;
   onDelete: (id: string) => Promise<void>;
-  onEdit: (id: string, data: { lubricantBrand?: string; lubricantName?: string; notes?: string }) => Promise<void>;
+  onEdit: (id: string, data: { lubricantBrand?: string; notes?: string }) => Promise<void>;
 }
 
 export default function LubeHistoryDialog({
@@ -106,13 +105,12 @@ export default function LubeHistoryDialog({
                             </span>
                           </div>
 
-                          {(event.lubricantBrand || event.lubricantName) && (
+                          {(event.lubricantBrand) && (
                             <div className="text-sm">
                               {event.lubricantBrand && (
                                 <span className="font-medium">{event.lubricantBrand}</span>
                               )}
-                              {event.lubricantBrand && event.lubricantName && " "}
-                              {event.lubricantName && <span>{event.lubricantName}</span>}
+                              {event.lubricantBrand && " "}
                             </div>
                           )}
 
