@@ -1,21 +1,44 @@
 "use client";
 
-import { useOptimistic, useTransition } from "react";
+import { useState, useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { addChainLube } from "./actions/add-chain-lube";
+import { NotebookText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ColoredProgress from "@/components/ui/colored-progress";
 import { CHAIN_LUBE_INTERVAL_KM } from "@/lib/default-parts";
+import LubeDialog from "@/components/part-card/LubeDialog";
+import LubeHistoryDialog from "@/components/part-card/LubeHistoryDialog";
+import {
+  lubeChain,
+  deleteLubeEvent,
+  updateLubeEvent,
+} from "@/app/app/actions/lube-service";
+
+interface LubeEvent {
+  id: string;
+  lubricantBrand: string | null;
+  lubricantName: string | null;
+  notes: string | null;
+  kmAtTime: number;
+  createdAt: Date;
+}
+
+interface LubeButtonProps {
+  bikeId: string;
+  currentKm: number;
+  lastLubeKmInitial?: number | null;
+  lubeEvents?: LubeEvent[];
+}
 
 export default function LubeButton({
   bikeId,
   currentKm,
   lastLubeKmInitial,
-}: {
-  bikeId: string;
-  currentKm: number;
-  lastLubeKmInitial?: number | null;
-}) {
+  lubeEvents = [],
+}: LubeButtonProps) {
+  const [activeDialog, setActiveDialog] = useState<"lube" | "history" | null>(
+    null
+  );
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -23,33 +46,98 @@ export default function LubeButton({
     lastLubeKmInitial ?? null,
     (_currentState, newKm: number) => newKm
   );
+
   const kmSinceLube = lastLubeKm !== null ? currentKm - lastLubeKm : currentKm;
+  const progressPercent = Math.min(
+    (kmSinceLube / CHAIN_LUBE_INTERVAL_KM) * 100,
+    100
+  );
+  const lastLubeEvent = lubeEvents[0]; // Już posortowane desc
 
-  const progressPercent = Math.min((kmSinceLube / CHAIN_LUBE_INTERVAL_KM) * 100, 100); // zakładam smarowanie co 200 km
+  async function handleLube(data: {
+    lubricantBrand?: string;
+    lubricantName?: string;
+    notes?: string;
+  }) {
+    const formData = new FormData();
+    formData.set("bikeId", bikeId);
+    formData.set("currentKm", currentKm.toString());
+    if (data.lubricantBrand)
+      formData.set("lubricantBrand", data.lubricantBrand);
+    if (data.lubricantName) formData.set("lubricantName", data.lubricantName);
+    if (data.notes) formData.set("notes", data.notes);
 
-  async function action() {
     startTransition(async () => {
-      setLastLubeKm(currentKm); // tylko UI
-      await addChainLube(bikeId); // server update
-      router.refresh(); // odświeża dane z serwera, wearKm nie ruszony
+      setLastLubeKm(currentKm); // Optimistic UI
+      await lubeChain(formData);
+      setActiveDialog(null);
+      router.refresh();
+    });
+  }
+
+  async function handleDelete(eventId: string) {
+    startTransition(async () => {
+      await deleteLubeEvent(eventId);
+      router.refresh();
+    });
+  }
+
+  async function handleEdit(
+    eventId: string,
+    data: { lubricantBrand?: string; lubricantName?: string; notes?: string }
+  ) {
+    startTransition(async () => {
+      await updateLubeEvent(eventId, data);
+      router.refresh();
     });
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex justify-between items-center">
-        <span>{kmSinceLube} km od ostatniego smarowania</span>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={action}
-          disabled={isPending}
-          className="text-muted-foreground"
-        >
-          {isPending ? "Smarowanie..." : "💧 Smaruj"}
-        </Button>
+    <>
+      <div className="flex flex-col gap-2">
+        <div className="flex justify-between items-center">
+          <span>{kmSinceLube} km od ostatniego smarowania</span>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setActiveDialog("lube")}
+              disabled={isPending}
+              className="text-muted-foreground"
+            >
+              {isPending ? "Smarowanie..." : "💧 Smaruj"}
+            </Button>
+            {lubeEvents.length > 0 && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setActiveDialog("history")}
+              >
+                <NotebookText className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+        <ColoredProgress value={progressPercent} />
       </div>
-      <ColoredProgress value={progressPercent} />
-    </div>
+
+      <LubeDialog
+        open={activeDialog === "lube"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        currentKm={currentKm}
+        lastLubricantBrand={lastLubeEvent?.lubricantBrand}
+        lastLubricantName={lastLubeEvent?.lubricantName}
+        onLube={handleLube}
+      />
+
+      <LubeHistoryDialog
+        open={activeDialog === "history"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        lubeEvents={lubeEvents}
+        currentKm={currentKm}
+        onDelete={handleDelete}
+        onEdit={handleEdit}
+      />
+    </>
   );
 }

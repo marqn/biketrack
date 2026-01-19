@@ -145,10 +145,17 @@ model ServiceEvent {
   bikeId   String
   type     ServiceType
   kmAtTime Int
+  
+  // 👇 DODANE: Szczegóły smarowania
+  lubricantBrand String?
+  lubricantName  String?
+  notes          String?
 
   bike Bike @relation(fields: [bikeId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
+  
+  @@index([bikeId, type])
 }
 
 enum NotificationType {

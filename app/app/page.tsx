@@ -33,7 +33,6 @@ export default async function AppPage() {
           services: {
             where: { type: ServiceType.CHAIN_LUBE },
             orderBy: { createdAt: "desc" },
-            take: 1,
           },
         },
       },
@@ -78,6 +77,7 @@ export default async function AppPage() {
             bikeId={bike.id}
             currentKm={bike.totalKm}
             lastLubeKmInitial={lastLube?.kmAtTime}
+            lubeEvents={bike.services} // 👈 DODAJ TO!
           />
         </PartCard>
 
