@@ -68,6 +68,7 @@ type MenuItemType = {
 const menuItems: MenuItemType[] = [
   { name: "Twój rower", path: "/app" },
   { name: "Edytuj rower", dialog: "rename-bike" },
+  { name: "Historia", path: "/app/history" },
   { name: "Test", path: "/app/test" },
 ];
 
