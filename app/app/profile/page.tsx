@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Camera, Mail, User, Lock, Check, X, Eye, EyeOff } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface UserData {
   id: string;
@@ -39,6 +40,7 @@ interface Errors {
 }
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasPassword, setHasPassword] = useState(false);
@@ -112,6 +114,8 @@ export default function ProfilePage() {
             setUser({ ...user, image: base64Image });
             setSuccessMessage('Avatar zaktualizowany!');
             setTimeout(() => setSuccessMessage(''), 3000);
+
+            router.refresh();
           }
         } catch (error) {
           console.error('Błąd aktualizacji avatara:', error);
@@ -151,6 +155,8 @@ export default function ProfilePage() {
         setErrors({});
         setSuccessMessage('Nazwa użytkownika zaktualizowana!');
         setTimeout(() => setSuccessMessage(''), 3000);
+
+        router.refresh();
       }
     } catch (error) {
       console.error('Błąd aktualizacji nazwy:', error);
@@ -179,6 +185,8 @@ export default function ProfilePage() {
         setErrors({});
         setSuccessMessage('Email zaktualizowany!');
         setTimeout(() => setSuccessMessage(''), 3000);
+
+        router.refresh();
       }
     } catch (error) {
       console.error('Błąd aktualizacji emaila:', error);
