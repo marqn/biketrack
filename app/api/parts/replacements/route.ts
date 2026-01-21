@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { PrismaClient } from '@/lib/generated/prisma';
+import { prisma } from '@/lib/prisma';
 import { authOptions } from '../../auth/[...nextauth]/route';
-
-const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
     // Sprawdź czy użytkownik jest zalogowany
     const session = await getServerSession(authOptions);
     
-    if (!session || !session.user) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -23,6 +21,7 @@ export async function GET(request: NextRequest) {
 
     let bike;
     let replacements;
+    let services;
 
     if (bikeId) {
       // Pobierz konkretny rower
@@ -53,7 +52,7 @@ export async function GET(request: NextRequest) {
           bikeId: bikeId,
         },
         orderBy: {
-          createdAt: 'desc', // Najnowsze na górze
+          createdAt: 'desc',
         },
         select: {
           id: true,
@@ -66,6 +65,25 @@ export async function GET(request: NextRequest) {
           createdAt: true,
         },
       });
+
+      // Pobierz serwisy (smarowania)
+      services = await prisma.serviceEvent.findMany({
+        where: {
+          bikeId: bikeId,
+          type: 'CHAIN_LUBE',
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        select: {
+          id: true,
+          type: true,
+          kmAtTime: true,
+          lubricantBrand: true,
+          notes: true,
+          createdAt: true,
+        },
+      });
     } else {
       // Pobierz pierwszy rower użytkownika (domyślny)
       bike = await prisma.bike.findFirst({
@@ -73,7 +91,7 @@ export async function GET(request: NextRequest) {
           userId: session.user.id,
         },
         orderBy: {
-          createdAt: 'asc', // Pierwszy dodany rower
+          createdAt: 'asc',
         },
         select: {
           id: true,
@@ -89,6 +107,7 @@ export async function GET(request: NextRequest) {
           { 
             bike: null,
             replacements: [],
+            services: [],
             message: 'No bikes found'
           },
           { status: 200 }
@@ -114,11 +133,48 @@ export async function GET(request: NextRequest) {
           createdAt: true,
         },
       });
+
+      // Pobierz serwisy (smarowania)
+      services = await prisma.serviceEvent.findMany({
+        where: {
+          bikeId: bike.id,
+          type: 'CHAIN_LUBE',
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        select: {
+          id: true,
+          type: true,
+          kmAtTime: true,
+          lubricantBrand: true,
+          notes: true,
+          createdAt: true,
+        },
+      });
     }
+
+    // Połącz wymiany i serwisy w jeden timeline
+    const timeline = [
+      ...replacements.map(r => ({
+        id: r.id,
+        type: 'replacement' as const,
+        data: r,
+        createdAt: r.createdAt,
+      })),
+      ...services.map(s => ({
+        id: s.id,
+        type: 'service' as const,
+        data: s,
+        createdAt: s.createdAt,
+      })),
+    ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return NextResponse.json({
       bike,
-      replacements,
+      timeline,
+      replacements, // Dla kompatybilności wstecznej
+      services,
     });
 
   } catch (error) {
@@ -127,7 +183,5 @@ export async function GET(request: NextRequest) {
       { error: 'Internal server error' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
