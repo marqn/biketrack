@@ -1,9 +1,32 @@
-'use client';
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Wrench, Calendar, Bike, ChevronDown, Settings, Package, Disc, Zap, Mountain, ChevronUp, Droplet, CircleArrowOutUpLeft, CircleArrowOutUpRight, Link } from 'lucide-react';
+"use client";
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Wrench,
+  Calendar,
+  Bike,
+  ChevronDown,
+  Settings,
+  Package,
+  Disc,
+  Zap,
+  Mountain,
+  ChevronUp,
+  Droplet,
+  CircleArrowOutUpLeft,
+  CircleArrowOutUpRight,
+  Link,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 
 interface PartReplacement {
   id: string;
@@ -27,7 +50,7 @@ interface ServiceEvent {
 
 interface TimelineItem {
   id: string;
-  type: 'replacement' | 'service';
+  type: "replacement" | "service";
   data: PartReplacement | ServiceEvent;
   createdAt: string;
 }
@@ -40,14 +63,14 @@ interface BikeInfo {
   totalKm: number;
 }
 
-type FilterType = 'all' | 'replacement' | 'service';
+type FilterType = "all" | "replacement" | "service";
 
 const BikePartsHistory: React.FC = () => {
   const [timeline, setTimeline] = useState<TimelineItem[]>([]);
   const [bike, setBike] = useState<BikeInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<FilterType>('all');
+  const [filter, setFilter] = useState<FilterType>("all");
 
   useEffect(() => {
     fetchData();
@@ -56,46 +79,46 @@ const BikePartsHistory: React.FC = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/parts/replacements');
-      
+      const response = await fetch("/api/parts/replacements");
+
       if (!response.ok) {
-        throw new Error('Nie udało się pobrać danych');
+        throw new Error("Nie udało się pobrać danych");
       }
-      
+
       const data = await response.json();
       setTimeline(data.timeline || []);
       setBike(data.bike || null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Wystąpił błąd');
+      setError(err instanceof Error ? err.message : "Wystąpił błąd");
     } finally {
       setLoading(false);
     }
   };
 
   const getCategoryIcon = (item: TimelineItem): JSX.Element => {
-    if (item.type === 'service') {
+    if (item.type === "service") {
       return <Droplet className="w-5 h-5" />;
     }
-    
+
     const partType = (item.data as PartReplacement).partType;
-    switch(partType) {
-      case 'CHAIN':
+    switch (partType) {
+      case "CHAIN":
         return <Link className="w-5 h-5" />;
-      case 'CASSETTE':
+      case "CASSETTE":
         return <Settings className="w-5 h-5" />;
-      case 'PADS_FRONT':
-      case 'PADS_REAR':
+      case "PADS_FRONT":
+      case "PADS_REAR":
         return <Disc className="w-5 h-5" />;
-      case 'TIRE_FRONT':
+      case "TIRE_FRONT":
         return <CircleArrowOutUpLeft className="w-5 h-5" />;
-      case 'TIRE_REAR':
+      case "TIRE_REAR":
         return <CircleArrowOutUpRight className="w-5 h-5" />;
-      case 'SUSPENSION_FORK':
-      case 'SUSPENSION_SEATPOST':
+      case "SUSPENSION_FORK":
+      case "SUSPENSION_SEATPOST":
         return <Mountain className="w-5 h-5" />;
-      case 'DROPPER_POST':
+      case "DROPPER_POST":
         return <ChevronUp className="w-5 h-5" />;
-      case 'CHAINRING_1X':
+      case "CHAINRING_1X":
         return <Zap className="w-5 h-5" />;
       default:
         return <Wrench className="w-5 h-5" />;
@@ -104,49 +127,70 @@ const BikePartsHistory: React.FC = () => {
 
   const getPartTypeName = (partType: string): string => {
     const names: Record<string, string> = {
-      CHAIN: 'Łańcuch',
-      CASSETTE: 'Kaseta',
-      PADS_FRONT: 'Klocki hamulcowe przednie',
-      PADS_REAR: 'Klocki hamulcowe tylne',
-      TIRE_FRONT: 'Opona przednia',
-      TIRE_REAR: 'Opona tylna',
-      CHAINRING_1X: 'Zębatka 1x',
-      SUSPENSION_FORK: 'Widelec amortyzowany',
-      DROPPER_POST: 'Sztyca teleskopowa',
-      TUBELESS_SEALANT: 'Mleczko tubeless',
-      HANDLEBAR_TAPE: 'Owijka kierownicy',
-      SUSPENSION_SEATPOST: 'Sztyca amortyzowana',
+      CHAIN: "Łańcuch",
+      CASSETTE: "Kaseta",
+      PADS_FRONT: "Klocki hamulcowe przednie",
+      PADS_REAR: "Klocki hamulcowe tylne",
+      TIRE_FRONT: "Opona przednia",
+      TIRE_REAR: "Opona tylna",
+      CHAINRING_1X: "Zębatka 1x",
+      SUSPENSION_FORK: "Widelec amortyzowany",
+      DROPPER_POST: "Sztyca teleskopowa",
+      TUBELESS_SEALANT: "Mleczko tubeless",
+      HANDLEBAR_TAPE: "Owijka kierownicy",
+      SUSPENSION_SEATPOST: "Sztyca amortyzowana",
     };
     return names[partType] || partType;
   };
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('pl-PL', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    return date.toLocaleDateString("pl-PL", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
-  const replacementsCount = timeline.filter(item => item.type === 'replacement').length;
-  const servicesCount = timeline.filter(item => item.type === 'service').length;
+  const handleEdit = (item: TimelineItem) => {
+    // TODO: Implementacja edycji
+    console.log("Edit:", item);
+  };
 
-  const filteredTimeline = timeline.filter(item => {
-    if (filter === 'all') return true;
+  const handleDelete = async (item: TimelineItem) => {
+    if (!confirm("Czy na pewno chcesz usunąć ten element?")) return;
+
+    // TODO: Implementacja usuwania
+    console.log("Delete:", item);
+  };
+
+  const replacementsCount = timeline.filter(
+    (item) => item.type === "replacement"
+  ).length;
+  const servicesCount = timeline.filter(
+    (item) => item.type === "service"
+  ).length;
+
+  const filteredTimeline = timeline.filter((item) => {
+    if (filter === "all") return true;
     return item.type === filter;
   });
 
   const renderTimelineItem = (item: TimelineItem) => {
-    if (item.type === 'service') {
+    if (item.type === "service") {
       const service = item.data as ServiceEvent;
       return (
         <div key={item.id} className="relative pl-20">
-          {/* Timeline icon */}
-          <div className="absolute left-3.5 top-6 p-2.5 bg-cyan-600 rounded-full shadow-md ">
-            <Droplet className="w-5 h-5" />
+          {/* Timeline icon with km */}
+          <div className="absolute left-0 top-6 flex flex-col items-center">
+            <div className="p-2.5 bg-cyan-600 rounded-full shadow-md">
+              <Droplet className="w-5 h-5" />
+            </div>
+            <span className="text-xs font-semibold text-cyan-600 mt-1">
+              <Badge className="bg-cyan-600">{service.kmAtTime.toLocaleString("pl-PL")} km</Badge>
+            </span>
           </div>
-          
+
           <Card className="hover:shadow-lg transition-shadow duration-300 border-l-4 border-l-cyan-500">
             <CardHeader>
               <div className="flex items-start justify-between">
@@ -155,12 +199,27 @@ const BikePartsHistory: React.FC = () => {
                     Smarowanie łańcucha
                   </CardTitle>
                   <CardDescription className="text-base">
-                    {service.lubricantBrand || 'Serwis'}
+                    {service.lubricantBrand || "Serwis"}
                   </CardDescription>
                 </div>
-                <Badge className="bg-cyan-600">
-                  Serwis
-                </Badge>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => handleEdit(item)}
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onClick={() => handleDelete(item)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -168,12 +227,9 @@ const BikePartsHistory: React.FC = () => {
                 <div className="flex items-center gap-2 ">
                   <Calendar className="w-4 h-4 " />
                   <span className="text-sm font-medium">Data serwisu:</span>
-                  <span className="text-sm">{formatDate(service.createdAt)}</span>
-                </div>
-                <div className="flex items-center gap-2 ">
-                  <Bike className="w-4 h-4 " />
-                  <span className="text-sm font-medium">Przebieg:</span>
-                  <span className="text-sm">{service.kmAtTime.toLocaleString('pl-PL')} km</span>
+                  <span className="text-sm">
+                    {formatDate(service.createdAt)}
+                  </span>
                 </div>
                 {service.lubricantBrand && (
                   <div className="flex items-center gap-2 ">
@@ -202,28 +258,48 @@ const BikePartsHistory: React.FC = () => {
     const part = item.data as PartReplacement;
     return (
       <div key={item.id} className="relative pl-20">
-        {/* Timeline icon */}
-        <div className="absolute left-3.5 top-6 p-2.5 bg-blue-600 rounded-full shadow-md ">
-          {getCategoryIcon(item)}
+        {/* Timeline icon with km */}
+        <div className="absolute left-0 top-6 flex flex-col items-center">
+          <div className="p-2.5 bg-blue-600 rounded-full shadow-md ">
+            {getCategoryIcon(item)}
+          </div>
+          <span className="text-xs font-semibold text-blue-600 mt-1">
+          <Badge className="bg-blue-600">{part.kmAtReplacement.toLocaleString("pl-PL")} km</Badge>
+            
+          </span>
         </div>
-        
+
         <Card className="hover:shadow-lg transition-shadow duration-300">
           <CardHeader>
             <div className="flex items-start justify-between">
               <div>
                 <CardTitle className="text-xl mb-1">
-                  {part.brand && part.model 
+                  {part.brand && part.model
                     ? `${part.brand} ${part.model}`
-                    : getPartTypeName(part.partType)
-                  }
+                    : getPartTypeName(part.partType)}
                 </CardTitle>
                 <CardDescription className="text-base">
                   {getPartTypeName(part.partType)}
                 </CardDescription>
               </div>
-              <Badge variant="default">
-                Wymiana
-              </Badge>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => handleEdit(item)}
+                >
+                  <Pencil className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                  onClick={() => handleDelete(item)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -234,15 +310,10 @@ const BikePartsHistory: React.FC = () => {
                 <span className="text-sm">{formatDate(part.createdAt)}</span>
               </div>
               <div className="flex items-center gap-2 ">
-                <Bike className="w-4 h-4 " />
-                <span className="text-sm font-medium">Przebieg roweru:</span>
-                <span className="text-sm">{part.kmAtReplacement.toLocaleString('pl-PL')} km</span>
-              </div>
-              <div className="flex items-center gap-2 ">
                 <Wrench className="w-4 h-4 " />
                 <span className="text-sm font-medium">Zużycie części:</span>
                 <span className="text-sm font-semibold text-orange-600">
-                  {part.kmUsed.toLocaleString('pl-PL')} km
+                  {part.kmUsed.toLocaleString("pl-PL")} km
                 </span>
               </div>
               {part.notes && (
@@ -293,29 +364,33 @@ const BikePartsHistory: React.FC = () => {
           <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-600 rounded-full mb-4">
             <Bike className="w-10 h-10 " />
           </div>
-          <h1 className="text-4xl font-bold  mb-2">
-            Historia Serwisu
-          </h1>
+          <h1 className="text-4xl font-bold  mb-2">Historia Serwisu</h1>
           {bike && (
             <p className=" text-lg">
-              {bike.brand && bike.model ? `${bike.brand} ${bike.model}` : bike.name || 'Twój rower'}
+              {bike.brand && bike.model
+                ? `${bike.brand} ${bike.model}`
+                : bike.name || "Twój rower"}
             </p>
           )}
-          
+
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-6 mt-8">
             <div className=" rounded-lg px-6 py-4 shadow-sm">
-              <div className="text-2xl font-bold text-blue-600">{replacementsCount}</div>
+              <div className="text-2xl font-bold text-blue-600">
+                {replacementsCount}
+              </div>
               <div className="text-sm ">Wymian</div>
             </div>
             <div className=" rounded-lg px-6 py-4 shadow-sm">
-              <div className="text-2xl font-bold text-cyan-600">{servicesCount}</div>
+              <div className="text-2xl font-bold text-cyan-600">
+                {servicesCount}
+              </div>
               <div className="text-sm ">Smarowań</div>
             </div>
             {bike && (
               <div className=" rounded-lg px-6 py-4 shadow-sm">
                 <div className="text-2xl font-bold text-green-600">
-                  {bike.totalKm.toLocaleString('pl-PL')} km
+                  {bike.totalKm.toLocaleString("pl-PL")} km
                 </div>
                 <div className="text-sm ">Łączny przebieg</div>
               </div>
@@ -325,26 +400,34 @@ const BikePartsHistory: React.FC = () => {
           {/* Filters */}
           <div className="flex flex-wrap justify-center gap-3 mt-8">
             <Button
-              variant={filter === 'all' ? 'default' : 'outline'}
-              onClick={() => setFilter('all')}
+              variant={filter === "all" ? "default" : "outline"}
+              onClick={() => setFilter("all")}
               size="sm"
             >
               Wszystko ({timeline.length})
             </Button>
             <Button
-              variant={filter === 'replacement' ? 'default' : 'outline'}
-              onClick={() => setFilter('replacement')}
+              variant={filter === "replacement" ? "default" : "outline"}
+              onClick={() => setFilter("replacement")}
               size="sm"
-              className={filter === 'replacement' ? '' : 'border-blue-600 text-blue-600 hover:bg-blue-500'}
+              className={
+                filter === "replacement"
+                  ? ""
+                  : "border-blue-600 text-blue-600 hover:bg-blue-50"
+              }
             >
               <Wrench className="w-4 h-4 mr-2" />
               Wymiany ({replacementsCount})
             </Button>
             <Button
-              variant={filter === 'service' ? 'default' : 'outline'}
-              onClick={() => setFilter('service')}
+              variant={filter === "service" ? "default" : "outline"}
+              onClick={() => setFilter("service")}
               size="sm"
-              className={filter === 'service' ? 'bg-cyan-600 hover:bg-cyan-700' : 'border-cyan-600 text-cyan-600 hover:bg-cyan-500'}
+              className={
+                filter === "service"
+                  ? "bg-cyan-600 hover:bg-cyan-700"
+                  : "border-cyan-600 text-cyan-600 hover:bg-cyan-50"
+              }
             >
               <Droplet className="w-4 h-4 mr-2" />
               Smarowania ({servicesCount})
@@ -357,12 +440,18 @@ const BikePartsHistory: React.FC = () => {
           <Card className="text-center py-12">
             <CardContent>
               <Package className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <p className=" text-lg">Brak {filter === 'replacement' ? 'wymian' : filter === 'service' ? 'smarowań' : 'historii'}</p>
+              <p className=" text-lg">
+                Brak{" "}
+                {filter === "replacement"
+                  ? "wymian"
+                  : filter === "service"
+                    ? "smarowań"
+                    : "historii"}
+              </p>
               <p className=" text-sm mt-2">
-                {filter === 'all' 
-                  ? 'Wymiany części i serwisy będą tutaj wyświetlane'
-                  : 'Zmień filtr, aby zobaczyć inne zdarzenia'
-                }
+                {filter === "all"
+                  ? "Wymiany części i serwisy będą tutaj wyświetlane"
+                  : "Zmień filtr, aby zobaczyć inne zdarzenia"}
               </p>
             </CardContent>
           </Card>
