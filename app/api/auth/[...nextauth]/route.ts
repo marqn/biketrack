@@ -11,22 +11,35 @@ export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
   },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      allowDangerousEmailAccountLinking: true, // Dodane!
+      allowDangerousEmailAccountLinking: true,
+      // Ogranicz profile data od Google
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          // Skróć długie URL-e avatarów
+          image: profile.picture?.includes('googleusercontent.com') 
+            ? profile.picture.split('=')[0] + '=s96-c' // max 96px
+            : profile.picture,
+        };
+      },
     }),
     FacebookProvider({
       clientId: process.env.FACEBOOK_CLIENT_ID!,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
-      allowDangerousEmailAccountLinking: true, // Dodane!
+      allowDangerousEmailAccountLinking: true,
     }),
     StravaProvider({
       clientId: process.env.STRAVA_CLIENT_ID!,
       clientSecret: process.env.STRAVA_CLIENT_SECRET!,
-      allowDangerousEmailAccountLinking: true, // Dodane!
+      allowDangerousEmailAccountLinking: true,
       authorization: {
         params: {
           scope: "read,activity:read_all,profile:read_all",
@@ -77,15 +90,47 @@ export const authOptions: AuthOptions = {
     error: "/auth/error",
   },
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
+      // Pierwsze logowanie - ustaw podstawowe dane
       if (user) {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
-        token.picture = user.image;
         
         if (account) {
           token.provider = account.provider;
+        }
+
+        // ✅ ZAWSZE pobierz AKTUALNY avatar z bazy przy logowaniu
+        // NIE ufaj user.image z OAuth providera
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { image: true }
+        });
+
+        token.picture = dbUser?.image && dbUser.image.length > 200
+          ? dbUser.image.substring(0, 200)
+          : dbUser?.image;
+      }
+
+      // Aktualizacja sesji (np. po zmianie avatara w profilu)
+      if (trigger === "update" && session) {
+        const updatedUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            image: true,
+          }
+        });
+
+        if (updatedUser) {
+          token.email = updatedUser.email;
+          token.name = updatedUser.name;
+          token.picture = updatedUser.image && updatedUser.image.length > 200
+            ? updatedUser.image.substring(0, 200)
+            : updatedUser.image;
         }
       }
       
@@ -93,7 +138,7 @@ export const authOptions: AuthOptions = {
     },
 
     async session({ session, token }) {
-      if (session.user) {
+      if (session.user && token) {
         session.user.id = token.id as string;
         session.user.email = token.email as string | null;
         session.user.name = token.name as string | null;
@@ -105,13 +150,8 @@ export const authOptions: AuthOptions = {
     },
 
     async redirect({ url, baseUrl }) {
-      // Jeśli URL zawiera callbackUrl, użyj go
       if (url.startsWith("/")) return `${baseUrl}${url}`;
-      
-      // Jeśli URL jest na tym samym baseUrl, zwróć go
       else if (new URL(url).origin === baseUrl) return url;
-      
-      // W przeciwnym razie przekieruj na /app
       return `${baseUrl}/app`;
     },
 
@@ -120,35 +160,49 @@ export const authOptions: AuthOptions = {
         delete (account as any).athlete;
       }
 
-      // Automatyczne łączenie kont OAuth z tym samym emailem
+      // Skróć długie URL-e przed zapisaniem do bazy
+      if (user.image && user.image.length > 500) {
+        user.image = user.image.substring(0, 500);
+      }
+
       if (account?.provider !== "credentials" && user?.email) {
         const existingUser = await prisma.user.findUnique({
           where: { email: user.email },
+          select: { id: true, email: true, image: true }, // Dodaj image
         });
 
         if (existingUser) {
-          // Sprawdź czy konto już jest połączone
           const existingAccount = await prisma.account.findFirst({
             where: {
               userId: existingUser.id,
               provider: account.provider,
             },
+            select: { id: true },
           });
 
-          // Jeśli konto nie jest połączone, połącz je
           if (!existingAccount && account) {
+            // NIE zapisuj tokenów - powodują one ERR_RESPONSE_HEADERS_TOO_BIG
             await prisma.account.create({
               data: {
                 userId: existingUser.id,
                 type: account.type,
                 provider: account.provider,
                 providerAccountId: account.providerAccountId,
-                access_token: account.access_token,
-                expires_at: account.expires_at,
                 token_type: account.token_type,
                 scope: account.scope,
-                id_token: account.id_token,
-                refresh_token: account.refresh_token,
+              },
+            });
+          }
+
+          // ✅ Aktualizuj avatar TYLKO jeśli użytkownik nie ma jeszcze avatara
+          // NIE nadpisuj avatara przy każdym logowaniu
+          if (!existingUser.image && user.image) {
+            await prisma.user.update({
+              where: { id: existingUser.id },
+              data: { 
+                image: user.image.length > 500 
+                  ? user.image.substring(0, 500) 
+                  : user.image 
               },
             });
           }
@@ -158,6 +212,20 @@ export const authOptions: AuthOptions = {
       return true;
     },
   },
+  // Dodaj to żeby zmniejszyć rozmiar cookies
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    }
+  },
+  // Debug mode - usuń w produkcji
+  debug: process.env.NODE_ENV === 'development',
 };
 
 const handler = NextAuth(authOptions);
