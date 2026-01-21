@@ -13,18 +13,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-
 import EditLubeDialog from "./EditLubeDialog";
+import { ConfirmDeleteDialog } from "../bike-header/dialogs";
 
 interface LubeEvent {
   id: string;
@@ -40,7 +30,10 @@ interface LubeHistoryDialogProps {
   lubeEvents: LubeEvent[];
   currentKm: number;
   onDelete: (id: string) => Promise<void>;
-  onEdit: (id: string, data: { lubricantBrand?: string; notes?: string }) => Promise<void>;
+  onEdit: (
+    id: string,
+    data: { lubricantBrand?: string; notes?: string }
+  ) => Promise<void>;
 }
 
 export default function LubeHistoryDialog({
@@ -86,7 +79,7 @@ export default function LubeHistoryDialog({
               <>
                 {sortedEvents.map((event, index) => {
                   const kmSinceLube = currentKm - event.kmAtTime;
-                  
+
                   return (
                     <div
                       key={event.id}
@@ -96,7 +89,9 @@ export default function LubeHistoryDialog({
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-sm font-medium">
-                              {index === 0 ? "Ostatnie smarowanie" : `Smarowanie #${sortedEvents.length - index}`}
+                              {index === 0
+                                ? "Ostatnie smarowanie"
+                                : `Smarowanie #${sortedEvents.length - index}`}
                             </span>
                             <span className="text-xs text-muted-foreground">
                               {format(new Date(event.createdAt), "d MMM yyyy", {
@@ -105,10 +100,12 @@ export default function LubeHistoryDialog({
                             </span>
                           </div>
 
-                          {(event.lubricantBrand) && (
+                          {event.lubricantBrand && (
                             <div className="text-sm">
                               {event.lubricantBrand && (
-                                <span className="font-medium">{event.lubricantBrand}</span>
+                                <span className="font-medium">
+                                  {event.lubricantBrand}
+                                </span>
                               )}
                               {event.lubricantBrand && " "}
                             </div>
@@ -164,21 +161,12 @@ export default function LubeHistoryDialog({
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Usunąć wpis z historii?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Ta operacja jest nieodwracalna. Wpis zostanie trwale usunięty z historii
-              smarowania.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Anuluj</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Usuń</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={() => setDeleteId(null)}
+        onConfirm={handleDelete}
+        itemName="smarowania"
+      />
 
       {editingEvent && (
         <EditLubeDialog

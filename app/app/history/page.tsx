@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, JSX } from "react";
 import {
   Card,
   CardContent,
@@ -9,16 +9,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import {
   Wrench,
   Calendar,
@@ -39,7 +29,7 @@ import {
 } from "lucide-react";
 import EditLubeDialog from "@/components/part-card/EditLubeDialog";
 import EditReplacementDialog from "@/components/part-card/EditReplacementDialog";
-
+import { ConfirmDeleteDialog } from "@/components/bike-header/dialogs";
 
 interface PartReplacement {
   id: string;
@@ -85,7 +75,9 @@ const BikePartsHistory: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterType>("all");
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [deleteType, setDeleteType] = useState<"replacement" | "service" | null>(null);
+  const [deleteType, setDeleteType] = useState<
+    "replacement" | "service" | null
+  >(null);
   const [editItem, setEditItem] = useState<TimelineItem | null>(null);
 
   useEffect(() => {
@@ -181,9 +173,10 @@ const BikePartsHistory: React.FC = () => {
     if (!deleteId || !deleteType) return;
 
     try {
-      const endpoint = deleteType === "replacement" 
-        ? `/api/parts/replacements/${deleteId}`
-        : `/api/services/${deleteId}`;
+      const endpoint =
+        deleteType === "replacement"
+          ? `/api/parts/replacements/${deleteId}`
+          : `/api/services/${deleteId}`;
 
       const response = await fetch(endpoint, {
         method: "DELETE",
@@ -203,7 +196,11 @@ const BikePartsHistory: React.FC = () => {
     }
   };
 
-  const handleEditReplacement = async (data: { brand?: string; model?: string; notes?: string }) => {
+  const handleEditReplacement = async (data: {
+    brand?: string;
+    model?: string;
+    notes?: string;
+  }) => {
     if (!editItem || editItem.type !== "replacement") return;
 
     try {
@@ -228,7 +225,10 @@ const BikePartsHistory: React.FC = () => {
     }
   };
 
-  const handleEditService = async (data: { lubricantBrand?: string; notes?: string }) => {
+  const handleEditService = async (data: {
+    lubricantBrand?: string;
+    notes?: string;
+  }) => {
     if (!editItem || editItem.type !== "service") return;
 
     try {
@@ -570,21 +570,12 @@ const BikePartsHistory: React.FC = () => {
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Usunąć wpis z historii?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Ta operacja jest nieodwracalna. Wpis zostanie trwale usunięty z historii
-              {deleteType === "service" ? " smarowania" : " wymian"}.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Anuluj</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>Usuń</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        itemName={deleteType === "service" ? "smarowania" : "wymian"}
+      />
 
       {/* Edit Dialogs */}
       {editItem && editItem.type === "replacement" && (

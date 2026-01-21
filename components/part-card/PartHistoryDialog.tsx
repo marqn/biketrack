@@ -13,18 +13,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-
 import EditReplacementDialog from "./EditReplacementDialog";
+import { ConfirmDeleteDialog } from "../bike-header/dialogs";
 
 interface PartReplacement {
   id: string;
@@ -42,7 +32,10 @@ interface PartHistoryDialogProps {
   partName: string;
   replacements: PartReplacement[];
   onDelete: (id: string) => Promise<void>;
-  onEdit: (id: string, data: { brand?: string; model?: string; notes?: string }) => Promise<void>;
+  onEdit: (
+    id: string,
+    data: { brand?: string; model?: string; notes?: string }
+  ) => Promise<void>;
 }
 
 export default function PartHistoryDialog({
@@ -95,22 +88,32 @@ export default function PartHistoryDialog({
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-sm font-medium">
-                            {index === 0 ? "Obecny komponent" : `Wymiana #${sortedReplacements.length - index}`}
+                            {index === 0
+                              ? "Obecny komponent"
+                              : `Wymiana #${sortedReplacements.length - index}`}
                           </span>
                           <span className="text-xs text-muted-foreground">
-                            {format(new Date(replacement.createdAt), "d MMM yyyy", {
-                              locale: pl,
-                            })}
+                            {format(
+                              new Date(replacement.createdAt),
+                              "d MMM yyyy",
+                              {
+                                locale: pl,
+                              }
+                            )}
                           </span>
                         </div>
 
                         {(replacement.brand || replacement.model) && (
                           <div className="text-sm">
                             {replacement.brand && (
-                              <span className="font-medium">{replacement.brand}</span>
+                              <span className="font-medium">
+                                {replacement.brand}
+                              </span>
                             )}
                             {replacement.brand && replacement.model && " "}
-                            {replacement.model && <span>{replacement.model}</span>}
+                            {replacement.model && (
+                              <span>{replacement.model}</span>
+                            )}
                           </div>
                         )}
 
@@ -161,21 +164,12 @@ export default function PartHistoryDialog({
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Usunąć wpis z historii?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Ta operacja jest nieodwracalna. Wpis zostanie trwale usunięty z historii
-              wymian.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Anuluj</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Usuń</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={() => setDeleteId(null)}
+        onConfirm={handleDelete}
+        itemName="wymian"
+      />
 
       {editingReplacement && (
         <EditReplacementDialog
