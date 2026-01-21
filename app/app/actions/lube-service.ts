@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import {prisma} from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { ServiceType } from "@/lib/generated/prisma";
 
 export async function lubeChain(formData: FormData) {
@@ -28,10 +28,11 @@ export async function lubeChain(formData: FormData) {
   revalidatePath("/app");
 }
 
-export async function deleteLubeEvent(eventId: string) {
-  await prisma.serviceEvent.delete({
-    where: { id: eventId },
-  });
+export async function deleteLubeEvent(eventId: string | null) {
+  eventId &&
+    (await prisma.serviceEvent.delete({
+      where: { id: eventId },
+    }));
 
   revalidatePath("/app");
 }

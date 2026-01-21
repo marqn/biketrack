@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,70 +10,61 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 
 interface ConfirmDeleteDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onConfirm: () => void | Promise<void>
-  title?: string
-  description?: string
-  itemName?: string
+  open: boolean;
+  onConfirm: () => void | Promise<void>;
+  onOpenChange: (open: boolean) => void;
+  title?: string;
+  description?: string;
+  itemName?: string;
 }
 
 export function ConfirmDeleteDialog({
   open,
-  onOpenChange,
   onConfirm,
+  onOpenChange,
   title = "Usunąć wpis z historii?",
   description,
   itemName,
 }: ConfirmDeleteDialogProps) {
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleConfirm = async () => {
-    setIsDeleting(true)
+    setIsDeleting(true);
     try {
-      await onConfirm()
-      onOpenChange(false)
-    } catch (error) {
-      console.error("Error deleting:", error)
+      await onConfirm();
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
-  }
+  };
 
   const getDescription = () => {
-    if (description) return description
-    
-    const baseText = "Ta operacja jest nieodwracalna. Wpis zostanie trwale usunięty"
+    if (description) return description;
+
+    const baseText =
+      "Ta operacja jest nieodwracalna. Wpis zostanie trwale usunięty";
     if (itemName) {
-      return `${baseText} z historii ${itemName}.`
+      return `${baseText} z historii ${itemName}.`;
     }
-    return `${baseText}.`
-  }
+    return `${baseText}.`;
+  };
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {getDescription()}
-          </AlertDialogDescription>
+          <AlertDialogDescription>{getDescription()}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>
-            Anuluj
-          </AlertDialogCancel>
-          <AlertDialogAction 
-            onClick={handleConfirm}
-            disabled={isDeleting}
-          >
+          <AlertDialogCancel disabled={isDeleting}>Anuluj</AlertDialogCancel>
+          <AlertDialogAction onClick={handleConfirm} disabled={isDeleting}>
             {isDeleting ? "Usuwanie..." : "Usuń"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

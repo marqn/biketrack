@@ -30,6 +30,9 @@ import {
 import EditLubeDialog from "@/components/part-card/EditLubeDialog";
 import EditReplacementDialog from "@/components/part-card/EditReplacementDialog";
 import { ConfirmDeleteDialog } from "@/components/bike-header/dialogs";
+import { deleteLubeEvent, updateLubeEvent } from "@/app/app/actions/lube-service";
+import { deletePartReplacement, updatePartReplacement } from "@/app/app/actions/replace-part";
+import { useRouter } from "next/navigation";
 
 interface PartReplacement {
   id: string;
@@ -79,6 +82,7 @@ const BikePartsHistory: React.FC = () => {
     "replacement" | "service" | null
   >(null);
   const [editItem, setEditItem] = useState<TimelineItem | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     fetchData();
@@ -173,26 +177,20 @@ const BikePartsHistory: React.FC = () => {
     if (!deleteId || !deleteType) return;
 
     try {
-      const endpoint =
-        deleteType === "replacement"
-          ? `/api/parts/replacements/${deleteId}`
-          : `/api/services/${deleteId}`;
-
-      const response = await fetch(endpoint, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Nie udało się usunąć elementu");
+      if (deleteType === "replacement") {
+        await deletePartReplacement(deleteId);
+      } else {
+        await deleteLubeEvent(deleteId);
       }
-
-      // Odśwież dane
+      
+      router.refresh();
       await fetchData();
-      setDeleteId(null);
-      setDeleteType(null);
     } catch (err) {
       console.error("Error deleting:", err);
       alert(err instanceof Error ? err.message : "Wystąpił błąd");
+    } finally {
+      setDeleteId(null);
+      setDeleteType(null);
     }
   };
 
@@ -204,19 +202,8 @@ const BikePartsHistory: React.FC = () => {
     if (!editItem || editItem.type !== "replacement") return;
 
     try {
-      const response = await fetch(`/api/parts/replacements/${editItem.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error("Nie udało się zaktualizować");
-      }
-
-      // Odśwież dane
+      await updatePartReplacement(editItem.id, data);
+      router.refresh();
       await fetchData();
       setEditItem(null);
     } catch (err) {
@@ -232,19 +219,8 @@ const BikePartsHistory: React.FC = () => {
     if (!editItem || editItem.type !== "service") return;
 
     try {
-      const response = await fetch(`/api/services/${editItem.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error("Nie udało się zaktualizować");
-      }
-
-      // Odśwież dane
+      await updateLubeEvent(editItem.id, data);
+      router.refresh();
       await fetchData();
       setEditItem(null);
     } catch (err) {
@@ -572,7 +548,14 @@ const BikePartsHistory: React.FC = () => {
       {/* Delete Confirmation Dialog */}
       <ConfirmDeleteDialog
         open={!!deleteId}
-        onOpenChange={() => setDeleteId(null)}
+        deleteId={deleteId}
+        deleteType={deleteType}
+        onOpenChange={(open: boolean) => {
+          if (!open) {
+            setDeleteId(null);
+            setDeleteType(null);
+          }
+        }}
         onConfirm={confirmDelete}
         itemName={deleteType === "service" ? "smarowania" : "wymian"}
       />
