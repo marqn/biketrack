@@ -1,8 +1,8 @@
 'use client';
-
-import React, { useState, useEffect, JSX } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Wrench, Calendar, Bike, ChevronDown, Settings, Package, Disc, Zap, Mountain, ChevronUp, Droplet, CircleArrowOutUpLeft, CircleArrowOutUpRight, Link } from 'lucide-react';
 
 interface PartReplacement {
@@ -40,11 +40,14 @@ interface BikeInfo {
   totalKm: number;
 }
 
+type FilterType = 'all' | 'replacement' | 'service';
+
 const BikePartsHistory: React.FC = () => {
   const [timeline, setTimeline] = useState<TimelineItem[]>([]);
   const [bike, setBike] = useState<BikeInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<FilterType>('all');
 
   useEffect(() => {
     fetchData();
@@ -125,6 +128,14 @@ const BikePartsHistory: React.FC = () => {
       day: 'numeric' 
     });
   };
+
+  const replacementsCount = timeline.filter(item => item.type === 'replacement').length;
+  const servicesCount = timeline.filter(item => item.type === 'service').length;
+
+  const filteredTimeline = timeline.filter(item => {
+    if (filter === 'all') return true;
+    return item.type === filter;
+  });
 
   const renderTimelineItem = (item: TimelineItem) => {
     if (item.type === 'service') {
@@ -294,8 +305,12 @@ const BikePartsHistory: React.FC = () => {
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-6 mt-8">
             <div className=" rounded-lg px-6 py-4 shadow-sm">
-              <div className="text-2xl font-bold text-blue-600">{timeline.length}</div>
-              <div className="text-sm ">Zdarzeń</div>
+              <div className="text-2xl font-bold text-blue-600">{replacementsCount}</div>
+              <div className="text-sm ">Wymian</div>
+            </div>
+            <div className=" rounded-lg px-6 py-4 shadow-sm">
+              <div className="text-2xl font-bold text-cyan-600">{servicesCount}</div>
+              <div className="text-sm ">Smarowań</div>
             </div>
             {bike && (
               <div className=" rounded-lg px-6 py-4 shadow-sm">
@@ -306,15 +321,49 @@ const BikePartsHistory: React.FC = () => {
               </div>
             )}
           </div>
+
+          {/* Filters */}
+          <div className="flex flex-wrap justify-center gap-3 mt-8">
+            <Button
+              variant={filter === 'all' ? 'default' : 'outline'}
+              onClick={() => setFilter('all')}
+              size="sm"
+            >
+              Wszystko ({timeline.length})
+            </Button>
+            <Button
+              variant={filter === 'replacement' ? 'default' : 'outline'}
+              onClick={() => setFilter('replacement')}
+              size="sm"
+              className={filter === 'replacement' ? '' : 'border-blue-600 text-blue-600 hover:bg-blue-500'}
+            >
+              <Wrench className="w-4 h-4 mr-2" />
+              Wymiany ({replacementsCount})
+            </Button>
+            <Button
+              variant={filter === 'service' ? 'default' : 'outline'}
+              onClick={() => setFilter('service')}
+              size="sm"
+              className={filter === 'service' ? 'bg-cyan-600 hover:bg-cyan-700' : 'border-cyan-600 text-cyan-600 hover:bg-cyan-500'}
+            >
+              <Droplet className="w-4 h-4 mr-2" />
+              Smarowania ({servicesCount})
+            </Button>
+          </div>
         </div>
 
         {/* Timeline */}
-        {timeline.length === 0 ? (
+        {filteredTimeline.length === 0 ? (
           <Card className="text-center py-12">
             <CardContent>
               <Package className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <p className=" text-lg">Brak historii</p>
-              <p className=" text-sm mt-2">Wymiany części i serwisy będą tutaj wyświetlane</p>
+              <p className=" text-lg">Brak {filter === 'replacement' ? 'wymian' : filter === 'service' ? 'smarowań' : 'historii'}</p>
+              <p className=" text-sm mt-2">
+                {filter === 'all' 
+                  ? 'Wymiany części i serwisy będą tutaj wyświetlane'
+                  : 'Zmień filtr, aby zobaczyć inne zdarzenia'
+                }
+              </p>
             </CardContent>
           </Card>
         ) : (
@@ -324,7 +373,7 @@ const BikePartsHistory: React.FC = () => {
 
             {/* Timeline items */}
             <div className="space-y-8">
-              {timeline.map((item) => renderTimelineItem(item))}
+              {filteredTimeline.map((item) => renderTimelineItem(item))}
             </div>
 
             {/* End indicator */}
