@@ -10,6 +10,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Wrench,
   Calendar,
   Bike,
@@ -27,6 +37,9 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
+import EditLubeDialog from "@/components/part-card/EditLubeDialog";
+import EditReplacementDialog from "@/components/part-card/EditReplacementDialog";
+
 
 interface PartReplacement {
   id: string;
@@ -71,6 +84,9 @@ const BikePartsHistory: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterType>("all");
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteType, setDeleteType] = useState<"replacement" | "service" | null>(null);
+  const [editItem, setEditItem] = useState<TimelineItem | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -153,15 +169,88 @@ const BikePartsHistory: React.FC = () => {
   };
 
   const handleEdit = (item: TimelineItem) => {
-    // TODO: Implementacja edycji
-    console.log("Edit:", item);
+    setEditItem(item);
   };
 
-  const handleDelete = async (item: TimelineItem) => {
-    if (!confirm("Czy na pewno chcesz usunąć ten element?")) return;
+  const handleDelete = (item: TimelineItem) => {
+    setDeleteId(item.id);
+    setDeleteType(item.type);
+  };
 
-    // TODO: Implementacja usuwania
-    console.log("Delete:", item);
+  const confirmDelete = async () => {
+    if (!deleteId || !deleteType) return;
+
+    try {
+      const endpoint = deleteType === "replacement" 
+        ? `/api/parts/replacements/${deleteId}`
+        : `/api/services/${deleteId}`;
+
+      const response = await fetch(endpoint, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Nie udało się usunąć elementu");
+      }
+
+      // Odśwież dane
+      await fetchData();
+      setDeleteId(null);
+      setDeleteType(null);
+    } catch (err) {
+      console.error("Error deleting:", err);
+      alert(err instanceof Error ? err.message : "Wystąpił błąd");
+    }
+  };
+
+  const handleEditReplacement = async (data: { brand?: string; model?: string; notes?: string }) => {
+    if (!editItem || editItem.type !== "replacement") return;
+
+    try {
+      const response = await fetch(`/api/parts/replacements/${editItem.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Nie udało się zaktualizować");
+      }
+
+      // Odśwież dane
+      await fetchData();
+      setEditItem(null);
+    } catch (err) {
+      console.error("Error updating:", err);
+      alert(err instanceof Error ? err.message : "Wystąpił błąd");
+    }
+  };
+
+  const handleEditService = async (data: { lubricantBrand?: string; notes?: string }) => {
+    if (!editItem || editItem.type !== "service") return;
+
+    try {
+      const response = await fetch(`/api/services/${editItem.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Nie udało się zaktualizować");
+      }
+
+      // Odśwież dane
+      await fetchData();
+      setEditItem(null);
+    } catch (err) {
+      console.error("Error updating:", err);
+      alert(err instanceof Error ? err.message : "Wystąpił błąd");
+    }
   };
 
   const replacementsCount = timeline.filter(
@@ -187,7 +276,9 @@ const BikePartsHistory: React.FC = () => {
               <Droplet className="w-5 h-5" />
             </div>
             <span className="text-xs font-semibold text-cyan-600 mt-1">
-              <Badge className="bg-cyan-600">{service.kmAtTime.toLocaleString("pl-PL")} km</Badge>
+              <Badge className="bg-cyan-600">
+                {service.kmAtTime.toLocaleString("pl-PL")} km
+              </Badge>
             </span>
           </div>
 
@@ -264,8 +355,9 @@ const BikePartsHistory: React.FC = () => {
             {getCategoryIcon(item)}
           </div>
           <span className="text-xs font-semibold text-blue-600 mt-1">
-          <Badge className="bg-blue-600">{part.kmAtReplacement.toLocaleString("pl-PL")} km</Badge>
-            
+            <Badge className="bg-blue-600">
+              {part.kmAtReplacement.toLocaleString("pl-PL")} km
+            </Badge>
           </span>
         </div>
 
@@ -413,7 +505,7 @@ const BikePartsHistory: React.FC = () => {
               className={
                 filter === "replacement"
                   ? ""
-                  : "border-blue-600 text-blue-600 hover:bg-blue-50"
+                  : "border-blue-600 text-blue-600 hover:bg-blue-500"
               }
             >
               <Wrench className="w-4 h-4 mr-2" />
@@ -426,7 +518,7 @@ const BikePartsHistory: React.FC = () => {
               className={
                 filter === "service"
                   ? "bg-cyan-600 hover:bg-cyan-700"
-                  : "border-cyan-600 text-cyan-600 hover:bg-cyan-50"
+                  : "border-cyan-600 text-cyan-600 hover:bg-cyan-500"
               }
             >
               <Droplet className="w-4 h-4 mr-2" />
@@ -476,6 +568,42 @@ const BikePartsHistory: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Usunąć wpis z historii?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Ta operacja jest nieodwracalna. Wpis zostanie trwale usunięty z historii
+              {deleteType === "service" ? " smarowania" : " wymian"}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Anuluj</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Usuń</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Edit Dialogs */}
+      {editItem && editItem.type === "replacement" && (
+        <EditReplacementDialog
+          open={true}
+          onOpenChange={() => setEditItem(null)}
+          replacement={editItem.data as PartReplacement}
+          onSave={handleEditReplacement}
+        />
+      )}
+
+      {editItem && editItem.type === "service" && (
+        <EditLubeDialog
+          open={true}
+          onOpenChange={() => setEditItem(null)}
+          lubeEvent={editItem.data as ServiceEvent}
+          onSave={handleEditService}
+        />
+      )}
     </div>
   );
 };
