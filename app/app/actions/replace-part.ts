@@ -55,10 +55,38 @@ export async function replacePart(formData: FormData) {
 }
 
 export async function deletePartReplacement(replacementId: string) {
-  await prisma.partReplacement.delete({
+  // Pobierz szczegóły wymiany przed usunięciem
+  const replacement = await prisma.partReplacement.findUnique({
     where: { id: replacementId },
+    select: {
+      partId: true,
+      kmUsed: true,
+      bikeId: true,
+    },
   });
 
+  if (!replacement) {
+    throw new Error("Nie znaleziono wpisu wymiany");
+  }
+
+  // Użyj transakcji aby zapewnić atomowość operacji
+  await prisma.$transaction([
+    // Przywróć km do części
+    prisma.bikePart.update({
+      where: { id: replacement.partId },
+      data: {
+        wearKm: {
+          increment: replacement.kmUsed,
+        },
+      },
+    }),
+    // Usuń wpis wymiany
+    prisma.partReplacement.delete({
+      where: { id: replacementId },
+    }),
+  ]);
+
+  revalidatePath(`/app/bikes/${replacement.bikeId}`);
   revalidatePath("/app/bikes");
 }
 
