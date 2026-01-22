@@ -24,7 +24,6 @@ export default async function AppPage() {
         include: {
           parts: {
             include: {
-              // 👇 DODANE: Dołącz historię wymian
               replacements: {
                 orderBy: { createdAt: "desc" },
               },
@@ -45,15 +44,6 @@ export default async function AppPage() {
   const bike = user.bikes[0];
   const lastLube = bike.services[0];
 
-  // Funkcja pomocnicza do pobierania najnowszej wymiany
-  const getLatestReplacement = (partId: string | undefined) => {
-    if (!partId) return null;
-    const part = bike.parts.find((p) => p.id === partId);
-    return part?.replacements?.[0] || null; // Już posortowane desc
-  };
-
-  const latestChainReplacement = getLatestReplacement(chain?.id);
-
   return (
     <div className="space-y-6 lg:px-24 lg:space-6">
       <NotificationsList />
@@ -65,19 +55,21 @@ export default async function AppPage() {
 
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
         <PartCard
-          partId={chain?.id || ""} // 👈 DODANE
-          partName={`⛓️ | Łańcuch`}
+          partId={chain?.id || ""}
+          partName={PART_UI[PartType.CHAIN]}
           wearKm={chain?.wearKm || 0}
           expectedKm={chain?.expectedKm || 0}
           bikeId={bike.id}
           partType={PartType.CHAIN}
-          replacements={chain?.replacements || []} // 👈 DODANE
+          replacements={chain?.replacements || []}
+          currentBrand={chain?.replacements?.[0]?.brand}
+          currentModel={chain?.replacements?.[0]?.model}
         >
           <LubeButton
             bikeId={bike.id}
             currentKm={bike.totalKm}
             lastLubeKmInitial={lastLube?.kmAtTime}
-            lubeEvents={bike.services} // 👈 DODAJ TO!
+            lubeEvents={bike.services}
           />
         </PartCard>
 
@@ -89,13 +81,15 @@ export default async function AppPage() {
             return (
               <PartCard
                 key={part.type}
-                partId={existingPart?.id || ""} // 👈 DODANE
+                partId={existingPart?.id || ""}
                 partName={PART_UI[part.type]}
                 expectedKm={part.expectedKm}
                 wearKm={existingPart?.wearKm || 0}
                 bikeId={bike.id}
                 partType={part.type}
-                replacements={existingPart?.replacements || []} // 👈 DODANE
+                replacements={existingPart?.replacements || []}
+                currentBrand={existingPart?.replacements?.[0]?.brand}
+                currentModel={existingPart?.replacements?.[0]?.model}
               />
             );
           })}

@@ -59,7 +59,9 @@ export default function PartCard({
   currentModel,
   children,
 }: PartCardProps) {
-  const [activeDialog, setActiveDialog] = React.useState<DialogType | "replace" | "history">(null);
+  const [activeDialog, setActiveDialog] = React.useState<
+    DialogType | "replace" | "history"
+  >(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -115,7 +117,11 @@ export default function PartCard({
                 onClick={() => setActiveDialog("bike-details")}
                 className="text-xs text-muted-foreground relative after:absolute after:bottom-0 after:left-1/2 after:h-[2px] after:w-0 after:bg-current after:transition-all after:duration-300 after:-translate-x-1/2 hover:after:w-full cursor-pointer"
               >
-                Dodaj model
+                {currentBrand || currentModel
+                  ? currentBrand && currentModel
+                    ? `${currentBrand} ${currentModel}`
+                    : currentBrand || currentModel
+                  : "Dodaj model"}
               </button>
             </p>
           </CardTitle>
@@ -154,7 +160,9 @@ export default function PartCard({
           </div>
         </CardContent>
 
-        {children && <CardContent className="space-y-3">{children}</CardContent>}
+        {children && (
+          <CardContent className="space-y-3">{children}</CardContent>
+        )}
       </Card>
 
       <PartDetailsDialog
