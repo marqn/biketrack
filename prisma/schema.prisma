@@ -101,6 +101,8 @@ model Bike {
   partReplacements PartReplacement[]
 
   createdAt DateTime @default(now())
+  
+  @@index([userId]) // 👈 DODAJ
 }
 
 model BikePart {
@@ -115,6 +117,9 @@ model BikePart {
   replacements PartReplacement[]
 
   createdAt DateTime @default(now())
+  
+  @@unique([bikeId, type]) // 👈 DODAJ - szybsze wyszukiwanie części po bikeId i type
+  @@index([bikeId]) // 👈 DODAJ
 }
 
 // 👇 NOWY MODEL - Historia wymian
@@ -146,7 +151,6 @@ model ServiceEvent {
   type     ServiceType
   kmAtTime Int
   
-  // 👇 DODANE: Szczegóły smarowania
   lubricantBrand String?
   notes          String?
 
@@ -154,7 +158,7 @@ model ServiceEvent {
 
   createdAt DateTime @default(now())
   
-  @@index([bikeId, type])
+  @@index([bikeId, type, createdAt]) // 👈 POPRAW - dodaj createdAt bo sortujesz po nim
 }
 
 enum NotificationType {
