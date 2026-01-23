@@ -14,29 +14,27 @@ import {
   Calendar,
   Bike,
   ChevronDown,
-  Settings,
   Package,
-  Disc,
-  Zap,
-  Mountain,
-  ChevronUp,
-  Droplet,
-  CircleArrowOutUpLeft,
-  CircleArrowOutUpRight,
-  Link,
   Pencil,
   Trash2,
 } from "lucide-react";
 import EditLubeDialog from "@/components/part-card/EditLubeDialog";
 import EditReplacementDialog from "@/components/part-card/EditReplacementDialog";
 import { ConfirmDeleteDialog } from "@/components/bike-header/dialogs";
-import { deleteLubeEvent, updateLubeEvent } from "@/app/app/actions/lube-service";
-import { deletePartReplacement, updatePartReplacement } from "@/app/app/actions/replace-part";
+import {
+  deleteLubeEvent,
+  updateLubeEvent,
+} from "@/app/app/actions/lube-service";
+import {
+  deletePartReplacement,
+  updatePartReplacement,
+} from "@/app/app/actions/replace-part";
 import { useRouter } from "next/navigation";
 import { PartType } from "@/lib/generated/prisma";
 import { PartReplacement } from "@/lib/types";
 import { getPartName } from "@/lib/default-parts";
 import { formatDate } from "@/lib/utils";
+import { getCategoryIcon, SERVICE_ICON } from "@/lib/part-icons";
 
 interface ServiceEvent {
   id: string;
@@ -100,37 +98,6 @@ const BikePartsHistory: React.FC = () => {
     }
   };
 
-  const getCategoryIcon = (item: TimelineItem): JSX.Element => {
-    if (item.type === "service") {
-      return <Droplet className="w-5 h-5" />;
-    }
-
-    const partType = (item.data as PartReplacement).partType;
-    switch (partType) {
-      case PartType.CHAIN:
-        return <Link className="w-5 h-5" />;
-      case PartType.CASSETTE:
-        return <Settings className="w-5 h-5" />;
-      case PartType.PADS_FRONT:
-      case PartType.PADS_REAR:
-        return <Disc className="w-5 h-5" />;
-      case PartType.TIRE_FRONT:
-        return <CircleArrowOutUpLeft className="w-5 h-5" />;
-      case PartType.TIRE_REAR:
-        return <CircleArrowOutUpRight className="w-5 h-5" />;
-      case PartType.SUSPENSION_FORK:
-      case PartType.SUSPENSION_SEATPOST:
-        return <Mountain className="w-5 h-5" />;
-      case PartType.DROPPER_POST:
-        return <ChevronUp className="w-5 h-5" />;
-      case PartType.CHAINRING_1X:
-        return <Zap className="w-5 h-5" />;
-      default:
-        return <Wrench className="w-5 h-5" />;
-    }
-  };
-
-
   const handleEdit = (item: TimelineItem) => {
     setEditItem(item);
   };
@@ -149,7 +116,7 @@ const BikePartsHistory: React.FC = () => {
       } else {
         await deleteLubeEvent(deleteId);
       }
-      
+
       router.refresh();
       await fetchData();
     } catch (err) {
@@ -197,10 +164,10 @@ const BikePartsHistory: React.FC = () => {
   };
 
   const replacementsCount = timeline.filter(
-    (item) => item.type === "replacement"
+    (item) => item.type === "replacement",
   ).length;
   const servicesCount = timeline.filter(
-    (item) => item.type === "service"
+    (item) => item.type === "service",
   ).length;
 
   const filteredTimeline = timeline.filter((item) => {
@@ -216,7 +183,7 @@ const BikePartsHistory: React.FC = () => {
           {/* Timeline icon with km */}
           <div className="absolute left-0 top-6 flex flex-col items-center">
             <div className="p-2.5 bg-cyan-600 rounded-full shadow-md">
-              <Droplet className="w-5 h-5" />
+              {getCategoryIcon("service")}
             </div>
             <span className="text-xs font-semibold text-cyan-600 mt-1">
               <Badge className="bg-cyan-600">
@@ -267,7 +234,7 @@ const BikePartsHistory: React.FC = () => {
                 </div>
                 {service.lubricantBrand && (
                   <div className="flex items-center gap-2 ">
-                    <Droplet className="w-4 h-4 " />
+                    <SERVICE_ICON />
                     <span className="text-sm font-medium">Środek:</span>
                     <span className="text-sm">{service.lubricantBrand}</span>
                   </div>
@@ -295,7 +262,7 @@ const BikePartsHistory: React.FC = () => {
         {/* Timeline icon with km */}
         <div className="absolute left-0 top-6 flex flex-col items-center">
           <div className="p-2.5 bg-blue-600 rounded-full shadow-md ">
-            {getCategoryIcon(item)}
+            {getCategoryIcon(part.partType || "")}
           </div>
           <span className="text-xs font-semibold text-blue-600 mt-1">
             <Badge className="bg-blue-600">
@@ -464,7 +431,7 @@ const BikePartsHistory: React.FC = () => {
                   : "border-cyan-600 text-cyan-600 hover:bg-cyan-500"
               }
             >
-              <Droplet className="w-4 h-4 mr-2" />
+              <SERVICE_ICON />
               Smarowania ({servicesCount})
             </Button>
           </div>
