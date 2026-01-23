@@ -15,16 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import EditReplacementDialog from "./EditReplacementDialog";
 import { ConfirmDeleteDialog } from "../bike-header/dialogs";
-
-interface PartReplacement {
-  id: string;
-  brand: string | null;
-  model: string | null;
-  notes: string | null;
-  kmAtReplacement: number;
-  kmUsed: number;
-  createdAt: Date;
-}
+import { PartReplacement } from "@/lib/types";
 
 interface PartHistoryDialogProps {
   open: boolean;

@@ -80,3 +80,14 @@ export const VARIANT_BY_TYPE: Record<string, "default" | "destructive"> = {
   EMAIL_MISSING: "default",
   SYSTEM: "default",
 }
+
+export interface PartReplacement {
+  id: string;
+  brand: string | null;
+  model: string | null;
+  notes: string | null;
+  kmAtReplacement: number;
+  kmUsed: number;
+  createdAt?: Date | string;
+  partType?: string;
+}

@@ -23,16 +23,7 @@ import {
   deletePartReplacement,
   updatePartReplacement,
 } from "@/app/app/actions/replace-part";
-
-interface PartReplacement {
-  id: string;
-  brand: string | null;
-  model: string | null;
-  notes: string | null;
-  kmAtReplacement: number;
-  kmUsed: number;
-  createdAt: Date;
-}
+import { PartReplacement } from "@/lib/types";
 
 interface PartCardProps {
   partName: string;

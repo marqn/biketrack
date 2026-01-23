@@ -34,17 +34,7 @@ import { deleteLubeEvent, updateLubeEvent } from "@/app/app/actions/lube-service
 import { deletePartReplacement, updatePartReplacement } from "@/app/app/actions/replace-part";
 import { useRouter } from "next/navigation";
 import { PartType } from "@/lib/generated/prisma";
-
-interface PartReplacement {
-  id: string;
-  partType: string;
-  brand: string | null;
-  model: string | null;
-  notes: string | null;
-  kmAtReplacement: number;
-  kmUsed: number;
-  createdAt: string;
-}
+import { PartReplacement } from "@/lib/types";
 
 interface ServiceEvent {
   id: string;
