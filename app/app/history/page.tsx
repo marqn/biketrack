@@ -33,6 +33,7 @@ import { ConfirmDeleteDialog } from "@/components/bike-header/dialogs";
 import { deleteLubeEvent, updateLubeEvent } from "@/app/app/actions/lube-service";
 import { deletePartReplacement, updatePartReplacement } from "@/app/app/actions/replace-part";
 import { useRouter } from "next/navigation";
+import { PartType } from "@/lib/generated/prisma";
 
 interface PartReplacement {
   id: string;
@@ -114,23 +115,23 @@ const BikePartsHistory: React.FC = () => {
 
     const partType = (item.data as PartReplacement).partType;
     switch (partType) {
-      case "CHAIN":
+      case PartType.CHAIN:
         return <Link className="w-5 h-5" />;
-      case "CASSETTE":
+      case PartType.CASSETTE:
         return <Settings className="w-5 h-5" />;
-      case "PADS_FRONT":
-      case "PADS_REAR":
+      case PartType.PADS_FRONT:
+      case PartType.PADS_REAR:
         return <Disc className="w-5 h-5" />;
-      case "TIRE_FRONT":
+      case PartType.TIRE_FRONT:
         return <CircleArrowOutUpLeft className="w-5 h-5" />;
-      case "TIRE_REAR":
+      case PartType.TIRE_REAR:
         return <CircleArrowOutUpRight className="w-5 h-5" />;
-      case "SUSPENSION_FORK":
-      case "SUSPENSION_SEATPOST":
+      case PartType.SUSPENSION_FORK:
+      case PartType.SUSPENSION_SEATPOST:
         return <Mountain className="w-5 h-5" />;
-      case "DROPPER_POST":
+      case PartType.DROPPER_POST:
         return <ChevronUp className="w-5 h-5" />;
-      case "CHAINRING_1X":
+      case PartType.CHAINRING_1X:
         return <Zap className="w-5 h-5" />;
       default:
         return <Wrench className="w-5 h-5" />;

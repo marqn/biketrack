@@ -155,7 +155,7 @@ export const authOptions: AuthOptions = {
       return `${baseUrl}/app`;
     },
 
-    async signIn({ account, user, profile }) {
+    async signIn({ account, user }) {
       if (account?.provider === "strava") {
         delete (account as any).athlete;
       }
