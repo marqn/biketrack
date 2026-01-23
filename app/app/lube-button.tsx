@@ -13,14 +13,7 @@ import {
   deleteLubeEvent,
   updateLubeEvent,
 } from "@/app/app/actions/lube-service";
-
-interface LubeEvent {
-  id: string;
-  lubricantBrand: string | null;
-  notes: string | null;
-  kmAtTime: number;
-  createdAt: Date;
-}
+import { LubeEvent } from "@/lib/types";
 
 interface LubeButtonProps {
   bikeId: string;

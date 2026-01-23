@@ -31,34 +31,10 @@ import {
 } from "@/app/app/actions/replace-part";
 import { useRouter } from "next/navigation";
 import { PartType } from "@/lib/generated/prisma";
-import { PartReplacement } from "@/lib/types";
+import { PartReplacement, ServiceEvent, TimelineItem, BikeInfo } from "@/lib/types";
 import { getPartName } from "@/lib/default-parts";
 import { formatDate } from "@/lib/utils";
 import { getCategoryIcon, SERVICE_ICON } from "@/lib/part-icons";
-
-interface ServiceEvent {
-  id: string;
-  type: string;
-  kmAtTime: number;
-  lubricantBrand: string | null;
-  notes: string | null;
-  createdAt: string;
-}
-
-interface TimelineItem {
-  id: string;
-  type: "replacement" | "service";
-  data: PartReplacement | ServiceEvent;
-  createdAt: string;
-}
-
-interface BikeInfo {
-  id: string;
-  name: string | null;
-  brand: string | null;
-  model: string | null;
-  totalKm: number;
-}
 
 type FilterType = "all" | "replacement" | "service";
 

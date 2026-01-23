@@ -91,3 +91,30 @@ export interface PartReplacement {
   createdAt?: Date | string;
   partType?: string;
 }
+
+export interface LubeEvent {
+  id: string;
+  lubricantBrand: string | null;
+  notes: string | null;
+  kmAtTime: number;
+  createdAt: Date | string;
+}
+
+export interface ServiceEvent extends LubeEvent {
+  type: string;
+}
+
+export interface BikeInfo {
+  id: string;
+  name: string | null;
+  brand: string | null;
+  model: string | null;
+  totalKm: number;
+}
+
+export interface TimelineItem {
+  id: string;
+  type: "replacement" | "service";
+  data: PartReplacement | ServiceEvent;
+  createdAt: string;
+}

@@ -15,16 +15,9 @@ import {
 import { Button } from "@/components/ui/button";
 import EditLubeDialog from "./EditLubeDialog";
 import { ConfirmDeleteDialog } from "../bike-header/dialogs";
+import { LubeEvent } from "@/lib/types";
 
-interface LubeEvent {
-  id: string;
-  lubricantBrand: string | null;
-  notes: string | null;
-  kmAtTime: number;
-  createdAt: Date;
-}
-
-interface LubeHistoryDialogProps {
+interface LubeHistoryDialogProps{
   open: boolean;
   onOpenChange: (open: boolean) => void;
   lubeEvents: LubeEvent[];
