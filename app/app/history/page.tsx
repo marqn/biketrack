@@ -30,8 +30,12 @@ import {
   updatePartReplacement,
 } from "@/app/app/actions/replace-part";
 import { useRouter } from "next/navigation";
-import { PartType } from "@/lib/generated/prisma";
-import { PartReplacement, ServiceEvent, TimelineItem, BikeInfo } from "@/lib/types";
+import {
+  PartReplacement,
+  ServiceEvent,
+  TimelineItem,
+  BikeInfo,
+} from "@/lib/types";
 import { getPartName } from "@/lib/default-parts";
 import { formatDate } from "@/lib/utils";
 import { getCategoryIcon, SERVICE_ICON } from "@/lib/part-icons";
@@ -172,12 +176,20 @@ const BikePartsHistory: React.FC = () => {
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div>
-                  <CardTitle className="text-xl mb-1">
-                    Smarowanie łańcucha
-                  </CardTitle>
-                  <CardDescription className="text-base">
-                    {service.lubricantBrand || "Serwis"}
-                  </CardDescription>
+                  {service.lubricantBrand ? (
+                    <>
+                      <CardTitle className="text-xl mb-1">
+                        {service.lubricantBrand}
+                      </CardTitle>
+                      <CardDescription className="text-base">
+                        Smarowanie łańcucha
+                      </CardDescription>
+                    </>
+                  ) : (
+                    <CardTitle className="text-xl mb-1">
+                      Smarowanie łańcucha
+                    </CardTitle>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <Button
