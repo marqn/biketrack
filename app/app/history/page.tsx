@@ -35,6 +35,8 @@ import { deletePartReplacement, updatePartReplacement } from "@/app/app/actions/
 import { useRouter } from "next/navigation";
 import { PartType } from "@/lib/generated/prisma";
 import { PartReplacement } from "@/lib/types";
+import { getPartName } from "@/lib/default-parts";
+import { formatDate } from "@/lib/utils";
 
 interface ServiceEvent {
   id: string;
@@ -128,32 +130,6 @@ const BikePartsHistory: React.FC = () => {
     }
   };
 
-  const getPartTypeName = (partType: string): string => {
-    const names: Record<string, string> = {
-      CHAIN: "Łańcuch",
-      CASSETTE: "Kaseta",
-      PADS_FRONT: "Klocki hamulcowe przednie",
-      PADS_REAR: "Klocki hamulcowe tylne",
-      TIRE_FRONT: "Opona przednia",
-      TIRE_REAR: "Opona tylna",
-      CHAINRING_1X: "Zębatka 1x",
-      SUSPENSION_FORK: "Widelec amortyzowany",
-      DROPPER_POST: "Sztyca teleskopowa",
-      TUBELESS_SEALANT: "Mleczko tubeless",
-      HANDLEBAR_TAPE: "Owijka kierownicy",
-      SUSPENSION_SEATPOST: "Sztyca amortyzowana",
-    };
-    return names[partType] || partType;
-  };
-
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("pl-PL", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
 
   const handleEdit = (item: TimelineItem) => {
     setEditItem(item);
@@ -335,10 +311,10 @@ const BikePartsHistory: React.FC = () => {
                 <CardTitle className="text-xl mb-1">
                   {part.brand && part.model
                     ? `${part.brand} ${part.model}`
-                    : getPartTypeName(part.partType)}
+                    : getPartName(part.partType)}
                 </CardTitle>
                 <CardDescription className="text-base">
-                  {getPartTypeName(part.partType)}
+                  {getPartName(part.partType)}
                 </CardDescription>
               </div>
               <div className="flex gap-2">
