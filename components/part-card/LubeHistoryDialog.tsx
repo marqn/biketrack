@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
 import { Pencil, Trash2 } from "lucide-react";
@@ -16,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import EditLubeDialog from "./EditLubeDialog";
 import { ConfirmDeleteDialog } from "../bike-header/dialogs";
 import { LubeEvent } from "@/lib/types";
+import { useDialogWithActions } from "@/lib/hooks/useDialog";
 
 interface LubeHistoryDialogProps{
   open: boolean;
@@ -37,8 +37,8 @@ export default function LubeHistoryDialog({
   onDelete,
   onEdit,
 }: LubeHistoryDialogProps) {
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [editId, setEditId] = useState<string | null>(null);
+  const { editId, deleteId, startEdit, cancelEdit, startDelete, cancelDelete } =
+    useDialogWithActions<string>();
 
   const sortedEvents = [...lubeEvents].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -49,7 +49,7 @@ export default function LubeHistoryDialog({
   async function handleDelete() {
     if (!deleteId) return;
     await onDelete(deleteId);
-    setDeleteId(null);
+    cancelDelete();
   }
 
   return (
@@ -132,14 +132,14 @@ export default function LubeHistoryDialog({
                           <Button
                             size="icon"
                             variant="ghost"
-                            onClick={() => setEditId(event.id)}
+                            onClick={() => startEdit(event.id)}
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
                           <Button
                             size="icon"
                             variant="ghost"
-                            onClick={() => setDeleteId(event.id)}
+                            onClick={() => startDelete(event.id)}
                           >
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
@@ -156,7 +156,7 @@ export default function LubeHistoryDialog({
 
       <ConfirmDeleteDialog
         open={!!deleteId}
-        onOpenChange={() => setDeleteId(null)}
+        onOpenChange={cancelDelete}
         onConfirm={handleDelete}
         itemName="smarowania"
       />
@@ -164,12 +164,12 @@ export default function LubeHistoryDialog({
       {editingEvent && (
         <EditLubeDialog
           open={!!editId}
-          onOpenChange={() => setEditId(null)}
+          onOpenChange={cancelEdit}
           lubeEvent={editingEvent}
           onSave={async (data) => {
             if (editId) {
               await onEdit(editId, data);
-              setEditId(null);
+              cancelEdit();
             }
           }}
         />

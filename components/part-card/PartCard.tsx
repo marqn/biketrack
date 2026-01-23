@@ -24,6 +24,7 @@ import {
   updatePartReplacement,
 } from "@/app/app/actions/replace-part";
 import { PartReplacement } from "@/lib/types";
+import { useMultiDialog } from "@/lib/hooks/useDialog";
 
 interface PartCardProps {
   partName: string;
@@ -50,9 +51,9 @@ export default function PartCard({
   currentModel,
   children,
 }: PartCardProps) {
-  const [activeDialog, setActiveDialog] = React.useState<
+  const { activeDialog, openDialog, closeDialog } = useMultiDialog<
     DialogType | "replace" | "history"
-  >(null);
+  >();
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -75,7 +76,7 @@ export default function PartCard({
 
     startTransition(async () => {
       await replacePart(formData);
-      setActiveDialog(null);
+      closeDialog();
       router.refresh();
     });
   }
@@ -105,7 +106,7 @@ export default function PartCard({
             {partName}
             <p>
               <button
-                onClick={() => setActiveDialog("bike-details")}
+                onClick={() => openDialog("bike-details")}
                 className="text-xs text-muted-foreground relative after:absolute after:bottom-0 after:left-1/2 after:h-[2px] after:w-0 after:bg-current after:transition-all after:duration-300 after:-translate-x-1/2 hover:after:w-full cursor-pointer"
               >
                 {currentBrand || currentModel
@@ -133,7 +134,7 @@ export default function PartCard({
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => setActiveDialog("replace")}
+                onClick={() => openDialog("replace")}
                 disabled={isPending}
               >
                 {isPending ? "Wymieniam..." : "🔄 Wymień"}
@@ -142,7 +143,7 @@ export default function PartCard({
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => setActiveDialog("history")}
+                  onClick={() => openDialog("history")}
                 >
                   <NotebookText className="h-4 w-4" />
                 </Button>
@@ -158,13 +159,13 @@ export default function PartCard({
 
       <PartDetailsDialog
         open={activeDialog === "bike-details"}
-        onOpenChange={(open) => !open && setActiveDialog(null)}
+        onOpenChange={(open) => !open && closeDialog()}
         partName={partName}
       />
 
       <ReplacePartDialog
         open={activeDialog === "replace"}
-        onOpenChange={(open) => !open && setActiveDialog(null)}
+        onOpenChange={(open) => !open && closeDialog()}
         partName={partName}
         currentBrand={currentBrand}
         currentModel={currentModel}
@@ -173,7 +174,7 @@ export default function PartCard({
 
       <PartHistoryDialog
         open={activeDialog === "history"}
-        onOpenChange={(open) => !open && setActiveDialog(null)}
+        onOpenChange={(open) => !open && closeDialog()}
         partName={partName}
         replacements={replacements}
         onDelete={handleDelete}

@@ -40,6 +40,7 @@ import {
   DeleteAccountDialog,
   AddEmailDialog,
 } from "./dialogs";
+import { useMultiDialog } from "@/lib/hooks/useDialog";
 
 interface BikeHeaderProps {
   bike: Bike;
@@ -76,7 +77,7 @@ type SyncStatus = "synced" | "syncing" | "error";
 
 export function BikeHeader({ bike, user }: BikeHeaderProps) {
   const router = useRouter();
-  const [activeDialog, setActiveDialog] = useState<DialogType>(null);
+  const { activeDialog, openDialog, closeDialog } = useMultiDialog<DialogType>();
   const [hasSeenTooltip, setHasSeenTooltip] = useState(false);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("synced");
 
@@ -95,7 +96,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
 
   const handleMenuClick = (item: MenuItemType) => {
     if (item.dialog) {
-      setActiveDialog(item.dialog);
+      openDialog(item.dialog);
     } else if (item.path) {
       router.push(item.path);
     }
@@ -133,7 +134,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
 
   useEffect(() => {
     const handler = () => {
-      setActiveDialog("add-email");
+      openDialog("add-email");
     };
 
     window.addEventListener("open-email-dialog", handler);
@@ -247,7 +248,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
                 Wyloguj
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => setActiveDialog("delete-account")}
+                onClick={() => openDialog("delete-account")}
               >
                 <Delete className="mr-2 h-4 w-4" />
                 Usuń konto
@@ -260,20 +261,20 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
       {/* DIALOGS */}
       <RenameBikeDialog
         open={activeDialog === "rename-bike"}
-        onOpenChange={(open) => !open && setActiveDialog(null)}
+        onOpenChange={(open) => !open && closeDialog()}
         bike={bike}
         onSave={handleUpdateBike}
       />
 
       <DeleteAccountDialog
         open={activeDialog === "delete-account"}
-        onOpenChange={(open) => !open && setActiveDialog(null)}
+        onOpenChange={(open) => !open && closeDialog()}
         onConfirm={handleDeleteAccount}
       />
 
       <AddEmailDialog
         open={activeDialog === "add-email"}
-        onOpenChange={(open) => !open && setActiveDialog(null)}
+        onOpenChange={(open) => !open && closeDialog()}
       />
     </header>
   );

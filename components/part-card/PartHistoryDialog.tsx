@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
 import { Pencil, Trash2 } from "lucide-react";
@@ -16,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import EditReplacementDialog from "./EditReplacementDialog";
 import { ConfirmDeleteDialog } from "../bike-header/dialogs";
 import { PartReplacement } from "@/lib/types";
+import { useDialogWithActions } from "@/lib/hooks/useDialog";
 
 interface PartHistoryDialogProps {
   open: boolean;
@@ -37,8 +37,8 @@ export default function PartHistoryDialog({
   onDelete,
   onEdit,
 }: PartHistoryDialogProps) {
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [editId, setEditId] = useState<string | null>(null);
+  const { editId, deleteId, startEdit, cancelEdit, startDelete, cancelDelete } =
+    useDialogWithActions<string>();
 
   const sortedReplacements = [...replacements].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -49,7 +49,7 @@ export default function PartHistoryDialog({
   async function handleDelete() {
     if (!deleteId) return;
     await onDelete(deleteId);
-    setDeleteId(null);
+    cancelDelete();
   }
 
   return (
@@ -134,14 +134,14 @@ export default function PartHistoryDialog({
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => setEditId(replacement.id)}
+                          onClick={() => startEdit(replacement.id)}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => setDeleteId(replacement.id)}
+                          onClick={() => startDelete(replacement.id)}
                         >
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
@@ -157,7 +157,7 @@ export default function PartHistoryDialog({
 
       <ConfirmDeleteDialog
         open={!!deleteId}
-        onOpenChange={() => setDeleteId(null)}
+        onOpenChange={cancelDelete}
         onConfirm={handleDelete}
         itemName="wymian"
       />
@@ -165,12 +165,12 @@ export default function PartHistoryDialog({
       {editingReplacement && (
         <EditReplacementDialog
           open={!!editId}
-          onOpenChange={() => setEditId(null)}
+          onOpenChange={cancelEdit}
           replacement={editingReplacement}
           onSave={async (data) => {
             if (editId) {
               await onEdit(editId, data);
-              setEditId(null);
+              cancelEdit();
             }
           }}
         />
