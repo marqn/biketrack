@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { BikeHeader } from "../../components/bike-header/BikeHeader";
+import { Footer } from "../../components/footer/Footer";
 
 export default async function RootLayout({
   children,
@@ -59,9 +60,10 @@ export default async function RootLayout({
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       {headerProps && <BikeHeader {...headerProps} />}
-      <main className="container mx-auto px-2 pt-24 pb-2">{children}</main>
-    </>
+      <main className="flex-1 container mx-auto px-2 pt-24 pb-8">{children}</main>
+      <Footer />
+    </div>
   );
 }
