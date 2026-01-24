@@ -36,6 +36,8 @@ export default function BrandModelFields({
   const [lastModelQuery, setLastModelQuery] = useState("");
   const [brandNotFound, setBrandNotFound] = useState(false);
   const [modelNotFound, setModelNotFound] = useState(false);
+  const [selectedBrandIndex, setSelectedBrandIndex] = useState(-1);
+  const [selectedModelIndex, setSelectedModelIndex] = useState(-1);
 
   // Search brands
   useEffect(() => {
@@ -52,11 +54,13 @@ export default function BrandModelFields({
         setBrandSuggestions(results);
         setLastBrandQuery(brand);
         setBrandNotFound(results.length === 0);
+        setSelectedBrandIndex(-1); // Reset selection
         setIsSearchingBrands(false);
       } else {
         setBrandSuggestions([]);
         setBrandNotFound(false);
         setLastBrandQuery("");
+        setSelectedBrandIndex(-1);
       }
     }, 300);
 
@@ -78,11 +82,13 @@ export default function BrandModelFields({
         setModelSuggestions(results);
         setLastModelQuery(model);
         setModelNotFound(results.length === 0);
+        setSelectedModelIndex(-1); // Reset selection
         setIsSearchingModels(false);
       } else {
         setModelSuggestions([]);
         setModelNotFound(false);
         setLastModelQuery("");
+        setSelectedModelIndex(-1);
       }
     }, 300);
 
@@ -104,6 +110,7 @@ export default function BrandModelFields({
     setBrandSuggestions([]);
     setBrandNotFound(false);
     setLastBrandQuery("");
+    setSelectedBrandIndex(-1);
   };
 
   const handleClearModel = () => {
@@ -112,6 +119,69 @@ export default function BrandModelFields({
     setModelSuggestions([]);
     setModelNotFound(false);
     setLastModelQuery("");
+    setSelectedModelIndex(-1);
+  };
+
+  const handleBrandKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showBrandSuggestions || brandSuggestions.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setSelectedBrandIndex((prev) =>
+          prev < brandSuggestions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setSelectedBrandIndex((prev) => (prev > 0 ? prev - 1 : -1));
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (selectedBrandIndex >= 0) {
+          onBrandChange(brandSuggestions[selectedBrandIndex]);
+          setShowBrandSuggestions(false);
+          setSelectedBrandIndex(-1);
+        }
+        break;
+      case "Escape":
+        e.preventDefault();
+        setShowBrandSuggestions(false);
+        setSelectedBrandIndex(-1);
+        break;
+    }
+  };
+
+  const handleModelKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showModelSuggestions || modelSuggestions.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setSelectedModelIndex((prev) =>
+          prev < modelSuggestions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setSelectedModelIndex((prev) => (prev > 0 ? prev - 1 : -1));
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (selectedModelIndex >= 0) {
+          const product = modelSuggestions[selectedModelIndex];
+          onModelChange(product.model);
+          onProductSelect(product);
+          setShowModelSuggestions(false);
+          setSelectedModelIndex(-1);
+        }
+        break;
+      case "Escape":
+        e.preventDefault();
+        setShowModelSuggestions(false);
+        setSelectedModelIndex(-1);
+        break;
+    }
   };
 
   return (
@@ -138,6 +208,7 @@ export default function BrandModelFields({
                 setLastBrandQuery("");
               }
             }}
+            onKeyDown={handleBrandKeyDown}
             onFocus={() => setShowBrandSuggestions(true)}
             onBlur={() => setTimeout(() => setShowBrandSuggestions(false), 200)}
             className="pr-8"
@@ -156,15 +227,21 @@ export default function BrandModelFields({
         {/* Brand suggestions dropdown */}
         {showBrandSuggestions && brandSuggestions.length > 0 && (
           <div className="absolute z-10 w-full mt-1 bg-popover border rounded-md shadow-md max-h-48 overflow-y-auto">
-            {brandSuggestions.map((brandName) => (
+            {brandSuggestions.map((brandName, index) => (
               <button
                 key={brandName}
                 type="button"
-                className="w-full px-3 py-2 text-left hover:bg-accent text-sm"
+                className={`w-full px-3 py-2 text-left text-sm transition-colors ${
+                  index === selectedBrandIndex
+                    ? "bg-accent"
+                    : "hover:bg-accent"
+                }`}
                 onMouseDown={() => {
                   onBrandChange(brandName);
                   setShowBrandSuggestions(false);
+                  setSelectedBrandIndex(-1);
                 }}
+                onMouseEnter={() => setSelectedBrandIndex(index)}
               >
                 {brandName}
               </button>
@@ -195,6 +272,7 @@ export default function BrandModelFields({
                 setLastModelQuery("");
               }
             }}
+            onKeyDown={handleModelKeyDown}
             onFocus={() => setShowModelSuggestions(true)}
             onBlur={() => setTimeout(() => setShowModelSuggestions(false), 200)}
             disabled={!brand}
@@ -215,16 +293,22 @@ export default function BrandModelFields({
         {/* Model suggestions dropdown */}
         {showModelSuggestions && modelSuggestions.length > 0 && (
           <div className="absolute z-10 w-full mt-1 bg-popover border rounded-md shadow-md max-h-60 overflow-y-auto">
-            {modelSuggestions.map((product) => (
+            {modelSuggestions.map((product, index) => (
               <button
                 key={product.id}
                 type="button"
-                className="w-full px-3 py-2 text-left hover:bg-accent"
+                className={`w-full px-3 py-2 text-left transition-colors ${
+                  index === selectedModelIndex
+                    ? "bg-accent"
+                    : "hover:bg-accent"
+                }`}
                 onMouseDown={() => {
                   onModelChange(product.model);
                   onProductSelect(product);
                   setShowModelSuggestions(false);
+                  setSelectedModelIndex(-1);
                 }}
+                onMouseEnter={() => setSelectedModelIndex(index)}
               >
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">{product.model}</span>
