@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useState, useEffect } from "react";
+import { X } from "lucide-react";
 import { PartType } from "@/lib/generated/prisma";
 import { PartProduct } from "@/lib/types";
 import { searchBrands, searchModels } from "@/app/app/actions/search-brands";
@@ -97,6 +98,22 @@ export default function BrandModelFields({
     onProductSelect(null);
   }, [brand]);
 
+  const handleClearBrand = () => {
+    onBrandChange("");
+    onProductSelect(null);
+    setBrandSuggestions([]);
+    setBrandNotFound(false);
+    setLastBrandQuery("");
+  };
+
+  const handleClearModel = () => {
+    onModelChange("");
+    onProductSelect(null);
+    setModelSuggestions([]);
+    setModelNotFound(false);
+    setLastModelQuery("");
+  };
+
   return (
     <div className="space-y-4">
       {/* Brand field */}
@@ -104,25 +121,37 @@ export default function BrandModelFields({
         <Label htmlFor="brand">
           Marka <span className="text-destructive">*</span>
         </Label>
-        <Input
-          id="brand"
-          placeholder="np. Continental, Shimano, SRAM"
-          value={brand}
-          onChange={(e) => {
-            const newBrand = e.target.value;
-            onBrandChange(newBrand);
-            onProductSelect(null);
-            setShowBrandSuggestions(true);
-            
-            // Reset brandNotFound tylko gdy użytkownik skraca query lub zmienia kierunek
-            if (!newBrand.toLowerCase().startsWith(lastBrandQuery.toLowerCase()) || newBrand.length < lastBrandQuery.length) {
-              setBrandNotFound(false);
-              setLastBrandQuery("");
-            }
-          }}
-          onFocus={() => setShowBrandSuggestions(true)}
-          onBlur={() => setTimeout(() => setShowBrandSuggestions(false), 200)}
-        />
+        <div className="relative">
+          <Input
+            id="brand"
+            placeholder="np. Continental, Shimano, SRAM"
+            value={brand}
+            onChange={(e) => {
+              const newBrand = e.target.value;
+              onBrandChange(newBrand);
+              onProductSelect(null);
+              setShowBrandSuggestions(true);
+              
+              // Reset brandNotFound tylko gdy użytkownik skraca query lub zmienia kierunek
+              if (!newBrand.toLowerCase().startsWith(lastBrandQuery.toLowerCase()) || newBrand.length < lastBrandQuery.length) {
+                setBrandNotFound(false);
+                setLastBrandQuery("");
+              }
+            }}
+            onFocus={() => setShowBrandSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowBrandSuggestions(false), 200)}
+            className="pr-8"
+          />
+          {brand && (
+            <button
+              type="button"
+              onClick={handleClearBrand}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
 
         {/* Brand suggestions dropdown */}
         {showBrandSuggestions && brandSuggestions.length > 0 && (
@@ -149,26 +178,39 @@ export default function BrandModelFields({
         <Label htmlFor="model">
           Model <span className="text-destructive">*</span>
         </Label>
-        <Input
-          id="model"
-          placeholder="np. GP5000, XT CN-M8100"
-          value={model}
-          onChange={(e) => {
-            const newModel = e.target.value;
-            onModelChange(newModel);
-            onProductSelect(null);
-            setShowModelSuggestions(true);
-            
-            // Reset modelNotFound tylko gdy użytkownik skraca query lub zmienia kierunek
-            if (!newModel.toLowerCase().startsWith(lastModelQuery.toLowerCase()) || newModel.length < lastModelQuery.length) {
-              setModelNotFound(false);
-              setLastModelQuery("");
-            }
-          }}
-          onFocus={() => setShowModelSuggestions(true)}
-          onBlur={() => setTimeout(() => setShowModelSuggestions(false), 200)}
-          disabled={!brand}
-        />
+        <div className="relative">
+          <Input
+            id="model"
+            placeholder="np. GP5000, XT CN-M8100"
+            value={model}
+            onChange={(e) => {
+              const newModel = e.target.value;
+              onModelChange(newModel);
+              onProductSelect(null);
+              setShowModelSuggestions(true);
+              
+              // Reset modelNotFound tylko gdy użytkownik skraca query lub zmienia kierunek
+              if (!newModel.toLowerCase().startsWith(lastModelQuery.toLowerCase()) || newModel.length < lastModelQuery.length) {
+                setModelNotFound(false);
+                setLastModelQuery("");
+              }
+            }}
+            onFocus={() => setShowModelSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowModelSuggestions(false), 200)}
+            disabled={!brand}
+            className="pr-8"
+          />
+          {model && (
+            <button
+              type="button"
+              onClick={handleClearModel}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!brand}
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
 
         {/* Model suggestions dropdown */}
         {showModelSuggestions && modelSuggestions.length > 0 && (
