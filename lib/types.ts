@@ -118,3 +118,53 @@ export interface TimelineItem {
   data: PartReplacement | ServiceEvent;
   createdAt: string;
 }
+
+// Nowe interfejsy dla globalnego systemu produktów i opinii
+export interface PartProduct {
+  id: string;
+  type: string;
+  brand: string;
+  model: string;
+  description: string | null;
+  officialImageUrl: string | null;
+  officialPrice: unknown; // Prisma Decimal type
+  averageRating: number | null;
+  totalReviews: number;
+  averageKmLifespan: number | null;
+  totalInstallations: number;
+  specifications: unknown;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}
+
+export interface PartReview {
+  id: string;
+  userId: string;
+  partId: string;
+  productId: string;
+  rating: number;
+  reviewText: string | null;
+  kmAtReview: number;
+  kmUsed: number;
+  bikeType: BikeType;
+  pros: string[];
+  cons: string[];
+  verified: boolean;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}
+
+export interface PartProductWithStats extends PartProduct {
+  reviews?: PartReview[];
+}
+
+export interface BikePartWithProduct {
+  id: string;
+  type: string;
+  wearKm: number;
+  expectedKm: number;
+  productId: string | null;
+  installedAt: Date | string | null;
+  partSpecificData: unknown;
+  product: PartProduct | null;
+}

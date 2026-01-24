@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { PartType } from "@/lib/generated/prisma";
+import { PartType, Prisma } from "@/lib/generated/prisma";
 
 export async function replacePart(formData: FormData) {
   const bikeId = formData.get("bikeId") as string;
@@ -21,6 +21,7 @@ export async function replacePart(formData: FormData) {
     include: {
       parts: {
         where: { type: partType },
+        include: { product: true }, // Include product dla snapshot
       },
     },
   });
@@ -31,24 +32,30 @@ export async function replacePart(formData: FormData) {
 
   const part = bike.parts[0];
 
-  // Zapisz historię wymiany
+  // Zapisz historię wymiany (snapshot produktu)
   await prisma.partReplacement.create({
     data: {
       bikeId,
       partId: part.id,
       partType,
-      brand: brand?.trim() || null,
-      model: model?.trim() || null,
+      productId: part.productId,
+      brand: part.product?.brand || brand?.trim() || null,
+      model: part.product?.model || model?.trim() || null,
       notes: notes?.trim() || null,
       kmAtReplacement: bike.totalKm,
       kmUsed: part.wearKm,
     },
   });
 
-  // Zresetuj licznik zużycia części
+  // Reset BikePart (nowa część = czyste dane)
   await prisma.bikePart.update({
     where: { id: part.id },
-    data: { wearKm: 0 },
+    data: {
+      wearKm: 0,
+      productId: null,
+      installedAt: null,
+      partSpecificData: Prisma.JsonNull,
+    },
   });
 
   revalidatePath("/app"); // 👈 DODANE - główna strona

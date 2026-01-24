@@ -1,7 +1,6 @@
 "use client";
 
-import { Bike, Github, Heart } from "lucide-react";
-import Link from "next/link";
+import { Bike, Heart } from "lucide-react";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();

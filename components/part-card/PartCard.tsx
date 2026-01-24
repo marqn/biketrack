@@ -17,13 +17,11 @@ import ColoredProgress from "@/components/ui/colored-progress";
 import { DialogType } from "@/components/bike-header/BikeHeader";
 import PartDetailsDialog from "./PartDetailsDialog";
 import PartHistoryDialog from "./PartHistoryDialog";
-import ReplacePartDialog from "./ReplacePartDialog";
 import {
-  replacePart,
   deletePartReplacement,
   updatePartReplacement,
 } from "@/app/app/actions/replace-part";
-import { PartReplacement } from "@/lib/types";
+import { PartReplacement, BikePartWithProduct } from "@/lib/types";
 import { useMultiDialog } from "@/lib/hooks/useDialog";
 
 interface PartCardProps {
@@ -36,6 +34,7 @@ interface PartCardProps {
   replacements?: PartReplacement[];
   currentBrand?: string | null;
   currentModel?: string | null;
+  currentPart?: Partial<BikePartWithProduct> | null;
   children?: React.ReactNode;
 }
 
@@ -43,6 +42,7 @@ export default function PartCard({
   partName,
   wearKm,
   expectedKm,
+  currentPart,
   bikeId,
   partId,
   partType,
@@ -61,25 +61,6 @@ export default function PartCard({
     Math.round((wearKm / expectedKm) * 100),
     100
   );
-
-  async function handleReplace(data: {
-    brand?: string;
-    model?: string;
-    notes?: string;
-  }) {
-    const formData = new FormData();
-    formData.set("bikeId", bikeId);
-    formData.set("partType", partType);
-    if (data.brand) formData.set("brand", data.brand);
-    if (data.model) formData.set("model", data.model);
-    if (data.notes) formData.set("notes", data.notes);
-
-    startTransition(async () => {
-      await replacePart(formData);
-      closeDialog();
-      router.refresh();
-    });
-  }
 
   async function handleDelete(replacementId: string) {
     startTransition(async () => {
@@ -160,16 +141,21 @@ export default function PartCard({
       <PartDetailsDialog
         open={activeDialog === "bike-details"}
         onOpenChange={(open) => !open && closeDialog()}
+        partType={partType}
         partName={partName}
+        partId={partId || ""}
+        bikeId={bikeId}
+        currentPart={currentPart}
       />
 
-      <ReplacePartDialog
+      <PartDetailsDialog
         open={activeDialog === "replace"}
         onOpenChange={(open) => !open && closeDialog()}
+        partType={partType}
         partName={partName}
-        currentBrand={currentBrand}
-        currentModel={currentModel}
-        onReplace={handleReplace}
+        partId={partId || ""}
+        bikeId={bikeId}
+        currentPart={currentPart}
       />
 
       <PartHistoryDialog

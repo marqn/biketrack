@@ -24,6 +24,7 @@ export default async function AppPage() {
         include: {
           parts: {
             include: {
+              product: true, // Include product data
               replacements: {
                 orderBy: { createdAt: "desc" },
               },
@@ -62,8 +63,9 @@ export default async function AppPage() {
           bikeId={bike.id}
           partType={PartType.CHAIN}
           replacements={chain?.replacements || []}
-          currentBrand={chain?.replacements?.[0]?.brand}
-          currentModel={chain?.replacements?.[0]?.model}
+          currentBrand={chain?.product?.brand || chain?.replacements?.[0]?.brand}
+          currentModel={chain?.product?.model || chain?.replacements?.[0]?.model}
+          currentPart={chain}
         >
           <LubeButton
             bikeId={bike.id}
@@ -88,8 +90,9 @@ export default async function AppPage() {
                 bikeId={bike.id}
                 partType={part.type}
                 replacements={existingPart?.replacements || []}
-                currentBrand={existingPart?.replacements?.[0]?.brand}
-                currentModel={existingPart?.replacements?.[0]?.model}
+                currentBrand={existingPart?.product?.brand || existingPart?.replacements?.[0]?.brand}
+                currentModel={existingPart?.product?.model || existingPart?.replacements?.[0]?.model}
+                currentPart={existingPart}
               />
             );
           })}

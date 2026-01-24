@@ -24,6 +24,7 @@ model User {
   sessions      Session[]
   bikes         Bike[]
   notifications Notification[]
+  partReviews   PartReview[]
 }
 
 model Account {
@@ -113,13 +114,21 @@ model BikePart {
   wearKm     Int @default(0)
   expectedKm Int
 
+  // Nowe pola dla globalnego systemu produktów
+  productId String? // Referencja do globalnego produktu
+  installedAt DateTime? // Data montażu
+  partSpecificData Json? // Specyficzne dane dla tej instancji części
+
   bike         Bike              @relation(fields: [bikeId], references: [id], onDelete: Cascade)
+  product      PartProduct?      @relation(fields: [productId], references: [id], onDelete: SetNull)
   replacements PartReplacement[]
+  reviews      PartReview[]
 
   createdAt DateTime @default(now())
-  
-  @@unique([bikeId, type]) // 👈 DODAJ - szybsze wyszukiwanie części po bikeId i type
-  @@index([bikeId]) // 👈 DODAJ
+
+  @@unique([bikeId, type])
+  @@index([bikeId])
+  @@index([productId])
 }
 
 // 👇 NOWY MODEL - Historia wymian
@@ -128,10 +137,11 @@ model PartReplacement {
   bikeId String
   partId String
 
-  partType PartType
-  brand    String?
-  model    String?
-  notes    String?
+  partType  PartType
+  productId String? // Snapshot productId
+  brand     String?
+  model     String?
+  notes     String?
 
   kmAtReplacement Int // Przebieg roweru w momencie wymiany
   kmUsed          Int // Ile km przejechał komponent (wearKm w momencie wymiany)
@@ -143,6 +153,74 @@ model PartReplacement {
 
   @@index([bikeId, partType])
   @@index([partId])
+  @@index([productId])
+}
+
+// Globalna baza produktów (community-driven)
+model PartProduct {
+  id   String   @id @default(cuid())
+  type PartType
+
+  brand String
+  model String
+
+  // Metadane produktu (opcjonalne - rozbudowa w przyszłości)
+  description      String?  @db.Text
+  officialImageUrl String?
+  officialPrice    Decimal? @db.Decimal(10, 2)
+
+  // Agregowane statystyki (denormalizowane dla wydajności)
+  averageRating      Float? @default(0)
+  totalReviews       Int    @default(0)
+  averageKmLifespan  Int?   @default(0)
+  totalInstallations Int    @default(0)
+
+  // Specyfikacja produktu (różna dla różnych typów)
+  specifications Json? // { width: 28, tubeless: true, ... }
+
+  bikeParts BikePart[]
+  reviews   PartReview[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([type, brand, model])
+  @@index([type, averageRating])
+  @@index([brand])
+}
+
+// Opinie użytkowników o produktach
+model PartReview {
+  id        String @id @default(cuid())
+  userId    String
+  partId    String
+  productId String
+
+  rating     Int     // 1-5
+  reviewText String? @db.Text
+
+  // Kontekst użytkowania
+  kmAtReview Int      // Przebieg w momencie dodania opinii
+  kmUsed     Int      // Ile km przejechał komponent
+  bikeType   BikeType // Typ roweru (kontekst)
+
+  // Pros/Cons
+  pros String[] @default([])
+  cons String[] @default([])
+
+  // Weryfikacja
+  verified Boolean @default(true) // true jeśli linked do rzeczywistego BikePart
+
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  part    BikePart    @relation(fields: [partId], references: [id], onDelete: Cascade)
+  product PartProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, partId])
+  @@index([productId, rating])
+  @@index([userId])
 }
 
 model ServiceEvent {
