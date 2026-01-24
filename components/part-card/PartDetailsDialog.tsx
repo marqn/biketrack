@@ -64,9 +64,9 @@ export default function PartDetailsDialog({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
+  // ZAWSZE czyść formularz przy otwarciu dialogu
   useEffect(() => {
     if (open) {
-      // Zawsze zaczynaj od czystego stanu
       setSelectedProduct(null);
       setBrand("");
       setModel("");
@@ -75,24 +75,8 @@ export default function PartDetailsDialog({
       setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
       setRating(0);
       setReviewText("");
-
-      // Jeśli jest currentPart z produktem, załaduj dane (tylko dla edycji)
-      if (currentPart?.product) {
-        setSelectedProduct(currentPart.product as PartProduct);
-        setBrand(currentPart.product.brand);
-        setModel(currentPart.product.model);
-
-        if (currentPart.installedAt) {
-          const date = new Date(currentPart.installedAt);
-          setInstalledAt(date.toISOString().split("T")[0]);
-        }
-
-        if (currentPart.partSpecificData) {
-          setPartSpecificData(currentPart.partSpecificData as Record<string, unknown>);
-        }
-      }
     }
-  }, [open, currentPart, partType]);
+  }, [open, partType]);
 
   async function handleSave() {
     if (!brand.trim() || !model.trim()) {

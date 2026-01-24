@@ -38,8 +38,9 @@ export default function BrandModelFields({
 
   // Search brands
   useEffect(() => {
-    // Jeśli już wiemy że marka nie istnieje i użytkownik tylko dodaje znaki, nie szukaj ponownie
-    if (brandNotFound && brand.startsWith(lastBrandQuery) && brand.length > lastBrandQuery.length) {
+    // Inteligentne cachowanie: jeśli poprzednie zapytanie nie zwróciło wyników
+    // i obecne query jest rozszerzeniem poprzedniego, nie wysyłaj zapytania
+    if (brandNotFound && lastBrandQuery && brand.toLowerCase().startsWith(lastBrandQuery.toLowerCase()) && brand.length > lastBrandQuery.length) {
       return;
     }
 
@@ -54,16 +55,18 @@ export default function BrandModelFields({
       } else {
         setBrandSuggestions([]);
         setBrandNotFound(false);
+        setLastBrandQuery("");
       }
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [brand, partType, brandNotFound, lastBrandQuery]);
+  }, [brand, partType]);
 
   // Search models
   useEffect(() => {
-    // Jeśli już wiemy że model nie istnieje i użytkownik tylko dodaje znaki, nie szukaj ponownie
-    if (modelNotFound && model.startsWith(lastModelQuery) && model.length > lastModelQuery.length) {
+    // Inteligentne cachowanie: jeśli poprzednie zapytanie nie zwróciło wyników
+    // i obecne query jest rozszerzeniem poprzedniego, nie wysyłaj zapytania
+    if (modelNotFound && lastModelQuery && model.toLowerCase().startsWith(lastModelQuery.toLowerCase()) && model.length > lastModelQuery.length) {
       return;
     }
 
@@ -78,11 +81,21 @@ export default function BrandModelFields({
       } else {
         setModelSuggestions([]);
         setModelNotFound(false);
+        setLastModelQuery("");
       }
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [brand, model, partType, modelNotFound, lastModelQuery]);
+  }, [brand, model, partType]);
+
+  // Reset model state when brand changes
+  useEffect(() => {
+    setModelSuggestions([]);
+    setModelNotFound(false);
+    setLastModelQuery("");
+    onModelChange("");
+    onProductSelect(null);
+  }, [brand]);
 
   return (
     <div className="space-y-4">
@@ -96,10 +109,16 @@ export default function BrandModelFields({
           placeholder="np. Continental, Shimano, SRAM"
           value={brand}
           onChange={(e) => {
-            onBrandChange(e.target.value);
+            const newBrand = e.target.value;
+            onBrandChange(newBrand);
             onProductSelect(null);
             setShowBrandSuggestions(true);
-            setBrandNotFound(false); // Reset gdy użytkownik zmienia input
+            
+            // Reset brandNotFound tylko gdy użytkownik skraca query lub zmienia kierunek
+            if (!newBrand.toLowerCase().startsWith(lastBrandQuery.toLowerCase()) || newBrand.length < lastBrandQuery.length) {
+              setBrandNotFound(false);
+              setLastBrandQuery("");
+            }
           }}
           onFocus={() => setShowBrandSuggestions(true)}
           onBlur={() => setTimeout(() => setShowBrandSuggestions(false), 200)}
@@ -141,10 +160,16 @@ export default function BrandModelFields({
           placeholder="np. GP5000, XT CN-M8100"
           value={model}
           onChange={(e) => {
-            onModelChange(e.target.value);
+            const newModel = e.target.value;
+            onModelChange(newModel);
             onProductSelect(null);
             setShowModelSuggestions(true);
-            setModelNotFound(false); // Reset gdy użytkownik zmienia input
+            
+            // Reset modelNotFound tylko gdy użytkownik skraca query lub zmienia kierunek
+            if (!newModel.toLowerCase().startsWith(lastModelQuery.toLowerCase()) || newModel.length < lastModelQuery.length) {
+              setModelNotFound(false);
+              setLastModelQuery("");
+            }
           }}
           onFocus={() => setShowModelSuggestions(true)}
           onBlur={() => setTimeout(() => setShowModelSuggestions(false), 200)}

@@ -62,6 +62,25 @@ export default function PartCard({
     100
   );
 
+  async function handleReplace(data: {
+    brand?: string;
+    model?: string;
+    notes?: string;
+  }) {
+    const formData = new FormData();
+    formData.set("bikeId", bikeId);
+    formData.set("partType", partType);
+    if (data.brand) formData.set("brand", data.brand);
+    if (data.model) formData.set("model", data.model);
+    if (data.notes) formData.set("notes", data.notes);
+
+    startTransition(async () => {
+      await replacePart(formData);
+      closeDialog();
+      router.refresh();
+    });
+  }
+
   async function handleDelete(replacementId: string) {
     startTransition(async () => {
       await deletePartReplacement(replacementId);
