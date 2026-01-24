@@ -148,7 +148,6 @@ export default function PartCard({
         partType={partType}
         partName={partName}
         partId={partId || ""}
-        bikeId={bikeId}
         mode={hasCurrentPart ? "edit" : "create"}
         currentPart={currentPart}
       />
@@ -160,7 +159,6 @@ export default function PartCard({
         partType={partType}
         partName={partName}
         partId={partId || ""}
-        bikeId={bikeId}
         mode="replace"
         currentPart={currentPart}
       />

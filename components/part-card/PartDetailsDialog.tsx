@@ -12,7 +12,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { PartType } from "@/lib/generated/prisma";
@@ -38,7 +37,6 @@ interface PartDetailsDialogProps {
   partType: PartType;
   partName: string;
   partId: string;
-  bikeId: string;
   mode: "create" | "edit" | "replace";
   currentPart?: Partial<BikePartWithProduct> | null;
 }
@@ -49,7 +47,6 @@ export default function PartDetailsDialog({
   partType,
   partName,
   partId,
-  bikeId,
   mode,
   currentPart,
 }: PartDetailsDialogProps) {
@@ -181,7 +178,7 @@ export default function PartDetailsDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh]">
-        <DialogHeader className="flex-shrink-0">
+        <DialogHeader className="shrink-0">
           <DialogTitle>
             {mode === "edit"
               ? "Edytuj szczegóły"
@@ -266,7 +263,7 @@ export default function PartDetailsDialog({
           </div>
         </div>
 
-        <DialogFooter className="flex-shrink-0">
+        <DialogFooter className="shrink-0">
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Anuluj
           </Button>
