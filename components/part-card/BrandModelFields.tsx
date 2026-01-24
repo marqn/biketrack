@@ -142,12 +142,6 @@ export default function BrandModelFields({
             ))}
           </div>
         )}
-
-        {brand && brandSuggestions.length === 0 && !isSearchingBrands && (
-          <p className="text-xs text-muted-foreground">
-            💡 Nowa marka - zostanie dodana do bazy
-          </p>
-        )}
       </div>
 
       {/* Model field */}
@@ -205,12 +199,6 @@ export default function BrandModelFields({
               </button>
             ))}
           </div>
-        )}
-
-        {brand && model && modelSuggestions.length === 0 && !isSearchingModels && (
-          <p className="text-xs text-muted-foreground">
-            💡 Nowy model - zostanie dodany do bazy
-          </p>
         )}
       </div>
     </div>

@@ -39,6 +39,7 @@ interface PartDetailsDialogProps {
   partName: string;
   partId: string;
   bikeId: string;
+  mode: "create" | "edit";
   currentPart?: Partial<BikePartWithProduct> | null;
 }
 
@@ -49,6 +50,7 @@ export default function PartDetailsDialog({
   partName,
   partId,
   bikeId,
+  mode,
   currentPart,
 }: PartDetailsDialogProps) {
   const [selectedProduct, setSelectedProduct] = useState<PartProduct | null>(null);
@@ -64,19 +66,50 @@ export default function PartDetailsDialog({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  // ZAWSZE czyść formularz przy otwarciu dialogu
   useEffect(() => {
     if (open) {
-      setSelectedProduct(null);
-      setBrand("");
-      setModel("");
-      const today = new Date();
-      setInstalledAt(today.toISOString().split("T")[0]);
-      setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
-      setRating(0);
-      setReviewText("");
+      if (mode === "edit" && currentPart?.product) {
+        // Tryb edycji - załaduj dane z currentPart
+        setSelectedProduct(currentPart.product as PartProduct);
+        setBrand(currentPart.product.brand);
+        setModel(currentPart.product.model);
+
+        if (currentPart.installedAt) {
+          const date = new Date(currentPart.installedAt);
+          setInstalledAt(date.toISOString().split("T")[0]);
+        } else {
+          const today = new Date();
+          setInstalledAt(today.toISOString().split("T")[0]);
+        }
+
+        if (currentPart.partSpecificData) {
+          setPartSpecificData(currentPart.partSpecificData as Record<string, unknown>);
+        } else {
+          setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
+        }
+
+        // Załaduj ocenę i opinię jeśli istnieją
+        if (currentPart.product.reviews && currentPart.product.reviews.length > 0) {
+          const review = currentPart.product.reviews[0];
+          setRating(review.rating || 0);
+          setReviewText(review.text || "");
+        } else {
+          setRating(0);
+          setReviewText("");
+        }
+      } else {
+        // Tryb create - wyczyść wszystko
+        setSelectedProduct(null);
+        setBrand("");
+        setModel("");
+        const today = new Date();
+        setInstalledAt(today.toISOString().split("T")[0]);
+        setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
+        setRating(0);
+        setReviewText("");
+      }
     }
-  }, [open, partType]);
+  }, [open, mode, currentPart, partType]);
 
   async function handleSave() {
     if (!brand.trim() || !model.trim()) {
@@ -148,7 +181,9 @@ export default function PartDetailsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh]">
         <DialogHeader className="flex-shrink-0">
-          <DialogTitle>Dodaj szczegóły: {partName}</DialogTitle>
+          <DialogTitle>
+            {mode === "edit" ? "Edytuj szczegóły" : "Dodaj szczegóły"}: {partName}
+          </DialogTitle>
           <DialogDescription>
             Określ model części oraz jej parametry użytkowe
           </DialogDescription>

@@ -62,24 +62,8 @@ export default function PartCard({
     100
   );
 
-  async function handleReplace(data: {
-    brand?: string;
-    model?: string;
-    notes?: string;
-  }) {
-    const formData = new FormData();
-    formData.set("bikeId", bikeId);
-    formData.set("partType", partType);
-    if (data.brand) formData.set("brand", data.brand);
-    if (data.model) formData.set("model", data.model);
-    if (data.notes) formData.set("notes", data.notes);
-
-    startTransition(async () => {
-      await replacePart(formData);
-      closeDialog();
-      router.refresh();
-    });
-  }
+  // Określ czy jest to edit czy create
+  const hasCurrentPart = !!(currentBrand && currentModel);
 
   async function handleDelete(replacementId: string) {
     startTransition(async () => {
@@ -157,6 +141,7 @@ export default function PartCard({
         )}
       </Card>
 
+      {/* Dialog dla edycji istniejącej części */}
       <PartDetailsDialog
         open={activeDialog === "bike-details"}
         onOpenChange={(open) => !open && closeDialog()}
@@ -164,9 +149,11 @@ export default function PartCard({
         partName={partName}
         partId={partId || ""}
         bikeId={bikeId}
+        mode={hasCurrentPart ? "edit" : "create"}
         currentPart={currentPart}
       />
 
+      {/* Dialog dla wymiany (zawsze create) */}
       <PartDetailsDialog
         open={activeDialog === "replace"}
         onOpenChange={(open) => !open && closeDialog()}
@@ -174,7 +161,8 @@ export default function PartCard({
         partName={partName}
         partId={partId || ""}
         bikeId={bikeId}
-        currentPart={currentPart}
+        mode="create"
+        currentPart={null}
       />
 
       <PartHistoryDialog
