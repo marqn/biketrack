@@ -34,6 +34,9 @@ export interface InstallPartInput {
   reviewText?: string;
   pros?: string[];
   cons?: string[];
+
+  // Czy to jest wymiana części (powoduje zapisanie starej części do historii)
+  isReplacement?: boolean;
 }
 
 export async function installPart(data: InstallPartInput) {
@@ -41,10 +44,27 @@ export async function installPart(data: InstallPartInput) {
 
   const part = await prisma.bikePart.findUnique({
     where: { id: data.partId },
-    include: { bike: true },
+    include: { bike: true, product: true },
   });
 
   if (!part) throw new Error("Part not found");
+
+  // Jeśli to wymiana części, zapisz starą część do historii
+  if (data.isReplacement && part.wearKm > 0) {
+    await prisma.partReplacement.create({
+      data: {
+        bikeId: part.bikeId,
+        partId: part.id,
+        partType: part.type,
+        productId: part.productId,
+        brand: part.product?.brand || data.brand?.trim() || null,
+        model: part.product?.model || data.model?.trim() || null,
+        notes: null,
+        kmAtReplacement: part.bike.totalKm,
+        kmUsed: part.wearKm,
+      },
+    });
+  }
 
   // Jeśli nie wybrano produktu, utwórz nowy (upsert)
   if (!productId && data.brand && data.model) {
@@ -62,7 +82,7 @@ export async function installPart(data: InstallPartInput) {
         type: canonicalType,
         brand: data.brand,
         model: data.model,
-        specifications: data.partSpecificData,
+        specifications: data.partSpecificData as any,
         totalInstallations: 1,
       },
       update: {
@@ -84,7 +104,9 @@ export async function installPart(data: InstallPartInput) {
     data: {
       productId,
       installedAt: data.installedAt || new Date(),
-      partSpecificData: data.partSpecificData,
+      partSpecificData: data.partSpecificData as any,
+      // Jeśli to wymiana, wyzeruj zużycie
+      ...(data.isReplacement && { wearKm: 0 }),
     },
   });
 

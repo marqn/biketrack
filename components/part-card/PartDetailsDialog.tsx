@@ -39,7 +39,7 @@ interface PartDetailsDialogProps {
   partName: string;
   partId: string;
   bikeId: string;
-  mode: "create" | "edit";
+  mode: "create" | "edit" | "replace";
   currentPart?: Partial<BikePartWithProduct> | null;
 }
 
@@ -98,7 +98,7 @@ export default function PartDetailsDialog({
           setReviewText("");
         }
       } else {
-        // Tryb create - wyczyść wszystko
+        // Tryb create i replace - wyczyść wszystko
         setSelectedProduct(null);
         setBrand("");
         setModel("");
@@ -128,6 +128,7 @@ export default function PartDetailsDialog({
           partSpecificData: hasSpecificFields(partType) ? partSpecificData : undefined,
           rating: rating > 0 ? rating : undefined,
           reviewText: reviewText.trim() || undefined,
+          isReplacement: mode === "replace",
         });
         onOpenChange(false);
         router.refresh();
@@ -182,10 +183,16 @@ export default function PartDetailsDialog({
       <DialogContent className="max-w-2xl max-h-[90vh]">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle>
-            {mode === "edit" ? "Edytuj szczegóły" : "Dodaj szczegóły"}: {partName}
+            {mode === "edit"
+              ? "Edytuj szczegóły"
+              : mode === "replace"
+              ? "Wymień"
+              : "Dodaj szczegóły"}: {partName}
           </DialogTitle>
           <DialogDescription>
-            Określ model części oraz jej parametry użytkowe
+            {mode === "replace"
+              ? "Podaj szczegóły nowej części"
+              : "Określ model części oraz jej parametry użytkowe"}
           </DialogDescription>
         </DialogHeader>
 

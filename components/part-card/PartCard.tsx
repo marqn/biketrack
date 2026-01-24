@@ -153,7 +153,7 @@ export default function PartCard({
         currentPart={currentPart}
       />
 
-      {/* Dialog dla wymiany (zawsze create) */}
+      {/* Dialog dla wymiany */}
       <PartDetailsDialog
         open={activeDialog === "replace"}
         onOpenChange={(open) => !open && closeDialog()}
@@ -161,8 +161,8 @@ export default function PartCard({
         partName={partName}
         partId={partId || ""}
         bikeId={bikeId}
-        mode="create"
-        currentPart={null}
+        mode="replace"
+        currentPart={currentPart}
       />
 
       <PartHistoryDialog
