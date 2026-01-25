@@ -12,9 +12,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import LubricantBrandAutocomplete from "./LubricantBrandAutocomplete";
 
 interface LubeDialogProps {
   open: boolean;
@@ -79,15 +79,11 @@ export default function LubeDialog({
             <span className="font-medium">{currentKm} km</span>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="brand">Marka smaru/wosku</Label>
-            <Input
-              id="brand"
-              placeholder="np. Squirt, Muc-Off, Finish Line"
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-            />
-          </div>
+          <LubricantBrandAutocomplete
+            id="brand"
+            value={brand}
+            onChange={setBrand}
+          />
 
           <div className="space-y-2">
             <Label htmlFor="notes">Notatki</Label>
