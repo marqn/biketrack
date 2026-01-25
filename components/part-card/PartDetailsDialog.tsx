@@ -39,6 +39,11 @@ interface PartDetailsDialogProps {
   partId: string;
   mode: "create" | "edit" | "replace";
   currentPart?: Partial<BikePartWithProduct> | null;
+  // Opcjonalne - dla edycji PartReplacement z historii
+  onSave?: (data: { brand?: string; model?: string; notes?: string }) => Promise<void>;
+  initialBrand?: string;
+  initialModel?: string;
+  initialNotes?: string;
 }
 
 export default function PartDetailsDialog({
@@ -49,6 +54,10 @@ export default function PartDetailsDialog({
   partId,
   mode,
   currentPart,
+  onSave,
+  initialBrand,
+  initialModel,
+  initialNotes,
 }: PartDetailsDialogProps) {
   const [selectedProduct, setSelectedProduct] = useState<PartProduct | null>(null);
   const [brand, setBrand] = useState("");
@@ -94,6 +103,16 @@ export default function PartDetailsDialog({
           setRating(0);
           setReviewText("");
         }
+      } else if (initialBrand || initialModel) {
+        // Tryb edycji z initial values (np. z PartReplacement)
+        setSelectedProduct(null);
+        setBrand(initialBrand || "");
+        setModel(initialModel || "");
+        const today = new Date();
+        setInstalledAt(today.toISOString().split("T")[0]);
+        setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
+        setRating(0);
+        setReviewText(initialNotes || "");
       } else {
         // Tryb create i replace - wyczyść wszystko
         setSelectedProduct(null);
@@ -106,7 +125,7 @@ export default function PartDetailsDialog({
         setReviewText("");
       }
     }
-  }, [open, mode, currentPart, partType]);
+  }, [open, mode, currentPart, partType, initialBrand, initialModel, initialNotes]);
 
   async function handleSave() {
     if (!brand.trim() || !model.trim()) {
@@ -116,17 +135,26 @@ export default function PartDetailsDialog({
 
     startTransition(async () => {
       try {
-        await installPart({
-          partId,
-          productId: selectedProduct?.id,
-          brand: brand.trim(),
-          model: model.trim(),
-          installedAt: installedAt ? new Date(installedAt) : undefined,
-          partSpecificData: hasSpecificFields(partType) ? partSpecificData : undefined,
-          rating: rating > 0 ? rating : undefined,
-          reviewText: reviewText.trim() || undefined,
-          mode,
-        });
+        if (onSave) {
+          // Użyj zewnętrznego handlera (np. dla edycji PartReplacement)
+          await onSave({
+            brand: brand.trim(),
+            model: model.trim(),
+            notes: reviewText.trim() || undefined,
+          });
+        } else {
+          await installPart({
+            partId,
+            productId: selectedProduct?.id,
+            brand: brand.trim(),
+            model: model.trim(),
+            installedAt: installedAt ? new Date(installedAt) : undefined,
+            partSpecificData: hasSpecificFields(partType) ? partSpecificData : undefined,
+            rating: rating > 0 ? rating : undefined,
+            reviewText: reviewText.trim() || undefined,
+            mode,
+          });
+        }
         onOpenChange(false);
         router.refresh();
       } catch (error) {

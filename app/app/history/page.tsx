@@ -19,7 +19,7 @@ import {
   Trash2,
 } from "lucide-react";
 import EditLubeDialog from "@/components/part-card/EditLubeDialog";
-import EditReplacementDialog from "@/components/part-card/EditReplacementDialog";
+import PartDetailsDialog from "@/components/part-card/PartDetailsDialog";
 import { ConfirmDeleteDialog } from "@/components/bike-header/dialogs";
 import {
   deleteLubeEvent,
@@ -484,10 +484,16 @@ const BikePartsHistory: React.FC = () => {
 
       {/* Edit Dialogs */}
       {editItem && editItem.type === "replacement" && (
-        <EditReplacementDialog
+        <PartDetailsDialog
           open={true}
           onOpenChange={() => setEditItem(null)}
-          replacement={editItem.data as PartReplacement}
+          partType={(editItem.data as PartReplacement).partType}
+          partName={getPartName((editItem.data as PartReplacement).partType)}
+          partId={(editItem.data as PartReplacement).partId}
+          mode="edit"
+          initialBrand={(editItem.data as PartReplacement).brand || ""}
+          initialModel={(editItem.data as PartReplacement).model || ""}
+          initialNotes={(editItem.data as PartReplacement).notes || ""}
           onSave={handleEditReplacement}
         />
       )}

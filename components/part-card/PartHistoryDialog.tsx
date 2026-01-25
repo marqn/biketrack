@@ -12,7 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import EditReplacementDialog from "./EditReplacementDialog";
+import PartDetailsDialog from "./PartDetailsDialog";
 import { ConfirmDeleteDialog } from "../bike-header/dialogs";
 import { PartReplacement } from "@/lib/types";
 import { useDialogWithActions } from "@/lib/hooks/useDialog";
@@ -163,14 +163,19 @@ export default function PartHistoryDialog({
       />
 
       {editingReplacement && (
-        <EditReplacementDialog
+        <PartDetailsDialog
           open={!!editId}
           onOpenChange={cancelEdit}
-          replacement={editingReplacement}
+          partType={editingReplacement.partType}
+          partName={partName}
+          partId={editingReplacement.partId}
+          mode="edit"
+          initialBrand={editingReplacement.brand || ""}
+          initialModel={editingReplacement.model || ""}
+          initialNotes={editingReplacement.notes || ""}
           onSave={async (data) => {
             if (editId) {
               await onEdit(editId, data);
-              cancelEdit();
             }
           }}
         />
