@@ -125,7 +125,7 @@ export default function PartDetailsDialog({
           partSpecificData: hasSpecificFields(partType) ? partSpecificData : undefined,
           rating: rating > 0 ? rating : undefined,
           reviewText: reviewText.trim() || undefined,
-          isReplacement: mode === "replace",
+          mode,
         });
         onOpenChange(false);
         router.refresh();

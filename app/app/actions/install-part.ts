@@ -35,12 +35,18 @@ export interface InstallPartInput {
   pros?: string[];
   cons?: string[];
 
-  // Czy to jest wymiana części (powoduje zapisanie starej części do historii)
+  // Tryb operacji
+  mode: "create" | "edit" | "replace";
+
+  // @deprecated - użyj mode: "replace" zamiast tego
   isReplacement?: boolean;
 }
 
 export async function installPart(data: InstallPartInput) {
   let productId = data.productId;
+
+  // Obsługa wstecznej kompatybilności
+  const mode = data.mode || (data.isReplacement ? "replace" : "create");
 
   const part = await prisma.bikePart.findUnique({
     where: { id: data.partId },
@@ -49,21 +55,38 @@ export async function installPart(data: InstallPartInput) {
 
   if (!part) throw new Error("Part not found");
 
-  // Jeśli to wymiana części, zapisz starą część do historii
-  if (data.isReplacement && part.wearKm > 0) {
-    await prisma.partReplacement.create({
-      data: {
-        bikeId: part.bikeId,
-        partId: part.id,
-        partType: part.type,
-        productId: part.productId,
-        brand: part.product?.brand || data.brand?.trim() || null,
-        model: part.product?.model || data.model?.trim() || null,
-        notes: null,
-        kmAtReplacement: part.bike.totalKm,
-        kmUsed: part.wearKm,
-      },
+  // Obsługa wymiany części - zaktualizuj istniejący rekord lub utwórz nowy
+  if (mode === "replace") {
+    const existingReplacement = await prisma.partReplacement.findFirst({
+      where: { partId: part.id },
+      orderBy: { createdAt: "desc" },
     });
+
+    if (existingReplacement) {
+      // Zaktualizuj istniejący rekord z finalnymi danymi
+      await prisma.partReplacement.update({
+        where: { id: existingReplacement.id },
+        data: {
+          kmAtReplacement: part.bike.totalKm,
+          kmUsed: part.wearKm,
+        },
+      });
+    } else {
+      // Utwórz nowy rekord jeśli nie istnieje (stare dane bez historii)
+      await prisma.partReplacement.create({
+        data: {
+          bikeId: part.bikeId,
+          partId: part.id,
+          partType: part.type,
+          productId: part.productId,
+          brand: part.product?.brand || data.brand?.trim() || null,
+          model: part.product?.model || data.model?.trim() || null,
+          notes: null,
+          kmAtReplacement: part.bike.totalKm,
+          kmUsed: part.wearKm,
+        },
+      });
+    }
   }
 
   // Jeśli nie wybrano produktu, utwórz nowy (upsert)
@@ -106,9 +129,59 @@ export async function installPart(data: InstallPartInput) {
       installedAt: data.installedAt || new Date(),
       partSpecificData: data.partSpecificData as any,
       // Jeśli to wymiana, wyzeruj zużycie
-      ...(data.isReplacement && { wearKm: 0 }),
+      ...(mode === "replace" && { wearKm: 0 }),
     },
   });
+
+  // Obsługa PartReplacement dla trybu "create", "edit" i nowej części przy "replace"
+  if ((mode === "create" || mode === "replace") && (data.brand || data.model || productId)) {
+    // Tryb create lub replace - utwórz nowy rekord PartReplacement dla nowej części
+    await prisma.partReplacement.create({
+      data: {
+        bikeId: part.bikeId,
+        partId: part.id,
+        partType: part.type,
+        productId: productId || null,
+        brand: data.brand?.trim() || null,
+        model: data.model?.trim() || null,
+        notes: null,
+        kmAtReplacement: part.bike.totalKm,
+        kmUsed: 0, // Nowa część ma 0 km
+      },
+    });
+  } else if (mode === "edit") {
+    // Tryb edit - znajdź i zaktualizuj najnowszy rekord PartReplacement
+    const existingReplacement = await prisma.partReplacement.findFirst({
+      where: { partId: part.id },
+      orderBy: { createdAt: "desc" },
+    });
+
+    if (existingReplacement) {
+      await prisma.partReplacement.update({
+        where: { id: existingReplacement.id },
+        data: {
+          productId: productId || existingReplacement.productId,
+          brand: data.brand?.trim() || existingReplacement.brand,
+          model: data.model?.trim() || existingReplacement.model,
+        },
+      });
+    } else {
+      // Jeśli nie ma rekordu (np. stare dane), utwórz nowy
+      await prisma.partReplacement.create({
+        data: {
+          bikeId: part.bikeId,
+          partId: part.id,
+          partType: part.type,
+          productId: productId || null,
+          brand: data.brand?.trim() || null,
+          model: data.model?.trim() || null,
+          notes: null,
+          kmAtReplacement: part.bike.totalKm,
+          kmUsed: part.wearKm,
+        },
+      });
+    }
+  }
 
   // Jeśli dodano opinię, utwórz PartReview
   if (data.rating && productId) {
