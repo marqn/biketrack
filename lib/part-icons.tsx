@@ -28,6 +28,7 @@ export const PART_ICON_COMPONENTS: Record<PartType, LucideIcon> = {
   [PartType.DROPPER_POST]: ChevronUp,
   [PartType.TUBELESS_SEALANT]: Wrench,
   [PartType.SUSPENSION_SEATPOST]: Mountain,
+  [PartType.LUBRICANT]: Droplet,
 };
 
 // Specjalne ikony dla innych typów (np. serwis)

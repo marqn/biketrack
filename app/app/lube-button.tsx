@@ -47,19 +47,21 @@ export default function LubeButton({
   const lastLubeEvent = lubeEvents[0]; // Już posortowane desc
 
   async function handleLube(data: {
-    lubricantBrand?: string;
-    notes?: string;
+    productId?: string;
+    brand?: string;
+    model?: string;
+    lubricantType?: "wax" | "oil";
+    unknownProduct?: boolean;
+    rating?: number;
+    reviewText?: string;
   }) {
-    const formData = new FormData();
-    formData.set("bikeId", bikeId);
-    formData.set("currentKm", currentKm.toString());
-    if (data.lubricantBrand)
-      formData.set("lubricantBrand", data.lubricantBrand);
-    if (data.notes) formData.set("notes", data.notes);
-
     startTransition(async () => {
       setLastLubeKm(currentKm); // Optimistic UI
-      await lubeChain(formData);
+      await lubeChain({
+        bikeId,
+        currentKm,
+        ...data,
+      });
       setActiveDialog(null);
       router.refresh();
     });
@@ -74,7 +76,13 @@ export default function LubeButton({
 
   async function handleEdit(
     eventId: string,
-    data: { lubricantBrand?: string; notes?: string }
+    data: {
+      lubricantBrand?: string;
+      lubricantProductId?: string | null;
+      notes?: string;
+      rating?: number;
+      reviewText?: string;
+    }
   ) {
     startTransition(async () => {
       await updateLubeEvent(eventId, data);
@@ -117,7 +125,7 @@ export default function LubeButton({
         open={activeDialog === "lube"}
         onOpenChange={(open) => !open && setActiveDialog(null)}
         currentKm={currentKm}
-        lastLubricantBrand={lastLubeEvent?.lubricantBrand}
+        lastLubricantProduct={lastLubeEvent?.lubricantProduct}
         onLube={handleLube}
       />
 

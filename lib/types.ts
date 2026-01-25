@@ -95,9 +95,24 @@ export interface PartReplacement {
 export interface LubeEvent {
   id: string;
   lubricantBrand: string | null;
+  lubricantProductId: string | null;
+  lubricantProduct?: {
+    id: string;
+    brand: string;
+    model: string;
+    specifications: unknown;
+    averageRating: number | null;
+    totalReviews: number;
+  } | null;
   notes: string | null;
   kmAtTime: number;
   createdAt: Date | string;
+  // Opinia powiązana z tym smarowaniem
+  reviews?: Array<{
+    id: string;
+    rating: number;
+    reviewText: string | null;
+  }>;
 }
 
 export interface ServiceEvent extends LubeEvent {
@@ -140,7 +155,8 @@ export interface PartProduct {
 export interface PartReview {
   id: string;
   userId: string;
-  partId: string;
+  partId: string | null;
+  serviceEventId: string | null;
   productId: string;
   rating: number;
   reviewText: string | null;

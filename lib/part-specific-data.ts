@@ -31,6 +31,10 @@ export type TubelessSealantSpecificData = {
   volume: number; // ml
 };
 
+export type LubricantSpecificData = {
+  lubricantType: "wax" | "oil";
+};
+
 export type PartSpecificDataMap = {
   [PartType.TIRE_FRONT]: TireSpecificData;
   [PartType.TIRE_REAR]: TireSpecificData;
@@ -44,6 +48,7 @@ export type PartSpecificDataMap = {
   [PartType.DROPPER_POST]: SuspensionSpecificData;
   [PartType.SUSPENSION_SEATPOST]: SuspensionSpecificData;
   [PartType.HANDLEBAR_TAPE]: Record<string, never>; // Brak specyficznych pól
+  [PartType.LUBRICANT]: LubricantSpecificData;
 };
 
 export function getDefaultSpecificData(
@@ -62,12 +67,13 @@ export function getDefaultSpecificData(
     [PartType.DROPPER_POST]: { travel: 150 },
     [PartType.SUSPENSION_SEATPOST]: { travel: 50 },
     [PartType.HANDLEBAR_TAPE]: {},
+    [PartType.LUBRICANT]: { lubricantType: "oil" },
   };
   return (defaults[type] || {}) as Partial<PartSpecificDataMap[PartType]>;
 }
 
 export function hasSpecificFields(type: PartType): boolean {
-  const typesWithFields = [
+  const typesWithFields: PartType[] = [
     PartType.TIRE_FRONT,
     PartType.TIRE_REAR,
     PartType.CHAIN,
@@ -79,6 +85,7 @@ export function hasSpecificFields(type: PartType): boolean {
     PartType.TUBELESS_SEALANT,
     PartType.DROPPER_POST,
     PartType.SUSPENSION_SEATPOST,
+    PartType.LUBRICANT,
   ];
   return typesWithFields.includes(type);
 }

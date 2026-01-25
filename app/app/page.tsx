@@ -33,6 +33,26 @@ export default async function AppPage() {
           services: {
             where: { type: ServiceType.CHAIN_LUBE },
             orderBy: { createdAt: "desc" },
+            include: {
+              lubricantProduct: {
+                select: {
+                  id: true,
+                  brand: true,
+                  model: true,
+                  specifications: true,
+                  averageRating: true,
+                  totalReviews: true,
+                },
+              },
+              reviews: {
+                select: {
+                  id: true,
+                  rating: true,
+                  reviewText: true,
+                },
+                take: 1,
+              },
+            },
           },
         },
       },

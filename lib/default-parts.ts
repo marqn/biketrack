@@ -64,6 +64,7 @@ export const PART_NAMES: Record<PartType, string> = {
   [PartType.DROPPER_POST]: "Sztyca teleskopowa",
   [PartType.TUBELESS_SEALANT]: "Mleczko tubeless",
   [PartType.SUSPENSION_SEATPOST]: "Sztyca amortyzowana",
+  [PartType.LUBRICANT]: "Smar/Wosk do łańcucha",
 };
 
 // Emoji dla każdego typu części
@@ -80,6 +81,7 @@ export const PART_ICONS: Record<PartType, string> = {
   [PartType.DROPPER_POST]: "🪵",
   [PartType.TUBELESS_SEALANT]: "🧼",
   [PartType.SUSPENSION_SEATPOST]: "🪵",
+  [PartType.LUBRICANT]: "💧",
 };
 
 // UI format (emoji | nazwa) - zachowane dla kompatybilności wstecznej

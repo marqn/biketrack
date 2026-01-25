@@ -12,12 +12,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import EditLubeDialog from "./EditLubeDialog";
 import { ConfirmDeleteDialog } from "../bike-header/dialogs";
 import { LubeEvent } from "@/lib/types";
 import { useDialogWithActions } from "@/lib/hooks/useDialog";
+import { LubricantSpecificData } from "@/lib/part-specific-data";
 
-interface LubeHistoryDialogProps{
+interface LubeHistoryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   lubeEvents: LubeEvent[];
@@ -25,7 +27,13 @@ interface LubeHistoryDialogProps{
   onDelete: (id: string) => Promise<void>;
   onEdit: (
     id: string,
-    data: { lubricantBrand?: string; notes?: string }
+    data: {
+      lubricantBrand?: string;
+      lubricantProductId?: string | null;
+      notes?: string;
+      rating?: number;
+      reviewText?: string;
+    }
   ) => Promise<void>;
 }
 
@@ -37,11 +45,18 @@ export default function LubeHistoryDialog({
   onDelete,
   onEdit,
 }: LubeHistoryDialogProps) {
-  const { editId, deleteId, startEdit, cancelEdit, startDelete, cancelDelete } =
-    useDialogWithActions<string>();
+  const {
+    editId,
+    deleteId,
+    startEdit,
+    cancelEdit,
+    startDelete,
+    cancelDelete,
+  } = useDialogWithActions<string>();
 
   const sortedEvents = [...lubeEvents].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    (a, b) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
   const editingEvent = sortedEvents.find((e) => e.id === editId);
@@ -50,6 +65,12 @@ export default function LubeHistoryDialog({
     if (!deleteId) return;
     await onDelete(deleteId);
     cancelDelete();
+  }
+
+  function getLubricantTypeLabel(specs: unknown): string | null {
+    const data = specs as Partial<LubricantSpecificData> | null;
+    if (!data?.lubricantType) return null;
+    return data.lubricantType === "wax" ? "Wosk" : "Smar";
   }
 
   return (
@@ -72,6 +93,10 @@ export default function LubeHistoryDialog({
               <>
                 {sortedEvents.map((event, index) => {
                   const kmSinceLube = currentKm - event.kmAtTime;
+                  const product = event.lubricantProduct;
+                  const lubricantTypeLabel = product
+                    ? getLubricantTypeLabel(product.specifications)
+                    : null;
 
                   return (
                     <div
@@ -87,22 +112,43 @@ export default function LubeHistoryDialog({
                                 : `Smarowanie #${sortedEvents.length - index}`}
                             </span>
                             <span className="text-xs text-muted-foreground">
-                              {format(new Date(event.createdAt), "d MMM yyyy", {
-                                locale: pl,
-                              })}
+                              {format(
+                                new Date(event.createdAt),
+                                "d MMM yyyy",
+                                {
+                                  locale: pl,
+                                }
+                              )}
                             </span>
                           </div>
 
-                          {event.lubricantBrand && (
-                            <div className="text-sm">
-                              {event.lubricantBrand && (
-                                <span className="font-medium">
-                                  {event.lubricantBrand}
-                                </span>
+                          {/* Produkt */}
+                          {product ? (
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-medium">
+                                {product.brand} {product.model}
+                              </span>
+                              {lubricantTypeLabel && (
+                                <Badge variant="secondary" className="text-xs">
+                                  {lubricantTypeLabel}
+                                </Badge>
                               )}
-                              {event.lubricantBrand && " "}
+                              {product.averageRating !== null &&
+                                product.averageRating > 0 &&
+                                product.totalReviews > 0 && (
+                                  <span className="text-xs text-muted-foreground">
+                                    ⭐ {product.averageRating.toFixed(1)} (
+                                    {product.totalReviews})
+                                  </span>
+                                )}
                             </div>
-                          )}
+                          ) : event.lubricantBrand ? (
+                            <div className="text-sm">
+                              <span className="font-medium">
+                                {event.lubricantBrand}
+                              </span>
+                            </div>
+                          ) : null}
 
                           <div className="text-sm text-muted-foreground mt-2">
                             <div>
@@ -121,9 +167,23 @@ export default function LubeHistoryDialog({
                             )}
                           </div>
 
-                          {event.notes && (
+                          {/* Ocena użytkownika */}
+                          {event.reviews?.[0] && (
+                            <div className="mt-2 flex items-center gap-2">
+                              <span className="text-sm text-muted-foreground">
+                                Twoja ocena:
+                              </span>
+                              <span className="text-yellow-500">
+                                {"★".repeat(event.reviews[0].rating)}
+                                {"☆".repeat(5 - event.reviews[0].rating)}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Opinia / notatki */}
+                          {(event.reviews?.[0]?.reviewText || event.notes) && (
                             <div className="mt-2 text-sm text-muted-foreground italic">
-                              {event.notes}
+                              {event.reviews?.[0]?.reviewText || event.notes}
                             </div>
                           )}
                         </div>

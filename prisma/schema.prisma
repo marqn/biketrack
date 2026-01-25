@@ -80,6 +80,7 @@ enum PartType {
   TUBELESS_SEALANT
   HANDLEBAR_TAPE
   SUSPENSION_SEATPOST
+  LUBRICANT
 }
 
 enum ServiceType {
@@ -178,8 +179,9 @@ model PartProduct {
   // Specyfikacja produktu (różna dla różnych typów)
   specifications Json? // { width: 28, tubeless: true, ... }
 
-  bikeParts BikePart[]
-  reviews   PartReview[]
+  bikeParts     BikePart[]
+  reviews       PartReview[]
+  serviceEvents ServiceEvent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -189,19 +191,20 @@ model PartProduct {
   @@index([brand])
 }
 
-// Opinie użytkowników o produktach
+// Opinie użytkowników o produktach (części i smary)
 model PartReview {
-  id        String @id @default(cuid())
-  userId    String
-  partId    String
-  productId String
+  id             String  @id @default(cuid())
+  userId         String
+  partId         String? // Opcjonalne - dla opinii o częściach
+  serviceEventId String? // Opcjonalne - dla opinii o smarach
+  productId      String
 
   rating     Int     // 1-5
   reviewText String? @db.Text
 
   // Kontekst użytkowania
   kmAtReview Int      // Przebieg w momencie dodania opinii
-  kmUsed     Int      // Ile km przejechał komponent
+  kmUsed     Int      // Ile km przejechał komponent / km od smarowania
   bikeType   BikeType // Typ roweru (kontekst)
 
   // Pros/Cons
@@ -209,16 +212,18 @@ model PartReview {
   cons String[] @default([])
 
   // Weryfikacja
-  verified Boolean @default(true) // true jeśli linked do rzeczywistego BikePart
+  verified Boolean @default(true) // true jeśli linked do rzeczywistego BikePart/ServiceEvent
 
-  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  part    BikePart    @relation(fields: [partId], references: [id], onDelete: Cascade)
-  product PartProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  part         BikePart?     @relation(fields: [partId], references: [id], onDelete: Cascade)
+  serviceEvent ServiceEvent? @relation(fields: [serviceEventId], references: [id], onDelete: Cascade)
+  product      PartProduct   @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([userId, partId])
+  @@unique([userId, serviceEventId])
   @@index([productId, rating])
   @@index([userId])
 }
@@ -228,15 +233,19 @@ model ServiceEvent {
   bikeId   String
   type     ServiceType
   kmAtTime Int
-  
-  lubricantBrand String?
-  notes          String?
 
-  bike Bike @relation(fields: [bikeId], references: [id], onDelete: Cascade)
+  lubricantBrand     String?
+  lubricantProductId String?
+  notes              String?
+
+  bike             Bike         @relation(fields: [bikeId], references: [id], onDelete: Cascade)
+  lubricantProduct PartProduct? @relation(fields: [lubricantProductId], references: [id], onDelete: SetNull)
+  reviews          PartReview[]
 
   createdAt DateTime @default(now())
-  
-  @@index([bikeId, type, createdAt]) // 👈 POPRAW - dodaj createdAt bo sortujesz po nim
+
+  @@index([bikeId, type, createdAt])
+  @@index([lubricantProductId])
 }
 
 enum NotificationType {
