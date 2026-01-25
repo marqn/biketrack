@@ -114,25 +114,27 @@ export default function PartCard({
               {" km "}/ {expectedKm} km
             </span>
 
-            <span className="flex items-center gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => openDialog("replace")}
-                disabled={isPending}
-              >
-                {isPending ? "Wymieniam..." : "🔄 Wymień"}
-              </Button>
-              {replacements.length > 0 && (
+            {hasCurrentPart && (
+              <span className="flex items-center gap-2">
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => openDialog("history")}
+                  onClick={() => openDialog("replace")}
+                  disabled={isPending}
                 >
-                  <NotebookText className="h-4 w-4" />
+                  {isPending ? "Wymieniam..." : "🔄 Wymień"}
                 </Button>
-              )}
-            </span>
+                {replacements.length > 0 && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => openDialog("history")}
+                  >
+                    <NotebookText className="h-4 w-4" />
+                  </Button>
+                )}
+              </span>
+            )}
           </div>
         </CardContent>
 
