@@ -69,6 +69,7 @@ export async function deletePartReplacement(replacementId: string) {
       partId: true,
       kmUsed: true,
       bikeId: true,
+      kmAtReplacement: true,
     },
   });
 
@@ -76,21 +77,43 @@ export async function deletePartReplacement(replacementId: string) {
     throw new Error("Nie znaleziono wpisu wymiany");
   }
 
-  await prisma.$transaction([
-    prisma.bikePart.update({
+  // Znajdź poprzedni rekord PartReplacement dla tej części (starszy niż usuwany)
+  const previousReplacement = await prisma.partReplacement.findFirst({
+    where: {
+      partId: replacement.partId,
+      id: { not: replacementId },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  // Usuń rekord
+  await prisma.partReplacement.delete({
+    where: { id: replacementId },
+  });
+
+  if (previousReplacement) {
+    // Przywróć poprzednią część do BikePart
+    await prisma.bikePart.update({
       where: { id: replacement.partId },
       data: {
-        wearKm: {
-          increment: replacement.kmUsed,
-        },
+        productId: previousReplacement.productId,
+        wearKm: previousReplacement.kmUsed,
       },
-    }),
-    prisma.partReplacement.delete({
-      where: { id: replacementId },
-    }),
-  ]);
+    });
+  } else {
+    // Brak poprzedniej części - wyczyść BikePart
+    await prisma.bikePart.update({
+      where: { id: replacement.partId },
+      data: {
+        productId: null,
+        wearKm: 0,
+        installedAt: null,
+        partSpecificData: Prisma.JsonNull,
+      },
+    });
+  }
 
-  revalidatePath("/app"); // 👈 DODANE
+  revalidatePath("/app");
   revalidatePath(`/app/bikes/${replacement.bikeId}`);
   revalidatePath("/app/bikes");
 }
