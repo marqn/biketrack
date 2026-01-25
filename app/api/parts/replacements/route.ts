@@ -1,23 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 export async function GET(request: NextRequest) {
   try {
     // Sprawdź czy użytkownik jest zalogowany
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Pobierz bikeId z query params (opcjonalnie)
     const { searchParams } = new URL(request.url);
-    const bikeId = searchParams.get('bikeId');
+    const bikeId = searchParams.get("bikeId");
 
     let bike;
     let replacements;
@@ -40,10 +37,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (!bike) {
-        return NextResponse.json(
-          { error: 'Bike not found' },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: "Bike not found" }, { status: 404 });
       }
 
       // Pobierz wymiany dla tego roweru
@@ -52,7 +46,7 @@ export async function GET(request: NextRequest) {
           bikeId: bikeId,
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
         select: {
           id: true,
@@ -70,10 +64,10 @@ export async function GET(request: NextRequest) {
       services = await prisma.serviceEvent.findMany({
         where: {
           bikeId: bikeId,
-          type: 'CHAIN_LUBE',
+          type: "CHAIN_LUBE",
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
         select: {
           id: true,
@@ -91,7 +85,7 @@ export async function GET(request: NextRequest) {
           userId: session.user.id,
         },
         orderBy: {
-          createdAt: 'asc',
+          createdAt: "asc",
         },
         select: {
           id: true,
@@ -104,13 +98,13 @@ export async function GET(request: NextRequest) {
 
       if (!bike) {
         return NextResponse.json(
-          { 
+          {
             bike: null,
             replacements: [],
             services: [],
-            message: 'No bikes found'
+            message: "No bikes found",
           },
-          { status: 200 }
+          { status: 200 },
         );
       }
 
@@ -120,7 +114,7 @@ export async function GET(request: NextRequest) {
           bikeId: bike.id,
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
         select: {
           id: true,
@@ -138,37 +132,35 @@ export async function GET(request: NextRequest) {
       services = await prisma.serviceEvent.findMany({
         where: {
           bikeId: bike.id,
-          type: 'CHAIN_LUBE',
+          type: "CHAIN_LUBE",
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
-        select: {
-          id: true,
-          type: true,
-          kmAtTime: true,
-          lubricantBrand: true,
-          notes: true,
-          createdAt: true,
+        include: {
+          lubricantProduct: true,
         },
       });
     }
 
     // Połącz wymiany i serwisy w jeden timeline
     const timeline = [
-      ...replacements.map(r => ({
+      ...replacements.map((r) => ({
         id: r.id,
-        type: 'replacement' as const,
+        type: "replacement" as const,
         data: r,
         createdAt: r.createdAt,
       })),
-      ...services.map(s => ({
+      ...services.map((s) => ({
         id: s.id,
-        type: 'service' as const,
+        type: "service" as const,
         data: s,
         createdAt: s.createdAt,
       })),
-    ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    ].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
 
     return NextResponse.json({
       bike,
@@ -176,12 +168,11 @@ export async function GET(request: NextRequest) {
       replacements, // Dla kompatybilności wstecznej
       services,
     });
-
   } catch (error) {
-    console.error('Error fetching part replacements:', error);
+    console.error("Error fetching part replacements:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

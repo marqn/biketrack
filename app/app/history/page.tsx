@@ -179,7 +179,9 @@ const BikePartsHistory: React.FC = () => {
                   {service.lubricantBrand ? (
                     <>
                       <CardTitle className="text-xl mb-1">
-                        {service.lubricantBrand}
+                        {service.lubricantProduct
+                          ? `${service.lubricantProduct.brand} ${service.lubricantProduct.model}`
+                          : service.lubricantBrand}
                       </CardTitle>
                       <CardDescription className="text-base">
                         Smarowanie łańcucha
