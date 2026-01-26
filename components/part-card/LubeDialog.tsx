@@ -68,7 +68,7 @@ export default function LubeDialog({
 
   // Wypełnij pola poprzednimi wartościami po otwarciu
   useEffect(() => {
-    if (open) {
+    async function initDialog() {
       if (lastLubricantProduct) {
         setBrand(lastLubricantProduct.brand);
         setModel(lastLubricantProduct.model);
@@ -79,23 +79,46 @@ export default function LubeDialog({
           setLubricantData({ lubricantType: specs.lubricantType });
         }
         setUnknownProduct(false);
+
+        // Załaduj poprzednią opinię użytkownika
+        if (lastLubricantProduct.id) {
+          setIsLoadingReview(true);
+          try {
+            const review = await getUserLubricantReview(lastLubricantProduct.id);
+            if (review) {
+              setRating(review.rating);
+              setReviewText(review.reviewText || "");
+            } else {
+              setRating(0);
+              setReviewText("");
+            }
+          } finally {
+            setIsLoadingReview(false);
+          }
+        }
       } else {
         setBrand("");
         setModel("");
         setSelectedProduct(null);
         setLubricantData({ lubricantType: "oil" });
         setUnknownProduct(false);
+        setRating(0);
+        setReviewText("");
       }
-      setRating(0);
       setHoveredRating(0);
-      setReviewText("");
+    }
+
+    if (open) {
+      initDialog();
     }
   }, [open, lastLubricantProduct]);
 
-  // Załaduj poprzednią opinię użytkownika po wybraniu produktu
+  // Załaduj poprzednią opinię użytkownika po wybraniu NOWEGO produktu z autocomplete
   useEffect(() => {
     async function loadPreviousReview() {
       if (!selectedProduct?.id) return;
+      // Nie ładuj ponownie jeśli to ten sam produkt co lastLubricantProduct
+      if (selectedProduct.id === lastLubricantProduct?.id) return;
 
       setIsLoadingReview(true);
       try {
@@ -103,6 +126,9 @@ export default function LubeDialog({
         if (review) {
           setRating(review.rating);
           setReviewText(review.reviewText || "");
+        } else {
+          setRating(0);
+          setReviewText("");
         }
       } finally {
         setIsLoadingReview(false);
@@ -112,7 +138,7 @@ export default function LubeDialog({
     if (selectedProduct?.id) {
       loadPreviousReview();
     }
-  }, [selectedProduct?.id]);
+  }, [selectedProduct?.id, lastLubricantProduct?.id]);
 
   async function handleSubmit() {
     setIsSubmitting(true);

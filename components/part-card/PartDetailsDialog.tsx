@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -17,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { PartType } from "@/lib/generated/prisma";
 import { PartProduct, BikePartWithProduct } from "@/lib/types";
 import { installPart } from "@/app/app/actions/install-part";
+import { getUserPartReview } from "@/app/app/actions/get-user-part-review";
 import BrandModelFields from "./BrandModelFields";
 import TireFields from "./specific-fields/TireFields";
 import ChainFields from "./specific-fields/ChainFields";
@@ -70,10 +70,11 @@ export default function PartDetailsDialog({
     getDefaultSpecificData(partType) as Record<string, unknown>
   );
   const [isPending, startTransition] = useTransition();
+  const [isLoadingReview, setIsLoadingReview] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    if (open) {
+    async function initDialog() {
       if (mode === "edit" && currentPart?.product) {
         // Tryb edycji - załaduj dane z currentPart
         setSelectedProduct(currentPart.product as PartProduct);
@@ -94,11 +95,21 @@ export default function PartDetailsDialog({
           setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
         }
 
-        // Załaduj ocenę i opinię jeśli istnieją
-        if (currentPart.product.reviews && currentPart.product.reviews.length > 0) {
-          const review = currentPart.product.reviews[0];
-          setRating(review.rating || 0);
-          setReviewText(review.text || "");
+        // Załaduj opinię użytkownika z bazy danych
+        if (currentPart.product.id) {
+          setIsLoadingReview(true);
+          try {
+            const review = await getUserPartReview(currentPart.product.id);
+            if (review) {
+              setRating(review.rating);
+              setReviewText(review.reviewText || "");
+            } else {
+              setRating(0);
+              setReviewText("");
+            }
+          } finally {
+            setIsLoadingReview(false);
+          }
         } else {
           setRating(0);
           setReviewText("");
@@ -124,6 +135,11 @@ export default function PartDetailsDialog({
         setRating(0);
         setReviewText("");
       }
+      setHoveredRating(0);
+    }
+
+    if (open) {
+      initDialog();
     }
   }, [open, mode, currentPart, partType, initialBrand, initialModel, initialNotes]);
 
@@ -261,7 +277,14 @@ export default function PartDetailsDialog({
 
           {/* === Opinia === */}
           <div className="space-y-4">
-            <h4 className="text-sm font-medium">Opinia (opcjonalnie)</h4>
+            <h4 className="text-sm font-medium">
+              Opinia (opcjonalnie)
+              {isLoadingReview && (
+                <span className="ml-2 text-xs text-muted-foreground">
+                  Ładowanie...
+                </span>
+              )}
+            </h4>
 
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
