@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { PartType } from "@/lib/generated/prisma";
 import { PartProduct } from "@/lib/types";
@@ -38,6 +38,7 @@ export default function BrandModelFields({
   const [modelNotFound, setModelNotFound] = useState(false);
   const [selectedBrandIndex, setSelectedBrandIndex] = useState(-1);
   const [selectedModelIndex, setSelectedModelIndex] = useState(-1);
+  const userChangedBrandRef = useRef(false);
 
   // Search brands
   useEffect(() => {
@@ -95,16 +96,20 @@ export default function BrandModelFields({
     return () => clearTimeout(timer);
   }, [brand, model, partType]);
 
-  // Reset model state when brand changes
+  // Reset model state only when user manually changes brand
   useEffect(() => {
-    setModelSuggestions([]);
-    setModelNotFound(false);
-    setLastModelQuery("");
-    onModelChange("");
-    onProductSelect(null);
+    if (userChangedBrandRef.current) {
+      userChangedBrandRef.current = false;
+      setModelSuggestions([]);
+      setModelNotFound(false);
+      setLastModelQuery("");
+      onModelChange("");
+      onProductSelect(null);
+    }
   }, [brand]);
 
   const handleClearBrand = () => {
+    userChangedBrandRef.current = true;
     onBrandChange("");
     onProductSelect(null);
     setBrandSuggestions([]);
@@ -139,6 +144,7 @@ export default function BrandModelFields({
       case "Enter":
         e.preventDefault();
         if (selectedBrandIndex >= 0) {
+          userChangedBrandRef.current = true;
           onBrandChange(brandSuggestions[selectedBrandIndex]);
           setShowBrandSuggestions(false);
           setSelectedBrandIndex(-1);
@@ -198,10 +204,11 @@ export default function BrandModelFields({
             value={brand}
             onChange={(e) => {
               const newBrand = e.target.value;
+              userChangedBrandRef.current = true;
               onBrandChange(newBrand);
               onProductSelect(null);
               setShowBrandSuggestions(true);
-              
+
               // Reset brandNotFound tylko gdy użytkownik skraca query lub zmienia kierunek
               if (!newBrand.toLowerCase().startsWith(lastBrandQuery.toLowerCase()) || newBrand.length < lastBrandQuery.length) {
                 setBrandNotFound(false);
@@ -237,6 +244,7 @@ export default function BrandModelFields({
                     : "hover:bg-accent"
                 }`}
                 onMouseDown={() => {
+                  userChangedBrandRef.current = true;
                   onBrandChange(brandName);
                   setShowBrandSuggestions(false);
                   setSelectedBrandIndex(-1);

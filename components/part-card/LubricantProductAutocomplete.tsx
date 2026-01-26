@@ -36,8 +36,7 @@ export default function LubricantProductAutocomplete({
   const [modelNotFound, setModelNotFound] = useState(false);
   const [selectedBrandIndex, setSelectedBrandIndex] = useState(-1);
   const [selectedModelIndex, setSelectedModelIndex] = useState(-1);
-  const prevBrandRef = useRef(brand);
-  const isInitialMount = useRef(true);
+  const userChangedBrandRef = useRef(false);
 
   // Wyszukaj marki
   useEffect(() => {
@@ -97,26 +96,20 @@ export default function LubricantProductAutocomplete({
     return () => clearTimeout(timer);
   }, [brand, model]);
 
-  // Resetuj model gdy zmieni się marka (ale nie przy inicjalizacji)
+  // Resetuj model tylko gdy użytkownik ręcznie zmieni markę
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      prevBrandRef.current = brand;
-      return;
-    }
-
-    // Resetuj tylko gdy brand naprawdę się zmienił
-    if (prevBrandRef.current !== brand) {
+    if (userChangedBrandRef.current) {
+      userChangedBrandRef.current = false;
       setModelSuggestions([]);
       setModelNotFound(false);
       setLastModelQuery("");
       onModelChange("");
       onProductSelect(null);
-      prevBrandRef.current = brand;
     }
   }, [brand]);
 
   const handleClearBrand = () => {
+    userChangedBrandRef.current = true;
     onBrandChange("");
     onProductSelect(null);
     setBrandSuggestions([]);
@@ -151,6 +144,7 @@ export default function LubricantProductAutocomplete({
       case "Enter":
         e.preventDefault();
         if (selectedBrandIndex >= 0) {
+          userChangedBrandRef.current = true;
           onBrandChange(brandSuggestions[selectedBrandIndex]);
           setShowBrandSuggestions(false);
           setSelectedBrandIndex(-1);
@@ -208,6 +202,7 @@ export default function LubricantProductAutocomplete({
             value={brand}
             onChange={(e) => {
               const newBrand = e.target.value;
+              userChangedBrandRef.current = true;
               onBrandChange(newBrand);
               onProductSelect(null);
               setShowBrandSuggestions(true);
@@ -247,6 +242,7 @@ export default function LubricantProductAutocomplete({
                   index === selectedBrandIndex ? "bg-accent" : "hover:bg-accent"
                 }`}
                 onMouseDown={() => {
+                  userChangedBrandRef.current = true;
                   onBrandChange(brandName);
                   setShowBrandSuggestions(false);
                   setSelectedBrandIndex(-1);
