@@ -98,19 +98,32 @@ export async function lubeChain(input: LubeChainInput) {
     },
   });
 
-  // Utwórz opinię jeśli podano ocenę i mamy produkt
+  // Utwórz/zaktualizuj opinię jeśli podano ocenę i mamy produkt
   if (rating && rating >= 1 && rating <= 5 && finalProductId) {
-    // Sprawdź czy już istnieje opinia dla tego zdarzenia
-    const existingReview = await prisma.partReview.findUnique({
+    // Sprawdź czy użytkownik ma już opinię dla tego produktu (smar)
+    const existingReview = await prisma.partReview.findFirst({
       where: {
-        userId_serviceEventId: {
-          userId: bike.userId,
-          serviceEventId: serviceEvent.id,
-        },
+        userId: bike.userId,
+        productId: finalProductId,
+        serviceEventId: { not: null }, // Tylko opinie o smarach
       },
     });
 
-    if (!existingReview) {
+    if (existingReview) {
+      // Aktualizuj istniejącą opinię tylko jeśli dane się zmieniły
+      if (existingReview.rating !== rating || existingReview.reviewText !== (reviewText?.trim() || null)) {
+        await prisma.partReview.update({
+          where: { id: existingReview.id },
+          data: {
+            rating,
+            reviewText: reviewText?.trim() || null,
+            kmAtReview: currentKm,
+          },
+        });
+        await updateLubricantProductStats(finalProductId);
+      }
+    } else {
+      // Utwórz nową opinię
       await prisma.partReview.create({
         data: {
           userId: bike.userId,
@@ -119,12 +132,10 @@ export async function lubeChain(input: LubeChainInput) {
           rating,
           reviewText: reviewText?.trim() || null,
           kmAtReview: currentKm,
-          kmUsed: 0, // Będzie zaktualizowane przy następnym smarowaniu
+          kmUsed: 0,
           bikeType: bike.type,
         },
       });
-
-      // Zaktualizuj statystyki produktu
       await updateLubricantProductStats(finalProductId);
     }
   }
