@@ -95,28 +95,30 @@ export default function LubeButton({
       <div className="flex flex-col gap-2">
         <div className="flex justify-between items-center">
           <span>{kmSinceLube} km od ostatniego smarowania</span>
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setActiveDialog("lube")}
-              disabled={isPending}
-              className="text-muted-foreground"
-            >
-              {isPending ? "Smarowanie..." : "💧 Smaruj"}
-            </Button>
-            {lubeEvents.length > 0 && (
+          {kmSinceLube > 0 && (
+            <div className="flex items-center gap-2">
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => setActiveDialog("history")}
-                className="text-muted-foreground"
+                onClick={() => setActiveDialog("lube")}
                 disabled={isPending}
+                className="text-muted-foreground"
               >
-                <NotebookText className="h-4 w-4" />
+                {isPending ? "Smarowanie..." : "💧 Smaruj"}
               </Button>
-            )}
-          </div>
+              {lubeEvents.length > 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setActiveDialog("history")}
+                  className="text-muted-foreground"
+                  disabled={isPending}
+                >
+                  <NotebookText className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          )}
         </div>
         <ColoredProgress value={progressPercent} />
       </div>
