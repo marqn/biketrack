@@ -1,8 +1,6 @@
 "use client";
 
-import * as React from "react";
 import { useState, useEffect } from "react";
-
 import {
   Dialog,
   DialogContent,
@@ -20,6 +18,7 @@ import LubricantFields from "./specific-fields/LubricantFields";
 import { PartProduct } from "@/lib/types";
 import { LubricantSpecificData } from "@/lib/part-specific-data";
 import { getUserLubricantReview } from "@/app/app/actions/get-user-lubricant-review";
+import { Loader2 } from "lucide-react";
 
 interface LubeDialogProps {
   open: boolean;
@@ -53,7 +52,7 @@ export default function LubeDialog({
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<PartProduct | null>(
-    null
+    null,
   );
   const [lubricantData, setLubricantData] = useState<
     Partial<LubricantSpecificData>
@@ -74,7 +73,8 @@ export default function LubeDialog({
         setBrand(lastLubricantProduct.brand);
         setModel(lastLubricantProduct.model);
         setSelectedProduct(lastLubricantProduct as PartProduct);
-        const specs = lastLubricantProduct.specifications as Partial<LubricantSpecificData> | null;
+        const specs =
+          lastLubricantProduct.specifications as Partial<LubricantSpecificData> | null;
         if (specs?.lubricantType) {
           setLubricantData({ lubricantType: specs.lubricantType });
         }
@@ -135,13 +135,28 @@ export default function LubeDialog({
       setReviewText("");
       setUnknownProduct(false);
     } finally {
-      setIsSubmitting(false);
+      setTimeout(() => setIsSubmitting(false), 1000); // Małe opóźnienie dla lepszego UX
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!isSubmitting) {
+          onOpenChange(next);
+        }
+      }}
+    >
       <DialogContent className="max-h-[90vh] overflow-y-auto">
+        {isSubmitting && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/70 backdrop-blur-sm">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              Zapisuję...
+            </div>
+          </div>
+        )}
         <DialogHeader>
           <DialogTitle>Nasmaruj łańcuch</DialogTitle>
           <DialogDescription>
@@ -204,7 +219,8 @@ export default function LubeDialog({
                 onProductSelect={(product) => {
                   setSelectedProduct(product);
                   if (product?.specifications) {
-                    const specs = product.specifications as Partial<LubricantSpecificData>;
+                    const specs =
+                      product.specifications as Partial<LubricantSpecificData>;
                     if (specs.lubricantType) {
                       setLubricantData({ lubricantType: specs.lubricantType });
                     }
@@ -283,6 +299,7 @@ export default function LubeDialog({
             Anuluj
           </Button>
           <Button onClick={handleSubmit} disabled={isSubmitting}>
+            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isSubmitting ? "Zapisuję..." : "Nasmaruj"}
           </Button>
         </DialogFooter>

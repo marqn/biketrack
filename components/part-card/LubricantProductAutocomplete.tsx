@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { PartProduct } from "@/lib/types";
 import {
@@ -36,6 +36,8 @@ export default function LubricantProductAutocomplete({
   const [modelNotFound, setModelNotFound] = useState(false);
   const [selectedBrandIndex, setSelectedBrandIndex] = useState(-1);
   const [selectedModelIndex, setSelectedModelIndex] = useState(-1);
+  const prevBrandRef = useRef(brand);
+  const isInitialMount = useRef(true);
 
   // Wyszukaj marki
   useEffect(() => {
@@ -95,13 +97,23 @@ export default function LubricantProductAutocomplete({
     return () => clearTimeout(timer);
   }, [brand, model]);
 
-  // Resetuj model gdy zmieni się marka
+  // Resetuj model gdy zmieni się marka (ale nie przy inicjalizacji)
   useEffect(() => {
-    setModelSuggestions([]);
-    setModelNotFound(false);
-    setLastModelQuery("");
-    onModelChange("");
-    onProductSelect(null);
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      prevBrandRef.current = brand;
+      return;
+    }
+
+    // Resetuj tylko gdy brand naprawdę się zmienił
+    if (prevBrandRef.current !== brand) {
+      setModelSuggestions([]);
+      setModelNotFound(false);
+      setLastModelQuery("");
+      onModelChange("");
+      onProductSelect(null);
+      prevBrandRef.current = brand;
+    }
   }, [brand]);
 
   const handleClearBrand = () => {
