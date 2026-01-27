@@ -9,6 +9,8 @@ import {
   LogOut,
   CreditCard,
   Delete,
+  Mail,
+  Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -202,9 +204,17 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
 
         {/* RIGHT SIDE */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-sm">
+          {/* <div className="flex items-center gap-2 text-sm">
             {syncIcon[syncStatus]}
-          </div>
+          </div> */}
+
+          <Button variant="outline" size="icon">
+            <Mail className="h-4 w-4" />
+          </Button>
+
+          <Button variant="outline" size="icon">
+            <Users className="h-4 w-4 color" />
+          </Button>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
