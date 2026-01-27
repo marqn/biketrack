@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { PartType } from "@/lib/generated/prisma";
 import { searchProducts } from "@/app/app/actions/search-products";
 import { PartProduct } from "@/lib/types";
@@ -77,19 +78,28 @@ export default function ProductAutocomplete({
                   setInputValue(`${product.brand} ${product.model}`);
                 }}
               >
-                <div className="flex flex-col">
+                <div className="flex flex-col flex-1">
                   <span className="font-medium">
                     {product.brand} {product.model}
                   </span>
-                  {product.averageRating !== null &&
-                    product.averageRating > 0 &&
-                    product.totalReviews > 0 && (
-                      <span className="text-xs text-muted-foreground">
-                        ⭐ {product.averageRating.toFixed(1)} (
-                        {product.totalReviews}{" "}
-                        {product.totalReviews === 1 ? "opinia" : "opinii"})
-                      </span>
-                    )}
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    {product.averageRating !== null &&
+                      product.averageRating > 0 &&
+                      product.totalReviews > 0 && (
+                        <span>
+                          ⭐ {product.averageRating.toFixed(1)} (
+                          {product.totalReviews}{" "}
+                          {product.totalReviews === 1 ? "opinia" : "opinii"})
+                        </span>
+                      )}
+                    <Link
+                      href={`/app/products/${product.id}/reviews`}
+                      className="text-primary hover:underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Zobacz opinie
+                    </Link>
+                  </div>
                 </div>
               </ComboboxItem>
             ))}

@@ -1,7 +1,7 @@
 "use client";
 
-import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
 
 import {
   Dialog,
@@ -39,7 +39,7 @@ export default function ReplacePartDialog({
   const [isReplacing, setIsReplacing] = useState(false);
 
   // Reset form when dialog opens and populate with current values
-  React.useEffect(() => {
+  useEffect(() => {
     if (open) {
       setBrand(currentBrand || "");
       setModel(currentModel || "");
