@@ -21,7 +21,7 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
-import { Search, ArrowRight, Star, Users, Route } from "lucide-react";
+import { Search } from "lucide-react";
 import { PartType } from "@/lib/generated/prisma";
 import { getPartName, PART_NAMES } from "@/lib/default-parts";
 import { ProductSortBy, ProductListItem } from "@/app/app/actions/get-products";
@@ -143,20 +143,20 @@ export function ProductsClient({
         </span>
       </div>
 
-      {/* Products List */}
-      <div className="space-y-4">
-        {products.length === 0 ? (
-          <Card className="py-12">
-            <CardContent className="text-center text-muted-foreground">
-              Nie znaleziono produktow
-            </CardContent>
-          </Card>
-        ) : (
-          products.map((product) => (
+      {/* Products Grid */}
+      {products.length === 0 ? (
+        <Card className="py-12">
+          <CardContent className="text-center text-muted-foreground">
+            Nie znaleziono produktow
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map((product) => (
             <ProductCard key={product.id} product={product} />
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (
@@ -213,43 +213,35 @@ export function ProductsClient({
 
 function ProductCard({ product }: { product: ProductListItem }) {
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:shadow-lg transition-shadow">
       <Link href={`/app/products/${product.id}/reviews`}>
         <CardContent className="p-6">
-          <div className="flex items-start">
-            <div className="space-y-1">
-              <h3 className="text-lg font-semibold">
+          <div className="flex items-start justify-between mb-3">
+            <div>
+              <h3 className="font-semibold text-lg">
                 {product.brand} {product.model}
               </h3>
               <p className="text-sm text-muted-foreground">
                 {getPartName(product.type as PartType)}
               </p>
             </div>
-          </div>
-
-          <div className="flex flex-wrap gap-6 mt-4 text-sm">
-            <div className="flex items-center gap-1.5">
-              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-              <span className="font-medium">
-                {product.averageRating?.toFixed(1) || "–"}
-              </span>
-              <span className="text-muted-foreground">
-                ({product.totalReviews} opinii)
-              </span>
-            </div>
-
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              <Users className="h-4 w-4" />
-              <span>{product.totalInstallations} instalacji</span>
-            </div>
-
-            {product.averageKmLifespan && product.averageKmLifespan > 0 && (
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <Route className="h-4 w-4" />
-                <span>
-                  ~{product.averageKmLifespan.toLocaleString("pl-PL")} km
+            <div className="text-right">
+              <div className="flex items-center gap-1">
+                <span className="text-yellow-500">
+                  {"★".repeat(Math.round(product.averageRating || 0))}
+                  {"☆".repeat(5 - Math.round(product.averageRating || 0))}
                 </span>
               </div>
+              <p className="text-xs text-muted-foreground">
+                {product.averageRating?.toFixed(1) || "–"} ({product.totalReviews})
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-4 text-sm text-muted-foreground">
+            <span>{product.totalInstallations} instalacji</span>
+            {product.averageKmLifespan && product.averageKmLifespan > 0 && (
+              <span>~{product.averageKmLifespan.toLocaleString("pl-PL")} km</span>
             )}
           </div>
         </CardContent>

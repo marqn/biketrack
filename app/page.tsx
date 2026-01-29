@@ -12,7 +12,7 @@ export default async function HomePage() {
 
   // Jeśli nie zalogowany, pokaż stronę główną
   if (!session || !session.user) {
-    const topProducts = await getTopProducts(5);
+    const topProducts = await getTopProducts(6);
 
     return (
       <div className="min-h-screen bg-linear-to-b from-background to-secondary/20">

@@ -17,7 +17,7 @@ export interface TopProductWithReviews {
   }>;
 }
 
-export async function getTopProducts(limit = 5): Promise<TopProductWithReviews[]> {
+export async function getTopProducts(limit = 6): Promise<TopProductWithReviews[]> {
   const products = await prisma.partProduct.findMany({
     where: {
       totalReviews: { gt: 0 },
