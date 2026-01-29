@@ -212,7 +212,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
             <Mail className="h-4 w-4" />
           </Button>
 
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" onClick={() => router.push("/app/test/races")}>
             <Users className="h-4 w-4 color" />
           </Button>
 

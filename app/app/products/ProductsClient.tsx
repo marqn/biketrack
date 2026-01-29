@@ -73,7 +73,7 @@ export function ProductsClient({
   }
 
   const partTypes = Object.keys(PART_NAMES).filter(
-    (t) => t !== "LUBRICANT"
+    (t) => t !== "LUBRICANT",
   ) as PartType[];
 
   return (
@@ -190,7 +190,7 @@ export function ProductsClient({
                     {page}
                   </PaginationLink>
                 </PaginationItem>
-              )
+              ),
             )}
 
             {currentPage < totalPages && (
@@ -214,56 +214,53 @@ export function ProductsClient({
 function ProductCard({ product }: { product: ProductListItem }) {
   return (
     <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h3 className="text-lg font-semibold">
-              {product.brand} {product.model}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {getPartName(product.type as PartType)}
-            </p>
-          </div>
-
-          <Link href={`/app/products/${product.id}/reviews`}>
-            <Button variant="ghost" className="gap-2">
-              Zobacz opinie
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
-
-        <div className="flex flex-wrap gap-6 mt-4 text-sm">
-          <div className="flex items-center gap-1.5">
-            <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-            <span className="font-medium">
-              {product.averageRating?.toFixed(1) || "–"}
-            </span>
-            <span className="text-muted-foreground">
-              ({product.totalReviews} opinii)
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1.5 text-muted-foreground">
-            <Users className="h-4 w-4" />
-            <span>{product.totalInstallations} instalacji</span>
-          </div>
-
-          {product.averageKmLifespan && product.averageKmLifespan > 0 && (
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              <Route className="h-4 w-4" />
-              <span>~{product.averageKmLifespan.toLocaleString("pl-PL")} km</span>
+      <Link href={`/app/products/${product.id}/reviews`}>
+        <CardContent className="p-6">
+          <div className="flex items-start">
+            <div className="space-y-1">
+              <h3 className="text-lg font-semibold">
+                {product.brand} {product.model}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {getPartName(product.type as PartType)}
+              </p>
             </div>
-          )}
-        </div>
-      </CardContent>
+          </div>
+
+          <div className="flex flex-wrap gap-6 mt-4 text-sm">
+            <div className="flex items-center gap-1.5">
+              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+              <span className="font-medium">
+                {product.averageRating?.toFixed(1) || "–"}
+              </span>
+              <span className="text-muted-foreground">
+                ({product.totalReviews} opinii)
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <Users className="h-4 w-4" />
+              <span>{product.totalInstallations} instalacji</span>
+            </div>
+
+            {product.averageKmLifespan && product.averageKmLifespan > 0 && (
+              <div className="flex items-center gap-1.5 text-muted-foreground">
+                <Route className="h-4 w-4" />
+                <span>
+                  ~{product.averageKmLifespan.toLocaleString("pl-PL")} km
+                </span>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Link>
     </Card>
   );
 }
 
 function generatePageNumbers(
   current: number,
-  total: number
+  total: number,
 ): (number | "ellipsis")[] {
   if (total <= 5) {
     return Array.from({ length: total }, (_, i) => i + 1);
