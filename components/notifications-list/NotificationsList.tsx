@@ -27,7 +27,9 @@ export function NotificationsList() {
         <Alert key={n.id} variant={VARIANT_BY_TYPE[n.type]}>
           <AlertTitle className="flex justify-between items-center">
             {n.title}
-            <div className="flex gap-2">
+          </AlertTitle>
+          <AlertDescription>{n.message}</AlertDescription>
+            <div className="flex gap-2 absolute right-2 top-1/2 -translate-y-1/2">
               {n.type === "EMAIL_MISSING" ? (
                 <Button
                   variant="secondary"
@@ -49,8 +51,6 @@ export function NotificationsList() {
                 </Button>
               )}
             </div>
-          </AlertTitle>
-          <AlertDescription>{n.message}</AlertDescription>
         </Alert>
       ))}
     </div>
