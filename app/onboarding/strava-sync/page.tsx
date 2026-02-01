@@ -23,6 +23,7 @@ import { BikeType } from "@/lib/generated/prisma";
 import BikeTypeSelector from "../_components/BikeTypeSelector";
 import { syncStravaBikes } from "./sync-strava-bikes";
 import { createBike } from "./actions";
+import BikeBrandModelFields from "@/components/bike/BikeBrandModelFields";
 
 interface StravaBike {
   id: string;
@@ -135,33 +136,17 @@ export default function StravaOnboardingPage() {
 
           {selectedBike && (
             <>
-              <div className="space-y-2">
-                <Label>Marka</Label>
-                <Input
-                  value={selectedBike.brand_name || ""}
-                  onChange={(e) =>
-                    setSelectedBike({
-                      ...selectedBike,
-                      brand_name: e.target.value,
-                    })
-                  }
-                  placeholder="Np. Trek, Specialized..."
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Model</Label>
-                <Input
-                  value={selectedBike.model_name || ""}
-                  onChange={(e) =>
-                    setSelectedBike({
-                      ...selectedBike,
-                      model_name: e.target.value,
-                    })
-                  }
-                  placeholder="Np. Domane SL 7"
-                />
-              </div>
+              <BikeBrandModelFields
+                brand={selectedBike.brand_name || ""}
+                model={selectedBike.model_name || ""}
+                onBrandChange={(brand) =>
+                  setSelectedBike({ ...selectedBike, brand_name: brand })
+                }
+                onModelChange={(model) =>
+                  setSelectedBike({ ...selectedBike, model_name: model })
+                }
+                onProductSelect={() => {}}
+              />
 
               <div className="space-y-2">
                 <Label>Przebieg (km)</Label>

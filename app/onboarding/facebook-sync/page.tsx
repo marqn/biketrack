@@ -1,7 +1,10 @@
-// app/onboarding/google/page.tsx
-import { getServerSession } from "next-auth";
+// app/onboarding/facebook-sync/page.tsx
+"use client";
+
+import { useState } from "react";
 import { createBike } from "../_actions/createBike";
 import BikeTypeSelector from "../_components/BikeTypeSelector";
+import BikeBrandModelFields from "@/components/bike/BikeBrandModelFields";
 import {
   Card,
   CardContent,
@@ -9,29 +12,44 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { redirect } from "next/navigation";
+import { BikeType } from "@/lib/generated/prisma";
 
-export default async function FacebookSyncPage() {
-   const session = await getServerSession(authOptions);
+export default function FacebookSyncPage() {
+  const [brand, setBrand] = useState("");
+  const [model, setModel] = useState("");
 
-  if (!session) {
-    redirect("/login");
+  async function handleTypeSelect(type: BikeType) {
+    await createBike({
+      type,
+      brand: brand || null,
+      model: model || null,
+    });
   }
+
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Witaj! 🚴</CardTitle>
-          <CardTitle className="text-2xl">Jaki masz rower?</CardTitle>
           <CardDescription className="text-base">
-            Wybierz typ roweru, a automatycznie dodamy odpowiednie komponenty
-            do śledzenia.
+            Podaj informacje o swoim rowerze, a automatycznie dodamy odpowiednie
+            komponenty do śledzenia.
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="flex justify-center">
-          <BikeTypeSelector onSelectType={createBike} />
+        <CardContent className="space-y-6">
+          <BikeBrandModelFields
+            brand={brand}
+            model={model}
+            onBrandChange={setBrand}
+            onModelChange={setModel}
+            onProductSelect={() => {}}
+          />
+
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-center">Typ roweru</p>
+            <BikeTypeSelector onSelectType={handleTypeSelect} />
+          </div>
         </CardContent>
       </Card>
     </main>

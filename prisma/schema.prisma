@@ -247,6 +247,30 @@ model ServiceEvent {
   @@index([lubricantProductId])
 }
 
+// Globalna baza modeli rowerów (community-driven)
+model BikeProduct {
+  id       String   @id @default(cuid())
+  bikeType BikeType
+
+  brand String // np. "Cannondale", "Trek", "Specialized"
+  model String // np. "Topstone Carbon LTD Di2", "Domane SL 7"
+
+  // Przyszłościowo: specyfikacja części dla tego modelu
+  specifications Json? // { "crankset": "Shimano GRX 820, 48/31", "bb": "Shimano BSA 68", ... }
+
+  // Metadane (opcjonalne)
+  description      String? @db.Text
+  officialImageUrl String?
+  year             Int? // rok modelowy
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([bikeType, brand, model])
+  @@index([brand])
+  @@index([bikeType])
+}
+
 enum NotificationType {
   PART_WORN
   PART_NEAR_WORN

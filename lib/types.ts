@@ -152,6 +152,19 @@ export interface PartProduct {
   updatedAt: Date | string;
 }
 
+export interface BikeProduct {
+  id: string;
+  bikeType: BikeType;
+  brand: string;
+  model: string;
+  specifications: Record<string, string> | null;
+  description: string | null;
+  officialImageUrl: string | null;
+  year: number | null;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}
+
 export interface PartReview {
   id: string;
   userId: string;
