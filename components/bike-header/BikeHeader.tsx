@@ -17,7 +17,7 @@ import {
   Home,
   Pencil,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -72,6 +72,7 @@ type SyncStatus = "synced" | "syncing" | "error";
 
 export function BikeHeader({ bike, user }: BikeHeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { activeDialog, openDialog, closeDialog } = useMultiDialog<DialogType>();
   const [hasSeenTooltip, setHasSeenTooltip] = useState(false);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("synced");
@@ -179,7 +180,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="outline" size="icon" onClick={() => router.push("/app")}>
+                <Button variant={pathname === "/app" ? "default" : "outline"} size="icon" onClick={() => router.push("/app")}>
                   <Home className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -205,7 +206,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="outline" size="icon" onClick={() => router.push("/app/test/races")}>
+                <Button variant={pathname?.startsWith("/app/test/races") ? "default" : "outline"} size="icon" onClick={() => router.push("/app/test/races")}>
                   <Users className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -218,7 +219,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="outline" size="icon" onClick={() => router.push("/app/history")}>
+                <Button variant={pathname?.startsWith("/app/history") ? "default" : "outline"} size="icon" onClick={() => router.push("/app/history")}>
                   <History className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -231,7 +232,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="outline" size="icon" onClick={() => router.push("/app/products")}>
+                <Button variant={pathname?.startsWith("/app/products") ? "default" : "outline"} size="icon" onClick={() => router.push("/app/products")}>
                   <Package className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -244,7 +245,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="outline" size="icon" onClick={() => router.push("/app/test")}>
+                <Button variant={pathname === "/app/test" ? "default" : "outline"} size="icon" onClick={() => router.push("/app/test")}>
                   <Settings className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
