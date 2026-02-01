@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { Bike, BikeType } from "@/lib/generated/prisma";
 import { JSX } from "react";
@@ -137,39 +138,42 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
     <header className="fixed top-0 left-0 z-50 w-screen border-b bg-card">
       <div className="container mx-auto px-8 py-3 flex items-center justify-between">
         {/* BIKE SWITCHER */}
-        {mounted && (
-          <TooltipProvider>
-            <Tooltip
-              open={mounted && !hasSeenTooltip}
-              onOpenChange={(open) => {
-                if (!open) setHasSeenTooltip(true);
-              }}
-            >
-              <TooltipTrigger asChild>
-                <Button variant="ghost" className="p-0 h-auto" onClick={() => openDialog("rename-bike")}>
-                  <div className="text-left">
-                    <div className="flex items-center gap-2">
-                      <h1 className="text-lg">{bikeTitle}</h1>
-                      <Pencil className="h-3 w-3 text-muted-foreground" />
+        <div className="min-w-35">
+          {!mounted ? (
+            <div className="space-y-2">
+              <Skeleton className="h-5 w-32" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+          ) : (
+            <TooltipProvider>
+              <Tooltip
+                open={!hasSeenTooltip}
+                onOpenChange={(open) => {
+                  if (!open) setHasSeenTooltip(true);
+                }}
+              >
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" className="p-0 h-auto" onClick={() => openDialog("rename-bike")}>
+                    <div className="text-left">
+                      <div className="flex items-center gap-2">
+                        <h1 className="text-lg">{bikeTitle}</h1>
+                        <Pencil className="h-3 w-3 text-muted-foreground" />
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {bike.type} {bike.totalKm.toLocaleString("pl-PL")} km
+                      </p>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {bike.type}{" "}
-                      {mounted
-                        ? bike.totalKm.toLocaleString("pl-PL")
-                        : bike.totalKm}{" "}
-                      km
-                    </p>
-                  </div>
-                </Button>
-              </TooltipTrigger>
-              {bike.brand || bike.model ? null : (
-                <TooltipContent>
-                  <p>Kliknij, aby edytować rower lub dodać nowy</p>
-                </TooltipContent>
-              )}
-            </Tooltip>
-          </TooltipProvider>
-        )}
+                  </Button>
+                </TooltipTrigger>
+                {bike.brand || bike.model ? null : (
+                  <TooltipContent>
+                    <p>Kliknij, aby edytować rower lub dodać nowy</p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </div>
 
         {/* RIGHT SIDE */}
         <div className="flex items-center gap-4">
