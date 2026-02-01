@@ -359,9 +359,9 @@ const BikePartsHistory: React.FC = () => {
           <h1 className="text-4xl font-bold  mb-2">Historia Serwisu</h1>
           {bike && (
             <p className=" text-lg">
-              {bike.brand && bike.model
-                ? `${bike.brand} ${bike.model}`
-                : bike.name || "Twój rower"}
+              {bike.brand || bike.model
+                ? `${bike.brand ?? ""} ${bike.model ?? ""}`.trim()
+                : bike.type}
             </p>
           )}
 

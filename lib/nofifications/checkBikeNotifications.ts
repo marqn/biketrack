@@ -10,7 +10,9 @@ export async function checkBikeNotifications(bikeId: string) {
       bike: {
         select: {
           userId: true,
-          name: true,
+          brand: true,
+          model: true,
+          type: true,
         },
       },
     },

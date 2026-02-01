@@ -26,16 +26,14 @@ interface RenameBikeDialogProps {
   onOpenChange: (open: boolean) => void;
   bike: {
     id: string;
-    name: string | null;
     brand?: string | null;
     model?: string | null;
-    type: BikeType; // ← Nie jest nullable
+    type: BikeType;
   };
   onSave: (data: {
-    name: string;
     brand: string;
     model: string;
-    type: BikeType; // ← Zawsze wymagane
+    type: BikeType;
   }) => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -45,25 +43,19 @@ export function RenameBikeDialog({
   bike,
   onSave,
 }: RenameBikeDialogProps) {
-  const [name, setName] = useState(bike.name);
   const [brand, setBrand] = useState(bike.brand ?? "");
   const [model, setModel] = useState(bike.model ?? "");
-  const [type, setType] = useState<BikeType>(bike.type); // ← Bez "NONE"
+  const [type, setType] = useState<BikeType>(bike.type);
 
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSave = async () => {
-    if (!name?.trim()) {
-      return;
-    }
-
     setIsLoading(true);
     try {
       const result = await onSave({
-        name,
         brand,
         model,
-        type, // ← Już nie trzeba konwertować
+        type,
       });
 
       if (result.success) {
@@ -79,7 +71,6 @@ export function RenameBikeDialog({
   // Reset formularza gdy dialog się otwiera
   const handleOpenChange = (open: boolean) => {
     if (open) {
-      setName(bike.name);
       setBrand(bike.brand ?? "");
       setModel(bike.model ?? "");
       setType(bike.type);
@@ -93,25 +84,12 @@ export function RenameBikeDialog({
         <DialogHeader>
           <DialogTitle>Edytuj rower</DialogTitle>
           <DialogDescription>
-            Nazwa i typ roweru są wymagane. Marka i model są opcjonalne, ale
-            pomagają w dopasowaniu komponentów.
+            Typ roweru jest wymagany. Marka i model są opcjonalne, ale pomagają
+            w dopasowaniu komponentów.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="bike-name">
-              Nazwa roweru <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="bike-name"
-              value={name ?? ""}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Mój rower"
-              disabled={isLoading}
-            />
-          </div>
-
           <div className="space-y-2">
             <Label htmlFor="bike-type">
               Typ roweru <span className="text-destructive">*</span>
@@ -169,7 +147,7 @@ export function RenameBikeDialog({
           >
             Anuluj
           </Button>
-          <Button onClick={handleSave} disabled={isLoading || !name?.trim()}>
+          <Button onClick={handleSave} disabled={isLoading}>
             {isLoading ? "Zapisywanie..." : "Zapisz zmiany"}
           </Button>
         </DialogFooter>

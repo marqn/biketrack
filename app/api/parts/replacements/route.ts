@@ -29,9 +29,9 @@ export async function GET(request: NextRequest) {
         },
         select: {
           id: true,
-          name: true,
           brand: true,
           model: true,
+          type: true,
           totalKm: true,
         },
       });
@@ -89,9 +89,9 @@ export async function GET(request: NextRequest) {
         },
         select: {
           id: true,
-          name: true,
           brand: true,
           model: true,
+          type: true,
           totalKm: true,
         },
       });

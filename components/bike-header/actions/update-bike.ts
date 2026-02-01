@@ -5,10 +5,9 @@ import { BikeType } from "@/lib/generated/prisma";
 import { revalidatePath } from "next/cache";
 
 interface UpdateBikeData {
-  name: string;
   brand: string;
   model: string;
-  type: BikeType; // ← Zawsze wymagane
+  type: BikeType;
 }
 
 export async function updateBike(
@@ -37,22 +36,13 @@ export async function updateBike(
       };
     }
 
-    // Walidacja - nazwa jest wymagana
-    if (!data.name.trim()) {
-      return {
-        success: false,
-        error: "Nazwa roweru jest wymagana",
-      };
-    }
-
     // Aktualizuj rower
     const updatedBike = await prisma.bike.update({
       where: { id: bikeId },
       data: {
-        name: data.name.trim(),
         brand: data.brand.trim() || null,
         model: data.model.trim() || null,
-        type: data.type, // ← Zawsze ustawione
+        type: data.type,
       },
     });
 

@@ -90,13 +90,17 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
     .toUpperCase();
 
   const handleUpdateBike = async (data: {
-    name: string;
     brand: string;
     model: string;
-    type: BikeType; // ← Bez pustego stringa
+    type: BikeType;
   }) => {
     return await updateBike(bike.id, user.id, data);
   };
+
+  // Nagłówek roweru: marka + model lub typ gdy brak
+  const bikeTitle = bike.brand || bike.model
+    ? `${bike.brand ?? ""} ${bike.model ?? ""}`.trim()
+    : bike.type;
 
   const handleDeleteAccount = async () => {
   try {
@@ -144,12 +148,9 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
                 <Button variant="ghost" className="p-0 h-auto" onClick={() => openDialog("rename-bike")}>
                   <div className="text-left">
                     <div className="flex items-center gap-2">
-                      <h1 className="text-lg">{bike.name}</h1>
+                      <h1 className="text-lg">{bikeTitle}</h1>
                       <Pencil className="h-3 w-3 text-muted-foreground" />
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {bike.brand} {bike.model}
-                    </p>
                     <p className="text-sm text-muted-foreground">
                       {bike.type}{" "}
                       {mounted

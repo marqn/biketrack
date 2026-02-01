@@ -24,7 +24,6 @@ export default async function RootLayout({
     if (user?.bikes?.[0]) {
       const headerBike = {
         id: user.bikes[0].id,
-        name: user.bikes[0].name,
         type: user.bikes[0].type,
         brand: user.bikes[0].brand,
         model: user.bikes[0].model,

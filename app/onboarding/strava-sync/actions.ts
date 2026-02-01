@@ -35,17 +35,11 @@ export async function createBike({
     redirect("/app");
   }
 
-  // Tworzenie nazwy roweru
-  const bikeName = brand && model 
-    ? `${brand} ${model}` 
-    : `${type} Bike`;
-
   const initialKm = totalKm || 0;
 
   await prisma.bike.create({
     data: {
       type,
-      name: bikeName,
       brand: brand || undefined,
       model: model || undefined,
       totalKm: initialKm,
@@ -53,7 +47,7 @@ export async function createBike({
       parts: {
         create: DEFAULT_PARTS[type].map(part => ({
           ...part,
-          wearKm: initialKm, // Ustawienie początkowego zużycia
+          wearKm: initialKm,
         })),
       },
     },

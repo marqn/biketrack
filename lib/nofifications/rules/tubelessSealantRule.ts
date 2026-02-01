@@ -13,7 +13,6 @@ export async function tubelessSealantRule(bikeId: string) {
       bike: {
         select: {
           userId: true,
-          name: true,
         },
       },
     },
