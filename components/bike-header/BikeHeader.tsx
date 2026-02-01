@@ -11,6 +11,11 @@ import {
   Delete,
   Mail,
   Users,
+  History,
+  Package,
+  Settings,
+  Home,
+  Pencil,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -23,6 +28,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+// DropdownMenuContent i DropdownMenuItem używane w menu użytkownika
 import {
   Tooltip,
   TooltipContent,
@@ -62,20 +68,6 @@ export type DialogType =
   | "add-email"
   | null;
 
-type MenuItemType = {
-  name: string;
-  path?: string;
-  dialog?: DialogType;
-};
-
-const menuItems: MenuItemType[] = [
-  { name: "Twój rower", path: "/app" },
-  { name: "Edytuj rower", dialog: "rename-bike" },
-  { name: "Historia", path: "/app/history" },
-  { name: "Produkty", path: "/app/products" },
-  { name: "Ustawki", path: "/app/test" },
-];
-
 type SyncStatus = "synced" | "syncing" | "error";
 
 export function BikeHeader({ bike, user }: BikeHeaderProps) {
@@ -96,14 +88,6 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
     .join("")
     .slice(0, 2)
     .toUpperCase();
-
-  const handleMenuClick = (item: MenuItemType) => {
-    if (item.dialog) {
-      openDialog(item.dialog);
-    } else if (item.path) {
-      router.push(item.path);
-    }
-  };
 
   const handleUpdateBike = async (data: {
     name: string;
@@ -157,41 +141,24 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
               }}
             >
               <TooltipTrigger asChild>
-                <div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="p-0 h-auto">
-                        <div className="text-left">
-                          <div className="flex items-center gap-2">
-                            <h1 className="text-lg">{bike.name}</h1>
-                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {bike.brand} {bike.model}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {bike.type}{" "}
-                            {mounted
-                              ? bike.totalKm.toLocaleString("pl-PL")
-                              : bike.totalKm}{" "}
-                            km
-                          </p>
-                        </div>
-                      </Button>
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent align="start" className="w-64">
-                      {menuItems.map((item) => (
-                        <DropdownMenuItem
-                          key={item.name}
-                          onClick={() => handleMenuClick(item)}
-                        >
-                          {item.name}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+                <Button variant="ghost" className="p-0 h-auto" onClick={() => openDialog("rename-bike")}>
+                  <div className="text-left">
+                    <div className="flex items-center gap-2">
+                      <h1 className="text-lg">{bike.name}</h1>
+                      <Pencil className="h-3 w-3 text-muted-foreground" />
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {bike.brand} {bike.model}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {bike.type}{" "}
+                      {mounted
+                        ? bike.totalKm.toLocaleString("pl-PL")
+                        : bike.totalKm}{" "}
+                      km
+                    </p>
+                  </div>
+                </Button>
               </TooltipTrigger>
               {bike.brand || bike.model ? null : (
                 <TooltipContent>
@@ -208,13 +175,83 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
             {syncIcon[syncStatus]}
           </div> */}
 
-          <Button variant="outline" size="icon">
-            <Mail className="h-4 w-4" />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="icon" onClick={() => router.push("/app")}>
+                  <Home className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Strona startowa</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
-          <Button variant="outline" size="icon" onClick={() => router.push("/app/test/races")}>
-            <Users className="h-4 w-4 color" />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="icon" onClick={() => openDialog("add-email")}>
+                  <Mail className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Powiadomienia</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="icon" onClick={() => router.push("/app/test/races")}>
+                  <Users className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Wyścigi</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="icon" onClick={() => router.push("/app/history")}>
+                  <History className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Historia</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="icon" onClick={() => router.push("/app/products")}>
+                  <Package className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Produkty</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="icon" onClick={() => router.push("/app/test")}>
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Ustawki</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
