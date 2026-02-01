@@ -7,13 +7,22 @@ import { BikeType } from "@/lib/generated/prisma";
 import { DEFAULT_PARTS } from "@/lib/default-parts";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
+// Normalizacja tekstu do Title Case (np. "trek" -> "Trek", "CANNONDALE" -> "Cannondale")
+function toTitleCase(str: string): string {
+  return str
+    .trim()
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 interface CreateBikeParams {
   type: BikeType;
   brand?: string | null;
   model?: string | null;
+  year?: number | null;
 }
 
-export async function createBike({ type, brand, model }: CreateBikeParams) {
+export async function createBike({ type, brand, model, year }: CreateBikeParams) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
 
@@ -28,30 +37,44 @@ export async function createBike({ type, brand, model }: CreateBikeParams) {
     redirect("/app");
   }
 
-  // Jeśli użytkownik podał markę i model, dodaj do BikeProduct jeśli nie istnieje
-  if (brand && model) {
-    await prisma.bikeProduct.upsert({
+  let finalBrand = brand?.trim() || null;
+  let finalModel = model?.trim() || null;
+
+  // Jeśli użytkownik podał markę i model, sprawdź czy już istnieje (case-insensitive)
+  if (finalBrand && finalModel) {
+    const existingProduct = await prisma.bikeProduct.findFirst({
       where: {
-        bikeType_brand_model: {
-          bikeType: type,
-          brand: brand.trim(),
-          model: model.trim(),
-        },
-      },
-      update: {}, // Nic nie aktualizuj jeśli już istnieje
-      create: {
         bikeType: type,
-        brand: brand.trim(),
-        model: model.trim(),
+        brand: { equals: finalBrand, mode: "insensitive" },
+        model: { equals: finalModel, mode: "insensitive" },
       },
     });
+
+    if (existingProduct) {
+      // Użyj istniejących danych (zachowaj spójność zapisu)
+      finalBrand = existingProduct.brand;
+      finalModel = existingProduct.model;
+    } else {
+      // Nowy produkt - normalizuj do Title Case
+      finalBrand = toTitleCase(finalBrand);
+      finalModel = toTitleCase(finalModel);
+
+      await prisma.bikeProduct.create({
+        data: {
+          bikeType: type,
+          brand: finalBrand,
+          model: finalModel,
+          year: year || undefined,
+        },
+      });
+    }
   }
 
   await prisma.bike.create({
     data: {
       type,
-      brand: brand || undefined,
-      model: model || undefined,
+      brand: finalBrand || undefined,
+      model: finalModel || undefined,
       userId: user.id,
       parts: {
         create: DEFAULT_PARTS[type],

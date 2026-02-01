@@ -7,18 +7,28 @@ import { BikeType } from "@/lib/generated/prisma";
 import { DEFAULT_PARTS } from "@/lib/default-parts";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
+// Normalizacja tekstu do Title Case (np. "trek" -> "Trek", "CANNONDALE" -> "Cannondale")
+function toTitleCase(str: string): string {
+  return str
+    .trim()
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 interface CreateBikeParams {
   type: BikeType;
   brand?: string | null;
   model?: string | null;
+  year?: number | null;
   totalKm?: number | null;
 }
 
-export async function createBike({ 
-  type, 
-  brand, 
-  model, 
-  totalKm 
+export async function createBike({
+  type,
+  brand,
+  model,
+  year,
+  totalKm
 }: CreateBikeParams) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
@@ -35,17 +45,50 @@ export async function createBike({
     redirect("/app");
   }
 
+  let finalBrand = brand?.trim() || null;
+  let finalModel = model?.trim() || null;
+
+  // Jeśli użytkownik podał markę i model, sprawdź czy już istnieje (case-insensitive)
+  if (finalBrand && finalModel) {
+    const existingProduct = await prisma.bikeProduct.findFirst({
+      where: {
+        bikeType: type,
+        brand: { equals: finalBrand, mode: "insensitive" },
+        model: { equals: finalModel, mode: "insensitive" },
+      },
+    });
+
+    if (existingProduct) {
+      // Użyj istniejących danych (zachowaj spójność zapisu)
+      finalBrand = existingProduct.brand;
+      finalModel = existingProduct.model;
+    } else {
+      // Nowy produkt - normalizuj do Title Case
+      finalBrand = toTitleCase(finalBrand);
+      finalModel = toTitleCase(finalModel);
+
+      await prisma.bikeProduct.create({
+        data: {
+          bikeType: type,
+          brand: finalBrand,
+          model: finalModel,
+          year: year || undefined,
+        },
+      });
+    }
+  }
+
   const initialKm = totalKm || 0;
 
   await prisma.bike.create({
     data: {
       type,
-      brand: brand || undefined,
-      model: model || undefined,
+      brand: finalBrand || undefined,
+      model: finalModel || undefined,
       totalKm: initialKm,
       userId: user.id,
       parts: {
-        create: DEFAULT_PARTS[type].map(part => ({
+        create: DEFAULT_PARTS[type].map((part) => ({
           ...part,
           wearKm: initialKm,
         })),
