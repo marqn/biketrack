@@ -94,6 +94,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
   const handleUpdateBike = async (data: {
     brand: string;
     model: string;
+    year: number | null;
     type: BikeType;
   }) => {
     return await updateBike(bike.id, user.id, data);
@@ -194,7 +195,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
             </Tooltip>
           </TooltipProvider>
 
-          <TooltipProvider>
+          {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="outline" size="icon" onClick={() => openDialog("add-email")}>
@@ -205,7 +206,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
                 <p>Powiadomienia</p>
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </TooltipProvider> */}
 
           <TooltipProvider>
             <Tooltip>

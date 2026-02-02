@@ -40,11 +40,10 @@ export async function createBike({ type, brand, model, year }: CreateBikeParams)
   let finalBrand = brand?.trim() || null;
   let finalModel = model?.trim() || null;
 
-  // Jeśli użytkownik podał markę i model, sprawdź czy już istnieje (case-insensitive)
+  // Jeśli użytkownik podał markę i model, sprawdź czy już istnieje (case-insensitive, ignoruj bikeType)
   if (finalBrand && finalModel) {
     const existingProduct = await prisma.bikeProduct.findFirst({
       where: {
-        bikeType: type,
         brand: { equals: finalBrand, mode: "insensitive" },
         model: { equals: finalModel, mode: "insensitive" },
       },
@@ -75,6 +74,7 @@ export async function createBike({ type, brand, model, year }: CreateBikeParams)
       type,
       brand: finalBrand || undefined,
       model: finalModel || undefined,
+      year: year || undefined,
       userId: user.id,
       parts: {
         create: DEFAULT_PARTS[type],

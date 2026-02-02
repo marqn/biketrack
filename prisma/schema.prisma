@@ -93,6 +93,7 @@ model Bike {
   userId  String
   brand   String?
   model   String?
+  year    Int?
   type    BikeType
   totalKm Int      @default(0)
 

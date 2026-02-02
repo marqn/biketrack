@@ -20,7 +20,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BikeType } from "@/lib/generated/prisma";
-import { bikeTypeLabels } from "@/lib/types";
+import { bikeTypeLabels, BikeProduct } from "@/lib/types";
+import BikeBrandModelFields from "@/components/bike/BikeBrandModelFields";
+
 interface RenameBikeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -28,11 +30,13 @@ interface RenameBikeDialogProps {
     id: string;
     brand?: string | null;
     model?: string | null;
+    year?: number | null;
     type: BikeType;
   };
   onSave: (data: {
     brand: string;
     model: string;
+    year: number | null;
     type: BikeType;
   }) => Promise<{ success: boolean; error?: string }>;
 }
@@ -45,6 +49,7 @@ export function RenameBikeDialog({
 }: RenameBikeDialogProps) {
   const [brand, setBrand] = useState(bike.brand ?? "");
   const [model, setModel] = useState(bike.model ?? "");
+  const [year, setYear] = useState(bike.year?.toString() ?? "");
   const [type, setType] = useState<BikeType>(bike.type);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -55,6 +60,7 @@ export function RenameBikeDialog({
       const result = await onSave({
         brand,
         model,
+        year: year ? parseInt(year, 10) : null,
         type,
       });
 
@@ -73,9 +79,16 @@ export function RenameBikeDialog({
     if (open) {
       setBrand(bike.brand ?? "");
       setModel(bike.model ?? "");
+      setYear(bike.year?.toString() ?? "");
       setType(bike.type);
     }
     onOpenChange(open);
+  };
+
+  const handleProductSelect = (product: BikeProduct | null) => {
+    if (product?.year) {
+      setYear(product.year.toString());
+    }
   };
 
   return (
@@ -112,24 +125,24 @@ export function RenameBikeDialog({
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="bike-brand">Marka</Label>
-            <Input
-              id="bike-brand"
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-              placeholder="np. Cannondale, Specialized, Trek"
-              disabled={isLoading}
-            />
-          </div>
+          <BikeBrandModelFields
+            brand={brand}
+            model={model}
+            onBrandChange={setBrand}
+            onModelChange={setModel}
+            onProductSelect={handleProductSelect}
+          />
 
           <div className="space-y-2">
-            <Label htmlFor="bike-model">Model</Label>
+            <Label htmlFor="bike-year">Rok modelowy</Label>
             <Input
-              id="bike-model"
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-              placeholder="np. Topstone Carbon LTD Di2"
+              id="bike-year"
+              type="number"
+              placeholder="np. 2023"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              min={1990}
+              max={new Date().getFullYear() + 1}
               disabled={isLoading}
             />
             <p className="text-xs text-muted-foreground">
