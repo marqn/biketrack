@@ -20,6 +20,7 @@ export async function GET() {
         name: true,
         email: true,
         image: true,
+        weight: true,
         password: true, // Sprawdzamy czy ma hasło
       }
     });
@@ -35,6 +36,7 @@ export async function GET() {
         name: user.name,
         email: user.email,
         image: user.image,
+        weight: user.weight,
         password: !!user.password // true/false
       }
     });
@@ -53,7 +55,7 @@ export async function PATCH(request: Request) {
     }
 
     const body = await request.json();
-    const { name, email, image, currentPassword, newPassword } = body;
+    const { name, email, image, weight, currentPassword, newPassword } = body;
 
     const updateData: any = {};
 
@@ -79,6 +81,11 @@ export async function PATCH(request: Request) {
     // Aktualizacja avatara
     if (image !== undefined) {
       updateData.image = image;
+    }
+
+    // Aktualizacja wagi
+    if (weight !== undefined) {
+      updateData.weight = weight;
     }
 
     // Zmiana hasła

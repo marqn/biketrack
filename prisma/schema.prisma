@@ -20,6 +20,7 @@ model User {
   emailVerified DateTime? @map("email_verified")
   image         String?
   password      String?
+  weight        Int?      // Waga użytkownika w kg - ważna dla opinii o oponach/dętkach (ciśnienie vs waga)
   accounts      Account[]
   sessions      Session[]
   bikes         Bike[]

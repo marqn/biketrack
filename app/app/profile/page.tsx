@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Camera, Mail, User, Lock, Check, X, Eye, EyeOff } from 'lucide-react';
+import { Camera, Mail, User, Lock, Check, X, Eye, EyeOff, Scale, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface UserData {
@@ -9,11 +9,13 @@ interface UserData {
   name: string | null;
   email: string | null;
   image: string | null;
+  weight: number | null;
 }
 
 interface FormData {
   name: string;
   email: string;
+  weight: string;
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
@@ -22,6 +24,7 @@ interface FormData {
 interface IsEditing {
   name: boolean;
   email: boolean;
+  weight: boolean;
   password: boolean;
 }
 
@@ -34,6 +37,7 @@ interface ShowPasswords {
 interface Errors {
   name?: string;
   email?: string;
+  weight?: string;
   currentPassword?: string;
   newPassword?: string;
   confirmPassword?: string;
@@ -48,12 +52,14 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState<IsEditing>({
     name: false,
     email: false,
+    weight: false,
     password: false
   });
 
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
+    weight: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
@@ -81,7 +87,8 @@ export default function ProfilePage() {
           setFormData(prev => ({
             ...prev,
             name: data.user.name || '',
-            email: data.user.email || ''
+            email: data.user.email || '',
+            weight: data.user.weight?.toString() || ''
           }));
         }
       } catch (error) {
@@ -194,6 +201,38 @@ export default function ProfilePage() {
     }
   };
 
+  const handleSaveWeight = async () => {
+    const weightValue = parseInt(formData.weight);
+
+    if (formData.weight && (isNaN(weightValue) || weightValue < 20 || weightValue > 300)) {
+      setErrors({ weight: 'Podaj wagę w zakresie 20-300 kg' });
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/user/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ weight: formData.weight ? weightValue : null })
+      });
+
+      const data = await response.json();
+
+      if (data.success && user) {
+        setUser({ ...user, weight: formData.weight ? weightValue : null });
+        setIsEditing({ ...isEditing, weight: false });
+        setErrors({});
+        setSuccessMessage('Waga zaktualizowana!');
+        setTimeout(() => setSuccessMessage(''), 3000);
+
+        router.refresh();
+      }
+    } catch (error) {
+      console.error('Błąd aktualizacji wagi:', error);
+      setErrors({ weight: 'Wystąpił błąd podczas zapisywania' });
+    }
+  };
+
   const handleSavePassword = async () => {
     const newErrors: Errors = {};
 
@@ -247,6 +286,7 @@ export default function ProfilePage() {
       ...formData,
       name: user?.name || '',
       email: user?.email || '',
+      weight: user?.weight?.toString() || '',
       currentPassword: '',
       newPassword: '',
       confirmPassword: ''
@@ -413,6 +453,70 @@ export default function ProfilePage() {
             <div className="flex items-center gap-3">
               <Mail className="w-5 h-5 text-muted-foreground" />
               <span>{user.email || 'Nie ustawiono'}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Weight Section */}
+        <div className="bg-card rounded-xl border p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Waga</h2>
+            {!isEditing.weight && (
+              <button
+                onClick={() => setIsEditing({ ...isEditing, weight: true })}
+                className="text-primary hover:underline text-sm font-medium"
+              >
+                {user.weight ? 'Edytuj' : 'Dodaj'}
+              </button>
+            )}
+          </div>
+
+          {/* Info box */}
+          <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg flex gap-3">
+            <Info className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+            <p className="text-sm text-muted-foreground">
+              Twoja waga jest istotna przy dodawaniu opinii o oponach i dętkach.
+              Pozwala innym użytkownikom lepiej ocenić, przy jakim ciśnieniu i wadze
+              dany produkt sprawdza się najlepiej.
+            </p>
+          </div>
+
+          {isEditing.weight ? (
+            <div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  value={formData.weight}
+                  onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                  className="w-32 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent bg-background"
+                  placeholder="np. 75"
+                  min="20"
+                  max="300"
+                />
+                <span className="text-muted-foreground">kg</span>
+              </div>
+              {errors.weight && <p className="text-destructive text-sm mt-1">{errors.weight}</p>}
+              <div className="flex gap-2 mt-3">
+                <button
+                  onClick={handleSaveWeight}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  <Check className="w-4 h-4" />
+                  Zapisz
+                </button>
+                <button
+                  onClick={() => handleCancel('weight')}
+                  className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                  Anuluj
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <Scale className="w-5 h-5 text-muted-foreground" />
+              <span>{user.weight ? `${user.weight} kg` : 'Nie ustawiono'}</span>
             </div>
           )}
         </div>
