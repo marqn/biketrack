@@ -16,6 +16,7 @@ import {
   Settings,
   Home,
   Pencil,
+  Shield,
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -59,6 +60,7 @@ interface BikeHeaderProps {
     name: string;
     email: string;
     image?: string | null;
+    role?: string;
   };
 }
 
@@ -181,6 +183,25 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
           {/* <div className="flex items-center gap-2 text-sm">
             {syncIcon[syncStatus]}
           </div> */}
+
+          {user.role === "ADMIN" && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={pathname?.startsWith("/admin") ? "default" : "destructive"}
+                    size="icon"
+                    onClick={() => router.push("/admin/bikes")}
+                  >
+                    <Shield className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Panel Admina</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
 
           <TooltipProvider>
             <Tooltip>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getBikeProducts } from "../_actions/bike-products";
+import { getBikeProducts, deleteBikeProduct } from "../_actions/bike-products";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil } from "lucide-react";
+import { DeleteButton } from "../_components/DeleteButton";
 
 export default async function BikesPage() {
   const { products } = await getBikeProducts({});
@@ -57,11 +58,18 @@ export default async function BikesPage() {
                 )}
               </TableCell>
               <TableCell>
-                <Link href={`/admin/bikes/${product.id}`}>
-                  <Button variant="ghost" size="sm">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </Link>
+                <div className="flex gap-1">
+                  <Link href={`/admin/bikes/${product.id}`}>
+                    <Button variant="ghost" size="sm">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <DeleteButton
+                    id={product.id}
+                    onDelete={deleteBikeProduct}
+                    confirmMessage="Czy na pewno chcesz usunac ten rower?"
+                  />
+                </div>
               </TableCell>
             </TableRow>
           ))}

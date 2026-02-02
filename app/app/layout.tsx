@@ -52,7 +52,7 @@ export default async function RootLayout({
           name: user.name!,
           email: user.email!,
           image: user.image,
-        //   plan: user.plan,
+          role: user.role,
         },
       };
     }

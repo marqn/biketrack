@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getPartProducts } from "../_actions/part-products";
+import { getPartProducts, deletePartProduct } from "../_actions/part-products";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil } from "lucide-react";
 import { PART_NAMES } from "@/lib/default-parts";
 import { PartType } from "@/lib/generated/prisma";
+import { DeleteButton } from "../_components/DeleteButton";
 
 export default async function PartsPage() {
   const { products } = await getPartProducts({});
@@ -55,11 +56,18 @@ export default async function PartsPage() {
                   : "-"}
               </TableCell>
               <TableCell>
-                <Link href={`/admin/parts/${product.id}`}>
-                  <Button variant="ghost" size="sm">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </Link>
+                <div className="flex gap-1">
+                  <Link href={`/admin/parts/${product.id}`}>
+                    <Button variant="ghost" size="sm">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <DeleteButton
+                    id={product.id}
+                    onDelete={deletePartProduct}
+                    confirmMessage="Czy na pewno chcesz usunac ta czesc?"
+                  />
+                </div>
               </TableCell>
             </TableRow>
           ))}
