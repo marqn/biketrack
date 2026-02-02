@@ -13,6 +13,11 @@ enum Plan {
   PREMIUM
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -21,6 +26,7 @@ model User {
   image         String?
   password      String?
   weight        Int?      // Waga użytkownika w kg - ważna dla opinii o oponach/dętkach (ciśnienie vs waga)
+  role          UserRole  @default(USER)
   accounts      Account[]
   sessions      Session[]
   bikes         Bike[]
@@ -180,9 +186,10 @@ model PartProduct {
   // Specyfikacja produktu (różna dla różnych typów)
   specifications Json? // { width: 28, tubeless: true, ... }
 
-  bikeParts     BikePart[]
-  reviews       PartReview[]
-  serviceEvents ServiceEvent[]
+  bikeParts           BikePart[]
+  reviews             PartReview[]
+  serviceEvents       ServiceEvent[]
+  bikeProductDefaults BikeProductDefaultPart[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -265,12 +272,32 @@ model BikeProduct {
   officialImageUrl String?
   year             Int? // rok modelowy
 
+  defaultParts BikeProductDefaultPart[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([bikeType, brand, model])
   @@index([brand])
   @@index([bikeType])
+}
+
+// Domyślne części dla modelu roweru (specyfikacja fabryczna)
+model BikeProductDefaultPart {
+  id            String   @id @default(cuid())
+  bikeProductId String
+  partProductId String
+  partType      PartType
+  expectedKm    Int      // Może nadpisać domyślny expectedKm dla tego roweru
+
+  bikeProduct BikeProduct @relation(fields: [bikeProductId], references: [id], onDelete: Cascade)
+  partProduct PartProduct @relation(fields: [partProductId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([bikeProductId, partType])
+  @@index([bikeProductId])
+  @@index([partProductId])
 }
 
 enum NotificationType {

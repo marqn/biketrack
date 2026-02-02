@@ -25,6 +25,7 @@ export default function SimpleOnboardingFlow() {
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState<BikeProduct | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function handleTypeSelect(type: BikeType) {
@@ -46,6 +47,7 @@ export default function SimpleOnboardingFlow() {
         brand: brand || null,
         model: model || null,
         year: year ? parseInt(year, 10) : null,
+        bikeProductId: selectedProduct?.id || null,
       });
     });
   }
@@ -115,6 +117,7 @@ export default function SimpleOnboardingFlow() {
                 onBrandChange={setBrand}
                 onModelChange={setModel}
                 onProductSelect={(product: BikeProduct | null) => {
+                  setSelectedProduct(product);
                   if (product?.year) {
                     setYear(product.year.toString());
                   }
