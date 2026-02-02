@@ -15,19 +15,31 @@ function getRelatedPartTypes(partType: PartType): PartType[] {
     return [PartType.PADS_FRONT, PartType.PADS_REAR];
   }
 
+  // Tarcze hamulcowe przednie i tylne współdzielą te same produkty
+  if (partType === PartType.DISC_FRONT || partType === PartType.DISC_REAR) {
+    return [PartType.DISC_FRONT, PartType.DISC_REAR];
+  }
+
   // Wszystkie inne części są unikalne
   return [partType];
 }
 
-export async function searchBrands(partType: PartType, query: string) {
+export async function searchBrands(partTypeStr: string, query: string) {
   if (query.length < 1) return [];
+
+  // Konwersja stringa na enum - pobieramy wartość z obiektu PartType
+  const partType = PartType[partTypeStr as keyof typeof PartType];
+  if (!partType) return [];
 
   const relatedTypes = getRelatedPartTypes(partType);
 
+  // Używamy OR zamiast in dla lepszej kompatybilności z typami enum
   const products = await prisma.partProduct.findMany({
     where: {
-      type: { in: relatedTypes },
-      brand: { contains: query, mode: "insensitive" },
+      AND: [
+        { OR: relatedTypes.map((t) => ({ type: t })) },
+        { brand: { contains: query, mode: "insensitive" } },
+      ],
     },
     select: {
       brand: true,
@@ -43,19 +55,26 @@ export async function searchBrands(partType: PartType, query: string) {
 }
 
 export async function searchModels(
-  partType: PartType,
+  partTypeStr: string,
   brand: string,
   query: string
 ) {
   if (!brand || query.length < 1) return [];
 
+  // Konwersja stringa na enum - pobieramy wartość z obiektu PartType
+  const partType = PartType[partTypeStr as keyof typeof PartType];
+  if (!partType) return [];
+
   const relatedTypes = getRelatedPartTypes(partType);
 
+  // Używamy OR zamiast in dla lepszej kompatybilności z typami enum
   const products = await prisma.partProduct.findMany({
     where: {
-      type: { in: relatedTypes },
-      brand: { equals: brand, mode: "insensitive" },
-      model: { contains: query, mode: "insensitive" },
+      AND: [
+        { OR: relatedTypes.map((t) => ({ type: t })) },
+        { brand: { equals: brand, mode: "insensitive" } },
+        { model: { contains: query, mode: "insensitive" } },
+      ],
     },
     orderBy: [{ averageRating: "desc" }, { totalReviews: "desc" }],
     take: 10,

@@ -75,18 +75,53 @@ enum SyncStatus {
 }
 
 enum PartType {
+  // Rama i widelec
+  FRAME
+  FORK
+  SUSPENSION_FORK
+
+  // Stery i suport
+  HEADSET
+  BOTTOM_BRACKET
+
+  // Napęd
+  CRANKSET
+  CHAINRING_1X
   CHAIN
   CASSETTE
+  DERAILLEUR_FRONT
+  DERAILLEUR_REAR
+  SHIFTERS
+
+  // Hamulce
+  BRAKES
+  BRAKE_LEVERS
   PADS_FRONT
   PADS_REAR
+  DISC_FRONT
+  DISC_REAR
+
+  // Koła
+  HUBS
+  RIMS
+  SPOKES
   TIRE_FRONT
   TIRE_REAR
-  CHAINRING_1X
-  SUSPENSION_FORK
-  DROPPER_POST
   TUBELESS_SEALANT
+
+  // Kierownica i cockpit
+  STEM
+  HANDLEBAR
   HANDLEBAR_TAPE
+  GRIPS
+
+  // Siodło i sztyca
+  SADDLE
+  SEATPOST
   SUSPENSION_SEATPOST
+  DROPPER_POST
+
+  // Inne
   LUBRICANT
 }
 

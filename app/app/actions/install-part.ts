@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { PartType } from "@/lib/generated/prisma";
 
 // Pomocnicza funkcja do normalizacji typu części do "kanonicznego" typu
-// Używamy jej aby opony i klocki współdzieliły produkty
+// Używamy jej aby opony, klocki i tarcze współdzieliły produkty
 function getCanonicalPartType(partType: PartType): PartType {
   // Opony zawsze przechowujemy jako TIRE_FRONT
   if (partType === PartType.TIRE_FRONT || partType === PartType.TIRE_REAR) {
@@ -15,6 +15,11 @@ function getCanonicalPartType(partType: PartType): PartType {
   // Klocki zawsze przechowujemy jako PADS_FRONT
   if (partType === PartType.PADS_FRONT || partType === PartType.PADS_REAR) {
     return PartType.PADS_FRONT;
+  }
+
+  // Tarcze hamulcowe zawsze przechowujemy jako DISC_FRONT
+  if (partType === PartType.DISC_FRONT || partType === PartType.DISC_REAR) {
+    return PartType.DISC_FRONT;
   }
 
   // Wszystkie inne części pozostają bez zmian

@@ -24,7 +24,7 @@ export default function SimpleOnboardingFlow() {
   const [selectedType, setSelectedType] = useState<BikeType | null>(null);
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
-  const [year, setYear] = useState("");
+  const [year, setYear] = useState("2026");
   const [selectedProduct, setSelectedProduct] = useState<BikeProduct | null>(null);
   const [isPending, startTransition] = useTransition();
 
