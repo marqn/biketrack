@@ -73,9 +73,17 @@ export async function createBike({ type, brand, model, year, bikeProductId }: Cr
     }
   }
 
-  // Pobierz domyślne części z BikeProduct jeśli są skonfigurowane
-  let partsToCreate: Array<{ type: typeof DEFAULT_PARTS[BikeType][number]["type"]; expectedKm: number; productId?: string }> = [];
+  // Zacznij od domyślnych części dla typu roweru
+  const partsMap = new Map<string, { type: typeof DEFAULT_PARTS[BikeType][number]["type"]; expectedKm: number; productId?: string }>();
 
+  for (const p of DEFAULT_PARTS[type]) {
+    partsMap.set(p.type, {
+      type: p.type,
+      expectedKm: p.expectedKm,
+    });
+  }
+
+  // Nadpisz/dodaj części z BikeProduct jeśli są skonfigurowane
   if (resolvedBikeProductId) {
     const bikeProductWithParts = await prisma.bikeProduct.findUnique({
       where: { id: resolvedBikeProductId },
@@ -86,23 +94,18 @@ export async function createBike({ type, brand, model, year, bikeProductId }: Cr
       },
     });
 
-    if (bikeProductWithParts?.defaultParts && bikeProductWithParts.defaultParts.length > 0) {
-      // Użyj skonfigurowanych części z BikeProduct
-      partsToCreate = bikeProductWithParts.defaultParts.map((dp) => ({
-        type: dp.partType,
-        expectedKm: dp.expectedKm,
-        productId: dp.partProductId,
-      }));
+    if (bikeProductWithParts?.defaultParts) {
+      for (const dp of bikeProductWithParts.defaultParts) {
+        partsMap.set(dp.partType, {
+          type: dp.partType,
+          expectedKm: dp.expectedKm,
+          productId: dp.partProductId,
+        });
+      }
     }
   }
 
-  // Fallback do DEFAULT_PARTS jeśli brak skonfigurowanych części
-  if (partsToCreate.length === 0) {
-    partsToCreate = DEFAULT_PARTS[type].map((p) => ({
-      type: p.type,
-      expectedKm: p.expectedKm,
-    }));
-  }
+  const partsToCreate = Array.from(partsMap.values());
 
   await prisma.bike.create({
     data: {

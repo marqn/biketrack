@@ -70,7 +70,7 @@ export default function SimpleOnboardingFlow() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">
-            {step === 1 ? "Witaj! 🚴" : "Szczegóły roweru"}
+            {step === 1 ? "Witaj!" : "Szczegóły roweru"}
           </CardTitle>
           <CardDescription className="text-base">
             {step === 1

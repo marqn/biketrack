@@ -37,14 +37,15 @@ export async function syncBikeParts(bikeId: string) {
   let addedCount = 0;
   let removedCount = 0;
 
-  // Dodaj brakujące części
+  // Dodaj brakujące części z przebiegiem równym aktualnemu przebiegowi roweru
+  // (zakładamy że te części były od początku)
   if (missingParts.length > 0) {
     await prisma.bikePart.createMany({
       data: missingParts.map((p) => ({
         bikeId: bike.id,
         type: p.type,
         expectedKm: p.expectedKm,
-        wearKm: 0,
+        wearKm: bike.totalKm,
       })),
     });
     addedCount = missingParts.length;

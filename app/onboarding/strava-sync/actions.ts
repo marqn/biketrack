@@ -48,6 +48,8 @@ export async function createBike({
   let finalBrand = brand?.trim() || null;
   let finalModel = model?.trim() || null;
 
+  let resolvedBikeProductId: string | null = null;
+
   // Jeśli użytkownik podał markę i model, sprawdź czy już istnieje (case-insensitive)
   if (finalBrand && finalModel) {
     const existingProduct = await prisma.bikeProduct.findFirst({
@@ -62,12 +64,13 @@ export async function createBike({
       // Użyj istniejących danych (zachowaj spójność zapisu)
       finalBrand = existingProduct.brand;
       finalModel = existingProduct.model;
+      resolvedBikeProductId = existingProduct.id;
     } else {
       // Nowy produkt - normalizuj do Title Case
       finalBrand = toTitleCase(finalBrand);
       finalModel = toTitleCase(finalModel);
 
-      await prisma.bikeProduct.create({
+      const newProduct = await prisma.bikeProduct.create({
         data: {
           bikeType: type,
           brand: finalBrand,
@@ -75,9 +78,43 @@ export async function createBike({
           year: year || undefined,
         },
       });
+      resolvedBikeProductId = newProduct.id;
     }
   }
 
+  // Zacznij od domyślnych części dla typu roweru
+  const partsMap = new Map<string, { type: typeof DEFAULT_PARTS[BikeType][number]["type"]; expectedKm: number; productId?: string }>();
+
+  for (const p of DEFAULT_PARTS[type]) {
+    partsMap.set(p.type, {
+      type: p.type,
+      expectedKm: p.expectedKm,
+    });
+  }
+
+  // Nadpisz/dodaj części z BikeProduct jeśli są skonfigurowane
+  if (resolvedBikeProductId) {
+    const bikeProductWithParts = await prisma.bikeProduct.findUnique({
+      where: { id: resolvedBikeProductId },
+      include: {
+        defaultParts: {
+          include: { partProduct: true },
+        },
+      },
+    });
+
+    if (bikeProductWithParts?.defaultParts) {
+      for (const dp of bikeProductWithParts.defaultParts) {
+        partsMap.set(dp.partType, {
+          type: dp.partType,
+          expectedKm: dp.expectedKm,
+          productId: dp.partProductId,
+        });
+      }
+    }
+  }
+
+  const partsToCreate = Array.from(partsMap.values());
   const initialKm = totalKm || 0;
 
   await prisma.bike.create({
@@ -88,13 +125,25 @@ export async function createBike({
       totalKm: initialKm,
       userId: user.id,
       parts: {
-        create: DEFAULT_PARTS[type].map((part) => ({
-          ...part,
+        create: partsToCreate.map((p) => ({
+          type: p.type,
+          expectedKm: p.expectedKm,
+          productId: p.productId || undefined,
+          installedAt: p.productId ? new Date() : undefined,
           wearKm: initialKm,
         })),
       },
     },
   });
+
+  // Zaktualizuj licznik instalacji dla PartProduct
+  const productIds = partsToCreate.filter((p) => p.productId).map((p) => p.productId!);
+  if (productIds.length > 0) {
+    await prisma.partProduct.updateMany({
+      where: { id: { in: productIds } },
+      data: { totalInstallations: { increment: 1 } },
+    });
+  }
 
   redirect("/app");
 }
