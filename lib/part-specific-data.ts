@@ -35,6 +35,18 @@ export type LubricantSpecificData = {
   lubricantType: "wax" | "oil";
 };
 
+export type MotorSpecificData = {
+  power: number; // W (watt)
+  motorType: "mid-drive" | "hub-front" | "hub-rear";
+};
+
+export type BatterySpecificData = {
+  capacity: number; // Wh
+  voltage: number; // V
+};
+
+export type ControllerSpecificData = Record<string, never>;
+
 export type PartSpecificDataMap = {
   [PartType.TIRE_FRONT]: TireSpecificData;
   [PartType.TIRE_REAR]: TireSpecificData;
@@ -49,6 +61,10 @@ export type PartSpecificDataMap = {
   [PartType.SUSPENSION_SEATPOST]: SuspensionSpecificData;
   [PartType.HANDLEBAR_TAPE]: Record<string, never>; // Brak specyficznych pól
   [PartType.LUBRICANT]: LubricantSpecificData;
+  // E-bike
+  [PartType.MOTOR]: MotorSpecificData;
+  [PartType.BATTERY]: BatterySpecificData;
+  [PartType.CONTROLLER]: ControllerSpecificData;
 };
 
 export function getDefaultSpecificData(
@@ -68,6 +84,10 @@ export function getDefaultSpecificData(
     [PartType.SUSPENSION_SEATPOST]: { travel: 50 },
     [PartType.HANDLEBAR_TAPE]: {},
     [PartType.LUBRICANT]: { lubricantType: "oil" },
+    // E-bike
+    [PartType.MOTOR]: { power: 250, motorType: "mid-drive" },
+    [PartType.BATTERY]: { capacity: 500, voltage: 36 },
+    [PartType.CONTROLLER]: {},
   };
   return (defaults[type] || {}) as Partial<PartSpecificDataMap[PartType]>;
 }
@@ -86,6 +106,9 @@ export function hasSpecificFields(type: PartType): boolean {
     PartType.DROPPER_POST,
     PartType.SUSPENSION_SEATPOST,
     PartType.LUBRICANT,
+    // E-bike
+    PartType.MOTOR,
+    PartType.BATTERY,
   ];
   return typesWithFields.includes(type);
 }

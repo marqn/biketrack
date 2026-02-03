@@ -27,10 +27,11 @@ export default async function RootLayout({
         type: user.bikes[0].type,
         brand: user.bikes[0].brand,
         model: user.bikes[0].model,
+        year: user.bikes[0].year,
+        isElectric: user.bikes[0].isElectric,
         totalKm: user.bikes[0].totalKm,
         userId: user.bikes[0].userId,
         createdAt: user.bikes[0].createdAt,
-        syncStatus: "synced",
       };
 
       const headerBikes = user.bikes.map((b) => ({
@@ -39,6 +40,8 @@ export default async function RootLayout({
         type: b.type,
         brand: b.brand,
         model: b.model,
+        year: b.year,
+        isElectric: b.isElectric,
         totalKm: b.totalKm,
         userId: b.userId,
         createdAt: b.createdAt,

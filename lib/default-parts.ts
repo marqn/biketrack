@@ -175,7 +175,7 @@ export const PART_NAMES: Record<PartType, string> = {
   [PartType.SPOKES]: "Szprychy",
   [PartType.TIRE_FRONT]: "Opona przednia",
   [PartType.TIRE_REAR]: "Opona tylna",
-  [PartType.TUBELESS_SEALANT]: "Mleczko tubeless",
+  [PartType.TUBELESS_SEALANT]: "Mleko tubeless",
   // Cockpit
   [PartType.STEM]: "Mostek",
   [PartType.HANDLEBAR]: "Kierownica",
@@ -188,6 +188,10 @@ export const PART_NAMES: Record<PartType, string> = {
   [PartType.DROPPER_POST]: "Sztyca teleskopowa",
   // Inne
   [PartType.LUBRICANT]: "Smar do łańcucha",
+  // E-bike
+  [PartType.MOTOR]: "Silnik",
+  [PartType.BATTERY]: "Akumulator",
+  [PartType.CONTROLLER]: "Sterownik",
 };
 
 // Emoji dla każdego typu części
@@ -233,6 +237,10 @@ export const PART_ICONS: Record<PartType, string> = {
   [PartType.DROPPER_POST]: "📏",
   // Inne
   [PartType.LUBRICANT]: "💧",
+  // E-bike
+  [PartType.MOTOR]: "⚡",
+  [PartType.BATTERY]: "🔋",
+  [PartType.CONTROLLER]: "🎛️",
 };
 
 // UI format (emoji | nazwa) - zachowane dla kompatybilności wstecznej
@@ -254,3 +262,10 @@ export function getPartIcon(partType: PartType | string): string {
 
 export const CHAIN_LUBE_INTERVAL_KM = 200;
 export const SEALANT_INTERVAL_DAYS = 90;
+
+// Domyślne części dla rowerów elektrycznych
+export const EBIKE_PARTS: DefaultPart[] = [
+  { type: PartType.MOTOR, expectedKm: 50000 },
+  { type: PartType.BATTERY, expectedKm: 30000 },
+  { type: PartType.CONTROLLER, expectedKm: 40000 },
+];

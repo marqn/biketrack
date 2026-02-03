@@ -123,6 +123,11 @@ enum PartType {
 
   // Inne
   LUBRICANT
+
+  // E-bike
+  MOTOR
+  BATTERY
+  CONTROLLER
 }
 
 enum ServiceType {
@@ -131,13 +136,14 @@ enum ServiceType {
 }
 
 model Bike {
-  id      String   @id @default(cuid())
-  userId  String
-  brand   String?
-  model   String?
-  year    Int?
-  type    BikeType
-  totalKm Int      @default(0)
+  id         String   @id @default(cuid())
+  userId     String
+  brand      String?
+  model      String?
+  year       Int?
+  type       BikeType
+  isElectric Boolean  @default(false)
+  totalKm    Int      @default(0)
 
   user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   parts            BikePart[]

@@ -6,7 +6,7 @@ import LubeButton from "./lube-button";
 import KmForm from "./km-form";
 import PartCard from "../../components/part-card/PartCard";
 import { PartType, ServiceType } from "@/lib/generated/prisma";
-import { DEFAULT_PARTS, PART_UI } from "@/lib/default-parts";
+import { DEFAULT_PARTS, EBIKE_PARTS, PART_UI } from "@/lib/default-parts";
 import { NotificationsList } from "@/components/notifications-list/NotificationsList";
 import { ensureEmailMissingNotification } from "@/lib/nofifications/emailMissing";
 import CalendarCard from "@/components/calendar-card/CalendarCard";
@@ -95,7 +95,7 @@ export default async function AppPage() {
           />
         </PartCard>
 
-        {DEFAULT_PARTS[bike.type]
+        {[...DEFAULT_PARTS[bike.type], ...(bike.isElectric ? EBIKE_PARTS : [])]
           .filter((part) => part.type !== PartType.CHAIN)
           .map((part) => {
             const existingPart = bike.parts.find((p) => p.type === part.type);

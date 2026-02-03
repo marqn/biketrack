@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -32,12 +33,14 @@ interface RenameBikeDialogProps {
     model?: string | null;
     year?: number | null;
     type: BikeType;
+    isElectric?: boolean;
   };
   onSave: (data: {
     brand: string;
     model: string;
     year: number | null;
     type: BikeType;
+    isElectric: boolean;
   }) => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -51,6 +54,7 @@ export function RenameBikeDialog({
   const [model, setModel] = useState(bike.model ?? "");
   const [year, setYear] = useState(bike.year?.toString() ?? "2026");
   const [type, setType] = useState<BikeType>(bike.type);
+  const [isElectric, setIsElectric] = useState(bike.isElectric ?? false);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -62,6 +66,7 @@ export function RenameBikeDialog({
         model,
         year: year ? parseInt(year, 10) : null,
         type,
+        isElectric,
       });
 
       if (result.success) {
@@ -81,6 +86,7 @@ export function RenameBikeDialog({
       setModel(bike.model ?? "");
       setYear(bike.year?.toString() ?? "");
       setType(bike.type);
+      setIsElectric(bike.isElectric ?? false);
     }
     onOpenChange(open);
   };
@@ -149,6 +155,18 @@ export function RenameBikeDialog({
               Dzięki temu będziemy mogli zaproponować konkretne komponenty
               dopasowane do tego modelu.
             </p>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="is-electric"
+              checked={isElectric}
+              onCheckedChange={(checked) => setIsElectric(checked === true)}
+              disabled={isLoading}
+            />
+            <Label htmlFor="is-electric" className="cursor-pointer">
+              Rower elektryczny (e-bike)
+            </Label>
           </div>
         </div>
 

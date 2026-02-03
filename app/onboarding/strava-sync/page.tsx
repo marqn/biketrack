@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels, BikeProduct } from "@/lib/types";
@@ -48,6 +49,7 @@ export default function StravaOnboardingPage() {
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
   const [year, setYear] = useState("2026");
+  const [isElectric, setIsElectric] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -103,6 +105,7 @@ export default function StravaOnboardingPage() {
         totalKm: selectedBike.distance
           ? Math.round(selectedBike.distance / 1000)
           : 0,
+        isElectric,
       });
     });
   }
@@ -119,6 +122,7 @@ export default function StravaOnboardingPage() {
         totalKm: selectedBike.distance
           ? Math.round(selectedBike.distance / 1000)
           : 0,
+        isElectric,
       });
     });
   }
@@ -265,6 +269,17 @@ export default function StravaOnboardingPage() {
                   />
                 </div>
               )}
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="is-electric"
+                  checked={isElectric}
+                  onCheckedChange={(checked) => setIsElectric(checked === true)}
+                />
+                <Label htmlFor="is-electric" className="cursor-pointer">
+                  Rower elektryczny (e-bike)
+                </Label>
+              </div>
 
               <div className="space-y-3 pt-2">
                 <Button

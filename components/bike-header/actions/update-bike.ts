@@ -1,8 +1,9 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { BikeType } from "@/lib/generated/prisma";
+import { BikeType, PartType } from "@/lib/generated/prisma";
 import { revalidatePath } from "next/cache";
+import { EBIKE_PARTS } from "@/lib/default-parts";
 
 // Normalizacja tekstu do Title Case (np. "trek" -> "Trek", "CANNONDALE" -> "Cannondale")
 function toTitleCase(str: string): string {
@@ -17,6 +18,7 @@ interface UpdateBikeData {
   model: string;
   year: number | null;
   type: BikeType;
+  isElectric: boolean;
 }
 
 export async function updateBike(
@@ -28,7 +30,7 @@ export async function updateBike(
     // Sprawdź czy rower należy do użytkownika
     const bike = await prisma.bike.findUnique({
       where: { id: bikeId },
-      select: { id: true, userId: true },
+      select: { id: true, userId: true, isElectric: true, totalKm: true },
     });
 
     if (!bike) {
@@ -84,6 +86,33 @@ export async function updateBike(
       }
     }
 
+    // Obsługa zmiany isElectric - dodaj lub usuń części e-bike
+    const ebikePartTypes: PartType[] = [PartType.MOTOR, PartType.BATTERY, PartType.CONTROLLER];
+
+    if (data.isElectric && !bike.isElectric) {
+      // Rower stał się elektryczny - dodaj części e-bike
+      for (const p of EBIKE_PARTS) {
+        await prisma.bikePart.upsert({
+          where: { bikeId_type: { bikeId, type: p.type } },
+          create: {
+            bikeId,
+            type: p.type,
+            expectedKm: p.expectedKm,
+            wearKm: bike.totalKm,
+          },
+          update: {},
+        });
+      }
+    } else if (!data.isElectric && bike.isElectric) {
+      // Rower przestał być elektryczny - usuń części e-bike
+      await prisma.bikePart.deleteMany({
+        where: {
+          bikeId,
+          type: { in: ebikePartTypes },
+        },
+      });
+    }
+
     // Aktualizuj rower
     const updatedBike = await prisma.bike.update({
       where: { id: bikeId },
@@ -92,6 +121,7 @@ export async function updateBike(
         model: finalModel,
         year: data.year,
         type: data.type,
+        isElectric: data.isElectric,
       },
     });
 

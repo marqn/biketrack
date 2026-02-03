@@ -98,6 +98,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
     model: string;
     year: number | null;
     type: BikeType;
+    isElectric: boolean;
   }) => {
     return await updateBike(bike.id, user.id, data);
   };

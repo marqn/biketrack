@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels, BikeProduct } from "@/lib/types";
 import { ArrowLeft } from "lucide-react";
@@ -26,6 +27,7 @@ export default function SimpleOnboardingFlow() {
   const [model, setModel] = useState("");
   const [year, setYear] = useState("2026");
   const [selectedProduct, setSelectedProduct] = useState<BikeProduct | null>(null);
+  const [isElectric, setIsElectric] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   function handleTypeSelect(type: BikeType) {
@@ -48,6 +50,7 @@ export default function SimpleOnboardingFlow() {
         model: model || null,
         year: year ? parseInt(year, 10) : null,
         bikeProductId: selectedProduct?.id || null,
+        isElectric,
       });
     });
   }
@@ -61,6 +64,7 @@ export default function SimpleOnboardingFlow() {
         brand: null,
         model: null,
         year: null,
+        isElectric,
       });
     });
   }
@@ -135,6 +139,17 @@ export default function SimpleOnboardingFlow() {
                   min={1990}
                   max={new Date().getFullYear() + 1}
                 />
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="is-electric"
+                  checked={isElectric}
+                  onCheckedChange={(checked) => setIsElectric(checked === true)}
+                />
+                <Label htmlFor="is-electric" className="cursor-pointer">
+                  Rower elektryczny (e-bike)
+                </Label>
               </div>
 
               <div className="space-y-3 pt-2">

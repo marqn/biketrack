@@ -244,13 +244,13 @@ async function main() {
     }
   })
 
-  // --- MLECZKO TUBELESS ---
+  // --- MLEKO TUBELESS ---
   const sealantStans = await prisma.partProduct.create({
     data: {
       type: PartType.TUBELESS_SEALANT,
       brand: 'Stans NoTubes',
       model: 'Race Sealant',
-      description: 'Mleczko tubeless Stans'
+      description: 'Mleko tubeless Stans'
     }
   })
 

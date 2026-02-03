@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { BikeType } from "@/lib/generated/prisma";
-import { DEFAULT_PARTS } from "@/lib/default-parts";
+import { DEFAULT_PARTS, EBIKE_PARTS } from "@/lib/default-parts";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 // Normalizacja tekstu do Title Case (np. "trek" -> "Trek", "CANNONDALE" -> "Cannondale")
@@ -21,9 +21,10 @@ interface CreateBikeParams {
   model?: string | null;
   year?: number | null;
   bikeProductId?: string | null;
+  isElectric?: boolean;
 }
 
-export async function createBike({ type, brand, model, year, bikeProductId }: CreateBikeParams) {
+export async function createBike({ type, brand, model, year, bikeProductId, isElectric = false }: CreateBikeParams) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
 
@@ -83,6 +84,16 @@ export async function createBike({ type, brand, model, year, bikeProductId }: Cr
     });
   }
 
+  // Dodaj części e-bike jeśli rower jest elektryczny
+  if (isElectric) {
+    for (const p of EBIKE_PARTS) {
+      partsMap.set(p.type, {
+        type: p.type,
+        expectedKm: p.expectedKm,
+      });
+    }
+  }
+
   // Nadpisz/dodaj części z BikeProduct jeśli są skonfigurowane
   if (resolvedBikeProductId) {
     const bikeProductWithParts = await prisma.bikeProduct.findUnique({
@@ -113,6 +124,7 @@ export async function createBike({ type, brand, model, year, bikeProductId }: Cr
       brand: finalBrand || undefined,
       model: finalModel || undefined,
       year: year || undefined,
+      isElectric,
       userId: user.id,
       parts: {
         create: partsToCreate.map((p) => ({
