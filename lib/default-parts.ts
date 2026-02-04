@@ -20,6 +20,8 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.DERAILLEUR_FRONT, expectedKm: 30000 },
     { type: PartType.DERAILLEUR_REAR, expectedKm: 20000 },
     { type: PartType.SHIFTERS, expectedKm: 30000 },
+    { type: PartType.PEDALS, expectedKm: 30000 },
+    { type: PartType.CLEATS, expectedKm: 5000 },
     // Hamulce
     { type: PartType.BRAKES, expectedKm: 30000 },
     { type: PartType.BRAKE_LEVERS, expectedKm: 30000 },
@@ -40,6 +42,11 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     // Siodło
     { type: PartType.SADDLE, expectedKm: 20000 },
     { type: PartType.SEATPOST, expectedKm: 50000 },
+    // Akcesoria
+    { type: PartType.BOTTLE_CAGE, expectedKm: 50000 },
+    { type: PartType.LIGHT_FRONT, expectedKm: 20000 },
+    { type: PartType.LIGHT_REAR, expectedKm: 20000 },
+    { type: PartType.COMPUTER, expectedKm: 50000 },
   ],
   GRAVEL: [
     // Rama i widelec
@@ -54,6 +61,8 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.CASSETTE, expectedKm: 6000 },
     { type: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
     { type: PartType.SHIFTERS, expectedKm: 25000 },
+    { type: PartType.PEDALS, expectedKm: 25000 },
+    { type: PartType.CLEATS, expectedKm: 5000 },
     // Hamulce
     { type: PartType.BRAKES, expectedKm: 25000 },
     { type: PartType.BRAKE_LEVERS, expectedKm: 25000 },
@@ -75,6 +84,14 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     // Siodło
     { type: PartType.SADDLE, expectedKm: 15000 },
     { type: PartType.SEATPOST, expectedKm: 40000 },
+    // Akcesoria
+    { type: PartType.FENDER_FRONT, expectedKm: 50000 },
+    { type: PartType.FENDER_REAR, expectedKm: 50000 },
+    { type: PartType.BOTTLE_CAGE, expectedKm: 50000 },
+    { type: PartType.BAG_SADDLE, expectedKm: 30000 },
+    { type: PartType.LIGHT_FRONT, expectedKm: 20000 },
+    { type: PartType.LIGHT_REAR, expectedKm: 20000 },
+    { type: PartType.COMPUTER, expectedKm: 50000 },
   ],
   MTB: [
     // Rama i widelec
@@ -89,6 +106,8 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.CASSETTE, expectedKm: 5000 },
     { type: PartType.DERAILLEUR_REAR, expectedKm: 12000 },
     { type: PartType.SHIFTERS, expectedKm: 20000 },
+    { type: PartType.PEDALS, expectedKm: 20000 },
+    { type: PartType.CLEATS, expectedKm: 5000 },
     // Hamulce
     { type: PartType.BRAKES, expectedKm: 20000 },
     { type: PartType.BRAKE_LEVERS, expectedKm: 20000 },
@@ -110,6 +129,11 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     // Siodło
     { type: PartType.SADDLE, expectedKm: 12000 },
     { type: PartType.DROPPER_POST, expectedKm: 8000 },
+    // Akcesoria
+    { type: PartType.BOTTLE_CAGE, expectedKm: 50000 },
+    { type: PartType.LIGHT_FRONT, expectedKm: 20000 },
+    { type: PartType.LIGHT_REAR, expectedKm: 20000 },
+    { type: PartType.COMPUTER, expectedKm: 50000 },
   ],
   OTHER: [
     // Rama i widelec
@@ -124,6 +148,7 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.CASSETTE, expectedKm: 5000 },
     { type: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
     { type: PartType.SHIFTERS, expectedKm: 25000 },
+    { type: PartType.PEDALS, expectedKm: 25000 },
     // Hamulce
     { type: PartType.BRAKES, expectedKm: 25000 },
     { type: PartType.BRAKE_LEVERS, expectedKm: 25000 },
@@ -142,6 +167,17 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     // Siodło
     { type: PartType.SADDLE, expectedKm: 15000 },
     { type: PartType.SUSPENSION_SEATPOST, expectedKm: 10000 },
+    // Akcesoria (turystyczne)
+    { type: PartType.FENDER_FRONT, expectedKm: 50000 },
+    { type: PartType.FENDER_REAR, expectedKm: 50000 },
+    { type: PartType.KICKSTAND, expectedKm: 100000 },
+    { type: PartType.RACK, expectedKm: 80000 },
+    { type: PartType.BAG_SADDLE, expectedKm: 30000 },
+    { type: PartType.BOTTLE_CAGE, expectedKm: 50000 },
+    { type: PartType.LIGHT_FRONT, expectedKm: 20000 },
+    { type: PartType.LIGHT_REAR, expectedKm: 20000 },
+    { type: PartType.BELL, expectedKm: 100000 },
+    { type: PartType.COMPUTER, expectedKm: 50000 },
   ],
 };
 
@@ -162,6 +198,8 @@ export const PART_NAMES: Record<PartType, string> = {
   [PartType.DERAILLEUR_FRONT]: "Przerzutka przód",
   [PartType.DERAILLEUR_REAR]: "Przerzutka tył",
   [PartType.SHIFTERS]: "Manetki",
+  [PartType.PEDALS]: "Pedały",
+  [PartType.CLEATS]: "Bloki SPD",
   // Hamulce
   [PartType.BRAKES]: "Hamulce",
   [PartType.BRAKE_LEVERS]: "Dźwignie hamulcowe",
@@ -186,6 +224,18 @@ export const PART_NAMES: Record<PartType, string> = {
   [PartType.SEATPOST]: "Sztyca",
   [PartType.SUSPENSION_SEATPOST]: "Sztyca amortyzowana",
   [PartType.DROPPER_POST]: "Sztyca teleskopowa",
+  // Akcesoria
+  [PartType.FENDER_FRONT]: "Błotnik przedni",
+  [PartType.FENDER_REAR]: "Błotnik tylny",
+  [PartType.KICKSTAND]: "Stopka",
+  [PartType.RACK]: "Bagażnik",
+  [PartType.BAG_SADDLE]: "Torba podsiodłowa",
+  [PartType.BAG_FRAME]: "Torba na ramę",
+  [PartType.BOTTLE_CAGE]: "Koszyk na bidon",
+  [PartType.LIGHT_FRONT]: "Lampka przednia",
+  [PartType.LIGHT_REAR]: "Lampka tylna",
+  [PartType.BELL]: "Dzwonek",
+  [PartType.COMPUTER]: "Licznik",
   // Inne
   [PartType.LUBRICANT]: "Smar do łańcucha",
   // E-bike
@@ -211,6 +261,8 @@ export const PART_ICONS: Record<PartType, string> = {
   [PartType.DERAILLEUR_FRONT]: "↔️",
   [PartType.DERAILLEUR_REAR]: "↔️",
   [PartType.SHIFTERS]: "🎚️",
+  [PartType.PEDALS]: "🦶",
+  [PartType.CLEATS]: "👟",
   // Hamulce
   [PartType.BRAKES]: "🛑",
   [PartType.BRAKE_LEVERS]: "✋",
@@ -235,6 +287,18 @@ export const PART_ICONS: Record<PartType, string> = {
   [PartType.SEATPOST]: "📏",
   [PartType.SUSPENSION_SEATPOST]: "📏",
   [PartType.DROPPER_POST]: "📏",
+  // Akcesoria
+  [PartType.FENDER_FRONT]: "🛡️",
+  [PartType.FENDER_REAR]: "🛡️",
+  [PartType.KICKSTAND]: "🦵",
+  [PartType.RACK]: "📦",
+  [PartType.BAG_SADDLE]: "👜",
+  [PartType.BAG_FRAME]: "🎒",
+  [PartType.BOTTLE_CAGE]: "🧃",
+  [PartType.LIGHT_FRONT]: "🔦",
+  [PartType.LIGHT_REAR]: "🔴",
+  [PartType.BELL]: "🔔",
+  [PartType.COMPUTER]: "📟",
   // Inne
   [PartType.LUBRICANT]: "💧",
   // E-bike
@@ -262,6 +326,96 @@ export function getPartIcon(partType: PartType | string): string {
 
 export const CHAIN_LUBE_INTERVAL_KM = 200;
 export const SEALANT_INTERVAL_DAYS = 90;
+
+// Kategorie części rowerowych
+export type PartCategory = "frame" | "drivetrain" | "brakes" | "wheels" | "cockpit" | "accessories";
+
+export const PART_CATEGORIES: Record<PartCategory, { label: string; types: PartType[] }> = {
+  frame: {
+    label: "Rama",
+    types: [PartType.FRAME, PartType.FORK, PartType.SUSPENSION_FORK],
+  },
+  drivetrain: {
+    label: "Napęd",
+    types: [
+      PartType.MOTOR,
+      PartType.BATTERY,
+      PartType.CONTROLLER,
+      PartType.CRANKSET,
+      PartType.CHAINRING_1X,
+      PartType.CHAIN,
+      PartType.CASSETTE,
+      PartType.BOTTOM_BRACKET,
+      PartType.DERAILLEUR_FRONT,
+      PartType.DERAILLEUR_REAR,
+      PartType.SHIFTERS,
+      PartType.PEDALS,
+      PartType.CLEATS,
+    ],
+  },
+  brakes: {
+    label: "Hamulce",
+    types: [
+      PartType.BRAKES,
+      PartType.BRAKE_LEVERS,
+      PartType.PADS_FRONT,
+      PartType.PADS_REAR,
+      PartType.DISC_FRONT,
+      PartType.DISC_REAR,
+    ],
+  },
+  wheels: {
+    label: "Koła",
+    types: [
+      PartType.HUBS,
+      PartType.RIMS,
+      PartType.SPOKES,
+      PartType.TIRE_FRONT,
+      PartType.TIRE_REAR,
+      PartType.TUBELESS_SEALANT,
+    ],
+  },
+  cockpit: {
+    label: "Kokpit",
+    types: [
+      PartType.HEADSET,
+      PartType.STEM,
+      PartType.HANDLEBAR,
+      PartType.HANDLEBAR_TAPE,
+      PartType.GRIPS,
+      PartType.SADDLE,
+      PartType.SEATPOST,
+      PartType.SUSPENSION_SEATPOST,
+      PartType.DROPPER_POST,
+    ],
+  },
+  accessories: {
+    label: "Akcesoria",
+    types: [
+      PartType.FENDER_FRONT,
+      PartType.FENDER_REAR,
+      PartType.KICKSTAND,
+      PartType.RACK,
+      PartType.BAG_SADDLE,
+      PartType.BAG_FRAME,
+      PartType.BOTTLE_CAGE,
+      PartType.LIGHT_FRONT,
+      PartType.LIGHT_REAR,
+      PartType.BELL,
+      PartType.COMPUTER,
+    ],
+  },
+};
+
+// Funkcja do znalezienia kategorii dla danego typu części
+export function getPartCategory(partType: PartType): PartCategory | null {
+  for (const [category, data] of Object.entries(PART_CATEGORIES)) {
+    if (data.types.includes(partType)) {
+      return category as PartCategory;
+    }
+  }
+  return null;
+}
 
 // Domyślne części dla rowerów elektrycznych
 export const EBIKE_PARTS: DefaultPart[] = [

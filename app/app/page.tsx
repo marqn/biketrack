@@ -4,12 +4,11 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import LubeButton from "./lube-button";
 import KmForm from "./km-form";
-import PartCard from "../../components/part-card/PartCard";
-import { PartType, ServiceType } from "@/lib/generated/prisma";
-import { DEFAULT_PARTS, EBIKE_PARTS, PART_UI } from "@/lib/default-parts";
+import { ServiceType } from "@/lib/generated/prisma";
+import { DEFAULT_PARTS, EBIKE_PARTS } from "@/lib/default-parts";
 import { NotificationsList } from "@/components/notifications-list/NotificationsList";
 import { ensureEmailMissingNotification } from "@/lib/nofifications/emailMissing";
-import CalendarCard from "@/components/calendar-card/CalendarCard";
+import PartsAccordion from "@/components/parts-accordion/PartsAccordion";
 
 export default async function AppPage() {
   const session = await getServerSession(authOptions);
@@ -61,62 +60,40 @@ export default async function AppPage() {
 
   if (!user?.bikes?.[0]) redirect("/onboarding");
 
-  const chain = user.bikes[0].parts.find((p) => p.type === PartType.CHAIN);
   const bike = user.bikes[0];
   const lastLube = bike.services[0];
+
+  // Przygotuj dane dla PartsAccordion
+  const defaultParts = [...DEFAULT_PARTS[bike.type], ...(bike.isElectric ? EBIKE_PARTS : [])];
+  const existingParts = bike.parts.map((p) => ({
+    id: p.id,
+    type: p.type,
+    wearKm: p.wearKm,
+    expectedKm: p.expectedKm,
+    isInstalled: p.isInstalled,
+    product: p.product,
+    replacements: p.replacements,
+  }));
 
   return (
     <div className="space-y-6 lg:px-24 lg:space-6">
       <NotificationsList />
 
-      {/* <div className="grid gap-4 grid-cols-1 md:grid-cols-2"> */}
-        <KmForm bikeId={bike.id} initialKm={bike.totalKm} />
-        {/* <CalendarCard /> */}
-      {/* </div> */}
+      <KmForm bikeId={bike.id} initialKm={bike.totalKm} />
 
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-        <PartCard
-          partId={chain?.id || ""}
-          partName={PART_UI[PartType.CHAIN]}
-          wearKm={chain?.wearKm || 0}
-          expectedKm={chain?.expectedKm || 0}
-          bikeId={bike.id}
-          partType={PartType.CHAIN}
-          replacements={chain?.replacements || []}
-          currentBrand={chain?.product?.brand || chain?.replacements?.[0]?.brand}
-          currentModel={chain?.product?.model || chain?.replacements?.[0]?.model}
-          currentPart={chain}
-        >
+      <PartsAccordion
+        bikeId={bike.id}
+        defaultParts={defaultParts}
+        existingParts={existingParts}
+        chainChildren={
           <LubeButton
             bikeId={bike.id}
             currentKm={bike.totalKm}
             lastLubeKmInitial={lastLube?.kmAtTime}
             lubeEvents={bike.services}
           />
-        </PartCard>
-
-        {[...DEFAULT_PARTS[bike.type], ...(bike.isElectric ? EBIKE_PARTS : [])]
-          .filter((part) => part.type !== PartType.CHAIN)
-          .map((part) => {
-            const existingPart = bike.parts.find((p) => p.type === part.type);
-
-            return (
-              <PartCard
-                key={part.type}
-                partId={existingPart?.id || ""}
-                partName={PART_UI[part.type]}
-                expectedKm={part.expectedKm}
-                wearKm={existingPart?.wearKm || 0}
-                bikeId={bike.id}
-                partType={part.type}
-                replacements={existingPart?.replacements || []}
-                currentBrand={existingPart?.product?.brand || existingPart?.replacements?.[0]?.brand}
-                currentModel={existingPart?.product?.model || existingPart?.replacements?.[0]?.model}
-                currentPart={existingPart}
-              />
-            );
-          })}
-      </div>
+        }
+      />
     </div>
   );
 }

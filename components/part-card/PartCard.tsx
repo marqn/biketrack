@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { NotebookText } from "lucide-react";
+import { NotebookText, Link, Unlink } from "lucide-react";
 import { PartType } from "@/lib/generated/prisma";
 import {
   Card,
@@ -21,6 +21,7 @@ import {
   deletePartReplacement,
   updatePartReplacement,
 } from "@/app/app/actions/replace-part";
+import { togglePartInstalled } from "@/app/app/actions/toggle-part-installed";
 import { PartReplacement, BikePartWithProduct } from "@/lib/types";
 import { useMultiDialog } from "@/lib/hooks/useDialog";
 
@@ -36,6 +37,8 @@ interface PartCardProps {
   currentModel?: string | null;
   currentPart?: Partial<BikePartWithProduct> | null;
   children?: React.ReactNode;
+  isAccessory?: boolean;
+  isInstalled?: boolean;
 }
 
 export default function PartCard({
@@ -50,6 +53,8 @@ export default function PartCard({
   currentBrand,
   currentModel,
   children,
+  isAccessory = false,
+  isInstalled = true,
 }: PartCardProps) {
   const { activeDialog, openDialog, closeDialog } = useMultiDialog<
     DialogType | "replace" | "history"
@@ -64,6 +69,14 @@ export default function PartCard({
 
   // Określ czy jest to edit czy create
   const hasCurrentPart = !!(currentBrand && currentModel);
+
+  async function handleToggleInstalled(checked: boolean) {
+    if (!partId) return;
+    startTransition(async () => {
+      await togglePartInstalled(partId, checked);
+      router.refresh();
+    });
+  }
 
   async function handleDelete(replacementId: string) {
     startTransition(async () => {
@@ -84,7 +97,7 @@ export default function PartCard({
 
   return (
     <>
-      <Card className="mt-4">
+      <Card className={`mt-4 ${isAccessory && !isInstalled ? "opacity-50" : ""}`}>
         <CardHeader className="pb-2">
           <CardTitle className="text-base">
             {partName}
@@ -101,7 +114,25 @@ export default function PartCard({
               </button>
             </p>
           </CardTitle>
-          {progressPercent >= 100 && <CardAction>🚨</CardAction>}
+          <CardAction className="flex items-center gap-2">
+            {progressPercent >= 100 && <span>🚨</span>}
+            {isAccessory && partId && (
+              <Button
+                size="icon"
+                variant={isInstalled ? "default" : "outline"}
+                onClick={() => handleToggleInstalled(!isInstalled)}
+                disabled={isPending}
+                title={isInstalled ? "Zdejmij z roweru" : "Zamontuj na rowerze"}
+                className="h-8 w-8"
+              >
+                {isInstalled ? (
+                  <Link className="h-4 w-4" />
+                ) : (
+                  <Unlink className="h-4 w-4" />
+                )}
+              </Button>
+            )}
+          </CardAction>
         </CardHeader>
 
         <CardContent className="space-y-3">

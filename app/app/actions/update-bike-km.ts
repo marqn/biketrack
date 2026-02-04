@@ -39,7 +39,7 @@ export async function updateBikeKm(formData: FormData) {
     }),
 
     prisma.bikePart.updateMany({
-      where: { bikeId },
+      where: { bikeId, isInstalled: true },
       data: {
         wearKm: { increment: diffKm },
       },

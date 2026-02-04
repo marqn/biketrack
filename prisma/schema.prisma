@@ -92,6 +92,8 @@ enum PartType {
   DERAILLEUR_FRONT
   DERAILLEUR_REAR
   SHIFTERS
+  PEDALS
+  CLEATS
 
   // Hamulce
   BRAKES
@@ -120,6 +122,19 @@ enum PartType {
   SEATPOST
   SUSPENSION_SEATPOST
   DROPPER_POST
+
+  // Akcesoria
+  FENDER_FRONT
+  FENDER_REAR
+  KICKSTAND
+  RACK
+  BAG_SADDLE
+  BAG_FRAME
+  BOTTLE_CAGE
+  LIGHT_FRONT
+  LIGHT_REAR
+  BELL
+  COMPUTER
 
   // Inne
   LUBRICANT
@@ -162,6 +177,7 @@ model BikePart {
 
   wearKm     Int @default(0)
   expectedKm Int
+  isInstalled Boolean @default(true) // Czy część jest zamontowana (dla akcesoriów)
 
   // Nowe pola dla globalnego systemu produktów
   productId String? // Referencja do globalnego produktu
