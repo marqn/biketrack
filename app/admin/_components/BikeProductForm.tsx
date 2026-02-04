@@ -49,7 +49,7 @@ export function BikeProductForm({ initialData }: BikeProductFormProps) {
   );
   const [brand, setBrand] = useState(initialData?.brand || "");
   const [model, setModel] = useState(initialData?.model || "");
-  const [year, setYear] = useState(initialData?.year?.toString() || "2026");
+  const [year, setYear] = useState(initialData?.year?.toString() || new Date().getFullYear().toString());
   const [description, setDescription] = useState(
     initialData?.description || ""
   );

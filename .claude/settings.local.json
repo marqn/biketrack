@@ -6,7 +6,8 @@
       "Bash(tasklist:*)",
       "Bash(findstr:*)",
       "Bash(npx tsx scripts/sync-all-bikes.ts)",
-      "WebFetch(domain:kross.pl)"
+      "WebFetch(domain:kross.pl)",
+      "Bash(npx tsx:*)"
     ]
   }
 }

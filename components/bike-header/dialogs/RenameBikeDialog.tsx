@@ -52,7 +52,7 @@ export function RenameBikeDialog({
 }: RenameBikeDialogProps) {
   const [brand, setBrand] = useState(bike.brand ?? "");
   const [model, setModel] = useState(bike.model ?? "");
-  const [year, setYear] = useState(bike.year?.toString() ?? "2026");
+  const [year, setYear] = useState(bike.year?.toString() ?? new Date().getFullYear().toString());
   const [type, setType] = useState<BikeType>(bike.type);
   const [isElectric, setIsElectric] = useState(bike.isElectric ?? false);
 

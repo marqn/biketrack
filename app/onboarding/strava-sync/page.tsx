@@ -48,7 +48,7 @@ export default function StravaOnboardingPage() {
   const [selectedType, setSelectedType] = useState<BikeType | null>(null);
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
-  const [year, setYear] = useState("2026");
+  const [year, setYear] = useState(new Date().getFullYear().toString());
   const [isElectric, setIsElectric] = useState(false);
   const [isPending, startTransition] = useTransition();
 

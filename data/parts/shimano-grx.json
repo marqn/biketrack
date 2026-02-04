@@ -1,0 +1,133 @@
+{
+  "parts": [
+    {
+      "source": { "name": "shimano.com" },
+      "brand": "Shimano",
+      "model": "GRX RD-RX822",
+      "rawType": "przerzutka tylna",
+      "description": "Przerzutka tylna Shimano GRX RX822 12-speed, Shadow RD+",
+      "compatibility": {
+        "speeds": 12,
+        "bikeTypes": ["gravel"]
+      }
+    },
+    {
+      "source": { "name": "shimano.com" },
+      "brand": "Shimano",
+      "model": "GRX RD-RX820",
+      "rawType": "przerzutka tylna",
+      "description": "Przerzutka tylna Shimano GRX RX820 12-speed dla 2x",
+      "compatibility": {
+        "speeds": 12,
+        "bikeTypes": ["gravel"]
+      }
+    },
+    {
+      "source": { "name": "shimano.com" },
+      "brand": "Shimano",
+      "model": "GRX RD-RX812",
+      "rawType": "przerzutka tylna",
+      "description": "Przerzutka tylna Shimano GRX RX812 11-speed 1x",
+      "compatibility": {
+        "speeds": 11,
+        "bikeTypes": ["gravel"]
+      }
+    },
+    {
+      "source": { "name": "shimano.com" },
+      "brand": "Shimano",
+      "model": "GRX ST-RX820",
+      "rawType": "manetki",
+      "description": "Manetki Shimano GRX 12-speed hydrauliczne",
+      "compatibility": {
+        "speeds": 12,
+        "bikeTypes": ["gravel"]
+      }
+    },
+    {
+      "source": { "name": "shimano.com" },
+      "brand": "Shimano",
+      "model": "GRX ST-RX810",
+      "rawType": "manetki",
+      "description": "Manetki Shimano GRX 11-speed hydrauliczne",
+      "compatibility": {
+        "speeds": 11,
+        "bikeTypes": ["gravel"]
+      }
+    },
+    {
+      "source": { "name": "shimano.com" },
+      "brand": "Shimano",
+      "model": "GRX BR-RX820",
+      "rawType": "hamulce",
+      "description": "Hamulce hydrauliczne Shimano GRX RX820"
+    },
+    {
+      "source": { "name": "shimano.com" },
+      "brand": "Shimano",
+      "model": "GRX BR-RX400",
+      "rawType": "hamulce",
+      "description": "Hamulce hydrauliczne Shimano GRX RX400"
+    },
+    {
+      "source": { "name": "shimano.com" },
+      "brand": "Shimano",
+      "model": "GRX FC-RX820-1",
+      "rawType": "korba",
+      "description": "Korba Shimano GRX 1x12 40T"
+    },
+    {
+      "source": { "name": "shimano.com" },
+      "brand": "Shimano",
+      "model": "CN-M6100",
+      "rawType": "łańcuch",
+      "description": "Łańcuch Shimano Deore 12-speed",
+      "compatibility": {
+        "speeds": 12
+      }
+    },
+    {
+      "source": { "name": "shimano.com" },
+      "brand": "Shimano",
+      "model": "CN-HG701-11",
+      "rawType": "łańcuch",
+      "description": "Łańcuch Shimano Ultegra/105 11-speed",
+      "compatibility": {
+        "speeds": 11
+      }
+    },
+    {
+      "source": { "name": "shimano.com" },
+      "brand": "Shimano",
+      "model": "CS-HG710 11-42T",
+      "rawType": "kaseta",
+      "description": "Kaseta Shimano GRX 12-speed 11-42T",
+      "compatibility": {
+        "speeds": 12,
+        "bikeTypes": ["gravel"]
+      }
+    },
+    {
+      "source": { "name": "shimano.com" },
+      "brand": "Shimano",
+      "model": "CS-HG700 11-34T",
+      "rawType": "kaseta",
+      "description": "Kaseta Shimano 11-speed 11-34T",
+      "compatibility": {
+        "speeds": 11
+      }
+    },
+    {
+      "source": { "name": "shimano.com" },
+      "brand": "Shimano",
+      "model": "L03A Resin",
+      "rawType": "klocki hamulcowe",
+      "description": "Klocki hamulcowe Shimano L03A żywiczne z radiatorem"
+    }
+  ],
+  "metadata": {
+    "exportedAt": "2024-01-15T10:00:00Z",
+    "source": "shimano.com",
+    "version": "1.0"
+  }
+}

@@ -1,0 +1,279 @@
+{
+  "parts": [
+    [
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "XX1 Eagle AXS",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM XX1 Eagle AXS 12-speed wireless MTB rear derailleur",
+        "compatibility": {
+          "speeds": 12,
+          "bikeTypes": ["mtb"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "XX1 Eagle",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM XX1 Eagle 12-speed MTB rear derailleur",
+        "compatibility": {
+          "speeds": 12,
+          "bikeTypes": ["mtb"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "X01 Eagle AXS",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM X01 Eagle AXS 12-speed wireless MTB rear derailleur",
+        "compatibility": {
+          "speeds": 12,
+          "bikeTypes": ["mtb"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "X01 Eagle",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM X01 Eagle 12-speed MTB rear derailleur",
+        "compatibility": {
+          "speeds": 12,
+          "bikeTypes": ["mtb"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "GX Eagle AXS",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM GX Eagle AXS 12-speed wireless MTB rear derailleur",
+        "compatibility": {
+          "speeds": 12,
+          "bikeTypes": ["mtb"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "GX Eagle",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM GX Eagle 12-speed MTB rear derailleur",
+        "compatibility": {
+          "speeds": 12,
+          "bikeTypes": ["mtb"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "NX Eagle",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM NX Eagle 12-speed MTB rear derailleur",
+        "compatibility": {
+          "speeds": 12,
+          "bikeTypes": ["mtb"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "SX Eagle",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM SX Eagle 12-speed MTB rear derailleur",
+        "compatibility": {
+          "speeds": 12,
+          "bikeTypes": ["mtb"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "EX1",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM EX1 8-speed E-MTB rear derailleur",
+        "compatibility": {
+          "speeds": 8,
+          "bikeTypes": ["emtb"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "GX DH",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM GX DH 7-speed downhill rear derailleur",
+        "compatibility": {
+          "speeds": 7,
+          "bikeTypes": ["downhill"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "X01 DH",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM X01 DH downhill rear derailleur",
+        "compatibility": {
+          "speeds": 7,
+          "bikeTypes": ["downhill"]
+        }
+      },
+
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "RED AXS",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM RED AXS 12-speed wireless road rear derailleur",
+        "compatibility": {
+          "speeds": 12,
+          "bikeTypes": ["road"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "Force AXS",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM Force AXS 12-speed wireless road rear derailleur",
+        "compatibility": {
+          "speeds": 12,
+          "bikeTypes": ["road"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "Rival AXS",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM Rival AXS 12-speed wireless road rear derailleur",
+        "compatibility": {
+          "speeds": 12,
+          "bikeTypes": ["road"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "Apex AXS",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM Apex AXS 12-speed wireless road/gravel rear derailleur",
+        "compatibility": {
+          "speeds": 12,
+          "bikeTypes": ["road", "gravel"]
+        }
+      },
+
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "RED XPLR AXS",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM RED XPLR AXS 13-speed gravel rear derailleur",
+        "compatibility": {
+          "speeds": 13,
+          "bikeTypes": ["gravel"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "Force XPLR AXS",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM Force XPLR AXS 13-speed gravel rear derailleur",
+        "compatibility": {
+          "speeds": 13,
+          "bikeTypes": ["gravel"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "Rival XPLR AXS",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM Rival XPLR AXS 13-speed gravel rear derailleur",
+        "compatibility": {
+          "speeds": 13,
+          "bikeTypes": ["gravel"]
+        }
+      },
+
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "Force 22",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM Force 22 mechanical road rear derailleur",
+        "compatibility": {
+          "speeds": 11,
+          "bikeTypes": ["road"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "Rival 22",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM Rival 22 mechanical road rear derailleur",
+        "compatibility": {
+          "speeds": 11,
+          "bikeTypes": ["road"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "Apex 1",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM Apex 1 mechanical rear derailleur",
+        "compatibility": {
+          "speeds": 11,
+          "bikeTypes": ["road", "gravel"]
+        }
+      },
+
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "X9",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM X9 MTB rear derailleur",
+        "compatibility": {
+          "speeds": 9,
+          "bikeTypes": ["mtb"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "X7",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM X7 MTB rear derailleur",
+        "compatibility": {
+          "speeds": 9,
+          "bikeTypes": ["mtb"]
+        }
+      },
+      {
+        "source": { "name": "sram.com" },
+        "brand": "SRAM",
+        "model": "X5",
+        "rawType": "przerzutka tylna",
+        "description": "SRAM X5 MTB rear derailleur",
+        "compatibility": {
+          "speeds": 9,
+          "bikeTypes": ["mtb"]
+        }
+      }
+    ]
+  ],
+  "metadata": {
+    "exportedAt": "2024-01-15T10:00:00Z",
+    "source": "shimano.com",
+    "version": "1.0"
+  }
+}

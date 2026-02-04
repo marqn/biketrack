@@ -1,0 +1,197 @@
+{
+  "bikes": [
+    {
+      "source": {
+        "name": "canyon.com",
+        "url": "https://www.canyon.com/pl-pl/gravel-bikes/performance/grail/cf/grail-cf-slx-8-etap/3706.html"
+      },
+      "brand": "Canyon",
+      "model": "Grail CF SLX 8 eTap",
+      "year": 2024,
+      "rawType": "gravel",
+      "components": [
+        {
+          "category": "Napęd",
+          "name": "Łańcuch",
+          "value": "SRAM Rival AXS Flattop"
+        },
+        {
+          "category": "Napęd",
+          "name": "Kaseta",
+          "value": "SRAM XG-1270 10-44T"
+        },
+        {
+          "category": "Napęd",
+          "name": "Przerzutka tylna",
+          "value": "SRAM Rival XPLR eTap AXS"
+        },
+        {
+          "category": "Napęd",
+          "name": "Manetki",
+          "value": "SRAM Rival eTap AXS HRD"
+        },
+        {
+          "category": "Napęd",
+          "name": "Korba",
+          "value": "SRAM Rival Wide 40T"
+        },
+        {
+          "category": "Hamulce",
+          "name": "Hamulce",
+          "value": "SRAM Rival eTap AXS HRD"
+        },
+        {
+          "category": "Hamulce",
+          "name": "Tarcze",
+          "value": "SRAM Paceline 160mm"
+        },
+        {
+          "category": "Koła",
+          "name": "Obręcze",
+          "value": "DT Swiss GRC 1400 Spline 42"
+        },
+        {
+          "category": "Koła",
+          "name": "Opona",
+          "value": "Schwalbe G-One RS 45mm"
+        },
+        {
+          "category": "Cockpit",
+          "name": "Kierownica",
+          "value": "Canyon CP0018 Grail Handlebar"
+        },
+        {
+          "category": "Cockpit",
+          "name": "Owijka kierownicy",
+          "value": "Canyon Ergospeed Gel"
+        },
+        {
+          "category": "Siodło",
+          "name": "Siodło",
+          "value": "Fizik Terra Argo X3"
+        },
+        {
+          "category": "Siodło",
+          "name": "Sztyca",
+          "value": "Canyon S15 VCLS 2.0 CF"
+        }
+      ],
+      "description": "Canyon Grail CF SLX 8 eTap - top-end gravel bike z bezprzewodową grupą SRAM Rival eTap AXS"
+    },
+    {
+      "source": {
+        "name": "canyon.com",
+        "url": "https://www.canyon.com/pl-pl/gravel-bikes/performance/grail/cf/grail-cf-7/3703.html"
+      },
+      "brand": "Canyon",
+      "model": "Grail CF 7",
+      "year": 2024,
+      "rawType": "gravel",
+      "components": [
+        {
+          "category": "Napęd",
+          "name": "Łańcuch",
+          "value": "Shimano CN-M6100"
+        },
+        {
+          "category": "Napęd",
+          "name": "Kaseta",
+          "value": "Shimano CS-HG710 11-42T"
+        },
+        {
+          "category": "Napęd",
+          "name": "Przerzutka tylna",
+          "value": "Shimano GRX RD-RX822"
+        },
+        {
+          "category": "Napęd",
+          "name": "Manetki",
+          "value": "Shimano GRX ST-RX820"
+        },
+        {
+          "category": "Napęd",
+          "name": "Korba",
+          "value": "Shimano GRX FC-RX820-1 40T"
+        },
+        {
+          "category": "Hamulce",
+          "name": "Hamulce",
+          "value": "Shimano GRX BR-RX820"
+        },
+        {
+          "category": "Koła",
+          "name": "Obręcze",
+          "value": "DT Swiss GR 1600 Spline"
+        },
+        {
+          "category": "Koła",
+          "name": "Opona",
+          "value": "Schwalbe G-One Allround 40mm"
+        },
+        {
+          "category": "Cockpit",
+          "name": "Kierownica",
+          "value": "Canyon CP0018 Grail Handlebar"
+        },
+        {
+          "category": "Siodło",
+          "name": "Siodło",
+          "value": "Selle Royal Scientia A3"
+        }
+      ],
+      "description": "Canyon Grail CF 7 - gravel z Shimano GRX 12-speed"
+    },
+    {
+      "source": {
+        "name": "canyon.com"
+      },
+      "brand": "Canyon",
+      "model": "Grail 6",
+      "year": 2024,
+      "rawType": "gravel",
+      "components": [
+        {
+          "category": "Napęd",
+          "name": "Łańcuch",
+          "value": "Shimano CN-HG701-11"
+        },
+        {
+          "category": "Napęd",
+          "name": "Kaseta",
+          "value": "Shimano CS-HG700 11-34T"
+        },
+        {
+          "category": "Napęd",
+          "name": "Przerzutka tylna",
+          "value": "Shimano GRX RD-RX812"
+        },
+        {
+          "category": "Napęd",
+          "name": "Manetki",
+          "value": "Shimano GRX ST-RX810"
+        },
+        {
+          "category": "Hamulce",
+          "name": "Hamulce",
+          "value": "Shimano GRX BR-RX400"
+        },
+        {
+          "category": "Koła",
+          "name": "Opona",
+          "value": "Schwalbe G-One Allround 38mm"
+        },
+        {
+          "category": "Siodło",
+          "name": "Siodło",
+          "value": "Selle Royal Scientia M1"
+        }
+      ],
+      "description": "Canyon Grail 6 - aluminiowy gravel z Shimano GRX 11-speed"
+    }
+  ],
+  "metadata": {
+    "exportedAt": "2024-01-15T10:00:00Z",
+    "source": "canyon.com",
+    "version": "1.0"
+  }
+}

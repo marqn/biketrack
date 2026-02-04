@@ -1,0 +1,105 @@
+{
+  "bikes": [
+    {
+      "source": {
+        "name": "nazwa-sklepu-lub-zrodla",
+        "url": "https://example.com/bike/123"
+      },
+      "brand": "Marka",
+      "model": "Model roweru",
+      "year": 2024,
+      "rawType": "gravel",
+      "isElectric": false,
+      "components": [
+        {
+          "category": "Napęd",
+          "name": "Łańcuch",
+          "value": "Shimano CN-M6100",
+          "expectedKm": 2500
+        },
+        {
+          "category": "Napęd",
+          "name": "Kaseta",
+          "value": "Shimano CS-M7100 10-51T"
+        },
+        {
+          "category": "Napęd",
+          "name": "Przerzutka tylna",
+          "value": "Shimano GRX RD-RX822"
+        },
+        {
+          "category": "Napęd",
+          "name": "Manetki",
+          "value": "Shimano GRX ST-RX820"
+        },
+        {
+          "category": "Napęd",
+          "name": "Korba",
+          "value": "Shimano GRX FC-RX820 40T"
+        },
+        {
+          "category": "Hamulce",
+          "name": "Hamulce",
+          "value": "Shimano GRX BR-RX400"
+        },
+        {
+          "category": "Hamulce",
+          "name": "Klocki hamulcowe",
+          "value": "Shimano L03A Resin"
+        },
+        {
+          "category": "Koła",
+          "name": "Opona przednia",
+          "value": "Schwalbe G-One RS 45mm"
+        },
+        {
+          "category": "Koła",
+          "name": "Opona tylna",
+          "value": "Schwalbe G-One RS 45mm"
+        },
+        {
+          "category": "Koła",
+          "name": "Obręcze",
+          "value": "DT Swiss G540"
+        },
+        {
+          "category": "Cockpit",
+          "name": "Kierownica",
+          "value": "FSA A-Wing Pro"
+        },
+        {
+          "category": "Cockpit",
+          "name": "Mostek",
+          "value": "FSA NS ACR"
+        },
+        {
+          "category": "Cockpit",
+          "name": "Owijka kierownicy",
+          "value": "Fizik Vento Microtex Tacky"
+        },
+        {
+          "category": "Siodło",
+          "name": "Siodło",
+          "value": "Fizik Terra Argo X5"
+        },
+        {
+          "category": "Rama",
+          "name": "Rama",
+          "value": "Carbon T784"
+        },
+        {
+          "category": "Rama",
+          "name": "Widelec",
+          "value": "Carbon Gravel"
+        }
+      ],
+      "description": "Opcjonalny opis roweru",
+      "imageUrl": "https://example.com/image.jpg"
+    }
+  ],
+  "metadata": {
+    "exportedAt": "2024-01-15T12:00:00Z",
+    "source": "nazwa-zrodla",
+    "version": "1.0"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "parts": [
+    {
+      "source": {
+        "name": "shimano.com",
+        "url": "https://bike.shimano.com/product/123"
+      },
+      "brand": "Shimano",
+      "model": "CN-M6100",
+      "rawType": "łańcuch",
+      "rawCategory": "Napęd",
+      "description": "Łańcuch 12-rzędowy Shimano Deore do rowerów MTB i gravel",
+      "compatibility": {
+        "speeds": 12,
+        "bikeTypes": ["mtb", "gravel"],
+        "brands": ["Shimano"]
+      },
+      "specifications": {
+        "weight": "252g",
+        "links": 126,
+        "width": "5.55mm"
+      },
+      "price": {
+        "value": 89.99,
+        "currency": "PLN"
+      },
+      "imageUrl": "https://example.com/chain.jpg"
+    },
+    {
+      "source": {
+        "name": "shimano.com"
+      },
+      "brand": "Shimano",
+      "model": "CS-M7100",
+      "rawType": "kaseta",
+      "description": "Kaseta Shimano SLX 10-51T 12-speed",
+      "compatibility": {
+        "speeds": 12,
+        "bikeTypes": ["mtb", "gravel"]
+      }
+    },
+    {
+      "source": {
+        "name": "continental.com"
+      },
+      "brand": "Continental",
+      "model": "Grand Prix 5000 28mm",
+      "rawType": "opona",
+      "description": "Opona szosowa Continental GP5000",
+      "compatibility": {
+        "bikeTypes": ["road"]
+      },
+      "specifications": {
+        "width": "28mm",
+        "weight": "220g",
+        "tpi": 330
+      }
+    }
+  ],
+  "metadata": {
+    "exportedAt": "2024-01-15T12:00:00Z",
+    "source": "manual",
+    "version": "1.0"
+  }
+}
