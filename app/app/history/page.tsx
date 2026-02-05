@@ -29,7 +29,6 @@ import {
   deletePartReplacement,
   updatePartReplacement,
 } from "@/app/app/actions/replace-part";
-import { useRouter } from "next/navigation";
 import {
   PartReplacement,
   ServiceEvent,
@@ -53,7 +52,6 @@ const BikePartsHistory: React.FC = () => {
     "replacement" | "service" | null
   >(null);
   const [editItem, setEditItem] = useState<TimelineItem | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
     fetchData();
@@ -108,16 +106,19 @@ const BikePartsHistory: React.FC = () => {
   const confirmDelete = async () => {
     if (!deleteId || !deleteType) return;
 
+    // Optimistic update: usuń z UI natychmiast
+    const previousTimeline = timeline;
+    setTimeline((prev) => prev.filter((item) => item.id !== deleteId));
+
     try {
       if (deleteType === "replacement") {
         await deletePartReplacement(deleteId);
       } else {
         await deleteLubeEvent(deleteId);
       }
-
-      router.refresh();
-      await fetchData();
     } catch (err) {
+      // Rollback przy błędzie
+      setTimeline(previousTimeline);
       console.error("Error deleting:", err);
       alert(err instanceof Error ? err.message : "Wystąpił błąd");
     } finally {
@@ -135,7 +136,6 @@ const BikePartsHistory: React.FC = () => {
 
     try {
       await updatePartReplacement(editItem.id, data);
-      router.refresh();
       await fetchData();
       setEditItem(null);
     } catch (err) {
@@ -152,7 +152,6 @@ const BikePartsHistory: React.FC = () => {
 
     try {
       await updateLubeEvent(editItem.id, data);
-      router.refresh();
       await fetchData();
       setEditItem(null);
     } catch (err) {

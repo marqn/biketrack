@@ -21,54 +21,50 @@ export default async function AppPage() {
   const cookieStore = await cookies();
   const selectedBikeId = cookieStore.get("selectedBikeId")?.value;
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+  // Pobierz tylko wybrany rower (lub pierwszy jeśli brak cookie)
+  const bike = await prisma.bike.findFirst({
+    where: {
+      userId: session.user.id,
+      ...(selectedBikeId && { id: selectedBikeId }),
+    },
+    orderBy: { createdAt: "asc" },
     include: {
-      bikes: {
+      parts: {
         include: {
-          parts: {
-            include: {
-              product: true,
-              replacements: {
-                orderBy: { createdAt: "desc" },
-              },
+          product: true,
+          replacements: {
+            orderBy: { createdAt: "desc" },
+          },
+        },
+      },
+      services: {
+        where: { type: ServiceType.CHAIN_LUBE },
+        orderBy: { createdAt: "desc" },
+        include: {
+          lubricantProduct: {
+            select: {
+              id: true,
+              brand: true,
+              model: true,
+              specifications: true,
+              averageRating: true,
+              totalReviews: true,
             },
           },
-          services: {
-            where: { type: ServiceType.CHAIN_LUBE },
-            orderBy: { createdAt: "desc" },
-            include: {
-              lubricantProduct: {
-                select: {
-                  id: true,
-                  brand: true,
-                  model: true,
-                  specifications: true,
-                  averageRating: true,
-                  totalReviews: true,
-                },
-              },
-              reviews: {
-                select: {
-                  id: true,
-                  rating: true,
-                  reviewText: true,
-                },
-                take: 1,
-              },
+          reviews: {
+            select: {
+              id: true,
+              rating: true,
+              reviewText: true,
             },
+            take: 1,
           },
         },
       },
     },
   });
 
-  if (!user?.bikes?.[0]) redirect("/onboarding");
-
-  // Znajdź wybrany rower lub użyj pierwszego
-  const bike =
-    (selectedBikeId && user.bikes.find((b) => b.id === selectedBikeId)) ||
-    user.bikes[0];
+  if (!bike) redirect("/onboarding");
 
   const lastLube = bike.services[0];
 

@@ -10,7 +10,8 @@
       "Bash(npx tsx:*)",
       "Bash(grep:*)",
       "Bash(npx next build:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(ls:*)"
     ]
   }
 }
