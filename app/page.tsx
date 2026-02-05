@@ -5,14 +5,23 @@ import { prisma } from "@/lib/prisma";
 import { authOptions } from "./api/auth/[...nextauth]/route";
 import Link from "next/link";
 import { getTopProducts } from "./app/actions/get-top-products";
+import { getLandingStats } from "./app/actions/get-landing-stats";
 import { TopProductsSection } from "@/components/top-products/TopProductsSection";
+import { FeaturesSection } from "@/components/landing/FeaturesSection";
+import { CommunityStatsSection } from "@/components/landing/CommunityStatsSection";
+import { PopularBikeSection } from "@/components/landing/PopularBikeSection";
+import { PopularPartSection } from "@/components/landing/PopularPartSection";
+import { Footer } from "@/components/footer/Footer";
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
 
   // Jeśli nie zalogowany, pokaż stronę główną
   if (!session || !session.user) {
-    const topProducts = await getTopProducts(6);
+    const [topProducts, landingStats] = await Promise.all([
+      getTopProducts(6),
+      getLandingStats(),
+    ]);
 
     return (
       <div className="min-h-screen bg-linear-to-b from-background to-secondary/20">
@@ -42,7 +51,12 @@ export default async function HomePage() {
           </div>
         </div>
 
+        <FeaturesSection />
+        <CommunityStatsSection stats={landingStats} />
+        <PopularBikeSection stats={landingStats} />
+        <PopularPartSection stats={landingStats} />
         <TopProductsSection products={topProducts} />
+        <Footer />
       </div>
     );
   }

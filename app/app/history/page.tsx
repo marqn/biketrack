@@ -73,7 +73,14 @@ const BikePartsHistory: React.FC = () => {
       const url = selectedBikeId
         ? `/api/parts/replacements?bikeId=${selectedBikeId}`
         : "/api/parts/replacements";
-      const response = await fetch(url);
+      let response = await fetch(url);
+
+      // If bike not found (stale cookie), clear cookie and retry without bikeId
+      if (response.status === 404 && selectedBikeId) {
+        document.cookie =
+          "selectedBikeId=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        response = await fetch("/api/parts/replacements");
+      }
 
       if (!response.ok) {
         throw new Error("Nie udało się pobrać danych");
