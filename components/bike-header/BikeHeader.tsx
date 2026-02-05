@@ -338,7 +338,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
                 Profil
               </DropdownMenuItem>
 
-              <DropdownMenuItem onClick={() => router.push("/upgrade")}>
+              <DropdownMenuItem onClick={() => router.push("/app/upgrade")}>
                 <CreditCard className="mr-2 h-4 w-4" />
                 Premium
               </DropdownMenuItem>
