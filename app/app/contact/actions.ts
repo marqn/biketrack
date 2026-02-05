@@ -18,7 +18,7 @@ export async function sendContactMessage(formData: { name: string; message: stri
 
     await transporter.sendMail({
       from: process.env.EMAIL_FROM,
-      to: "marqnpl@gmail.com",
+      to: "marqn@icloud.com",
       subject: `Kontakt od: ${name}`,
       text: `Imię: ${name}\n\nWiadomość:\n${message}`,
       html: `

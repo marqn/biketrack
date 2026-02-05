@@ -36,10 +36,14 @@ export async function chainLubeRule(bikeId: string) {
 
   if (!chainPart) return; // brak łańcucha = brak alertu
 
+  const bikeName = bike.brand || bike.model
+    ? `${bike.brand ?? ""} ${bike.model ?? ""}`.trim()
+    : bike.type;
+
   await ensureNotification({
     userId: bike.userId,
     type: NotificationType.SERVICE_DUE,
-    title: "Czas nasmarować łańcuch",
+    title: `Czas nasmarować łańcuch – ${bikeName}`,
     message: `Od ostatniego smarowania minęło ${kmSince} km.`,
     bikeId: bike.id,
     partId: chainPart.id, // ✅
