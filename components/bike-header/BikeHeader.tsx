@@ -283,6 +283,19 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
             </Tooltip>
           </TooltipProvider>
 
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant={pathname?.startsWith("/app/contact") ? "default" : "outline"} size="icon" onClick={() => router.push("/app/contact")}>
+                  <Mail className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Kontakt</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
           {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
