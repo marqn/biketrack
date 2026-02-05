@@ -57,12 +57,23 @@ const BikePartsHistory: React.FC = () => {
 
   useEffect(() => {
     fetchData();
+
+    const handleBikeChange = () => fetchData();
+    window.addEventListener("bike-changed", handleBikeChange);
+    return () => window.removeEventListener("bike-changed", handleBikeChange);
   }, []);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/parts/replacements");
+      const selectedBikeId = document.cookie
+        .split("; ")
+        .find((c) => c.startsWith("selectedBikeId="))
+        ?.split("=")[1];
+      const url = selectedBikeId
+        ? `/api/parts/replacements?bikeId=${selectedBikeId}`
+        : "/api/parts/replacements";
+      const response = await fetch(url);
 
       if (!response.ok) {
         throw new Error("Nie udało się pobrać danych");
