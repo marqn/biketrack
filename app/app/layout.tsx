@@ -47,6 +47,9 @@ export default async function RootLayout({
         createdAt: b.createdAt,
       }));
 
+      // Sprawdź czy premium jest aktywny
+      const isPremium = user.plan === "PREMIUM" && user.planExpiresAt && user.planExpiresAt > new Date();
+
       headerProps = {
         bike: headerBike,
         bikes: headerBikes,
@@ -56,6 +59,7 @@ export default async function RootLayout({
           email: user.email!,
           image: user.image,
           role: user.role,
+          plan: isPremium ? "PREMIUM" as const : "FREE" as const,
         },
       };
     }

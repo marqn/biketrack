@@ -101,16 +101,21 @@ export const authOptions: AuthOptions = {
           token.provider = account.provider;
         }
 
-        // ✅ ZAWSZE pobierz AKTUALNY avatar z bazy przy logowaniu
+        // ✅ ZAWSZE pobierz AKTUALNY avatar i plan z bazy przy logowaniu
         // NIE ufaj user.image z OAuth providera
         const dbUser = await prisma.user.findUnique({
           where: { id: user.id },
-          select: { image: true }
+          select: { image: true, plan: true, planExpiresAt: true }
         });
 
         token.picture = dbUser?.image && dbUser.image.length > 200
           ? dbUser.image.substring(0, 200)
           : dbUser?.image;
+
+        // Sprawdź czy premium nie wygasł
+        const isPremiumActive = dbUser?.plan === "PREMIUM" && dbUser.planExpiresAt && dbUser.planExpiresAt > new Date();
+        token.plan = isPremiumActive ? "PREMIUM" : "FREE";
+        token.planExpiresAt = dbUser?.planExpiresAt?.toISOString() ?? null;
       }
 
       // Aktualizacja sesji (np. po zmianie avatara w profilu)
@@ -122,6 +127,8 @@ export const authOptions: AuthOptions = {
             email: true,
             name: true,
             image: true,
+            plan: true,
+            planExpiresAt: true,
           }
         });
 
@@ -131,6 +138,10 @@ export const authOptions: AuthOptions = {
           token.picture = updatedUser.image && updatedUser.image.length > 200
             ? updatedUser.image.substring(0, 200)
             : updatedUser.image;
+
+          const isPremiumActive = updatedUser.plan === "PREMIUM" && updatedUser.planExpiresAt && updatedUser.planExpiresAt > new Date();
+          token.plan = isPremiumActive ? "PREMIUM" : "FREE";
+          token.planExpiresAt = updatedUser.planExpiresAt?.toISOString() ?? null;
         }
       }
       
@@ -144,8 +155,10 @@ export const authOptions: AuthOptions = {
         session.user.name = token.name as string | null;
         session.user.image = token.picture as string | null;
         session.user.provider = token.provider as string;
+        session.user.plan = (token.plan as "FREE" | "PREMIUM") ?? "FREE";
+        session.user.planExpiresAt = (token.planExpiresAt as string | null) ?? null;
       }
-      
+
       return session;
     },
 

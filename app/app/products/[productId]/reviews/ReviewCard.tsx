@@ -1,9 +1,9 @@
 "use client";
 
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, ThumbsUp, ThumbsDown } from "lucide-react";
+import { CheckCircle, Crown, ThumbsUp, ThumbsDown } from "lucide-react";
 import { bikeTypeLabels } from "@/lib/types";
 import { ReviewWithUser } from "@/app/app/actions/get-product-reviews";
 
@@ -13,6 +13,8 @@ interface ReviewCardProps {
 }
 
 export function ReviewCard({ review, isCurrentUser }: ReviewCardProps) {
+  const isPremium = review.user.plan === "PREMIUM" && review.user.planExpiresAt && new Date(review.user.planExpiresAt) > new Date();
+
   const initials =
     review.user.name
       ?.split(" ")
@@ -32,9 +34,14 @@ export function ReviewCard({ review, isCurrentUser }: ReviewCardProps) {
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10">
+            <Avatar className={`h-10 w-10 ${isPremium ? "ring-2 ring-blue-500" : ""}`}>
               <AvatarImage src={review.user.image || undefined} />
               <AvatarFallback>{initials}</AvatarFallback>
+              {isPremium && (
+                <AvatarBadge className="bg-blue-500 text-white ring-background">
+                  <Crown className="size-2!" />
+                </AvatarBadge>
+              )}
             </Avatar>
             <div>
               <div className="flex items-center gap-2">

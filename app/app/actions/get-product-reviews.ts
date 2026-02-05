@@ -27,6 +27,8 @@ export interface ReviewWithUser {
     id: string;
     name: string | null;
     image: string | null;
+    plan: "FREE" | "PREMIUM";
+    planExpiresAt: Date | null;
   };
 }
 
@@ -90,6 +92,8 @@ export async function getProductReviews({
             id: true,
             name: true,
             image: true,
+            plan: true,
+            planExpiresAt: true,
           },
         },
       },

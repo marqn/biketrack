@@ -2,6 +2,7 @@
 
 import {
   ChevronDown,
+  Crown,
   Wifi,
   WifiOff,
   Loader2,
@@ -37,7 +38,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -62,6 +63,7 @@ interface BikeHeaderProps {
     email: string;
     image?: string | null;
     role?: string;
+    plan?: "FREE" | "PREMIUM";
   };
 }
 
@@ -312,9 +314,14 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="p-0">
-                <Avatar className="h-9 w-9">
+                <Avatar className={`h-9 w-9 ${user.plan === "PREMIUM" ? "ring-2 ring-blue-500" : ""}`}>
                   <AvatarImage src={user.image ?? undefined} />
                   <AvatarFallback>{initials}</AvatarFallback>
+                  {user.plan === "PREMIUM" && (
+                    <AvatarBadge className="bg-blue-500 text-white ring-background">
+                      <Crown className="size-2!" />
+                    </AvatarBadge>
+                  )}
                 </Avatar>
                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </Button>
@@ -324,8 +331,8 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
               <div className="p-2">
                 <p className="text-sm font-medium">
                   {user.name}{" "}
-                  <Badge className="mt-1" variant="default">
-                    FREE
+                  <Badge className="mt-1" variant={user.plan === "PREMIUM" ? "default" : "secondary"}>
+                    {user.plan === "PREMIUM" ? "PREMIUM" : "FREE"}
                   </Badge>
                 </p>
                 <p className="text-xs text-muted-foreground">{user.email}</p>

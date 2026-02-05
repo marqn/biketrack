@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -98,10 +100,13 @@ const features = [
 type Plan = (typeof plans)[number];
 
 export default function UpgradePage() {
+  const { update } = useSession();
+  const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
 
   function handleSelectPlan(plan: Plan) {
     setSelectedPlan(plan);
@@ -109,13 +114,27 @@ export default function UpgradePage() {
     setDialogOpen(true);
   }
 
-  function handleConfirm() {
+  async function handleConfirm() {
+    if (!selectedPlan) return;
     setLoading(true);
-    // Symulacja — tutaj docelowo integracja z płatnościami (np. Stripe)
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const res = await fetch("/api/user/upgrade", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planId: selectedPlan.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setExpiresAt(data.planExpiresAt);
       setConfirmed(true);
-    }, 1500);
+      // Odśwież sesję żeby zaktualizować plan w całej aplikacji
+      await update();
+      router.refresh();
+    } catch (error) {
+      console.error("Upgrade error:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -162,11 +181,12 @@ export default function UpgradePage() {
           {plans.map((plan) => (
             <Card
               key={plan.id}
-              className={
+              className={`cursor-pointer transition-shadow hover:shadow-lg ${
                 plan.popular
                   ? "ring-2 ring-primary relative"
-                  : ""
-              }
+                  : "hover:ring-2 hover:ring-primary/50 relative"
+              }`}
+              onClick={() => handleSelectPlan(plan)}
             >
               {plan.popular && (
                 <div className="absolute -top-1 left-1/2 -translate-x-1/2">
@@ -200,7 +220,6 @@ export default function UpgradePage() {
                 <Button
                   className="w-full"
                   variant={plan.popular ? "default" : "outline"}
-                  onClick={() => handleSelectPlan(plan)}
                 >
                   Wybierz {plan.name.toLowerCase()}
                 </Button>
@@ -302,6 +321,18 @@ export default function UpgradePage() {
                   <strong>{selectedPlan?.duration}</strong> jest teraz aktywny.
                   Ciesz się pełnym dostępem do BikeTrackera!
                 </p>
+                {expiresAt && (
+                  <p className="text-center text-xs text-muted-foreground">
+                    Premium ważny do:{" "}
+                    <strong>
+                      {new Date(expiresAt).toLocaleDateString("pl-PL", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </strong>
+                  </p>
+                )}
               </div>
 
               <DialogFooter>

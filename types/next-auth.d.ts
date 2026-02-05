@@ -9,6 +9,8 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       provider?: "google" | "strava" | "credentials" | string;
+      plan?: "FREE" | "PREMIUM";
+      planExpiresAt?: string | null;
     };
   }
 
@@ -17,10 +19,11 @@ declare module "next-auth" {
   }
 }
 
-// 👇 DODAJ TO
 declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     provider?: string;
+    plan?: "FREE" | "PREMIUM";
+    planExpiresAt?: string | null;
   }
 }

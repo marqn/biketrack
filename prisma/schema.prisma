@@ -27,6 +27,8 @@ model User {
   password      String?
   weight        Int?      // Waga użytkownika w kg - ważna dla opinii o oponach/dętkach (ciśnienie vs waga)
   role          UserRole  @default(USER)
+  plan          Plan      @default(FREE)
+  planExpiresAt DateTime? // Data wygaśnięcia planu Premium
   accounts      Account[]
   sessions      Session[]
   bikes         Bike[]
