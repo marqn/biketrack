@@ -1,8 +1,19 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Camera, Mail, User, Lock, Check, X, Eye, EyeOff, Scale, Info } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from "react";
+import {
+  Camera,
+  Mail,
+  User,
+  Lock,
+  Check,
+  X,
+  Eye,
+  EyeOff,
+  Scale,
+  Info,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface UserData {
   id: string;
@@ -53,46 +64,46 @@ export default function ProfilePage() {
     name: false,
     email: false,
     weight: false,
-    password: false
+    password: false,
   });
 
   const [formData, setFormData] = useState<FormData>({
-    name: '',
-    email: '',
-    weight: '',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    name: "",
+    email: "",
+    weight: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
   const [showPasswords, setShowPasswords] = useState<ShowPasswords>({
     current: false,
     new: false,
-    confirm: false
+    confirm: false,
   });
 
   const [errors, setErrors] = useState<Errors>({});
-  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   // Wczytaj dane użytkownika z API
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch('/api/user/profile');
+        const response = await fetch("/api/user/profile");
         const data = await response.json();
-        
+
         if (data.user) {
           setUser(data.user);
           setHasPassword(!!data.user.password);
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
-            name: data.user.name || '',
-            email: data.user.email || '',
-            weight: data.user.weight?.toString() || ''
+            name: data.user.name || "",
+            email: data.user.email || "",
+            weight: data.user.weight?.toString() || "75",
           }));
         }
       } catch (error) {
-        console.error('Błąd wczytywania profilu:', error);
+        console.error("Błąd wczytywania profilu:", error);
       } finally {
         setLoading(false);
       }
@@ -107,25 +118,25 @@ export default function ProfilePage() {
       const reader = new FileReader();
       reader.onloadend = async () => {
         const base64Image = reader.result as string;
-        
+
         try {
-          const response = await fetch('/api/user/profile', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ image: base64Image })
+          const response = await fetch("/api/user/profile", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: base64Image }),
           });
 
           const data = await response.json();
-          
+
           if (data.success && user) {
             setUser({ ...user, image: base64Image });
-            setSuccessMessage('Avatar zaktualizowany!');
-            setTimeout(() => setSuccessMessage(''), 3000);
+            setSuccessMessage("Avatar zaktualizowany!");
+            setTimeout(() => setSuccessMessage(""), 3000);
 
             router.refresh();
           }
         } catch (error) {
-          console.error('Błąd aktualizacji avatara:', error);
+          console.error("Błąd aktualizacji avatara:", error);
         }
       };
       reader.readAsDataURL(file);
@@ -143,15 +154,15 @@ export default function ProfilePage() {
 
   const handleSaveName = async () => {
     if (!formData.name.trim()) {
-      setErrors({ name: 'Nazwa użytkownika nie może być pusta' });
+      setErrors({ name: "Nazwa użytkownika nie może być pusta" });
       return;
     }
 
     try {
-      const response = await fetch('/api/user/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: formData.name })
+      const response = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: formData.name }),
       });
 
       const data = await response.json();
@@ -160,28 +171,28 @@ export default function ProfilePage() {
         setUser({ ...user, name: formData.name });
         setIsEditing({ ...isEditing, name: false });
         setErrors({});
-        setSuccessMessage('Nazwa użytkownika zaktualizowana!');
-        setTimeout(() => setSuccessMessage(''), 3000);
+        setSuccessMessage("Nazwa użytkownika zaktualizowana!");
+        setTimeout(() => setSuccessMessage(""), 3000);
 
         router.refresh();
       }
     } catch (error) {
-      console.error('Błąd aktualizacji nazwy:', error);
-      setErrors({ name: 'Wystąpił błąd podczas zapisywania' });
+      console.error("Błąd aktualizacji nazwy:", error);
+      setErrors({ name: "Wystąpił błąd podczas zapisywania" });
     }
   };
 
   const handleSaveEmail = async () => {
     if (!validateEmail(formData.email)) {
-      setErrors({ email: 'Podaj poprawny adres email' });
+      setErrors({ email: "Podaj poprawny adres email" });
       return;
     }
 
     try {
-      const response = await fetch('/api/user/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email })
+      const response = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email }),
       });
 
       const data = await response.json();
@@ -190,30 +201,33 @@ export default function ProfilePage() {
         setUser({ ...user, email: formData.email });
         setIsEditing({ ...isEditing, email: false });
         setErrors({});
-        setSuccessMessage('Email zaktualizowany!');
-        setTimeout(() => setSuccessMessage(''), 3000);
+        setSuccessMessage("Email zaktualizowany!");
+        setTimeout(() => setSuccessMessage(""), 3000);
 
         router.refresh();
       }
     } catch (error) {
-      console.error('Błąd aktualizacji emaila:', error);
-      setErrors({ email: 'Wystąpił błąd podczas zapisywania' });
+      console.error("Błąd aktualizacji emaila:", error);
+      setErrors({ email: "Wystąpił błąd podczas zapisywania" });
     }
   };
 
   const handleSaveWeight = async () => {
     const weightValue = parseInt(formData.weight);
 
-    if (formData.weight && (isNaN(weightValue) || weightValue < 20 || weightValue > 300)) {
-      setErrors({ weight: 'Podaj wagę w zakresie 20-300 kg' });
+    if (
+      formData.weight &&
+      (isNaN(weightValue) || weightValue < 20 || weightValue > 300)
+    ) {
+      setErrors({ weight: "Podaj wagę w zakresie 20-300 kg" });
       return;
     }
 
     try {
-      const response = await fetch('/api/user/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ weight: formData.weight ? weightValue : null })
+      const response = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ weight: formData.weight ? weightValue : null }),
       });
 
       const data = await response.json();
@@ -222,14 +236,14 @@ export default function ProfilePage() {
         setUser({ ...user, weight: formData.weight ? weightValue : null });
         setIsEditing({ ...isEditing, weight: false });
         setErrors({});
-        setSuccessMessage('Waga zaktualizowana!');
-        setTimeout(() => setSuccessMessage(''), 3000);
+        setSuccessMessage("Waga zaktualizowana!");
+        setTimeout(() => setSuccessMessage(""), 3000);
 
         router.refresh();
       }
     } catch (error) {
-      console.error('Błąd aktualizacji wagi:', error);
-      setErrors({ weight: 'Wystąpił błąd podczas zapisywania' });
+      console.error("Błąd aktualizacji wagi:", error);
+      setErrors({ weight: "Wystąpił błąd podczas zapisywania" });
     }
   };
 
@@ -237,15 +251,15 @@ export default function ProfilePage() {
     const newErrors: Errors = {};
 
     if (!formData.currentPassword) {
-      newErrors.currentPassword = 'Podaj aktualne hasło';
+      newErrors.currentPassword = "Podaj aktualne hasło";
     }
 
     if (!validatePassword(formData.newPassword)) {
-      newErrors.newPassword = 'Hasło musi mieć minimum 8 znaków';
+      newErrors.newPassword = "Hasło musi mieć minimum 8 znaków";
     }
 
     if (formData.newPassword !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Hasła nie są zgodne';
+      newErrors.confirmPassword = "Hasła nie są zgodne";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -254,29 +268,34 @@ export default function ProfilePage() {
     }
 
     try {
-      const response = await fetch('/api/user/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           currentPassword: formData.currentPassword,
-          newPassword: formData.newPassword
-        })
+          newPassword: formData.newPassword,
+        }),
       });
 
       const data = await response.json();
 
       if (data.success) {
         setIsEditing({ ...isEditing, password: false });
-        setFormData({ ...formData, currentPassword: '', newPassword: '', confirmPassword: '' });
+        setFormData({
+          ...formData,
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
         setErrors({});
-        setSuccessMessage('Hasło zaktualizowane!');
-        setTimeout(() => setSuccessMessage(''), 3000);
+        setSuccessMessage("Hasło zaktualizowane!");
+        setTimeout(() => setSuccessMessage(""), 3000);
       } else {
-        setErrors({ currentPassword: data.error || 'Nieprawidłowe hasło' });
+        setErrors({ currentPassword: data.error || "Nieprawidłowe hasło" });
       }
     } catch (error) {
-      console.error('Błąd aktualizacji hasła:', error);
-      setErrors({ currentPassword: 'Wystąpił błąd podczas zapisywania' });
+      console.error("Błąd aktualizacji hasła:", error);
+      setErrors({ currentPassword: "Wystąpił błąd podczas zapisywania" });
     }
   };
 
@@ -284,12 +303,12 @@ export default function ProfilePage() {
     setIsEditing({ ...isEditing, [field]: false });
     setFormData({
       ...formData,
-      name: user?.name || '',
-      email: user?.email || '',
-      weight: user?.weight?.toString() || '',
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
+      name: user?.name || "",
+      email: user?.email || "",
+      weight: user?.weight?.toString() || "75",
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
     });
     setErrors({});
   };
@@ -321,7 +340,9 @@ export default function ProfilePage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Ustawienia Profilu</h1>
-          <p className="text-muted-foreground mt-2">Zarządzaj swoimi danymi osobowymi</p>
+          <p className="text-muted-foreground mt-2">
+            Zarządzaj swoimi danymi osobowymi
+          </p>
         </div>
 
         {/* Success Message */}
@@ -339,7 +360,11 @@ export default function ProfilePage() {
             <div className="relative">
               <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center overflow-hidden">
                 {user.image ? (
-                  <img src={user.image} alt="Avatar" className="w-full h-full object-cover" />
+                  <img
+                    src={user.image}
+                    alt="Avatar"
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <User className="w-12 h-12 text-white" />
                 )}
@@ -355,8 +380,12 @@ export default function ProfilePage() {
               </label>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Kliknij ikonę aparatu, aby zmienić zdjęcie</p>
-              <p className="text-xs text-muted-foreground">JPG, PNG lub GIF (max. 5MB)</p>
+              <p className="text-sm text-muted-foreground mb-1">
+                Kliknij ikonę aparatu, aby zmienić zdjęcie
+              </p>
+              <p className="text-xs text-muted-foreground">
+                JPG, PNG lub GIF (max. 5MB)
+              </p>
             </div>
           </div>
         </div>
@@ -379,11 +408,15 @@ export default function ProfilePage() {
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent bg-background"
                 placeholder="Twoja nazwa"
               />
-              {errors.name && <p className="text-destructive text-sm mt-1">{errors.name}</p>}
+              {errors.name && (
+                <p className="text-destructive text-sm mt-1">{errors.name}</p>
+              )}
               <div className="flex gap-2 mt-3">
                 <button
                   onClick={handleSaveName}
@@ -393,7 +426,7 @@ export default function ProfilePage() {
                   Zapisz
                 </button>
                 <button
-                  onClick={() => handleCancel('name')}
+                  onClick={() => handleCancel("name")}
                   className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
                 >
                   <X className="w-4 h-4" />
@@ -404,7 +437,7 @@ export default function ProfilePage() {
           ) : (
             <div className="flex items-center gap-3">
               <User className="w-5 h-5 text-muted-foreground" />
-              <span>{user.name || 'Nie ustawiono'}</span>
+              <span>{user.name || "Nie ustawiono"}</span>
             </div>
           )}
         </div>
@@ -427,11 +460,15 @@ export default function ProfilePage() {
               <input
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent bg-background"
                 placeholder="twoj@email.com"
               />
-              {errors.email && <p className="text-destructive text-sm mt-1">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-destructive text-sm mt-1">{errors.email}</p>
+              )}
               <div className="flex gap-2 mt-3">
                 <button
                   onClick={handleSaveEmail}
@@ -441,7 +478,7 @@ export default function ProfilePage() {
                   Zapisz
                 </button>
                 <button
-                  onClick={() => handleCancel('email')}
+                  onClick={() => handleCancel("email")}
                   className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
                 >
                   <X className="w-4 h-4" />
@@ -452,7 +489,7 @@ export default function ProfilePage() {
           ) : (
             <div className="flex items-center gap-3">
               <Mail className="w-5 h-5 text-muted-foreground" />
-              <span>{user.email || 'Nie ustawiono'}</span>
+              <span>{user.email || "Nie ustawiono"}</span>
             </div>
           )}
         </div>
@@ -466,7 +503,7 @@ export default function ProfilePage() {
                 onClick={() => setIsEditing({ ...isEditing, weight: true })}
                 className="text-primary hover:underline text-sm font-medium"
               >
-                {user.weight ? 'Edytuj' : 'Dodaj'}
+                {user.weight ? "Edytuj" : "Dodaj"}
               </button>
             )}
           </div>
@@ -476,8 +513,8 @@ export default function ProfilePage() {
             <Info className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
             <p className="text-sm text-muted-foreground">
               Twoja waga jest istotna przy dodawaniu opinii o oponach i dętkach.
-              Pozwala innym użytkownikom lepiej ocenić, przy jakim ciśnieniu i wadze
-              dany produkt sprawdza się najlepiej.
+              Pozwala innym użytkownikom lepiej ocenić, przy jakim ciśnieniu i
+              wadze dany produkt sprawdza się najlepiej.
             </p>
           </div>
 
@@ -487,7 +524,9 @@ export default function ProfilePage() {
                 <input
                   type="number"
                   value={formData.weight}
-                  onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, weight: e.target.value })
+                  }
                   className="w-32 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent bg-background"
                   placeholder="np. 75"
                   min="20"
@@ -495,7 +534,9 @@ export default function ProfilePage() {
                 />
                 <span className="text-muted-foreground">kg</span>
               </div>
-              {errors.weight && <p className="text-destructive text-sm mt-1">{errors.weight}</p>}
+              {errors.weight && (
+                <p className="text-destructive text-sm mt-1">{errors.weight}</p>
+              )}
               <div className="flex gap-2 mt-3">
                 <button
                   onClick={handleSaveWeight}
@@ -505,7 +546,7 @@ export default function ProfilePage() {
                   Zapisz
                 </button>
                 <button
-                  onClick={() => handleCancel('weight')}
+                  onClick={() => handleCancel("weight")}
                   className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
                 >
                   <X className="w-4 h-4" />
@@ -516,7 +557,7 @@ export default function ProfilePage() {
           ) : (
             <div className="flex items-center gap-3">
               <Scale className="w-5 h-5 text-muted-foreground" />
-              <span>{user.weight ? `${user.weight} kg` : 'Nie ustawiono'}</span>
+              <span>{user.weight ? `${user.weight} kg` : "Nie ustawiono"}</span>
             </div>
           )}
         </div>
@@ -543,20 +584,38 @@ export default function ProfilePage() {
                   </label>
                   <div className="relative">
                     <input
-                      type={showPasswords.current ? 'text' : 'password'}
+                      type={showPasswords.current ? "text" : "password"}
                       value={formData.currentPassword}
-                      onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          currentPassword: e.target.value,
+                        })
+                      }
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent pr-10 bg-background"
                     />
                     <button
                       type="button"
-                      onClick={() => setShowPasswords({ ...showPasswords, current: !showPasswords.current })}
+                      onClick={() =>
+                        setShowPasswords({
+                          ...showPasswords,
+                          current: !showPasswords.current,
+                        })
+                      }
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     >
-                      {showPasswords.current ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      {showPasswords.current ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
                     </button>
                   </div>
-                  {errors.currentPassword && <p className="text-destructive text-sm mt-1">{errors.currentPassword}</p>}
+                  {errors.currentPassword && (
+                    <p className="text-destructive text-sm mt-1">
+                      {errors.currentPassword}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -565,20 +624,38 @@ export default function ProfilePage() {
                   </label>
                   <div className="relative">
                     <input
-                      type={showPasswords.new ? 'text' : 'password'}
+                      type={showPasswords.new ? "text" : "password"}
                       value={formData.newPassword}
-                      onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          newPassword: e.target.value,
+                        })
+                      }
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent pr-10 bg-background"
                     />
                     <button
                       type="button"
-                      onClick={() => setShowPasswords({ ...showPasswords, new: !showPasswords.new })}
+                      onClick={() =>
+                        setShowPasswords({
+                          ...showPasswords,
+                          new: !showPasswords.new,
+                        })
+                      }
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     >
-                      {showPasswords.new ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      {showPasswords.new ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
                     </button>
                   </div>
-                  {errors.newPassword && <p className="text-destructive text-sm mt-1">{errors.newPassword}</p>}
+                  {errors.newPassword && (
+                    <p className="text-destructive text-sm mt-1">
+                      {errors.newPassword}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -587,20 +664,38 @@ export default function ProfilePage() {
                   </label>
                   <div className="relative">
                     <input
-                      type={showPasswords.confirm ? 'text' : 'password'}
+                      type={showPasswords.confirm ? "text" : "password"}
                       value={formData.confirmPassword}
-                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          confirmPassword: e.target.value,
+                        })
+                      }
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent pr-10 bg-background"
                     />
                     <button
                       type="button"
-                      onClick={() => setShowPasswords({ ...showPasswords, confirm: !showPasswords.confirm })}
+                      onClick={() =>
+                        setShowPasswords({
+                          ...showPasswords,
+                          confirm: !showPasswords.confirm,
+                        })
+                      }
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     >
-                      {showPasswords.confirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      {showPasswords.confirm ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
                     </button>
                   </div>
-                  {errors.confirmPassword && <p className="text-destructive text-sm mt-1">{errors.confirmPassword}</p>}
+                  {errors.confirmPassword && (
+                    <p className="text-destructive text-sm mt-1">
+                      {errors.confirmPassword}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex gap-2 pt-2">
@@ -612,7 +707,7 @@ export default function ProfilePage() {
                     Zapisz hasło
                   </button>
                   <button
-                    onClick={() => handleCancel('password')}
+                    onClick={() => handleCancel("password")}
                     className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
                   >
                     <X className="w-4 h-4" />

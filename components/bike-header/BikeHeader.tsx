@@ -13,6 +13,7 @@ import {
   Users,
   History,
   Package,
+  Newspaper,
   Settings,
   Home,
   Pencil,
@@ -230,7 +231,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
             </Tooltip>
           </TooltipProvider> */}
 
-          <TooltipProvider>
+          {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant={pathname?.startsWith("/app/test/races") ? "default" : "outline"} size="icon" onClick={() => router.push("/app/test/races")}>
@@ -241,7 +242,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
                 <p>Wyścigi</p>
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </TooltipProvider> */}
 
           <TooltipProvider>
             <Tooltip>
@@ -272,6 +273,19 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
+                <Button variant={pathname?.startsWith("/app/blog") ? "default" : "outline"} size="icon" onClick={() => router.push("/app/blog")}>
+                  <Newspaper className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Aktualności</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          {/* <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <Button variant={pathname === "/app/test" ? "default" : "outline"} size="icon" onClick={() => router.push("/app/test")}>
                   <Settings className="h-4 w-4" />
                 </Button>
@@ -280,7 +294,7 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
                 <p>Ustawki</p>
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </TooltipProvider> */}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
