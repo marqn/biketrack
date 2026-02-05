@@ -9,12 +9,17 @@ import { DEFAULT_PARTS, EBIKE_PARTS } from "@/lib/default-parts";
 import { NotificationsList } from "@/components/notifications-list/NotificationsList";
 import { ensureEmailMissingNotification } from "@/lib/nofifications/emailMissing";
 import PartsAccordion from "@/components/parts-accordion/PartsAccordion";
+import { cookies } from "next/headers";
 
 export default async function AppPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
 
   await ensureEmailMissingNotification(session.user.id);
+
+  // Odczytaj wybrany rower z cookie
+  const cookieStore = await cookies();
+  const selectedBikeId = cookieStore.get("selectedBikeId")?.value;
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -23,7 +28,7 @@ export default async function AppPage() {
         include: {
           parts: {
             include: {
-              product: true, // Include product data
+              product: true,
               replacements: {
                 orderBy: { createdAt: "desc" },
               },
@@ -60,7 +65,11 @@ export default async function AppPage() {
 
   if (!user?.bikes?.[0]) redirect("/onboarding");
 
-  const bike = user.bikes[0];
+  // Znajdź wybrany rower lub użyj pierwszego
+  const bike =
+    (selectedBikeId && user.bikes.find((b) => b.id === selectedBikeId)) ||
+    user.bikes[0];
+
   const lastLube = bike.services[0];
 
   // Przygotuj dane dla PartsAccordion

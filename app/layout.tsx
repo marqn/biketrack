@@ -10,7 +10,7 @@ const font = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BikeTracker - Monitoring Serwisowy Roweru",
+  title: "MBike - Monitoring Serwisowy Roweru",
   description:
     "Aplikacja do śledzenia stanu komponentów i historii serwisów rowerowych",
   generator: "v0.app",

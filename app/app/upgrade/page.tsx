@@ -146,7 +146,7 @@ export default function UpgradePage() {
         </div>
         <h1 className="text-3xl font-bold mb-2">Premium</h1>
         <p className="text-muted-foreground max-w-md mx-auto">
-          Odblokuj pełen potencjał BikeTrackera i zarządzaj swoimi rowerami jak
+          Odblokuj pełen potencjał MBikea i zarządzaj swoimi rowerami jak
           profesjonalista.
         </p>
       </div>
@@ -319,7 +319,7 @@ export default function UpgradePage() {
                 <p className="text-center text-sm text-muted-foreground">
                   Plan <strong>{selectedPlan?.name}</strong> na{" "}
                   <strong>{selectedPlan?.duration}</strong> jest teraz aktywny.
-                  Ciesz się pełnym dostępem do BikeTrackera!
+                  Ciesz się pełnym dostępem do MBikea!
                 </p>
                 {expiresAt && (
                   <p className="text-center text-xs text-muted-foreground">

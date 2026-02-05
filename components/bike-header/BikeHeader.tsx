@@ -3,22 +3,21 @@
 import {
   ChevronDown,
   Crown,
-  Wifi,
-  WifiOff,
-  Loader2,
   UserIcon,
   LogOut,
   CreditCard,
   Delete,
   Mail,
-  Users,
   History,
   Package,
   Newspaper,
-  Settings,
   Home,
   Pencil,
   Shield,
+  Plus,
+  Check,
+  Trash2,
+  Lock,
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -31,7 +30,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-// DropdownMenuContent i DropdownMenuItem używane w menu użytkownika
 import {
   Tooltip,
   TooltipContent,
@@ -43,14 +41,16 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { Bike, BikeType } from "@/lib/generated/prisma";
-import { JSX } from "react";
 import { signOut } from "next-auth/react";
 import { deleteAccount } from "./actions/delete-account";
+import { deleteBike } from "./actions/delete-bike";
 import { updateBike } from "./actions/update-bike";
 import {
   RenameBikeDialog,
   DeleteAccountDialog,
   AddEmailDialog,
+  ConfirmDeleteDialog,
+  AddBikeDialog,
 } from "./dialogs";
 import { useMultiDialog } from "@/lib/hooks/useDialog";
 
@@ -72,22 +72,15 @@ export type DialogType =
   | "rename-bike"
   | "bike-details"
   | "add-email"
+  | "add-bike"
+  | "delete-bike"
   | null;
 
-type SyncStatus = "synced" | "syncing" | "error";
-
-export function BikeHeader({ bike, user }: BikeHeaderProps) {
+export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { activeDialog, openDialog, closeDialog } = useMultiDialog<DialogType>();
-  const [hasSeenTooltip, setHasSeenTooltip] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>("synced");
-
-  const syncIcon: Record<SyncStatus, JSX.Element> = {
-    synced: <Wifi className="h-4 w-4 text-emerald-500" />,
-    syncing: <Loader2 className="h-4 w-4 animate-spin text-yellow-500" />,
-    error: <WifiOff className="h-4 w-4 text-destructive" />,
-  };
+  const [bikeToDelete, setBikeToDelete] = useState<string | null>(null);
 
   const initials = user.name
     .split(" ")
@@ -95,6 +88,10 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
     .join("")
     .slice(0, 2)
     .toUpperCase();
+
+  const isPremium = user.plan === "PREMIUM";
+  const canAddBike = isPremium && bikes.length < 10;
+  const hasMultipleBikes = bikes.length > 1;
 
   const handleUpdateBike = async (data: {
     brand: string;
@@ -106,26 +103,52 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
     return await updateBike(bike.id, user.id, data);
   };
 
+  const handleSwitchBike = (bikeId: string) => {
+    document.cookie = `selectedBikeId=${bikeId};path=/;max-age=${60 * 60 * 24 * 365}`;
+    router.refresh();
+  };
+
+  const handleDeleteBike = async () => {
+    if (!bikeToDelete) return;
+    const result = await deleteBike(bikeToDelete);
+    if (result.success) {
+      // Jeśli usunięto aktywny rower, przełącz na pierwszy dostępny
+      if (bikeToDelete === bike.id) {
+        const remaining = bikes.filter((b) => b.id !== bikeToDelete);
+        if (remaining[0]) {
+          document.cookie = `selectedBikeId=${remaining[0].id};path=/;max-age=${60 * 60 * 24 * 365}`;
+        }
+      }
+      setBikeToDelete(null);
+      closeDialog();
+      router.refresh();
+    }
+  };
+
   // Nagłówek roweru: marka + model lub typ gdy brak
   const bikeTitle = bike.brand || bike.model
     ? `${bike.brand ?? ""} ${bike.model ?? ""}`.trim()
     : bike.type;
 
+  const getBikeLabel = (b: Bike) => {
+    return b.brand || b.model
+      ? `${b.brand ?? ""} ${b.model ?? ""}`.trim()
+      : b.type;
+  };
+
   const handleDeleteAccount = async () => {
-  try {
-    // 1. Usuń konto z bazy danych
-    await deleteAccount();
-    
-    // 2. Wyloguj użytkownika i przekieruj na /login
-    await signOut({ 
-      callbackUrl: "/login",
-      redirect: true 
-    });
-  } catch (error) {
-    console.error("Error deleting account:", error);
-    alert("Wystąpił błąd podczas usuwania konta");
-  }
-};
+    try {
+      await deleteAccount();
+      await signOut({
+        callbackUrl: "/login",
+        redirect: true,
+      });
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      alert("Wystąpił błąd podczas usuwania konta");
+    }
+  };
+
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -152,42 +175,90 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
               <Skeleton className="h-4 w-24" />
             </div>
           ) : (
-            <TooltipProvider>
-              <Tooltip
-                open={!hasSeenTooltip}
-                onOpenChange={(open) => {
-                  if (!open) setHasSeenTooltip(true);
-                }}
-              >
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" className="p-0 h-auto" onClick={() => openDialog("rename-bike")}>
-                    <div className="text-left">
-                      <div className="flex items-center gap-2">
-                        <h1 className="text-lg">{bikeTitle}</h1>
-                        <Pencil className="h-3 w-3 text-muted-foreground" />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {bike.type} {bike.totalKm.toLocaleString("pl-PL")} km
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="p-0 h-auto">
+                  <div className="text-left">
+                    <div className="flex items-center gap-2">
+                      <h1 className="text-lg">{bikeTitle}</h1>
+                      <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {bike.type} {bike.totalKm.toLocaleString("pl-PL")} km
+                    </p>
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="start" className="w-64">
+                {/* Lista rowerów */}
+                {bikes.map((b) => (
+                  <DropdownMenuItem
+                    key={b.id}
+                    onClick={() => handleSwitchBike(b.id)}
+                    className="flex items-center justify-between"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm truncate ${b.id === bike.id ? "font-semibold" : ""}`}>
+                        {getBikeLabel(b)}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {b.type} · {b.totalKm.toLocaleString("pl-PL")} km
                       </p>
                     </div>
-                  </Button>
-                </TooltipTrigger>
-                {bike.brand || bike.model ? null : (
-                  <TooltipContent>
-                    <p>Kliknij, aby edytować rower lub dodać nowy</p>
-                  </TooltipContent>
+                    <div className="flex items-center gap-1 ml-2">
+                      {b.id === bike.id && (
+                        <Check className="h-4 w-4 text-primary shrink-0" />
+                      )}
+                      {hasMultipleBikes && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setBikeToDelete(b.id);
+                            openDialog("delete-bike");
+                          }}
+                          className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      )}
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+
+                <DropdownMenuSeparator />
+
+                {/* Edytuj aktywny rower */}
+                <DropdownMenuItem onClick={() => openDialog("rename-bike")}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edytuj rower
+                </DropdownMenuItem>
+
+                {/* Dodaj rower - premium lub upgrade CTA */}
+                {isPremium ? (
+                  <DropdownMenuItem
+                    onClick={() => openDialog("add-bike")}
+                    disabled={!canAddBike}
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    {canAddBike
+                      ? "Dodaj rower"
+                      : `Limit ${bikes.length}/10 rowerów`}
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem onClick={() => router.push("/app/upgrade")}>
+                    <Lock className="mr-2 h-4 w-4" />
+                    Odblokuj więcej rowerów
+                    <Crown className="ml-auto h-3 w-3 text-yellow-500" />
+                  </DropdownMenuItem>
                 )}
-              </Tooltip>
-            </TooltipProvider>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
 
         {/* RIGHT SIDE */}
         <div className="flex items-center gap-4">
-          {/* <div className="flex items-center gap-2 text-sm">
-            {syncIcon[syncStatus]}
-          </div> */}
-
           {user.role === "ADMIN" && (
             <TooltipProvider>
               <Tooltip>
@@ -219,32 +290,6 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-
-          {/* <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="outline" size="icon" onClick={() => openDialog("add-email")}>
-                  <Mail className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Powiadomienia</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider> */}
-
-          {/* <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant={pathname?.startsWith("/app/test/races") ? "default" : "outline"} size="icon" onClick={() => router.push("/app/test/races")}>
-                  <Users className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Wyścigi</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider> */}
 
           <TooltipProvider>
             <Tooltip>
@@ -297,19 +342,6 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-
-          {/* <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant={pathname === "/app/test" ? "default" : "outline"} size="icon" onClick={() => router.push("/app/test")}>
-                  <Settings className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Ustawki</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider> */}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -386,6 +418,24 @@ export function BikeHeader({ bike, user }: BikeHeaderProps) {
       <AddEmailDialog
         open={activeDialog === "add-email"}
         onOpenChange={(open) => !open && closeDialog()}
+      />
+
+      <AddBikeDialog
+        open={activeDialog === "add-bike"}
+        onOpenChange={(open) => !open && closeDialog()}
+      />
+
+      <ConfirmDeleteDialog
+        open={activeDialog === "delete-bike"}
+        onOpenChange={(open: boolean) => {
+          if (!open) {
+            setBikeToDelete(null);
+            closeDialog();
+          }
+        }}
+        onConfirm={handleDeleteBike}
+        title="Usunąć rower?"
+        description="Ta operacja jest nieodwracalna. Rower wraz z całą historią serwisów i części zostanie trwale usunięty."
       />
     </header>
   );

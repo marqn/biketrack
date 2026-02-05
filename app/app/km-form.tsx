@@ -2,6 +2,7 @@
 
 import {
   useCallback,
+  useEffect,
   useOptimistic,
   useRef,
   useState,
@@ -27,6 +28,11 @@ export default function KmForm({ bikeId, initialKm }: Props) {
   );
 
   const [inputKm, setInputKm] = useState(optimisticKm);
+
+  // Synchronizuj inputKm gdy zmieni się rower (nowe initialKm)
+  useEffect(() => {
+    setInputKm(initialKm);
+  }, [initialKm]);
 
   async function action(formData: FormData) {
     const newKm = Number(formData.get("newKm"));

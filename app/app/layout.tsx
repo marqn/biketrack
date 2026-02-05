@@ -3,6 +3,7 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { BikeHeader } from "../../components/bike-header/BikeHeader";
 import { Footer } from "../../components/footer/Footer";
+import { cookies } from "next/headers";
 
 export default async function RootLayout({
   children,
@@ -22,21 +23,30 @@ export default async function RootLayout({
     });
 
     if (user?.bikes?.[0]) {
+      // Odczytaj wybrany rower z cookie
+      const cookieStore = await cookies();
+      const selectedBikeId = cookieStore.get("selectedBikeId")?.value;
+
+      // Znajdź wybrany rower lub użyj pierwszego
+      const activeBike =
+        (selectedBikeId && user.bikes.find((b) => b.id === selectedBikeId)) ||
+        user.bikes[0];
+
       const headerBike = {
-        id: user.bikes[0].id,
-        type: user.bikes[0].type,
-        brand: user.bikes[0].brand,
-        model: user.bikes[0].model,
-        year: user.bikes[0].year,
-        isElectric: user.bikes[0].isElectric,
-        totalKm: user.bikes[0].totalKm,
-        userId: user.bikes[0].userId,
-        createdAt: user.bikes[0].createdAt,
+        id: activeBike.id,
+        type: activeBike.type,
+        brand: activeBike.brand,
+        model: activeBike.model,
+        year: activeBike.year,
+        isElectric: activeBike.isElectric,
+        totalKm: activeBike.totalKm,
+        userId: activeBike.userId,
+        createdAt: activeBike.createdAt,
       };
 
       const headerBikes = user.bikes.map((b) => ({
         id: b.id,
-        name: b.type, // Użyj typu jako nazwy,
+        name: b.type,
         type: b.type,
         brand: b.brand,
         model: b.model,

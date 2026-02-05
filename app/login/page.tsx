@@ -97,7 +97,7 @@ export default function Page() {
               🚴
             </div>
           </CardTitle>
-          <CardTitle className="text-2xl">BikeTrack</CardTitle>
+          <CardTitle className="text-2xl">MBike</CardTitle>
           <CardDescription>
             {isLogin
               ? "Zaloguj się, aby zarządzać serwisem swoich rowerów"

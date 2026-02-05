@@ -24,7 +24,7 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <h1 className="text-5xl font-bold tracking-tight">BikeTrack</h1>
+            <h1 className="text-5xl font-bold tracking-tight">MBike</h1>
 
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Zarządzaj serwisem swoich rowerów w jednym miejscu.

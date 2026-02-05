@@ -1,13 +1,15 @@
 "use server";
 
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
-import { redirect } from "next/navigation";
 import { BikeType } from "@/lib/generated/prisma";
 import { DEFAULT_PARTS, EBIKE_PARTS } from "@/lib/default-parts";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { revalidatePath } from "next/cache";
 
-// Normalizacja tekstu do Title Case (np. "trek" -> "Trek", "CANNONDALE" -> "Cannondale")
+const MAX_BIKES_FREE = 1;
+const MAX_BIKES_PREMIUM = 10;
+
 function toTitleCase(str: string): string {
   return str
     .trim()
@@ -15,7 +17,7 @@ function toTitleCase(str: string): string {
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-interface CreateBikeParams {
+interface AddBikeParams {
   type: BikeType;
   brand?: string | null;
   model?: string | null;
@@ -24,30 +26,48 @@ interface CreateBikeParams {
   isElectric?: boolean;
 }
 
-export async function createBike({ type, brand, model, year, bikeProductId, isElectric = false }: CreateBikeParams) {
+export async function addBike({
+  type,
+  brand,
+  model,
+  year,
+  bikeProductId,
+  isElectric = false,
+}: AddBikeParams) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) {
+    return { success: false, error: "Nie jesteś zalogowany" };
+  }
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    include: { bikes: true },
+    include: { bikes: { select: { id: true } } },
   });
 
-  if (!user) redirect("/login");
+  if (!user) {
+    return { success: false, error: "Użytkownik nie znaleziony" };
+  }
 
-  // Premium: do 10 rowerów, Free: 1 rower
-  const isPremium = user.plan === "PREMIUM" && user.planExpiresAt && user.planExpiresAt > new Date();
-  const maxBikes = isPremium ? 10 : 1;
+  const isPremium =
+    user.plan === "PREMIUM" &&
+    user.planExpiresAt &&
+    user.planExpiresAt > new Date();
+
+  const maxBikes = isPremium ? MAX_BIKES_PREMIUM : MAX_BIKES_FREE;
 
   if (user.bikes.length >= maxBikes) {
-    redirect("/app");
+    return {
+      success: false,
+      error: isPremium
+        ? `Osiągnięto limit ${MAX_BIKES_PREMIUM} rowerów`
+        : "Plan darmowy pozwala na 1 rower. Wykup Premium, aby dodać więcej.",
+    };
   }
 
   let finalBrand = brand?.trim() || null;
   let finalModel = model?.trim() || null;
   let resolvedBikeProductId = bikeProductId || null;
 
-  // Jeśli użytkownik podał markę i model, sprawdź czy już istnieje (case-insensitive, ignoruj bikeType)
   if (finalBrand && finalModel) {
     const existingProduct = await prisma.bikeProduct.findFirst({
       where: {
@@ -57,12 +77,10 @@ export async function createBike({ type, brand, model, year, bikeProductId, isEl
     });
 
     if (existingProduct) {
-      // Użyj istniejących danych (zachowaj spójność zapisu)
       finalBrand = existingProduct.brand;
       finalModel = existingProduct.model;
       resolvedBikeProductId = existingProduct.id;
     } else {
-      // Nowy produkt - normalizuj do Title Case
       finalBrand = toTitleCase(finalBrand);
       finalModel = toTitleCase(finalModel);
 
@@ -78,27 +96,25 @@ export async function createBike({ type, brand, model, year, bikeProductId, isEl
     }
   }
 
-  // Zacznij od domyślnych części dla typu roweru
-  const partsMap = new Map<string, { type: typeof DEFAULT_PARTS[BikeType][number]["type"]; expectedKm: number; productId?: string }>();
+  const partsMap = new Map<
+    string,
+    {
+      type: (typeof DEFAULT_PARTS)[BikeType][number]["type"];
+      expectedKm: number;
+      productId?: string;
+    }
+  >();
 
   for (const p of DEFAULT_PARTS[type]) {
-    partsMap.set(p.type, {
-      type: p.type,
-      expectedKm: p.expectedKm,
-    });
+    partsMap.set(p.type, { type: p.type, expectedKm: p.expectedKm });
   }
 
-  // Dodaj części e-bike jeśli rower jest elektryczny
   if (isElectric) {
     for (const p of EBIKE_PARTS) {
-      partsMap.set(p.type, {
-        type: p.type,
-        expectedKm: p.expectedKm,
-      });
+      partsMap.set(p.type, { type: p.type, expectedKm: p.expectedKm });
     }
   }
 
-  // Nadpisz/dodaj części z BikeProduct jeśli są skonfigurowane
   if (resolvedBikeProductId) {
     const bikeProductWithParts = await prisma.bikeProduct.findUnique({
       where: { id: resolvedBikeProductId },
@@ -122,7 +138,7 @@ export async function createBike({ type, brand, model, year, bikeProductId, isEl
 
   const partsToCreate = Array.from(partsMap.values());
 
-  await prisma.bike.create({
+  const newBike = await prisma.bike.create({
     data: {
       type,
       brand: finalBrand || undefined,
@@ -141,8 +157,9 @@ export async function createBike({ type, brand, model, year, bikeProductId, isEl
     },
   });
 
-  // Zaktualizuj licznik instalacji dla PartProduct
-  const productIds = partsToCreate.filter((p) => p.productId).map((p) => p.productId!);
+  const productIds = partsToCreate
+    .filter((p) => p.productId)
+    .map((p) => p.productId!);
   if (productIds.length > 0) {
     await prisma.partProduct.updateMany({
       where: { id: { in: productIds } },
@@ -150,5 +167,7 @@ export async function createBike({ type, brand, model, year, bikeProductId, isEl
     });
   }
 
-  redirect("/app");
+  revalidatePath("/app");
+
+  return { success: true, bikeId: newBike.id };
 }

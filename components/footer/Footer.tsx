@@ -14,7 +14,7 @@ export function Footer() {
         {/* Bottom Section - Copyright */}
         <div className="mt-8 pt-6 border-t">
           <div className="flex flex-col md:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
-            <p>© {yearDisplay} BikeTracker. Wszelkie prawa zastrzeżone.</p>
+            <p>© {yearDisplay} MBike. Wszelkie prawa zastrzeżone.</p>
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-1">
                 Created with{" "}
