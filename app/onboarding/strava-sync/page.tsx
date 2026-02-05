@@ -106,6 +106,7 @@ export default function StravaOnboardingPage() {
           ? Math.round(selectedBike.distance / 1000)
           : 0,
         isElectric,
+        stravaGearId: selectedBike.id,
       });
     });
   }
@@ -123,6 +124,7 @@ export default function StravaOnboardingPage() {
           ? Math.round(selectedBike.distance / 1000)
           : 0,
         isElectric,
+        stravaGearId: selectedBike.id,
       });
     });
   }

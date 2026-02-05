@@ -35,6 +35,7 @@ export default async function RootLayout({
       const headerBike = {
         id: activeBike.id,
         type: activeBike.type,
+        stravaGearId: activeBike.stravaGearId,
         brand: activeBike.brand,
         model: activeBike.model,
         year: activeBike.year,
@@ -48,6 +49,7 @@ export default async function RootLayout({
         id: b.id,
         name: b.type,
         type: b.type,
+        stravaGearId: b.stravaGearId,
         brand: b.brand,
         model: b.model,
         year: b.year,

@@ -24,6 +24,8 @@ interface AddBikeParams {
   year?: number | null;
   bikeProductId?: string | null;
   isElectric?: boolean;
+  stravaGearId?: string | null;
+  totalKm?: number;
 }
 
 export async function addBike({
@@ -33,6 +35,8 @@ export async function addBike({
   year,
   bikeProductId,
   isElectric = false,
+  stravaGearId,
+  totalKm = 0,
 }: AddBikeParams) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
@@ -145,6 +149,8 @@ export async function addBike({
       model: finalModel || undefined,
       year: year || undefined,
       isElectric,
+      stravaGearId: stravaGearId || undefined,
+      totalKm,
       userId: user.id,
       parts: {
         create: partsToCreate.map((p) => ({

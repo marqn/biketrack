@@ -153,14 +153,15 @@ enum ServiceType {
 }
 
 model Bike {
-  id         String   @id @default(cuid())
-  userId     String
-  brand      String?
-  model      String?
-  year       Int?
-  type       BikeType
-  isElectric Boolean  @default(false)
-  totalKm    Int      @default(0)
+  id           String   @id @default(cuid())
+  userId       String
+  stravaGearId String?  @unique // ID sprzętu ze Strava - dla wykrywania duplikatów
+  brand        String?
+  model        String?
+  year         Int?
+  type         BikeType
+  isElectric   Boolean  @default(false)
+  totalKm      Int      @default(0)
 
   user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   parts            BikePart[]
@@ -168,8 +169,8 @@ model Bike {
   partReplacements PartReplacement[]
 
   createdAt DateTime @default(now())
-  
-  @@index([userId]) // 👈 DODAJ
+
+  @@index([userId])
 }
 
 model BikePart {

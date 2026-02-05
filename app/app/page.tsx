@@ -21,48 +21,60 @@ export default async function AppPage() {
   const cookieStore = await cookies();
   const selectedBikeId = cookieStore.get("selectedBikeId")?.value;
 
-  // Pobierz tylko wybrany rower (lub pierwszy jeśli brak cookie)
-  const bike = await prisma.bike.findFirst({
-    where: {
-      userId: session.user.id,
-      ...(selectedBikeId && { id: selectedBikeId }),
-    },
-    orderBy: { createdAt: "asc" },
-    include: {
-      parts: {
-        include: {
-          product: true,
-          replacements: {
-            orderBy: { createdAt: "desc" },
-          },
-        },
-      },
-      services: {
-        where: { type: ServiceType.CHAIN_LUBE },
-        orderBy: { createdAt: "desc" },
-        include: {
-          lubricantProduct: {
-            select: {
-              id: true,
-              brand: true,
-              model: true,
-              specifications: true,
-              averageRating: true,
-              totalReviews: true,
-            },
-          },
-          reviews: {
-            select: {
-              id: true,
-              rating: true,
-              reviewText: true,
-            },
-            take: 1,
-          },
+  const bikeInclude = {
+    parts: {
+      include: {
+        product: true,
+        replacements: {
+          orderBy: { createdAt: "desc" } as const,
         },
       },
     },
-  });
+    services: {
+      where: { type: ServiceType.CHAIN_LUBE },
+      orderBy: { createdAt: "desc" } as const,
+      include: {
+        lubricantProduct: {
+          select: {
+            id: true,
+            brand: true,
+            model: true,
+            specifications: true,
+            averageRating: true,
+            totalReviews: true,
+          },
+        },
+        reviews: {
+          select: {
+            id: true,
+            rating: true,
+            reviewText: true,
+          },
+          take: 1,
+        },
+      },
+    },
+  };
+
+  // Pobierz wybrany rower z cookie
+  let bike = selectedBikeId
+    ? await prisma.bike.findFirst({
+        where: {
+          userId: session.user.id,
+          id: selectedBikeId,
+        },
+        include: bikeInclude,
+      })
+    : null;
+
+  // Fallback do pierwszego roweru jeśli wybrany nie istnieje lub brak cookie
+  if (!bike) {
+    bike = await prisma.bike.findFirst({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "asc" },
+      include: bikeInclude,
+    });
+  }
 
   if (!bike) redirect("/onboarding");
 
