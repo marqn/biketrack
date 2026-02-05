@@ -30,6 +30,8 @@ type ExistingPart = {
   isInstalled?: boolean;
   product?: { brand: string; model: string } | null;
   replacements: PartReplacement[];
+  createdAt?: Date | string;
+  installedAt?: Date | string | null;
 };
 
 interface PartsAccordionProps {
@@ -120,6 +122,7 @@ export default function PartsAccordion({
                   currentPart={existingPart as BikePartWithProduct | undefined}
                   isAccessory={category === "accessories"}
                   isInstalled={existingPart?.isInstalled ?? true}
+                  createdAt={existingPart?.createdAt}
                 >
                   {partType === PartType.CHAIN && chainChildren}
                 </PartCard>

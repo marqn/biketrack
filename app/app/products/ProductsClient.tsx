@@ -81,7 +81,7 @@ export function ProductsClient({
       <div>
         <h1 className="text-3xl font-bold">Produkty</h1>
         <p className="text-muted-foreground">
-          Przegladaj i oceniaj czesci rowerowe
+          Przeglądaj i oceniaj części rowerowe
         </p>
       </div>
 

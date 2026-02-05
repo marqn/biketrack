@@ -20,8 +20,9 @@ export async function tubelessSealantRule(bikeId: string) {
 
   if (!part) return
 
+  const referenceDate = part.installedAt || part.createdAt
   const daysSince =
-    (Date.now() - part.createdAt.getTime()) / (1000 * 60 * 60 * 24)
+    (Date.now() - referenceDate.getTime()) / (1000 * 60 * 60 * 24)
 
   if (daysSince < SEALANT_INTERVAL_DAYS) return
 

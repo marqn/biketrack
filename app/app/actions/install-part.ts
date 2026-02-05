@@ -139,7 +139,7 @@ export async function installPart(data: InstallPartInput) {
   });
 
   // Obsługa PartReplacement dla trybu "create", "edit" i nowej części przy "replace"
-  if ((mode === "create" || mode === "replace") && (data.brand || data.model || productId)) {
+  if ((mode === "create" || mode === "replace") && (data.brand || data.model || productId || part.type === PartType.TUBELESS_SEALANT)) {
     // Tryb create lub replace - utwórz nowy rekord PartReplacement dla nowej części
     await prisma.partReplacement.create({
       data: {

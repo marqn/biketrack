@@ -21,11 +21,11 @@ export default async function PartsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Czesci (PartProduct)</h1>
+        <h1 className="text-2xl font-bold">Części (PartProduct)</h1>
         <Link href="/admin/parts/new">
           <Button>
             <Plus className="h-4 w-4 mr-2" />
-            Dodaj czesc
+            Dodaj częśc
           </Button>
         </Link>
       </div>
@@ -74,7 +74,7 @@ export default async function PartsPage() {
           {products.length === 0 && (
             <TableRow>
               <TableCell colSpan={5} className="text-center text-muted-foreground">
-                Brak czesci w bazie
+                Brak części w bazie
               </TableCell>
             </TableRow>
           )}

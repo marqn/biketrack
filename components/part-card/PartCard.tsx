@@ -17,6 +17,7 @@ import ColoredProgress from "@/components/ui/colored-progress";
 import { DialogType } from "@/components/bike-header/BikeHeader";
 import PartDetailsDialog from "./PartDetailsDialog";
 import PartHistoryDialog from "./PartHistoryDialog";
+import { SEALANT_INTERVAL_DAYS } from "@/lib/default-parts";
 import {
   deletePartReplacement,
   updatePartReplacement,
@@ -39,6 +40,7 @@ interface PartCardProps {
   children?: React.ReactNode;
   isAccessory?: boolean;
   isInstalled?: boolean;
+  createdAt?: Date | string;
 }
 
 export default function PartCard({
@@ -55,6 +57,7 @@ export default function PartCard({
   children,
   isAccessory = false,
   isInstalled = true,
+  createdAt,
 }: PartCardProps) {
   const { activeDialog, openDialog, closeDialog } = useMultiDialog<
     DialogType | "replace" | "history"
@@ -62,13 +65,21 @@ export default function PartCard({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const progressPercent = Math.min(
-    Math.round((wearKm / expectedKm) * 100),
-    100
-  );
+  const isSealant = partType === PartType.TUBELESS_SEALANT;
+  const sealantDate = isSealant
+    ? (currentPart?.installedAt || createdAt)
+    : null;
+  const daysSinceInstall = sealantDate
+    ? Math.floor((Date.now() - new Date(sealantDate).getTime()) / (1000 * 60 * 60 * 24))
+    : 0;
+
+  const progressPercent = isSealant && sealantDate
+    ? Math.min(Math.round((daysSinceInstall / SEALANT_INTERVAL_DAYS) * 100), 100)
+    : Math.min(Math.round((wearKm / expectedKm) * 100), 100);
 
   // Określ czy jest to edit czy create
   const hasCurrentPart = !!(currentBrand && currentModel);
+  const canReplace = hasCurrentPart || (isSealant && !!currentPart?.installedAt);
 
   async function handleToggleInstalled(checked: boolean) {
     if (!partId) return;
@@ -140,13 +151,23 @@ export default function PartCard({
 
           <div className="text-sm text-muted-foreground items-center flex justify-between">
             <span>
-              Zużycie:{" "}
-              <span className="font-medium text-foreground">{wearKm}</span>
-              {" km "}/ {expectedKm} km
+              {isSealant && sealantDate ? (
+                <>
+                  Wiek:{" "}
+                  <span className="font-medium text-foreground">{daysSinceInstall}</span>
+                  {" dni "}/ {SEALANT_INTERVAL_DAYS} dni
+                </>
+              ) : (
+                <>
+                  Zużycie:{" "}
+                  <span className="font-medium text-foreground">{wearKm}</span>
+                  {" km "}/ {expectedKm} km
+                </>
+              )}
             </span>
 
-            {hasCurrentPart && (
-              <span className="flex items-center gap-2">
+            <span className="flex items-center gap-2">
+              {canReplace && (
                 <Button
                   size="sm"
                   variant="outline"
@@ -155,17 +176,17 @@ export default function PartCard({
                 >
                   {isPending ? "Wymieniam..." : "🔄 Wymień"}
                 </Button>
-                {replacements.length > 0 && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => openDialog("history")}
-                  >
-                    <NotebookText className="h-4 w-4" />
-                  </Button>
-                )}
-              </span>
-            )}
+              )}
+              {replacements.length > 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => openDialog("history")}
+                >
+                  <NotebookText className="h-4 w-4" />
+                </Button>
+              )}
+            </span>
           </div>
         </CardContent>
 
@@ -181,7 +202,7 @@ export default function PartCard({
         partType={partType}
         partName={partName}
         partId={partId || ""}
-        mode={hasCurrentPart ? "edit" : "create"}
+        mode={canReplace ? "edit" : "create"}
         currentPart={currentPart}
       />
 

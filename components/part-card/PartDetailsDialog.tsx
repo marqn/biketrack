@@ -10,9 +10,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { pl } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 import { PartType } from "@/lib/generated/prisma";
 import { PartProduct, BikePartWithProduct } from "@/lib/types";
 import { installPart } from "@/app/app/actions/install-part";
@@ -69,6 +76,7 @@ export default function PartDetailsDialog({
   const [partSpecificData, setPartSpecificData] = useState<Record<string, unknown>>(
     getDefaultSpecificData(partType) as Record<string, unknown>
   );
+  const [unknownProduct, setUnknownProduct] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isLoadingReview, setIsLoadingReview] = useState(false);
   const router = useRouter();
@@ -80,6 +88,7 @@ export default function PartDetailsDialog({
         setSelectedProduct(currentPart.product as PartProduct);
         setBrand(currentPart.product.brand);
         setModel(currentPart.product.model);
+        setUnknownProduct(false);
 
         if (currentPart.installedAt) {
           const date = new Date(currentPart.installedAt);
@@ -114,11 +123,23 @@ export default function PartDetailsDialog({
           setRating(0);
           setReviewText("");
         }
+      } else if (mode === "edit" && isSealant && currentPart?.installedAt) {
+        // Tryb edycji mleka tubeless bez produktu (tylko data)
+        setSelectedProduct(null);
+        setBrand("");
+        setModel("");
+        setUnknownProduct(true);
+        const date = new Date(currentPart.installedAt);
+        setInstalledAt(date.toISOString().split("T")[0]);
+        setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
+        setRating(0);
+        setReviewText("");
       } else if (initialBrand || initialModel) {
         // Tryb edycji z initial values (np. z PartReplacement)
         setSelectedProduct(null);
         setBrand(initialBrand || "");
         setModel(initialModel || "");
+        setUnknownProduct(false);
         const today = new Date();
         setInstalledAt(today.toISOString().split("T")[0]);
         setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
@@ -129,6 +150,7 @@ export default function PartDetailsDialog({
         setSelectedProduct(null);
         setBrand("");
         setModel("");
+        setUnknownProduct(false);
         const today = new Date();
         setInstalledAt(today.toISOString().split("T")[0]);
         setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
@@ -143,8 +165,10 @@ export default function PartDetailsDialog({
     }
   }, [open, mode, currentPart, partType, initialBrand, initialModel, initialNotes]);
 
+  const isSealant = partType === PartType.TUBELESS_SEALANT;
+
   async function handleSave() {
-    if (!brand.trim() || !model.trim()) {
+    if (!unknownProduct && (!brand.trim() || !model.trim())) {
       alert("Proszę podać markę i model");
       return;
     }
@@ -245,73 +269,126 @@ export default function PartDetailsDialog({
           <div className="space-y-4">
             <h4 className="text-sm font-medium">Podstawowe informacje</h4>
 
-            <BrandModelFields
-              partType={partType}
-              brand={brand}
-              model={model}
-              onBrandChange={(newBrand) => setBrand(newBrand)}
-              onModelChange={(newModel) => setModel(newModel)}
-              onProductSelect={(product) => {
-                setSelectedProduct(product);
-                if (product && product.specifications) {
-                  setPartSpecificData(
-                    product.specifications as Record<string, unknown>
-                  );
-                }
-              }}
-            />
+            {isSealant && (
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="unknown-product"
+                  checked={unknownProduct}
+                  onCheckedChange={(checked) => {
+                    setUnknownProduct(checked === true);
+                    if (checked) {
+                      setBrand("");
+                      setModel("");
+                      setSelectedProduct(null);
+                      setRating(0);
+                      setReviewText("");
+                    }
+                  }}
+                />
+                <Label
+                  htmlFor="unknown-product"
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  Nie znam produktu / Chcę tylko zapisać datę
+                </Label>
+              </div>
+            )}
+
+            {!unknownProduct && (
+              <BrandModelFields
+                partType={partType}
+                brand={brand}
+                model={model}
+                onBrandChange={(newBrand) => setBrand(newBrand)}
+                onModelChange={(newModel) => setModel(newModel)}
+                onProductSelect={(product) => {
+                  setSelectedProduct(product);
+                  if (product && product.specifications) {
+                    setPartSpecificData(
+                      product.specifications as Record<string, unknown>
+                    );
+                  }
+                }}
+              />
+            )}
           </div>
 
           {/* === Data montażu === */}
           <div className="space-y-4">
             <h4 className="text-sm font-medium">Data montażu</h4>
-            <Input
-              type="date"
-              value={installedAt}
-              onChange={(e) => setInstalledAt(e.target.value)}
-            />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !installedAt && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {installedAt
+                    ? format(new Date(installedAt), "d MMMM yyyy", { locale: pl })
+                    : "Wybierz datę"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={installedAt ? new Date(installedAt) : undefined}
+                  onSelect={(date) => {
+                    if (date) {
+                      setInstalledAt(date.toISOString().split("T")[0]);
+                    }
+                  }}
+                  disabled={(date) => date > new Date()}
+                  locale={pl}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           {/* === Specyficzne pola dla typu części === */}
           {renderSpecificFields()}
 
           {/* === Opinia === */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-medium">
-              Opinia (opcjonalnie)
-              {isLoadingReview && (
-                <span className="ml-2 text-xs text-muted-foreground">
-                  Ładowanie...
-                </span>
-              )}
-            </h4>
+          {!unknownProduct && (
+            <div className="space-y-4">
+              <h4 className="text-sm font-medium">
+                Opinia (opcjonalnie)
+                {isLoadingReview && (
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    Ładowanie...
+                  </span>
+                )}
+              </h4>
 
-            <div className="flex gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  onClick={() => setRating(star)}
-                  onMouseEnter={() => setHoveredRating(star)}
-                  onMouseLeave={() => setHoveredRating(0)}
-                  className="text-2xl transition-colors focus:outline-none"
-                >
-                  {star <= (hoveredRating || rating) ? (
-                    <span className="text-yellow-500">★</span>
-                  ) : (
-                    <span className="text-muted-foreground">☆</span>
-                  )}
-                </button>
-              ))}
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setRating(star)}
+                    onMouseEnter={() => setHoveredRating(star)}
+                    onMouseLeave={() => setHoveredRating(0)}
+                    className="text-2xl transition-colors focus:outline-none"
+                  >
+                    {star <= (hoveredRating || rating) ? (
+                      <span className="text-yellow-500">★</span>
+                    ) : (
+                      <span className="text-muted-foreground">☆</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              <Textarea
+                placeholder="Twoje wrażenia, trwałość, awaryjność…"
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+                rows={3}
+              />
             </div>
-
-            <Textarea
-              placeholder="Twoje wrażenia, trwałość, awaryjność…"
-              value={reviewText}
-              onChange={(e) => setReviewText(e.target.value)}
-              rows={3}
-            />
-          </div>
+          )}
         </div>
 
         <DialogFooter className="shrink-0">

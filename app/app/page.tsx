@@ -82,6 +82,8 @@ export default async function AppPage() {
     isInstalled: p.isInstalled,
     product: p.product,
     replacements: p.replacements,
+    createdAt: p.createdAt,
+    installedAt: p.installedAt,
   }));
 
   return (
