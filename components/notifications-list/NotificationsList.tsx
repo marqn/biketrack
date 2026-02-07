@@ -24,33 +24,33 @@ export function NotificationsList() {
   return (
     <div className="space-y-3">
       {visibleNotifications.map((n) => (
-        <Alert key={n.id} variant={VARIANT_BY_TYPE[n.type]}>
-          <AlertTitle className="flex justify-between items-center">
-            {n.title}
-          </AlertTitle>
-          <AlertDescription>{n.message}</AlertDescription>
-            <div className="flex gap-2 absolute right-2 top-1/2 -translate-y-1/2">
-              {n.type === "EMAIL_MISSING" ? (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => {
-                    setHiddenIds((prev) => [...prev, n.id]);
-                    dispatchNotificationAction(n.type);
-                  }}
-                >
-                  Dodaj e-maila
-                </Button>
-              ) : (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => markAsRead(n.id)}
-                >
-                  OK
-                </Button>
-              )}
-            </div>
+        <Alert key={n.id} variant={VARIANT_BY_TYPE[n.type]} className="flex items-start gap-3">
+          <div className="flex-1 min-w-0">
+            <AlertTitle>{n.title}</AlertTitle>
+            <AlertDescription>{n.message}</AlertDescription>
+          </div>
+          <div className="flex shrink-0 pt-1">
+            {n.type === "EMAIL_MISSING" ? (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setHiddenIds((prev) => [...prev, n.id]);
+                  dispatchNotificationAction(n.type);
+                }}
+              >
+                Dodaj e-maila
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => markAsRead(n.id)}
+              >
+                OK
+              </Button>
+            )}
+          </div>
         </Alert>
       ))}
     </div>

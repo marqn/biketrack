@@ -308,12 +308,12 @@ export default function UpgradePage() {
             <>
               <DialogHeader>
                 <DialogTitle>Dziękujemy!</DialogTitle>
-                <DialogDescription>
+                <DialogDescription className="text-center">
                   Twój plan Premium został aktywowany.
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="flex flex-col items-center py-6 gap-3">
+              <div className="flex flex-col items-center py-3 gap-3">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
                   <Crown className="w-8 h-8 text-primary" />
                 </div>
@@ -337,7 +337,7 @@ export default function UpgradePage() {
               </div>
 
               <DialogFooter>
-                <Button onClick={() => setDialogOpen(false)}>
+                <Button onClick={() => router.push("/")}>
                   Zamknij
                 </Button>
               </DialogFooter>
