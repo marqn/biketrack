@@ -99,6 +99,7 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
     year: number | null;
     type: BikeType;
     isElectric: boolean;
+    description: string;
   }) => {
     return await updateBike(bike.id, user.id, data);
   };
@@ -404,6 +405,7 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
 
       {/* DIALOGS */}
       <RenameBikeDialog
+        key={bike.id}
         open={activeDialog === "rename-bike"}
         onOpenChange={(open) => !open && closeDialog()}
         bike={bike}

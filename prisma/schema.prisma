@@ -160,6 +160,7 @@ model Bike {
   model        String?
   year         Int?
   type         BikeType
+  description  String?
   isElectric   Boolean  @default(false)
   totalKm      Int      @default(0)
 

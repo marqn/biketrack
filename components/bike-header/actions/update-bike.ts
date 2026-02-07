@@ -19,6 +19,7 @@ interface UpdateBikeData {
   year: number | null;
   type: BikeType;
   isElectric: boolean;
+  description: string;
 }
 
 export async function updateBike(
@@ -122,11 +123,12 @@ export async function updateBike(
         year: data.year,
         type: data.type,
         isElectric: data.isElectric,
+        description: data.description.trim() || null,
       },
     });
 
     // Odśwież cache Next.js
-    revalidatePath("/app");
+    revalidatePath("/app", "layout");
     revalidatePath(`/app/bike/${bikeId}`);
 
     return { success: true, bike: updatedBike };

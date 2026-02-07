@@ -26,7 +26,7 @@ export function PopularBikeSection({ stats }: PopularBikeSectionProps) {
           Najpopularniejsze rowery
         </h2>
         <p className="text-muted-foreground text-center mb-8">
-          Co jeżdżą nasi użytkownicy
+          Na czym jeżdżą nasi użytkownicy
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">

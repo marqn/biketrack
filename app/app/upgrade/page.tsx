@@ -151,26 +151,6 @@ export default function UpgradePage() {
         </p>
       </div>
 
-      {/* Features */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {features.map((feature) => (
-          <Card key={feature.title}>
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
-                  <feature.icon className="w-5 h-5 text-primary" />
-                </div>
-                <CardTitle>{feature.title}</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-sm">
-                {feature.description}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
 
       {/* Pricing */}
       <div>
@@ -237,6 +217,27 @@ export default function UpgradePage() {
         </p>
       </div>
 
+      {/* Features */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {features.map((feature) => (
+          <Card key={feature.title}>
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
+                  <feature.icon className="w-5 h-5 text-primary" />
+                </div>
+                <CardTitle>{feature.title}</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground text-sm">
+                {feature.description}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      
       {/* Confirmation Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>

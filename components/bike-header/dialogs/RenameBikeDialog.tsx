@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
@@ -34,6 +35,7 @@ interface RenameBikeDialogProps {
     year?: number | null;
     type: BikeType;
     isElectric?: boolean;
+    description?: string | null;
   };
   onSave: (data: {
     brand: string;
@@ -41,6 +43,7 @@ interface RenameBikeDialogProps {
     year: number | null;
     type: BikeType;
     isElectric: boolean;
+    description: string;
   }) => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -55,6 +58,7 @@ export function RenameBikeDialog({
   const [year, setYear] = useState(bike.year?.toString() ?? new Date().getFullYear().toString());
   const [type, setType] = useState<BikeType>(bike.type);
   const [isElectric, setIsElectric] = useState(bike.isElectric ?? false);
+  const [description, setDescription] = useState(bike.description ?? "");
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -67,6 +71,7 @@ export function RenameBikeDialog({
         year: year ? parseInt(year, 10) : null,
         type,
         isElectric,
+        description,
       });
 
       if (result.success) {
@@ -87,6 +92,7 @@ export function RenameBikeDialog({
       setYear(bike.year?.toString() ?? "");
       setType(bike.type);
       setIsElectric(bike.isElectric ?? false);
+      setDescription(bike.description ?? "");
     }
     onOpenChange(open);
   };
@@ -99,8 +105,8 @@ export function RenameBikeDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent>
-        <DialogHeader>
+      <DialogContent className="max-h-[90vh]">
+        <DialogHeader className="shrink-0">
           <DialogTitle>Edytuj rower</DialogTitle>
           <DialogDescription>
             Typ roweru jest wymagany. Marka i model są opcjonalne, ale pomagają
@@ -108,27 +114,59 @@ export function RenameBikeDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="bike-type">
-              Typ roweru <span className="text-destructive">*</span>
-            </Label>
-            <Select
-              value={type}
-              onValueChange={(value) => setType(value as BikeType)}
-              disabled={isLoading}
-            >
-              <SelectTrigger id="bike-type">
-                <SelectValue placeholder="Wybierz typ roweru" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(bikeTypeLabels).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <div
+          className="custom-scrollbar space-y-4 overflow-y-auto -mx-6 pl-6 pr-8"
+          style={{ maxHeight: "calc(90vh - 200px)" }}
+        >
+          <div className="flex gap-4 items-end">
+            <div className="space-y-2">
+              <Label htmlFor="bike-type">
+                Typ roweru <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                value={type}
+                onValueChange={(value) => setType(value as BikeType)}
+                disabled={isLoading}
+              >
+                <SelectTrigger id="bike-type" className="w-36">
+                  <SelectValue placeholder="Wybierz typ" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(bikeTypeLabels).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="bike-year">Rok</Label>
+              <Input
+                id="bike-year"
+                type="number"
+                placeholder="2023"
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                min={1990}
+                max={new Date().getFullYear() + 1}
+                disabled={isLoading}
+                className="w-24"
+              />
+            </div>
+
+            <div className="flex items-center space-x-2 pb-2">
+              <Checkbox
+                id="is-electric"
+                checked={isElectric}
+                onCheckedChange={(checked) => setIsElectric(checked === true)}
+                disabled={isLoading}
+              />
+              <Label htmlFor="is-electric" className="cursor-pointer whitespace-nowrap">
+                E-bike
+              </Label>
+            </div>
           </div>
 
           <BikeBrandModelFields
@@ -140,37 +178,25 @@ export function RenameBikeDialog({
           />
 
           <div className="space-y-2">
-            <Label htmlFor="bike-year">Rok modelowy</Label>
-            <Input
-              id="bike-year"
-              type="number"
-              placeholder="np. 2023"
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              min={1990}
-              max={new Date().getFullYear() + 1}
+            <Label htmlFor="bike-description">Opisz swój rower</Label>
+            <Textarea
+              id="bike-description"
+              placeholder="np. Mój główny rower do codziennych dojazdów, z dodatkowym oświetleniem i sakwami..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              maxLength={500}
               disabled={isLoading}
             />
             <p className="text-xs text-muted-foreground">
-              Dzięki temu będziemy mogli zaproponować konkretne komponenty
-              dopasowane do tego modelu.
+              Twój opis będzie widoczny dla innych użytkowników. Pochwal się swoim setupem,
+              opisz modyfikacje lub podziel się tym, co sprawia że ten rower jest wyjątkowy.
+              Inni będą mogli komentować i proponować ulepszenia!
             </p>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="is-electric"
-              checked={isElectric}
-              onCheckedChange={(checked) => setIsElectric(checked === true)}
-              disabled={isLoading}
-            />
-            <Label htmlFor="is-electric" className="cursor-pointer">
-              Rower elektryczny (e-bike)
-            </Label>
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="shrink-0">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
