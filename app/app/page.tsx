@@ -96,7 +96,7 @@ export default async function AppPage() {
 
   return (
     <div className="space-y-6 lg:px-24 lg:space-6">
-      <NotificationsList />
+      {/* <NotificationsList /> */}
 
       <KmForm bikeId={bike.id} initialKm={bike.totalKm} />
 

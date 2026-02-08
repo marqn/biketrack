@@ -43,6 +43,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { Bike, BikeType } from "@/lib/generated/prisma";
 import { signOut } from "next-auth/react";
+import { useNotifications } from "@/app/hooks/useNotifications";
 import { deleteAccount } from "./actions/delete-account";
 import { deleteBike } from "./actions/delete-bike";
 import { updateBike } from "./actions/update-bike";
@@ -82,6 +83,8 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
   const pathname = usePathname();
   const { activeDialog, openDialog, closeDialog } = useMultiDialog<DialogType>();
   const [bikeToDelete, setBikeToDelete] = useState<string | null>(null);
+  const { notifications: unreadNotifications } = useNotifications();
+  const unreadCount = unreadNotifications.length;
 
   const initials = user.name
     .split(" ")
@@ -349,12 +352,22 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant={pathname?.startsWith("/app/contact") ? "default" : "outline"} size="icon" onClick={() => router.push("/app/contact")}>
+                <Button
+                  variant={pathname?.startsWith("/app/messages") ? "default" : "outline"}
+                  size="icon"
+                  className="relative"
+                  onClick={() => router.push("/app/messages")}
+                >
                   <Mail className="h-4 w-4" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Kontakt</p>
+                <p>Wiadomości</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

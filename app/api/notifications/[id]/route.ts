@@ -26,3 +26,24 @@ export async function PATCH(
 
   return new Response(null, { status: 204 })
 }
+
+export async function DELETE(
+  _: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
+
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return new Response(null, { status: 401 })
+  }
+
+  await prisma.notification.deleteMany({
+    where: {
+      id,
+      userId: session.user.id,
+    },
+  })
+
+  return new Response(null, { status: 204 })
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { Bike, Heart } from "lucide-react";
+import Link from "next/link";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -19,7 +20,7 @@ export function Footer() {
               <div className="flex items-center gap-1">
                 Created with{" "}
                 <Heart className="h-3 w-3 text-red-500 fill-red-500" /> by{" "}
-                <span className="font-semibold text-foreground">Marqn</span>
+                <Link href="/app/contact" className="font-semibold text-foreground hover:underline">Marqn</Link>
               </div>
 
               <p className="flex items-center gap-1 justify-evenly">
