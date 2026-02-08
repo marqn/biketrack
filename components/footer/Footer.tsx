@@ -15,16 +15,36 @@ export function Footer() {
         {/* Bottom Section - Copyright */}
         <div className="mt-8 pt-6 border-t">
           <div className="flex flex-col md:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
-            <p>© {yearDisplay} MBike. Wszelkie prawa zastrzeżone.</p>
+            <div className="flex flex-col gap-2">
+              <Link
+                href="/app/blog"
+                className="font-semibold text-foreground hover:underline"
+              >
+                Aktualności
+              </Link>
+              <Link
+                href="/app/contact"
+                className="font-semibold text-foreground hover:underline"
+              >
+                Kontakt
+              </Link>
+              <p>© {yearDisplay} MBike. Wszelkie prawa zastrzeżone.</p>
+            </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-1">
                 Created with{" "}
                 <Heart className="h-3 w-3 text-red-500 fill-red-500" /> by{" "}
-                <Link href="/app/contact" className="font-semibold text-foreground hover:underline">Marqn</Link>
+                <Link
+                  href="/app/contact"
+                  className="font-semibold text-foreground hover:underline"
+                >
+                  Marqn
+                </Link>
               </div>
 
               <p className="flex items-center gap-1 justify-evenly">
-                <Bike className="h-3 w-3 text-green-500" />ver. 1.0.1
+                <Bike className="h-3 w-3 text-green-500" />
+                ver. 1.0.1
               </p>
             </div>
           </div>

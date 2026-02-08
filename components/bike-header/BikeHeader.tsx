@@ -348,7 +348,7 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
             </Tooltip>
           </TooltipProvider>
 
-          <TooltipProvider>
+          {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant={pathname?.startsWith("/app/blog") ? "default" : "outline"} size="icon" onClick={() => router.push("/app/blog")}>
@@ -359,7 +359,7 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
                 <p>Aktualności</p>
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </TooltipProvider> */}
 
           <TooltipProvider>
             <Tooltip>
