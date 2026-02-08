@@ -29,11 +29,15 @@ model User {
   role          UserRole  @default(USER)
   plan          Plan      @default(FREE)
   planExpiresAt DateTime? // Data wygaśnięcia planu Premium
-  accounts      Account[]
-  sessions      Session[]
-  bikes         Bike[]
-  notifications Notification[]
-  partReviews   PartReview[]
+  bio           String?   @db.Text // Krótki opis na profilu publicznym
+  profileSlug   String?   @unique  // URL-friendly identyfikator profilu publicznego
+  accounts       Account[]
+  sessions       Session[]
+  bikes          Bike[]
+  notifications  Notification[]
+  partReviews    PartReview[]
+  bikeComments   BikeComment[]
+  commentReports CommentReport[]
 }
 
 model Account {
@@ -163,15 +167,20 @@ model Bike {
   description  String?
   isElectric   Boolean  @default(false)
   totalKm      Int      @default(0)
+  isPublic     Boolean  @default(false)  // Czy rower jest widoczny publicznie
+  slug         String?  @unique          // URL-friendly identyfikator dla strony publicznej
+  imageUrl     String?  @db.Text         // Zdjęcie roweru (base64)
 
   user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   parts            BikePart[]
   services         ServiceEvent[]
   partReplacements PartReplacement[]
+  comments         BikeComment[]
 
   createdAt DateTime @default(now())
 
   @@index([userId])
+  @@index([isPublic, type])
 }
 
 model BikePart {
@@ -367,6 +376,8 @@ enum NotificationType {
   SERVICE_DUE
   EMAIL_MISSING
   SYSTEM
+  NEW_COMMENT    // Ktoś skomentował Twój rower
+  COMMENT_REPLY  // Ktoś odpowiedział na Twój komentarz
 }
 
 enum NotificationStatus {
@@ -383,8 +394,9 @@ model Notification {
   title   String
   message String
 
-  bikeId String?
-  partId String?
+  bikeId    String?
+  partId    String?
+  commentId String?  // Referencja do komentarza (dla notyfikacji społecznościowych)
 
   status NotificationStatus @default(UNREAD)
 
@@ -394,4 +406,65 @@ model Notification {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
+}
+
+// ========== Funkcje społecznościowe ==========
+
+enum CommentType {
+  GENERAL    // Ogólny komentarz
+  SUGGESTION // Propozycja ulepszenia
+  QUESTION   // Pytanie
+}
+
+model BikeComment {
+  id       String      @id @default(cuid())
+  bikeId   String
+  userId   String
+  parentId String?     // Dla odpowiedzi (nullable = komentarz główny)
+  content  String      @db.Text
+  type     CommentType @default(GENERAL)
+  isHidden Boolean     @default(false) // Soft-delete / ukryty przez moderację
+
+  bike    Bike          @relation(fields: [bikeId], references: [id], onDelete: Cascade)
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent  BikeComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies BikeComment[] @relation("CommentReplies")
+  reports CommentReport[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bikeId, createdAt])
+  @@index([userId])
+  @@index([parentId])
+}
+
+enum ReportReason {
+  SPAM
+  OFFENSIVE
+  IRRELEVANT
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  DISMISSED
+}
+
+model CommentReport {
+  id        String       @id @default(cuid())
+  commentId String
+  userId    String       // Kto zgłosił
+  reason    ReportReason
+  details   String?      @db.Text
+  status    ReportStatus @default(PENDING)
+
+  comment BikeComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([commentId, userId]) // Jedno zgłoszenie per użytkownik per komentarz
+  @@index([status])
 }

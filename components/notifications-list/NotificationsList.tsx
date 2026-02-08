@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { VARIANT_BY_TYPE } from "@/lib/types";
 import { dispatchNotificationAction } from "./dispatchNotificationAction";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function NotificationsList() {
   const { notifications, loading, markAsRead } = useNotifications();
   const [hiddenIds, setHiddenIds] = useState<string[]>([]);
+  const router = useRouter();
 
   if (loading) return null;
 
@@ -41,6 +43,32 @@ export function NotificationsList() {
               >
                 Dodaj e-maila
               </Button>
+            ) : n.type === "NEW_COMMENT" || n.type === "COMMENT_REPLY" ? (
+              <div className="flex gap-1">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={async () => {
+                    markAsRead(n.id);
+                    if (n.bikeId) {
+                      const res = await fetch(`/api/bike-slug/${n.bikeId}`);
+                      const data = await res.json();
+                      if (data.slug) {
+                        router.push(`/app/discover/bike/${data.slug}`);
+                      }
+                    }
+                  }}
+                >
+                  Zobacz
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => markAsRead(n.id)}
+                >
+                  OK
+                </Button>
+              </div>
             ) : (
               <Button
                 variant="ghost"

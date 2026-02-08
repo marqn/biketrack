@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -24,6 +25,9 @@ import {
 import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels, BikeProduct } from "@/lib/types";
 import BikeBrandModelFields from "@/components/bike/BikeBrandModelFields";
+import { toggleBikeVisibility } from "@/app/app/actions/toggle-bike-visibility";
+import { uploadBikeImage, removeBikeImage } from "@/app/app/actions/upload-bike-image";
+import { Camera, Globe, X } from "lucide-react";
 
 interface RenameBikeDialogProps {
   open: boolean;
@@ -36,6 +40,9 @@ interface RenameBikeDialogProps {
     type: BikeType;
     isElectric?: boolean;
     description?: string | null;
+    isPublic?: boolean;
+    slug?: string | null;
+    imageUrl?: string | null;
   };
   onSave: (data: {
     brand: string;
@@ -59,8 +66,46 @@ export function RenameBikeDialog({
   const [type, setType] = useState<BikeType>(bike.type);
   const [isElectric, setIsElectric] = useState(bike.isElectric ?? false);
   const [description, setDescription] = useState(bike.description ?? "");
+  const [isPublic, setIsPublic] = useState(bike.isPublic ?? false);
+  const [bikeImage, setBikeImage] = useState<string | null>(bike.imageUrl ?? null);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [visibilityLoading, setVisibilityLoading] = useState(false);
+  const [visibilitySlug, setVisibilitySlug] = useState<string | null>(bike.slug ?? null);
+
+  const handleVisibilityChange = async (checked: boolean) => {
+    setVisibilityLoading(true);
+    setIsPublic(checked);
+    try {
+      const result = await toggleBikeVisibility(bike.id, checked);
+      if (!result.success) {
+        setIsPublic(!checked); // revert on error
+      } else if (result.slug) {
+        setVisibilitySlug(result.slug);
+      }
+    } catch {
+      setIsPublic(!checked); // revert on error
+    } finally {
+      setVisibilityLoading(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64 = reader.result as string;
+      setBikeImage(base64);
+      await uploadBikeImage(bike.id, base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = async () => {
+    setBikeImage(null);
+    await removeBikeImage(bike.id);
+  };
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -93,6 +138,9 @@ export function RenameBikeDialog({
       setType(bike.type);
       setIsElectric(bike.isElectric ?? false);
       setDescription(bike.description ?? "");
+      setIsPublic(bike.isPublic ?? false);
+      setVisibilitySlug(bike.slug ?? null);
+      setBikeImage(bike.imageUrl ?? null);
     }
     onOpenChange(open);
   };
@@ -193,6 +241,90 @@ export function RenameBikeDialog({
               opisz modyfikacje lub podziel się tym, co sprawia że ten rower jest wyjątkowy.
               Inni będą mogli komentować i proponować ulepszenia!
             </p>
+          </div>
+
+          {/* Zdjęcie roweru */}
+          <div className="space-y-2">
+            <Label>Zdjęcie roweru</Label>
+            <div className="flex items-center gap-4">
+              <div className="relative w-32 h-24 rounded-lg border-2 border-dashed border-muted-foreground/25 flex items-center justify-center overflow-hidden bg-muted/50">
+                {bikeImage ? (
+                  <>
+                    <img
+                      src={bikeImage}
+                      alt="Rower"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute top-1 right-1 p-0.5 rounded-full bg-background/80 hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </>
+                ) : (
+                  <label className="cursor-pointer flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
+                    <Camera className="h-6 w-6" />
+                    <span className="text-xs">Dodaj zdjęcie</span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+              {bikeImage && (
+                <label className="cursor-pointer text-sm text-primary hover:underline">
+                  Zmień zdjęcie
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+          </div>
+
+          {/* Widoczność publiczna */}
+          <div className="rounded-lg border p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="bike-public" className="cursor-pointer">
+                    Rower publiczny
+                  </Label>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Twój rower będzie widoczny w sekcji Odkrywaj. Inni użytkownicy
+                  będą mogli oglądać jego części i komentować.
+                </p>
+              </div>
+              <Switch
+                id="bike-public"
+                checked={isPublic}
+                onCheckedChange={handleVisibilityChange}
+                disabled={isLoading || visibilityLoading}
+              />
+            </div>
+            {visibilityLoading && (
+              <p className="text-xs text-muted-foreground">Zapisywanie...</p>
+            )}
+            {isPublic && visibilitySlug && !visibilityLoading && (
+              <p className="text-xs text-green-600">
+                Rower jest publiczny: /app/discover/bike/{visibilitySlug}
+              </p>
+            )}
+            {!isPublic && !visibilityLoading && visibilitySlug && (
+              <p className="text-xs text-muted-foreground">
+                Rower jest prywatny
+              </p>
+            )}
           </div>
         </div>
 

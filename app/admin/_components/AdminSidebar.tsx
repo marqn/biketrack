@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Bike, Wrench, Home } from "lucide-react";
+import { Bike, Wrench, Home, Flag } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: Home },
   { href: "/admin/bikes", label: "Rowery", icon: Bike },
   { href: "/admin/parts", label: "Czesci", icon: Wrench },
+  { href: "/admin/moderation", label: "Moderacja", icon: Flag },
 ];
 
 export function AdminSidebar() {

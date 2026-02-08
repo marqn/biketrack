@@ -22,6 +22,8 @@ export async function GET() {
         image: true,
         weight: true,
         password: true, // Sprawdzamy czy ma hasło
+        bio: true,
+        profileSlug: true,
       }
     });
 
@@ -37,7 +39,9 @@ export async function GET() {
         email: user.email,
         image: user.image,
         weight: user.weight,
-        password: !!user.password // true/false
+        password: !!user.password, // true/false
+        bio: user.bio,
+        profileSlug: user.profileSlug,
       }
     });
   } catch (error) {
@@ -55,7 +59,7 @@ export async function PATCH(request: Request) {
     }
 
     const body = await request.json();
-    const { name, email, image, weight, currentPassword, newPassword } = body;
+    const { name, email, image, weight, currentPassword, newPassword, bio, profileSlug } = body;
 
     const updateData: any = {};
 
@@ -86,6 +90,27 @@ export async function PATCH(request: Request) {
     // Aktualizacja wagi
     if (weight !== undefined) {
       updateData.weight = weight;
+    }
+
+    // Aktualizacja bio
+    if (bio !== undefined) {
+      updateData.bio = bio || null;
+    }
+
+    // Generacja profileSlug (jeśli jeszcze nie ma)
+    if (profileSlug !== undefined) {
+      if (profileSlug) {
+        // Sprawdź unikalność
+        const existingSlug = await prisma.user.findUnique({
+          where: { profileSlug }
+        });
+        if (existingSlug && existingSlug.id !== session.user.id) {
+          return NextResponse.json({ error: 'Slug already taken' }, { status: 400 });
+        }
+        updateData.profileSlug = profileSlug;
+      } else {
+        updateData.profileSlug = null;
+      }
     }
 
     // Zmiana hasła

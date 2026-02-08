@@ -44,6 +44,9 @@ export default async function RootLayout({
         totalKm: activeBike.totalKm,
         userId: activeBike.userId,
         createdAt: activeBike.createdAt,
+        isPublic: activeBike.isPublic,
+        slug: activeBike.slug,
+        imageUrl: activeBike.imageUrl,
       };
 
       const headerBikes = user.bikes.map((b) => ({
@@ -59,6 +62,9 @@ export default async function RootLayout({
         totalKm: b.totalKm,
         userId: b.userId,
         createdAt: b.createdAt,
+        isPublic: b.isPublic,
+        slug: b.slug,
+        imageUrl: b.imageUrl,
       }));
 
       // Sprawdź czy premium jest aktywny

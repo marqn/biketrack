@@ -79,6 +79,8 @@ export const VARIANT_BY_TYPE: Record<string, "default" | "destructive"> = {
   SERVICE_DUE: "default",
   EMAIL_MISSING: "default",
   SYSTEM: "default",
+  NEW_COMMENT: "default",
+  COMMENT_REPLY: "default",
 }
 
 export interface PartReplacement {

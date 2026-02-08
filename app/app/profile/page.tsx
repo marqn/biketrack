@@ -21,12 +21,15 @@ interface UserData {
   email: string | null;
   image: string | null;
   weight: number | null;
+  bio: string | null;
+  profileSlug: string | null;
 }
 
 interface FormData {
   name: string;
   email: string;
   weight: string;
+  bio: string;
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
@@ -36,6 +39,7 @@ interface IsEditing {
   name: boolean;
   email: boolean;
   weight: boolean;
+  bio: boolean;
   password: boolean;
 }
 
@@ -64,6 +68,7 @@ export default function ProfilePage() {
     name: false,
     email: false,
     weight: false,
+    bio: false,
     password: false,
   });
 
@@ -71,6 +76,7 @@ export default function ProfilePage() {
     name: "",
     email: "",
     weight: "",
+    bio: "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -100,6 +106,7 @@ export default function ProfilePage() {
             name: data.user.name || "",
             email: data.user.email || "",
             weight: data.user.weight?.toString() || "75",
+            bio: data.user.bio || "",
           }));
         }
       } catch (error) {
@@ -306,6 +313,7 @@ export default function ProfilePage() {
       name: user?.name || "",
       email: user?.email || "",
       weight: user?.weight?.toString() || "75",
+      bio: user?.bio || "",
       currentPassword: "",
       newPassword: "",
       confirmPassword: "",
@@ -558,6 +566,112 @@ export default function ProfilePage() {
             <div className="flex items-center gap-3">
               <Scale className="w-5 h-5 text-muted-foreground" />
               <span>{user.weight ? `${user.weight} kg` : "Nie ustawiono"}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Bio / Profil publiczny */}
+        <div className="bg-card rounded-xl border p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Profil publiczny</h2>
+            {!isEditing.bio && (
+              <button
+                onClick={() => setIsEditing({ ...isEditing, bio: true })}
+                className="text-primary hover:underline text-sm font-medium"
+              >
+                {user.bio ? "Edytuj" : "Dodaj"}
+              </button>
+            )}
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Twoje bio jest widoczne na Twoim publicznym profilu, gdy masz publiczne rowery.
+          </p>
+          {isEditing.bio ? (
+            <div>
+              <textarea
+                value={formData.bio}
+                onChange={(e) =>
+                  setFormData({ ...formData, bio: e.target.value })
+                }
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent bg-background"
+                placeholder="Napisz kilka słów o sobie..."
+                rows={3}
+                maxLength={500}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {formData.bio.length}/500
+              </p>
+              <div className="flex gap-2 mt-3">
+                <button
+                  onClick={async () => {
+                    try {
+                      // Generuj profileSlug jeśli nie ma
+                      const slugData: Record<string, string | null> = {};
+                      if (!user.profileSlug && user.name) {
+                        const slug = user.name
+                          .toLowerCase()
+                          .replace(/[^a-z0-9\s-]/g, "")
+                          .replace(/\s+/g, "-")
+                          .replace(/-+/g, "-")
+                          .trim();
+                        slugData.profileSlug = `${slug}-${user.id.slice(-6)}`;
+                      }
+
+                      const response = await fetch("/api/user/profile", {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          bio: formData.bio,
+                          ...slugData,
+                        }),
+                      });
+                      const data = await response.json();
+                      if (data.success) {
+                        setUser({
+                          ...user,
+                          bio: formData.bio || null,
+                          profileSlug: slugData.profileSlug ?? user.profileSlug,
+                        });
+                        setIsEditing({ ...isEditing, bio: false });
+                        setSuccessMessage("Profil publiczny zaktualizowany!");
+                        setTimeout(() => setSuccessMessage(""), 3000);
+                        router.refresh();
+                      }
+                    } catch (error) {
+                      console.error("Błąd aktualizacji bio:", error);
+                    }
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  <Check className="w-4 h-4" />
+                  Zapisz
+                </button>
+                <button
+                  onClick={() => handleCancel("bio")}
+                  className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                  Anuluj
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <User className="w-5 h-5 text-muted-foreground" />
+              <span>{user.bio || "Nie ustawiono"}</span>
+            </div>
+          )}
+          {user.profileSlug && (
+            <div className="mt-3 pt-3 border-t">
+              <p className="text-xs text-muted-foreground">
+                Link do profilu:{" "}
+                <a
+                  href={`/app/discover/user/${user.profileSlug}`}
+                  className="text-primary hover:underline"
+                >
+                  /app/discover/user/{user.profileSlug}
+                </a>
+              </p>
             </div>
           )}
         </div>

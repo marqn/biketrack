@@ -18,6 +18,7 @@ import {
   Check,
   Trash2,
   Lock,
+  Compass,
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -315,6 +316,19 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
               </TooltipTrigger>
               <TooltipContent>
                 <p>Produkty</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant={pathname?.startsWith("/app/discover") ? "default" : "outline"} size="icon" onClick={() => router.push("/app/discover")}>
+                  <Compass className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Odkrywaj</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
