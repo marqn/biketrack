@@ -220,10 +220,9 @@ export function AddBikeDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{getTitle()}</DialogTitle>
-          <DialogDescription>{getDescription()}</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-2">
+        <div className="space-y-4 py-2 ">
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           {/* Loading */}
@@ -289,18 +288,21 @@ export function AddBikeDialog({
                   Wróć do wyboru ze Strava
                 </button>
               )}
-              <ToggleGroup type="single" className="grid grid-cols-2 gap-3">
-                {Object.values(BikeType).map((type) => (
-                  <ToggleGroupItem
-                    key={type}
-                    value={type}
-                    onClick={() => handleTypeSelect(type)}
-                    className="h-16 text-base flex items-center justify-center text-center rounded-xl"
-                  >
-                    {bikeTypeLabels[type]}
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
+              <div className="flex justify-center">
+                <ToggleGroup type="single" className="grid grid-cols-2 gap-3 ">
+                  {Object.values(BikeType).map((type) => (
+                    <ToggleGroupItem
+                      key={type}
+                      value={type}
+                      onClick={() => handleTypeSelect(type)}
+                      className="h-16 text-base text-center rounded-xl"
+                    >
+                      {bikeTypeLabels[type]}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+
+              </div>
             </>
           )}
 

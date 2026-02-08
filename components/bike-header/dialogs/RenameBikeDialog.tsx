@@ -315,7 +315,7 @@ export function RenameBikeDialog({
                   />
 
                   <Label htmlFor="bike-public" className="cursor-pointer">
-                    Rower publiczny
+                    {isPublic ? "Rower publiczny" : "Rower prywatny"}
                   </Label>
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -339,7 +339,7 @@ export function RenameBikeDialog({
               </p>
             )}
             {!isPublic && !visibilityLoading && visibilitySlug && (
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground text-yellow-400">
                 Rower jest prywatny
               </p>
             )}

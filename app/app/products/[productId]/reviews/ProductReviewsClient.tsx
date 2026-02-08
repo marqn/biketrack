@@ -130,7 +130,7 @@ export function ProductReviewsClient({
               icon={<Users className="w-5 h-5 text-muted-foreground" />}
             />
             <StatBox
-              label="sśr. żywotność"
+              label="Śr. żywotność"
               value={
                 product.averageKmLifespan
                   ? `${product.averageKmLifespan.toLocaleString("pl-PL")} km`
