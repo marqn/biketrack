@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Bike as BikeIcon, MapPin, MessageSquare } from "lucide-react";
+import { Bike as BikeIcon, Loader2, MapPin, MessageSquare } from "lucide-react";
 import { bikeTypeLabels } from "@/lib/types";
 import { BikeType } from "@/lib/generated/prisma";
 import Link from "next/link";
@@ -25,6 +26,8 @@ interface BikeCardProps {
 }
 
 export function BikeCard({ bike }: BikeCardProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   if (!bike.slug) return null;
 
   const bikeTitle = bike.brand || bike.model
@@ -37,13 +40,19 @@ export function BikeCard({ bike }: BikeCardProps) {
       className="group block bg-card rounded-xl border overflow-hidden hover:shadow-md transition-shadow"
     >
       {/* Miniatura */}
-      <div className="w-full h-36 bg-muted flex items-center justify-center overflow-hidden">
+      <div className="relative w-full h-36 bg-muted flex items-center justify-center overflow-hidden">
         {bike.imageUrl ? (
-          <img
-            src={bike.imageUrl}
-            alt={bikeTitle}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-          />
+          <>
+            {!imageLoaded && (
+              <Loader2 className="h-8 w-8 text-muted-foreground/40 animate-spin absolute" />
+            )}
+            <img
+              src={bike.imageUrl}
+              alt={bikeTitle}
+              className={`w-full h-full object-cover group-hover:scale-105 transition-transform ${!imageLoaded ? "opacity-0" : "opacity-100"}`}
+              onLoad={() => setImageLoaded(true)}
+            />
+          </>
         ) : (
           <BikeIcon className="h-12 w-12 text-muted-foreground/30" />
         )}

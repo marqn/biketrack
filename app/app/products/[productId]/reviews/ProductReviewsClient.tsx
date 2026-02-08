@@ -93,7 +93,7 @@ export function ProductReviewsClient({
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
-        Powrot do listy produktow
+        Powrót do listy produktów
       </Link>
 
       {/* Product Header */}
@@ -117,7 +117,7 @@ export function ProductReviewsClient({
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatBox
-              label="Srednia ocena"
+              label="Średnia ocena"
               value={product.averageRating?.toFixed(1) || "–"}
               icon={
                 <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
@@ -130,7 +130,7 @@ export function ProductReviewsClient({
               icon={<Users className="w-5 h-5 text-muted-foreground" />}
             />
             <StatBox
-              label="Sr. zywotnosc"
+              label="sśr. żywotność"
               value={
                 product.averageKmLifespan
                   ? `${product.averageKmLifespan.toLocaleString("pl-PL")} km`
@@ -190,7 +190,7 @@ export function ProductReviewsClient({
         {reviews.length === 0 ? (
           <Card className="py-12">
             <CardContent className="text-center text-muted-foreground">
-              Brak opinii dla tego produktu. Badz pierwszy!
+              Brak opinii dla tego produktu. Bądź pierwszy!
             </CardContent>
           </Card>
         ) : (
