@@ -30,7 +30,8 @@ model User {
   plan          Plan      @default(FREE)
   planExpiresAt DateTime? // Data wygaśnięcia planu Premium
   bio           String?   @db.Text // Krótki opis na profilu publicznym
-  profileSlug   String?   @unique  // URL-friendly identyfikator profilu publicznego
+  profileSlug    String?   @unique  // URL-friendly identyfikator profilu publicznego
+  lastStravaSync DateTime?          // Ostatnia synchronizacja dystansów ze Strava
   accounts       Account[]
   sessions       Session[]
   bikes          Bike[]

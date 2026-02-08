@@ -194,7 +194,6 @@ export const authOptions: AuthOptions = {
           });
 
           if (!existingAccount && account) {
-            // NIE zapisuj tokenów - powodują one ERR_RESPONSE_HEADERS_TOO_BIG
             await prisma.account.create({
               data: {
                 userId: existingUser.id,
@@ -203,6 +202,19 @@ export const authOptions: AuthOptions = {
                 providerAccountId: account.providerAccountId,
                 token_type: account.token_type,
                 scope: account.scope,
+                access_token: account.access_token,
+                refresh_token: account.refresh_token,
+                expires_at: account.expires_at,
+              },
+            });
+          } else if (existingAccount && account?.provider === "strava") {
+            // Aktualizuj tokeny Strava przy każdym logowaniu
+            await prisma.account.update({
+              where: { id: existingAccount.id },
+              data: {
+                access_token: account.access_token,
+                refresh_token: account.refresh_token,
+                expires_at: account.expires_at,
               },
             });
           }

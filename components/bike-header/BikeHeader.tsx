@@ -10,7 +10,6 @@ import {
   Mail,
   History,
   Package,
-  Newspaper,
   Home,
   Pencil,
   Shield,
@@ -19,9 +18,11 @@ import {
   Trash2,
   Lock,
   Compass,
+  RefreshCw,
+  X,
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -37,13 +38,19 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from "@/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  AvatarBadge,
+} from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { Bike, BikeType } from "@/lib/generated/prisma";
 import { signOut } from "next-auth/react";
 import { useNotifications } from "@/app/hooks/useNotifications";
+import { syncStravaDistances } from "@/app/app/actions/sync-strava-distances";
 import { deleteAccount } from "./actions/delete-account";
 import { deleteBike } from "./actions/delete-bike";
 import { updateBike } from "./actions/update-bike";
@@ -67,6 +74,8 @@ interface BikeHeaderProps {
     role?: string;
     plan?: "FREE" | "PREMIUM";
   };
+  lastStravaSync?: string | null;
+  hasStrava?: boolean;
 }
 
 export type DialogType =
@@ -78,13 +87,55 @@ export type DialogType =
   | "delete-bike"
   | null;
 
-export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
+export function BikeHeader({
+  bike,
+  bikes,
+  user,
+  lastStravaSync,
+  hasStrava,
+}: BikeHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { activeDialog, openDialog, closeDialog } = useMultiDialog<DialogType>();
+  const { activeDialog, openDialog, closeDialog } =
+    useMultiDialog<DialogType>();
   const [bikeToDelete, setBikeToDelete] = useState<string | null>(null);
   const { notifications: unreadNotifications } = useNotifications();
   const unreadCount = unreadNotifications.length;
+  const [isSyncing, startSync] = useTransition();
+  const [syncDate, setSyncDate] = useState(lastStravaSync);
+  const [hasSynced, setHasSynced] = useState(false);
+  const [showStrava, setShowStrava] = useState(true);
+  const [iconVisible, setIconVisible] = useState(false);
+
+  useEffect(() => {
+    if (!hasStrava || isSyncing) return;
+    // Start fade in
+    const fadeInTimeout = setTimeout(() => setIconVisible(true), 50);
+    const interval = setInterval(() => {
+      // Fade out
+      setIconVisible(false);
+      // After fade out, switch icon and fade in
+      setTimeout(() => {
+        setShowStrava((prev) => !prev);
+        setTimeout(() => setIconVisible(true), 50);
+      }, 500);
+    }, 3000);
+    return () => {
+      clearTimeout(fadeInTimeout);
+      clearInterval(interval);
+    };
+  }, [hasStrava, isSyncing]);
+
+  const handleStravaSync = () => {
+    startSync(async () => {
+      const result = await syncStravaDistances(true);
+      if (result.synced > 0) {
+        router.refresh();
+      }
+      setSyncDate(new Date().toISOString());
+      setHasSynced(true);
+    });
+  };
 
   const initials = user.name
     .split(" ")
@@ -132,9 +183,10 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
   };
 
   // Nagłówek roweru: marka + model lub typ gdy brak
-  const bikeTitle = bike.brand || bike.model
-    ? `${bike.brand ?? ""} ${bike.model ?? ""}`.trim()
-    : bike.type;
+  const bikeTitle =
+    bike.brand || bike.model
+      ? `${bike.brand ?? ""} ${bike.model ?? ""}`.trim()
+      : bike.type;
 
   const getBikeLabel = (b: Bike) => {
     return b.brand || b.model
@@ -192,97 +244,152 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
   return (
     <header className="fixed top-0 left-0 z-50 w-screen border-b bg-card">
       <div className="container mx-auto px-8 py-3 flex items-center justify-between">
-        {/* BIKE SWITCHER */}
-        <div className="min-w-35">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="p-0 h-auto">
-                <div className="text-left">
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-lg">{bikeTitle}</h1>
-                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
+          {/* BIKE SWITCHER */}
+          <div className="min-w-35">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="p-0 h-auto">
+                  <div className="text-left">
+                    <div className="flex items-center gap-2">
+                      <h1 className="text-lg">{bikeTitle}</h1>
+                      <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {bike.type} {bike.totalKm.toLocaleString("pl-PL")} km
+                    </p>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    {bike.type} {bike.totalKm.toLocaleString("pl-PL")} km
-                  </p>
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
+                </Button>
+              </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="start" className="w-64">
-              {/* Lista rowerów */}
-              {bikes.map((b) => (
-                <DropdownMenuItem
-                  key={b.id}
-                  onClick={() => handleSwitchBike(b.id)}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-sm truncate ${b.id === bike.id ? "font-semibold" : ""}`}>
-                      {getBikeLabel(b)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {b.type} · {b.totalKm.toLocaleString("pl-PL")} km
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1 ml-2">
-                    {b.id === bike.id && (
-                      <Check className="h-4 w-4 text-primary shrink-0" />
-                    )}
-                    {hasMultipleBikes && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setBikeToDelete(b.id);
-                          openDialog("delete-bike");
-                        }}
-                        className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+              <DropdownMenuContent align="start" className="w-64">
+                {/* Lista rowerów */}
+                {bikes.map((b) => (
+                  <DropdownMenuItem
+                    key={b.id}
+                    onClick={() => handleSwitchBike(b.id)}
+                    className="flex items-center justify-between"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className={`text-sm truncate ${b.id === bike.id ? "font-semibold" : ""}`}
                       >
-                        <Trash2 className="h-3 w-3" />
-                      </button>
-                    )}
-                  </div>
-                </DropdownMenuItem>
-              ))}
+                        {getBikeLabel(b)}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {b.type} · {b.totalKm.toLocaleString("pl-PL")} km
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 ml-2">
+                      {b.id === bike.id && (
+                        <Check className="h-4 w-4 text-primary shrink-0" />
+                      )}
+                      {hasMultipleBikes && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setBikeToDelete(b.id);
+                            openDialog("delete-bike");
+                          }}
+                          className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      )}
+                    </div>
+                  </DropdownMenuItem>
+                ))}
 
-              <DropdownMenuSeparator />
+                <DropdownMenuSeparator />
 
-              {/* Edytuj aktywny rower */}
-              <DropdownMenuItem onClick={() => openDialog("rename-bike")}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Edytuj rower
-              </DropdownMenuItem>
+                {/* Edytuj aktywny rower */}
+                <DropdownMenuItem onClick={() => openDialog("rename-bike")}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edytuj rower
+                </DropdownMenuItem>
 
-              {/* Dodaj rower - premium lub upgrade CTA */}
-              {isPremium ? (
-                <DropdownMenuItem
-                  onClick={() => openDialog("add-bike")}
-                  disabled={!canAddBike}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  {canAddBike
-                    ? "Dodaj rower"
-                    : `Limit ${bikes.length}/10 rowerów`}
-                </DropdownMenuItem>
-              ) : (
-                <DropdownMenuItem onClick={() => router.push("/app/upgrade")}>
-                  <Lock className="mr-2 h-4 w-4" />
-                  Odblokuj więcej rowerów
-                  <Crown className="ml-auto h-3 w-3 text-yellow-500" />
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+                {/* Dodaj rower - premium lub upgrade CTA */}
+                {isPremium ? (
+                  <DropdownMenuItem
+                    onClick={() => openDialog("add-bike")}
+                    disabled={!canAddBike}
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    {canAddBike
+                      ? "Dodaj rower"
+                      : `Limit ${bikes.length}/10 rowerów`}
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem onClick={() => router.push("/app/upgrade")}>
+                    <Lock className="mr-2 h-4 w-4" />
+                    Odblokuj więcej rowerów
+                    <Crown className="ml-auto h-3 w-3 text-yellow-500" />
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
         {/* RIGHT SIDE */}
         <div className="flex items-center gap-4">
+          {hasStrava && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="relative"
+                      onClick={handleStravaSync}
+                      disabled={isSyncing || hasSynced}
+                    >
+                      <span className="relative h-4 w-4">
+                        <RefreshCw
+                          className={`absolute inset-0 h-4 w-4 text-orange-500 transition-opacity duration-500 ${
+                            isSyncing ? "animate-spin opacity-100" : showStrava ? "opacity-0" : iconVisible ? "opacity-100" : "opacity-0"
+                          }`}
+                        />
+                        {!isSyncing && (
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            className={`absolute inset-0 h-4 w-4 text-orange-500 transition-opacity duration-500 ${
+                              showStrava && iconVisible ? "opacity-100" : "opacity-0"
+                            }`}
+                          >
+                            <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
+                          </svg>
+                        )}
+                      </span>
+                      <span className={`absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full ${syncDate ? "bg-green-500" : "bg-destructive"}`}>
+                        {syncDate ? (
+                          <Check className="h-2.5 w-2.5 text-white" />
+                        ) : (
+                          <X className="h-2.5 w-2.5 text-destructive-foreground" />
+                        )}
+                      </span>
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {syncDate ? (
+                    <p>Strava sync: {new Date(syncDate).toLocaleString("pl-PL")}</p>
+                  ) : (
+                    <p>Strava: oczekuje na synchronizację</p>
+                  )}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+
           {user.role === "ADMIN" && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    variant={pathname?.startsWith("/admin") ? "default" : "destructive"}
+                    variant={
+                      pathname?.startsWith("/admin") ? "default" : "destructive"
+                    }
                     size="icon"
                     onClick={() => router.push("/admin/bikes")}
                   >
@@ -299,7 +406,11 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant={pathname === "/app" ? "default" : "outline"} size="icon" onClick={() => router.push("/app")}>
+                <Button
+                  variant={pathname === "/app" ? "default" : "outline"}
+                  size="icon"
+                  onClick={() => router.push("/app")}
+                >
                   <Home className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -312,7 +423,13 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant={pathname?.startsWith("/app/history") ? "default" : "outline"} size="icon" onClick={() => router.push("/app/history")}>
+                <Button
+                  variant={
+                    pathname?.startsWith("/app/history") ? "default" : "outline"
+                  }
+                  size="icon"
+                  onClick={() => router.push("/app/history")}
+                >
                   <History className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -325,7 +442,15 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant={pathname?.startsWith("/app/products") ? "default" : "outline"} size="icon" onClick={() => router.push("/app/products")}>
+                <Button
+                  variant={
+                    pathname?.startsWith("/app/products")
+                      ? "default"
+                      : "outline"
+                  }
+                  size="icon"
+                  onClick={() => router.push("/app/products")}
+                >
                   <Package className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -338,7 +463,15 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant={pathname?.startsWith("/app/discover") ? "default" : "outline"} size="icon" onClick={() => router.push("/app/discover")}>
+                <Button
+                  variant={
+                    pathname?.startsWith("/app/discover")
+                      ? "default"
+                      : "outline"
+                  }
+                  size="icon"
+                  onClick={() => router.push("/app/discover")}
+                >
                   <Compass className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -348,24 +481,15 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
             </Tooltip>
           </TooltipProvider>
 
-          {/* <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant={pathname?.startsWith("/app/blog") ? "default" : "outline"} size="icon" onClick={() => router.push("/app/blog")}>
-                  <Newspaper className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Aktualności</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider> */}
-
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant={pathname?.startsWith("/app/messages") ? "default" : "outline"}
+                  variant={
+                    pathname?.startsWith("/app/messages")
+                      ? "default"
+                      : "outline"
+                  }
                   size="icon"
                   className="relative"
                   onClick={() => router.push("/app/messages")}
@@ -387,7 +511,9 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="p-0">
-                <Avatar className={`h-9 w-9 ${user.plan === "PREMIUM" ? "ring-2 ring-blue-500" : ""}`}>
+                <Avatar
+                  className={`h-9 w-9 ${user.plan === "PREMIUM" ? "ring-2 ring-blue-500" : ""}`}
+                >
                   <AvatarImage src={user.image ?? undefined} />
                   <AvatarFallback>{initials}</AvatarFallback>
                   {user.plan === "PREMIUM" && (
@@ -404,7 +530,10 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
               <div className="p-2">
                 <p className="text-sm font-medium">
                   {user.name}{" "}
-                  <Badge className="mt-1" variant={user.plan === "PREMIUM" ? "default" : "secondary"}>
+                  <Badge
+                    className="mt-1"
+                    variant={user.plan === "PREMIUM" ? "default" : "secondary"}
+                  >
                     {user.plan === "PREMIUM" ? "PREMIUM" : "FREE"}
                   </Badge>
                 </p>
@@ -431,9 +560,7 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
                 <LogOut className="mr-2 h-4 w-4" />
                 Wyloguj
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => openDialog("delete-account")}
-              >
+              <DropdownMenuItem onClick={() => openDialog("delete-account")}>
                 <Delete className="mr-2 h-4 w-4" />
                 Usuń konto
               </DropdownMenuItem>

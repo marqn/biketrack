@@ -30,7 +30,8 @@ import {
   uploadBikeImage,
   removeBikeImage,
 } from "@/app/app/actions/upload-bike-image";
-import { Camera, Globe, X } from "lucide-react";
+import { Camera, Copy, Check, X } from "lucide-react";
+import Link from "next/link";
 import { VisibilityButton } from "@/components/icon/visibility-button/VisibilityButton";
 
 interface RenameBikeDialogProps {
@@ -79,6 +80,7 @@ export function RenameBikeDialog({
 
   const [isLoading, setIsLoading] = useState(false);
   const [visibilityLoading, setVisibilityLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [visibilitySlug, setVisibilitySlug] = useState<string | null>(
     bike.slug ?? null,
   );
@@ -305,7 +307,14 @@ export function RenameBikeDialog({
           </div>
 
           {/* Widoczność publiczna */}
-          <div className="rounded-lg border p-4 space-y-2">
+          <div
+            className="rounded-lg border p-4 space-y-2 cursor-pointer"
+            onClick={() => {
+              if (!isLoading && !visibilityLoading) {
+                handleVisibilityChange(!isPublic);
+              }
+            }}
+          >
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
@@ -328,19 +337,38 @@ export function RenameBikeDialog({
                 checked={isPublic}
                 onCheckedChange={handleVisibilityChange}
                 disabled={isLoading || visibilityLoading}
+                onClick={(e) => e.stopPropagation()}
               />
             </div>
             {visibilityLoading && (
               <p className="text-xs text-muted-foreground">Zapisywanie...</p>
             )}
             {isPublic && visibilitySlug && !visibilityLoading && (
-              <p className="text-xs text-green-600">
-                Rower jest publiczny: /app/discover/bike/{visibilitySlug}
+              <p className="text-xs text-green-600 flex items-center gap-1">
+                Rower jest publiczny: <Link
+                  className="text-xs text-blue-600"
+                  href={`/app/discover/bike/${visibilitySlug}`}
+                  onClick={(e) => { e.stopPropagation(); onOpenChange(false); }}
+                >
+                  /app/discover/bike/{visibilitySlug}
+                </Link>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigator.clipboard.writeText(`${window.location.origin}/app/discover/bike/${visibilitySlug}`);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="text-muted-foreground hover:text-foreground cursor-pointer"
+                >
+                  {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
+                </button>
               </p>
             )}
             {!isPublic && !visibilityLoading && visibilitySlug && (
-              <p className="text-xs text-muted-foreground text-yellow-400">
-                Rower jest prywatny
+              <p className="text-xs text-yellow-400">
+                Rower jest niewidoczny dla innych.
               </p>
             )}
           </div>

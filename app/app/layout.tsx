@@ -19,6 +19,11 @@ export default async function RootLayout({
       where: { id: session.user.id },
       include: {
         bikes: true,
+        accounts: {
+          where: { provider: "strava" },
+          select: { id: true },
+          take: 1,
+        },
       },
     });
 
@@ -81,6 +86,8 @@ export default async function RootLayout({
           role: user.role,
           plan: isPremium ? "PREMIUM" as const : "FREE" as const,
         },
+        lastStravaSync: user.lastStravaSync?.toISOString() ?? null,
+        hasStrava: user.accounts.length > 0,
       };
     }
   }

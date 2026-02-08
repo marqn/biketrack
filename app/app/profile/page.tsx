@@ -583,9 +583,12 @@ export default function ProfilePage() {
               </button>
             )}
           </div>
-          <p className="text-sm text-muted-foreground mb-4">
-            Twoje bio jest widoczne na Twoim publicznym profilu, gdy masz publiczne rowery.
-          </p>
+          <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg flex gap-3">
+            <Info className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+            <p className="text-sm text-muted-foreground">
+              Twój opis jest widoczny na Twoim publicznym profilu, gdy masz publiczne rowery.
+            </p>
+          </div>
           {isEditing.bio ? (
             <div>
               <textarea

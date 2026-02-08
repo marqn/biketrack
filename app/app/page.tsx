@@ -9,6 +9,7 @@ import { DEFAULT_PARTS, EBIKE_PARTS } from "@/lib/default-parts";
 import { NotificationsList } from "@/components/notifications-list/NotificationsList";
 import { ensureEmailMissingNotification } from "@/lib/nofifications/emailMissing";
 import PartsAccordion from "@/components/parts-accordion/PartsAccordion";
+import { StravaSyncTrigger } from "@/components/strava-sync-trigger";
 import { cookies } from "next/headers";
 
 export default async function AppPage() {
@@ -78,6 +79,12 @@ export default async function AppPage() {
 
   if (!bike) redirect("/onboarding");
 
+  // Sprawdź czy user ma konto Strava (do auto-sync dystansów)
+  const stravaAccount = await prisma.account.findFirst({
+    where: { userId: session.user.id, provider: "strava" },
+    select: { id: true },
+  });
+
   const lastLube = bike.services[0];
 
   // Przygotuj dane dla PartsAccordion
@@ -96,7 +103,7 @@ export default async function AppPage() {
 
   return (
     <div className="space-y-6 lg:px-24 lg:space-6">
-      {/* <NotificationsList /> */}
+      {stravaAccount && <StravaSyncTrigger />}
 
       <KmForm bikeId={bike.id} initialKm={bike.totalKm} />
 
