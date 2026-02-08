@@ -26,8 +26,12 @@ import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels, BikeProduct } from "@/lib/types";
 import BikeBrandModelFields from "@/components/bike/BikeBrandModelFields";
 import { toggleBikeVisibility } from "@/app/app/actions/toggle-bike-visibility";
-import { uploadBikeImage, removeBikeImage } from "@/app/app/actions/upload-bike-image";
+import {
+  uploadBikeImage,
+  removeBikeImage,
+} from "@/app/app/actions/upload-bike-image";
 import { Camera, Globe, X } from "lucide-react";
+import { VisibilityButton } from "@/components/icon/visibility-button/VisibilityButton";
 
 interface RenameBikeDialogProps {
   open: boolean;
@@ -62,16 +66,22 @@ export function RenameBikeDialog({
 }: RenameBikeDialogProps) {
   const [brand, setBrand] = useState(bike.brand ?? "");
   const [model, setModel] = useState(bike.model ?? "");
-  const [year, setYear] = useState(bike.year?.toString() ?? new Date().getFullYear().toString());
+  const [year, setYear] = useState(
+    bike.year?.toString() ?? new Date().getFullYear().toString(),
+  );
   const [type, setType] = useState<BikeType>(bike.type);
   const [isElectric, setIsElectric] = useState(bike.isElectric ?? false);
   const [description, setDescription] = useState(bike.description ?? "");
   const [isPublic, setIsPublic] = useState(bike.isPublic ?? false);
-  const [bikeImage, setBikeImage] = useState<string | null>(bike.imageUrl ?? null);
+  const [bikeImage, setBikeImage] = useState<string | null>(
+    bike.imageUrl ?? null,
+  );
 
   const [isLoading, setIsLoading] = useState(false);
   const [visibilityLoading, setVisibilityLoading] = useState(false);
-  const [visibilitySlug, setVisibilitySlug] = useState<string | null>(bike.slug ?? null);
+  const [visibilitySlug, setVisibilitySlug] = useState<string | null>(
+    bike.slug ?? null,
+  );
 
   const handleVisibilityChange = async (checked: boolean) => {
     setVisibilityLoading(true);
@@ -211,7 +221,10 @@ export function RenameBikeDialog({
                 onCheckedChange={(checked) => setIsElectric(checked === true)}
                 disabled={isLoading}
               />
-              <Label htmlFor="is-electric" className="cursor-pointer whitespace-nowrap">
+              <Label
+                htmlFor="is-electric"
+                className="cursor-pointer whitespace-nowrap"
+              >
                 E-bike
               </Label>
             </div>
@@ -237,9 +250,10 @@ export function RenameBikeDialog({
               disabled={isLoading}
             />
             <p className="text-xs text-muted-foreground">
-              Twój opis będzie widoczny dla innych użytkowników. Pochwal się swoim setupem,
-              opisz modyfikacje lub podziel się tym, co sprawia że ten rower jest wyjątkowy.
-              Inni będą mogli komentować i proponować ulepszenia!
+              Twój opis będzie widoczny dla innych użytkowników. Pochwal się
+              swoim setupem, opisz modyfikacje lub podziel się tym, co sprawia
+              że ten rower jest wyjątkowy. Inni będą mogli komentować i
+              proponować ulepszenia!
             </p>
           </div>
 
@@ -295,7 +309,11 @@ export function RenameBikeDialog({
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
-                  <Globe className="h-4 w-4 text-muted-foreground" />
+                  <VisibilityButton
+                    isVisible={isPublic}
+                    onClick={() => setIsPublic((prev) => !prev)}
+                  />
+
                   <Label htmlFor="bike-public" className="cursor-pointer">
                     Rower publiczny
                   </Label>
