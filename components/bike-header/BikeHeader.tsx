@@ -170,97 +170,109 @@ export function BikeHeader({ bike, bikes, user }: BikeHeaderProps) {
     return () => window.removeEventListener("open-email-dialog", handler);
   }, []);
 
+  if (!mounted) {
+    return (
+      <header className="fixed top-0 left-0 z-50 w-screen border-b bg-card">
+        <div className="container mx-auto px-8 py-3 flex items-center justify-between">
+          <div className="min-w-35 space-y-2">
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-4 w-24" />
+          </div>
+          <div className="flex items-center gap-4">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-9 w-9 rounded-md" />
+            ))}
+            <Skeleton className="h-9 w-9 rounded-full" />
+          </div>
+        </div>
+      </header>
+    );
+  }
+
   return (
     <header className="fixed top-0 left-0 z-50 w-screen border-b bg-card">
       <div className="container mx-auto px-8 py-3 flex items-center justify-between">
         {/* BIKE SWITCHER */}
         <div className="min-w-35">
-          {!mounted ? (
-            <div className="space-y-2">
-              <Skeleton className="h-5 w-32" />
-              <Skeleton className="h-4 w-24" />
-            </div>
-          ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="p-0 h-auto">
-                  <div className="text-left">
-                    <div className="flex items-center gap-2">
-                      <h1 className="text-lg">{bikeTitle}</h1>
-                      <ChevronDown className="h-3 w-3 text-muted-foreground" />
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {bike.type} {bike.totalKm.toLocaleString("pl-PL")} km
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="p-0 h-auto">
+                <div className="text-left">
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-lg">{bikeTitle}</h1>
+                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {bike.type} {bike.totalKm.toLocaleString("pl-PL")} km
+                  </p>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="start" className="w-64">
+              {/* Lista rowerów */}
+              {bikes.map((b) => (
+                <DropdownMenuItem
+                  key={b.id}
+                  onClick={() => handleSwitchBike(b.id)}
+                  className="flex items-center justify-between"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm truncate ${b.id === bike.id ? "font-semibold" : ""}`}>
+                      {getBikeLabel(b)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {b.type} · {b.totalKm.toLocaleString("pl-PL")} km
                     </p>
                   </div>
-                </Button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="start" className="w-64">
-                {/* Lista rowerów */}
-                {bikes.map((b) => (
-                  <DropdownMenuItem
-                    key={b.id}
-                    onClick={() => handleSwitchBike(b.id)}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm truncate ${b.id === bike.id ? "font-semibold" : ""}`}>
-                        {getBikeLabel(b)}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {b.type} · {b.totalKm.toLocaleString("pl-PL")} km
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1 ml-2">
-                      {b.id === bike.id && (
-                        <Check className="h-4 w-4 text-primary shrink-0" />
-                      )}
-                      {hasMultipleBikes && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setBikeToDelete(b.id);
-                            openDialog("delete-bike");
-                          }}
-                          className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </button>
-                      )}
-                    </div>
-                  </DropdownMenuItem>
-                ))}
-
-                <DropdownMenuSeparator />
-
-                {/* Edytuj aktywny rower */}
-                <DropdownMenuItem onClick={() => openDialog("rename-bike")}>
-                  <Pencil className="mr-2 h-4 w-4" />
-                  Edytuj rower
+                  <div className="flex items-center gap-1 ml-2">
+                    {b.id === bike.id && (
+                      <Check className="h-4 w-4 text-primary shrink-0" />
+                    )}
+                    {hasMultipleBikes && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setBikeToDelete(b.id);
+                          openDialog("delete-bike");
+                        }}
+                        className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
                 </DropdownMenuItem>
+              ))}
 
-                {/* Dodaj rower - premium lub upgrade CTA */}
-                {isPremium ? (
-                  <DropdownMenuItem
-                    onClick={() => openDialog("add-bike")}
-                    disabled={!canAddBike}
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    {canAddBike
-                      ? "Dodaj rower"
-                      : `Limit ${bikes.length}/10 rowerów`}
-                  </DropdownMenuItem>
-                ) : (
-                  <DropdownMenuItem onClick={() => router.push("/app/upgrade")}>
-                    <Lock className="mr-2 h-4 w-4" />
-                    Odblokuj więcej rowerów
-                    <Crown className="ml-auto h-3 w-3 text-yellow-500" />
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+              <DropdownMenuSeparator />
+
+              {/* Edytuj aktywny rower */}
+              <DropdownMenuItem onClick={() => openDialog("rename-bike")}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Edytuj rower
+              </DropdownMenuItem>
+
+              {/* Dodaj rower - premium lub upgrade CTA */}
+              {isPremium ? (
+                <DropdownMenuItem
+                  onClick={() => openDialog("add-bike")}
+                  disabled={!canAddBike}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  {canAddBike
+                    ? "Dodaj rower"
+                    : `Limit ${bikes.length}/10 rowerów`}
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem onClick={() => router.push("/app/upgrade")}>
+                  <Lock className="mr-2 h-4 w-4" />
+                  Odblokuj więcej rowerów
+                  <Crown className="ml-auto h-3 w-3 text-yellow-500" />
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* RIGHT SIDE */}
