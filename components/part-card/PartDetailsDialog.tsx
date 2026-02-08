@@ -92,10 +92,10 @@ export default function PartDetailsDialog({
 
         if (currentPart.installedAt) {
           const date = new Date(currentPart.installedAt);
-          setInstalledAt(date.toISOString().split("T")[0]);
+          setInstalledAt(format(date, "yyyy-MM-dd"));
         } else {
           const today = new Date();
-          setInstalledAt(today.toISOString().split("T")[0]);
+          setInstalledAt(format(today, "yyyy-MM-dd"));
         }
 
         if (currentPart.partSpecificData) {
@@ -130,7 +130,7 @@ export default function PartDetailsDialog({
         setModel("");
         setUnknownProduct(true);
         const date = new Date(currentPart.installedAt);
-        setInstalledAt(date.toISOString().split("T")[0]);
+        setInstalledAt(format(date, "yyyy-MM-dd"));
         setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
         setRating(0);
         setReviewText("");
@@ -141,7 +141,7 @@ export default function PartDetailsDialog({
         setModel(initialModel || "");
         setUnknownProduct(false);
         const today = new Date();
-        setInstalledAt(today.toISOString().split("T")[0]);
+        setInstalledAt(format(today, "yyyy-MM-dd"));
         setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
         setRating(0);
         setReviewText(initialNotes || "");
@@ -152,7 +152,7 @@ export default function PartDetailsDialog({
         setModel("");
         setUnknownProduct(false);
         const today = new Date();
-        setInstalledAt(today.toISOString().split("T")[0]);
+        setInstalledAt(format(today, "yyyy-MM-dd"));
         setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
         setRating(0);
         setReviewText("");
@@ -337,7 +337,7 @@ export default function PartDetailsDialog({
                   selected={installedAt ? new Date(installedAt) : undefined}
                   onSelect={(date) => {
                     if (date) {
-                      setInstalledAt(date.toISOString().split("T")[0]);
+                      setInstalledAt(format(date, "yyyy-MM-dd"));
                     }
                   }}
                   disabled={(date) => date > new Date()}
