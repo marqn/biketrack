@@ -108,6 +108,11 @@ export function BikeHeader({
   const [iconVisible, setIconVisible] = useState(false);
 
   useEffect(() => {
+    setSyncDate(lastStravaSync);
+    setHasSynced(false);
+  }, [lastStravaSync]);
+
+  useEffect(() => {
     if (!hasStrava || isSyncing) return;
     // Start fade in
     const fadeInTimeout = setTimeout(() => setIconVisible(true), 50);

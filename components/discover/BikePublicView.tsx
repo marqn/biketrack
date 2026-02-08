@@ -67,20 +67,14 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: Bik
       {/* Header z informacjami o rowerze */}
       <div className="bg-card rounded-xl border overflow-hidden">
         {/* Zdjęcie roweru */}
-        {isLoggedIn ? (
-          bike.imageUrl ? (
-            <div className="w-full h-64 bg-muted">
-              <img
-                src={bike.imageUrl}
-                alt={bikeTitle}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ) : (
-            <div className="w-full h-40 bg-muted flex items-center justify-center">
-              <BikeIcon className="h-16 w-16 text-muted-foreground/30" />
-            </div>
-          )
+        {bike.imageUrl ? (
+          <div className="w-full h-64 bg-muted">
+            <img
+              src={bike.imageUrl}
+              alt={bikeTitle}
+              className="w-full h-full object-cover"
+            />
+          </div>
         ) : (
           <div className="w-full h-40 bg-muted flex items-center justify-center">
             <BikeIcon className="h-16 w-16 text-muted-foreground/30" />
