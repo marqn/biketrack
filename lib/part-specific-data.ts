@@ -7,7 +7,7 @@ export type TireSpecificData = {
 };
 
 export type ChainSpecificData = {
-  speeds: number; // 10, 11, 12
+  speeds: 1 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 };
 
 export type CassetteSpecificData = {
