@@ -121,7 +121,7 @@ export default function PartsAccordion({
                   }
                   currentPart={existingPart as BikePartWithProduct | undefined}
                   isAccessory={category === "accessories"}
-                  isInstalled={existingPart?.isInstalled ?? true}
+                  isInstalled={existingPart?.isInstalled ?? (category !== "accessories")}
                   createdAt={existingPart?.createdAt}
                 >
                   {partType === PartType.CHAIN && chainChildren}

@@ -30,6 +30,12 @@ import ChainFields from "./specific-fields/ChainFields";
 import CassetteFields from "./specific-fields/CassetteFields";
 import PadsFields from "./specific-fields/PadsFields";
 import ForkFields from "./specific-fields/ForkFields";
+import SeatpostFields from "./specific-fields/SeatpostFields";
+import SpokesFields from "./specific-fields/SpokesFields";
+import HubsFields from "./specific-fields/HubsFields";
+import FrameFields from "./specific-fields/FrameFields";
+import BottomBracketFields from "./specific-fields/BottomBracketFields";
+import CranksetFields from "./specific-fields/CranksetFields";
 import {
   getDefaultSpecificData,
   hasSpecificFields,
@@ -38,6 +44,12 @@ import {
   CassetteSpecificData,
   PadsSpecificData,
   ForkSpecificData,
+  SeatpostSpecificData,
+  SpokesSpecificData,
+  HubsSpecificData,
+  FrameSpecificData,
+  BottomBracketSpecificData,
+  CranksetSpecificData,
 } from "@/lib/part-specific-data";
 
 interface PartDetailsDialogProps {
@@ -210,6 +222,13 @@ export default function PartDetailsDialog({
     if (!hasSpecificFields(partType)) return null;
 
     switch (partType) {
+      case PartType.FRAME:
+        return (
+          <FrameFields
+            data={partSpecificData as Partial<FrameSpecificData>}
+            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+          />
+        );
       case PartType.TIRE_FRONT:
       case PartType.TIRE_REAR:
         return (
@@ -244,6 +263,41 @@ export default function PartDetailsDialog({
         return (
           <ForkFields
             data={partSpecificData as Partial<ForkSpecificData>}
+            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.SEATPOST:
+        return (
+          <SeatpostFields
+            data={partSpecificData as Partial<SeatpostSpecificData>}
+            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.SPOKES:
+        return (
+          <SpokesFields
+            data={partSpecificData as Partial<SpokesSpecificData>}
+            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.HUBS:
+        return (
+          <HubsFields
+            data={partSpecificData as Partial<HubsSpecificData>}
+            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.BOTTOM_BRACKET:
+        return (
+          <BottomBracketFields
+            data={partSpecificData as Partial<BottomBracketSpecificData>}
+            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.CRANKSET:
+        return (
+          <CranksetFields
+            data={partSpecificData as Partial<CranksetSpecificData>}
             onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
           />
         );

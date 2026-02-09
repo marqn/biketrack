@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { DEFAULT_PARTS } from "@/lib/default-parts";
+import { DEFAULT_PARTS, getPartCategory } from "@/lib/default-parts";
 import { BikeType, PartType } from "@/lib/generated/prisma";
 
 /**
@@ -46,6 +46,7 @@ export async function syncBikeParts(bikeId: string) {
         type: p.type,
         expectedKm: p.expectedKm,
         wearKm: bike.totalKm,
+        isInstalled: getPartCategory(p.type) !== "accessories",
       })),
     });
     addedCount = missingParts.length;

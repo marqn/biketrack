@@ -24,6 +24,37 @@ export type ForkSpecificData = {
   material: "aluminum" | "steel" | "carbon" | "titanium";
 };
 
+export type SeatpostSpecificData = {
+  material: "aluminum" | "carbon";
+};
+
+export type SpokesSpecificData = {
+  material: "aluminum" | "brass" | "stainless-steel";
+};
+
+export type HubsSpecificData = {
+  discMount: "centerlock" | "6-bolt" | "none";
+  bearings: "loose-ball" | "cartridge";
+  holes: 24 | 28 | 32 | 36;
+};
+
+export type FrameSpecificData = {
+  material: "aluminum" | "carbon" | "titanium" | "steel";
+  brakeType: "rim" | "disc" | "disc-hydraulic" | "v-brake";
+  wheelSize: "24" | "26" | "27.5" | "28" | "29";
+  frameSize: "xs" | "s" | "m" | "l" | "xl" | "xxl" | "one-size";
+  gender: "women" | "men";
+};
+
+export type BottomBracketSpecificData = {
+  shellType: "square" | "bsa" | "ita" | "t47" | "press-fit";
+};
+
+export type CranksetSpecificData = {
+  chainring: 28 | 30 | 32 | 34 | 36 | 38 | 39 | 40 | 42 | 46 | 48;
+  length: "160" | "165" | "167.5" | "170" | "172.5" | "175" | "177.5";
+};
+
 export type SuspensionSpecificData = {
   travel: number; // mm
 };
@@ -53,6 +84,7 @@ export type BatterySpecificData = {
 export type ControllerSpecificData = Record<string, never>;
 
 export type PartSpecificDataMap = {
+  [PartType.FRAME]: FrameSpecificData;
   [PartType.TIRE_FRONT]: TireSpecificData;
   [PartType.TIRE_REAR]: TireSpecificData;
   [PartType.CHAIN]: ChainSpecificData;
@@ -60,6 +92,11 @@ export type PartSpecificDataMap = {
   [PartType.PADS_FRONT]: PadsSpecificData;
   [PartType.PADS_REAR]: PadsSpecificData;
   [PartType.FORK]: ForkSpecificData;
+  [PartType.SEATPOST]: SeatpostSpecificData;
+  [PartType.SPOKES]: SpokesSpecificData;
+  [PartType.HUBS]: HubsSpecificData;
+  [PartType.BOTTOM_BRACKET]: BottomBracketSpecificData;
+  [PartType.CRANKSET]: CranksetSpecificData;
   [PartType.SUSPENSION_FORK]: SuspensionSpecificData;
   [PartType.CHAINRING_1X]: ChainringSpecificData;
   [PartType.TUBELESS_SEALANT]: TubelessSealantSpecificData;
@@ -77,6 +114,7 @@ export function getDefaultSpecificData(
   type: PartType
 ): Partial<PartSpecificDataMap[PartType]> {
   const defaults: Partial<Record<PartType, unknown>> = {
+    [PartType.FRAME]: { material: "aluminum", brakeType: "disc", wheelSize: "28", frameSize: "m", gender: "men" },
     [PartType.TIRE_FRONT]: { width: 28, size: 700, tubeless: false },
     [PartType.TIRE_REAR]: { width: 28, size: 700, tubeless: false },
     [PartType.CHAIN]: { speeds: 11 },
@@ -84,6 +122,11 @@ export function getDefaultSpecificData(
     [PartType.PADS_FRONT]: { material: "organic" },
     [PartType.PADS_REAR]: { material: "organic" },
     [PartType.FORK]: { wheelSize: "28", material: "aluminum" },
+    [PartType.SEATPOST]: { material: "aluminum" },
+    [PartType.SPOKES]: { material: "stainless-steel" },
+    [PartType.HUBS]: { discMount: "centerlock", bearings: "cartridge", holes: 32 },
+    [PartType.BOTTOM_BRACKET]: { shellType: "bsa" },
+    [PartType.CRANKSET]: { chainring: 34, length: "170" },
     [PartType.SUSPENSION_FORK]: { travel: 100 },
     [PartType.CHAINRING_1X]: { teeth: 32 },
     [PartType.TUBELESS_SEALANT]: { volume: 60 },
@@ -101,6 +144,7 @@ export function getDefaultSpecificData(
 
 export function hasSpecificFields(type: PartType): boolean {
   const typesWithFields: PartType[] = [
+    PartType.FRAME,
     PartType.TIRE_FRONT,
     PartType.TIRE_REAR,
     PartType.CHAIN,
@@ -108,6 +152,11 @@ export function hasSpecificFields(type: PartType): boolean {
     PartType.PADS_FRONT,
     PartType.PADS_REAR,
     PartType.FORK,
+    PartType.SEATPOST,
+    PartType.SPOKES,
+    PartType.HUBS,
+    PartType.BOTTOM_BRACKET,
+    PartType.CRANKSET,
     PartType.SUSPENSION_FORK,
     PartType.CHAINRING_1X,
     PartType.TUBELESS_SEALANT,

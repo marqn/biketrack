@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { BikeType } from "@/lib/generated/prisma";
-import { DEFAULT_PARTS, EBIKE_PARTS } from "@/lib/default-parts";
+import { DEFAULT_PARTS, EBIKE_PARTS, getPartCategory } from "@/lib/default-parts";
 import { revalidatePath } from "next/cache";
 
 const MAX_BIKES_FREE = 1;
@@ -158,6 +158,7 @@ export async function addBike({
           expectedKm: p.expectedKm,
           productId: p.productId || undefined,
           installedAt: p.productId ? new Date() : undefined,
+          isInstalled: getPartCategory(p.type) !== "accessories",
         })),
       },
     },
