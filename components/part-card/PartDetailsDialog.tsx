@@ -36,6 +36,8 @@ import HubsFields from "./specific-fields/HubsFields";
 import FrameFields from "./specific-fields/FrameFields";
 import BottomBracketFields from "./specific-fields/BottomBracketFields";
 import CranksetFields from "./specific-fields/CranksetFields";
+import DerailleurRearFields from "./specific-fields/DerailleurRearFields";
+import PedalsFields from "./specific-fields/PedalsFields";
 import {
   getDefaultSpecificData,
   hasSpecificFields,
@@ -50,6 +52,8 @@ import {
   FrameSpecificData,
   BottomBracketSpecificData,
   CranksetSpecificData,
+  DerailleurRearSpecificData,
+  PedalsSpecificData,
 } from "@/lib/part-specific-data";
 
 interface PartDetailsDialogProps {
@@ -298,6 +302,20 @@ export default function PartDetailsDialog({
         return (
           <CranksetFields
             data={partSpecificData as Partial<CranksetSpecificData>}
+            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.DERAILLEUR_REAR:
+        return (
+          <DerailleurRearFields
+            data={partSpecificData as Partial<DerailleurRearSpecificData>}
+            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.PEDALS:
+        return (
+          <PedalsFields
+            data={partSpecificData as Partial<PedalsSpecificData>}
             onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
           />
         );

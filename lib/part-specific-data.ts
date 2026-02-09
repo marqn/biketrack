@@ -63,6 +63,19 @@ export type TubelessSealantSpecificData = {
   volume: number; // ml
 };
 
+export type PedalsSpecificData = {
+  clipless: "no" | "yes" | "one-sided" | "magnetic" | "two-sided";
+  bearings: "ceramic" | "needle" | "ball" | "cartridge" | "steel" | "bushing";
+  platform: boolean;
+  bodyMaterial: "aluminum" | "carbon" | "composite" | "nylon" | "steel" | "magnesium" | "plastic" | "titanium" | "fiberglass";
+};
+
+export type DerailleurRearSpecificData = {
+  speeds: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
+  derailleurType: "mechanical" | "electronic" | "wireless";
+  drivetrain: string;
+};
+
 export type LubricantSpecificData = {
   lubricantType: "wax" | "oil";
 };
@@ -97,6 +110,8 @@ export type PartSpecificDataMap = {
   [PartType.TUBELESS_SEALANT]: TubelessSealantSpecificData;
   [PartType.DROPPER_POST]: SuspensionSpecificData;
   [PartType.SUSPENSION_SEATPOST]: SuspensionSpecificData;
+  [PartType.PEDALS]: PedalsSpecificData;
+  [PartType.DERAILLEUR_REAR]: DerailleurRearSpecificData;
   [PartType.HANDLEBAR_TAPE]: Record<string, never>; // Brak specyficznych pól
   [PartType.LUBRICANT]: LubricantSpecificData;
   // E-bike
@@ -126,6 +141,8 @@ export function getDefaultSpecificData(
     [PartType.TUBELESS_SEALANT]: { volume: 60 },
     [PartType.DROPPER_POST]: { travel: 150 },
     [PartType.SUSPENSION_SEATPOST]: { travel: 50 },
+    [PartType.PEDALS]: { clipless: "no", bearings: "cartridge", platform: true, bodyMaterial: "aluminum" },
+    [PartType.DERAILLEUR_REAR]: { speeds: 11, derailleurType: "mechanical", drivetrain: "1x11" },
     [PartType.HANDLEBAR_TAPE]: {},
     [PartType.LUBRICANT]: { lubricantType: "oil" },
     // E-bike
@@ -151,6 +168,8 @@ export function hasSpecificFields(type: PartType): boolean {
     PartType.HUBS,
     PartType.BOTTOM_BRACKET,
     PartType.CRANKSET,
+    PartType.PEDALS,
+    PartType.DERAILLEUR_REAR,
     PartType.SUSPENSION_FORK,
     PartType.TUBELESS_SEALANT,
     PartType.DROPPER_POST,
