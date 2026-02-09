@@ -11,8 +11,8 @@ export type ChainSpecificData = {
 };
 
 export type CassetteSpecificData = {
-  range: string; // "11-34", "10-52"
-  speeds: number;
+  range: string;
+  speeds: 1 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 };
 
 export type PadsSpecificData = {
@@ -59,10 +59,6 @@ export type SuspensionSpecificData = {
   travel: number; // mm
 };
 
-export type ChainringSpecificData = {
-  teeth: number;
-};
-
 export type TubelessSealantSpecificData = {
   volume: number; // ml
 };
@@ -98,7 +94,6 @@ export type PartSpecificDataMap = {
   [PartType.BOTTOM_BRACKET]: BottomBracketSpecificData;
   [PartType.CRANKSET]: CranksetSpecificData;
   [PartType.SUSPENSION_FORK]: SuspensionSpecificData;
-  [PartType.CHAINRING_1X]: ChainringSpecificData;
   [PartType.TUBELESS_SEALANT]: TubelessSealantSpecificData;
   [PartType.DROPPER_POST]: SuspensionSpecificData;
   [PartType.SUSPENSION_SEATPOST]: SuspensionSpecificData;
@@ -128,7 +123,6 @@ export function getDefaultSpecificData(
     [PartType.BOTTOM_BRACKET]: { shellType: "bsa" },
     [PartType.CRANKSET]: { chainring: 34, length: "170" },
     [PartType.SUSPENSION_FORK]: { travel: 100 },
-    [PartType.CHAINRING_1X]: { teeth: 32 },
     [PartType.TUBELESS_SEALANT]: { volume: 60 },
     [PartType.DROPPER_POST]: { travel: 150 },
     [PartType.SUSPENSION_SEATPOST]: { travel: 50 },
@@ -158,7 +152,6 @@ export function hasSpecificFields(type: PartType): boolean {
     PartType.BOTTOM_BRACKET,
     PartType.CRANKSET,
     PartType.SUSPENSION_FORK,
-    PartType.CHAINRING_1X,
     PartType.TUBELESS_SEALANT,
     PartType.DROPPER_POST,
     PartType.SUSPENSION_SEATPOST,

@@ -43,13 +43,6 @@ const PART_TYPE_MAPPINGS: Record<string, PartType> = {
   'kurbel': PartType.CRANKSET,
   'kurbelgarnitur': PartType.CRANKSET,
 
-  // === ZĘBATKA 1X ===
-  'chainring': PartType.CHAINRING_1X,
-  'chainring 1x': PartType.CHAINRING_1X,
-  'zębatka': PartType.CHAINRING_1X,
-  'tarcza korby': PartType.CHAINRING_1X,
-  'kettenblatt': PartType.CHAINRING_1X,
-
   // === ŁAŃCUCH ===
   'chain': PartType.CHAIN,
   'łańcuch': PartType.CHAIN,

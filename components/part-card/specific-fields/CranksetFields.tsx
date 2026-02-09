@@ -42,7 +42,7 @@ const LENGTHS = [
 export default function CranksetFields({ data, onChange }: CranksetFieldsProps) {
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">Specyfikacja korby</h4>
+      <h4 className="text-sm font-medium">Specyfikacja mechanizmu korbowego</h4>
 
       <div className="space-y-2">
         <Label htmlFor="crankset-chainring">Stopniowanie</Label>

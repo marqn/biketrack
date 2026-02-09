@@ -20,7 +20,6 @@ export const FALLBACK_EXPECTED_KM: Record<PartType, number> = {
 
   // Napęd
   [PartType.CRANKSET]: 25000,
-  [PartType.CHAINRING_1X]: 10000,
   [PartType.CHAIN]: 2000,
   [PartType.CASSETTE]: 6000,
   [PartType.DERAILLEUR_FRONT]: 30000,

@@ -14,7 +14,6 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.BOTTOM_BRACKET, expectedKm: 15000 },
     // Napęd
     { type: PartType.CRANKSET, expectedKm: 30000 },
-    { type: PartType.CHAINRING_1X, expectedKm: 10000 },
     { type: PartType.CHAIN, expectedKm: 2500 },
     { type: PartType.CASSETTE, expectedKm: 8000 },
     { type: PartType.DERAILLEUR_FRONT, expectedKm: 30000 },
@@ -56,7 +55,6 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.BOTTOM_BRACKET, expectedKm: 12000 },
     // Napęd
     { type: PartType.CRANKSET, expectedKm: 25000 },
-    { type: PartType.CHAINRING_1X, expectedKm: 10000 },
     { type: PartType.CHAIN, expectedKm: 2000 },
     { type: PartType.CASSETTE, expectedKm: 6000 },
     { type: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
@@ -101,7 +99,6 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.BOTTOM_BRACKET, expectedKm: 10000 },
     // Napęd
     { type: PartType.CRANKSET, expectedKm: 20000 },
-    { type: PartType.CHAINRING_1X, expectedKm: 10000 },
     { type: PartType.CHAIN, expectedKm: 1800 },
     { type: PartType.CASSETTE, expectedKm: 5000 },
     { type: PartType.DERAILLEUR_REAR, expectedKm: 12000 },
@@ -143,7 +140,6 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.BOTTOM_BRACKET, expectedKm: 12000 },
     // Napęd
     { type: PartType.CRANKSET, expectedKm: 25000 },
-    { type: PartType.CHAINRING_1X, expectedKm: 10000 },
     { type: PartType.CHAIN, expectedKm: 1800 },
     { type: PartType.CASSETTE, expectedKm: 5000 },
     { type: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
@@ -191,8 +187,7 @@ export const PART_NAMES: Record<PartType, string> = {
   [PartType.HEADSET]: "Stery",
   [PartType.BOTTOM_BRACKET]: "Suport",
   // Napęd
-  [PartType.CRANKSET]: "Korba",
-  [PartType.CHAINRING_1X]: "Zębatka",
+  [PartType.CRANKSET]: "Mechanizm korbowy",
   [PartType.CHAIN]: "Łańcuch",
   [PartType.CASSETTE]: "Kaseta",
   [PartType.DERAILLEUR_FRONT]: "Przerzutka przód",
@@ -255,7 +250,6 @@ export const PART_ICONS: Record<PartType, string> = {
   [PartType.BOTTOM_BRACKET]: "⚙️",
   // Napęd
   [PartType.CRANKSET]: "🦵",
-  [PartType.CHAINRING_1X]: "🦀",
   [PartType.CHAIN]: "⛓️",
   [PartType.CASSETTE]: "⚙️",
   [PartType.DERAILLEUR_FRONT]: "↔️",
@@ -342,7 +336,6 @@ export const PART_CATEGORIES: Record<PartCategory, { label: string; types: PartT
       PartType.BATTERY,
       PartType.CONTROLLER,
       PartType.CRANKSET,
-      PartType.CHAINRING_1X,
       PartType.CHAIN,
       PartType.CASSETTE,
       PartType.BOTTOM_BRACKET,

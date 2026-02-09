@@ -93,7 +93,6 @@ enum PartType {
 
   // Napęd
   CRANKSET
-  CHAINRING_1X
   CHAIN
   CASSETTE
   DERAILLEUR_FRONT
