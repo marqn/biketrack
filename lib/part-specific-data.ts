@@ -1,9 +1,13 @@
 import { PartType } from "@/lib/generated/prisma";
 
 export type TireSpecificData = {
-  width: number; // mm
-  size: number; // 700c, 650b, 29
-  tubeless: boolean;
+  beadType: "wired" | "folding";
+  tubelessReady: boolean;
+  hookless: boolean;
+  treadType: "slick" | "semi-slick";
+  sizeFormat: "imperial" | "french";
+  sizeImperial?: string;
+  sizeFrench?: string;
 };
 
 export type ChainSpecificData = {
@@ -16,7 +20,14 @@ export type CassetteSpecificData = {
 };
 
 export type PadsSpecificData = {
-  material: "organic" | "metallic" | "semi-metallic";
+  rimBrake: boolean;
+  material?: "semi-metallic" | "resin-kevlar" | "ceramic" | "metallic" | "mixed" | "organic" | "organic-radiator" | "metallic-radiator" | "semi-metallic-radiator";
+  rim?: "aluminum" | "carbon";
+};
+
+export type DiscSpecificData = {
+  discMount: "centerlock" | "6-bolt";
+  size: "140" | "160" | "180" | "183" | "200" | "203" | "220" | "223";
 };
 
 export type ForkSpecificData = {
@@ -76,6 +87,26 @@ export type DerailleurRearSpecificData = {
   drivetrain: string;
 };
 
+export type HeadsetSpecificData = {
+  bearings: "loose-ball" | "cartridge";
+};
+
+export type HandlebarSpecificData = {
+  material: "aluminum" | "carbon";
+  width: number; // mm (400-750)
+};
+
+export type HandlebarTapeSpecificData = {
+  material: "velvet" | "eva" | "kraton" | "cork" | "rubber" | "foam" | "polyurethane" | "silicone" | "leather" | "solocush" | "synthetic-leather" | "gel" | "nylon" | "organic-cotton";
+  thickness: number; // mm (1.5-4.5)
+};
+
+export type StemSpecificData = {
+  length: number; // mm (30-150)
+  angle: number; // degrees (0-90)
+  material: "aluminum" | "carbon";
+};
+
 export type LubricantSpecificData = {
   lubricantType: "wax" | "oil";
 };
@@ -100,6 +131,8 @@ export type PartSpecificDataMap = {
   [PartType.CASSETTE]: CassetteSpecificData;
   [PartType.PADS_FRONT]: PadsSpecificData;
   [PartType.PADS_REAR]: PadsSpecificData;
+  [PartType.DISC_FRONT]: DiscSpecificData;
+  [PartType.DISC_REAR]: DiscSpecificData;
   [PartType.FORK]: ForkSpecificData;
   [PartType.SEATPOST]: SeatpostSpecificData;
   [PartType.SPOKES]: SpokesSpecificData;
@@ -112,12 +145,33 @@ export type PartSpecificDataMap = {
   [PartType.SUSPENSION_SEATPOST]: SuspensionSpecificData;
   [PartType.PEDALS]: PedalsSpecificData;
   [PartType.DERAILLEUR_REAR]: DerailleurRearSpecificData;
-  [PartType.HANDLEBAR_TAPE]: Record<string, never>; // Brak specyficznych pól
+  [PartType.STEM]: StemSpecificData;
+  [PartType.HEADSET]: HeadsetSpecificData;
+  [PartType.HANDLEBAR]: HandlebarSpecificData;
+  [PartType.HANDLEBAR_TAPE]: HandlebarTapeSpecificData;
   [PartType.LUBRICANT]: LubricantSpecificData;
   // E-bike
   [PartType.MOTOR]: MotorSpecificData;
   [PartType.BATTERY]: BatterySpecificData;
   [PartType.CONTROLLER]: ControllerSpecificData;
+  // Bez specyficznych pól
+  [PartType.DERAILLEUR_FRONT]: Record<string, never>;
+  [PartType.SHIFTERS]: Record<string, never>;
+  [PartType.CLEATS]: Record<string, never>;
+  [PartType.RIMS]: Record<string, never>;
+  [PartType.GRIPS]: Record<string, never>;
+  [PartType.SADDLE]: Record<string, never>;
+  [PartType.FENDER_FRONT]: Record<string, never>;
+  [PartType.FENDER_REAR]: Record<string, never>;
+  [PartType.KICKSTAND]: Record<string, never>;
+  [PartType.RACK]: Record<string, never>;
+  [PartType.BAG_SADDLE]: Record<string, never>;
+  [PartType.BAG_FRAME]: Record<string, never>;
+  [PartType.BOTTLE_CAGE]: Record<string, never>;
+  [PartType.LIGHT_FRONT]: Record<string, never>;
+  [PartType.LIGHT_REAR]: Record<string, never>;
+  [PartType.BELL]: Record<string, never>;
+  [PartType.COMPUTER]: Record<string, never>;
 };
 
 export function getDefaultSpecificData(
@@ -125,12 +179,14 @@ export function getDefaultSpecificData(
 ): Partial<PartSpecificDataMap[PartType]> {
   const defaults: Partial<Record<PartType, unknown>> = {
     [PartType.FRAME]: { material: "aluminum", brakeType: "disc", wheelSize: "28", frameSize: "m", gender: "men" },
-    [PartType.TIRE_FRONT]: { width: 28, size: 700, tubeless: false },
-    [PartType.TIRE_REAR]: { width: 28, size: 700, tubeless: false },
+    [PartType.TIRE_FRONT]: { beadType: "folding", tubelessReady: false, hookless: false, treadType: "slick", sizeFormat: "french", sizeFrench: "700 x 28C" },
+    [PartType.TIRE_REAR]: { beadType: "folding", tubelessReady: false, hookless: false, treadType: "slick", sizeFormat: "french", sizeFrench: "700 x 28C" },
     [PartType.CHAIN]: { speeds: 11 },
     [PartType.CASSETTE]: { range: "11-34", speeds: 11 },
-    [PartType.PADS_FRONT]: { material: "organic" },
-    [PartType.PADS_REAR]: { material: "organic" },
+    [PartType.PADS_FRONT]: { rimBrake: false, material: "organic" },
+    [PartType.PADS_REAR]: { rimBrake: false, material: "organic" },
+    [PartType.DISC_FRONT]: { discMount: "centerlock", size: "160" },
+    [PartType.DISC_REAR]: { discMount: "centerlock", size: "160" },
     [PartType.FORK]: { wheelSize: "28", material: "aluminum" },
     [PartType.SEATPOST]: { material: "aluminum" },
     [PartType.SPOKES]: { material: "stainless-steel" },
@@ -143,7 +199,10 @@ export function getDefaultSpecificData(
     [PartType.SUSPENSION_SEATPOST]: { travel: 50 },
     [PartType.PEDALS]: { clipless: "no", bearings: "cartridge", platform: true, bodyMaterial: "aluminum" },
     [PartType.DERAILLEUR_REAR]: { speeds: 11, derailleurType: "mechanical", drivetrain: "1x11" },
-    [PartType.HANDLEBAR_TAPE]: {},
+    [PartType.STEM]: { length: 90, angle: 6, material: "aluminum" },
+    [PartType.HEADSET]: { bearings: "cartridge" },
+    [PartType.HANDLEBAR]: { material: "aluminum", width: 420 },
+    [PartType.HANDLEBAR_TAPE]: { material: "eva", thickness: 2.5 },
     [PartType.LUBRICANT]: { lubricantType: "oil" },
     // E-bike
     [PartType.MOTOR]: { power: 250, motorType: "mid-drive" },
@@ -162,6 +221,8 @@ export function hasSpecificFields(type: PartType): boolean {
     PartType.CASSETTE,
     PartType.PADS_FRONT,
     PartType.PADS_REAR,
+    PartType.DISC_FRONT,
+    PartType.DISC_REAR,
     PartType.FORK,
     PartType.SEATPOST,
     PartType.SPOKES,
@@ -170,6 +231,10 @@ export function hasSpecificFields(type: PartType): boolean {
     PartType.CRANKSET,
     PartType.PEDALS,
     PartType.DERAILLEUR_REAR,
+    PartType.STEM,
+    PartType.HEADSET,
+    PartType.HANDLEBAR,
+    PartType.HANDLEBAR_TAPE,
     PartType.SUSPENSION_FORK,
     PartType.TUBELESS_SEALANT,
     PartType.DROPPER_POST,

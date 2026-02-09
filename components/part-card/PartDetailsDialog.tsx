@@ -38,6 +38,11 @@ import BottomBracketFields from "./specific-fields/BottomBracketFields";
 import CranksetFields from "./specific-fields/CranksetFields";
 import DerailleurRearFields from "./specific-fields/DerailleurRearFields";
 import PedalsFields from "./specific-fields/PedalsFields";
+import DiscFields from "./specific-fields/DiscFields";
+import StemFields from "./specific-fields/StemFields";
+import HeadsetFields from "./specific-fields/HeadsetFields";
+import HandlebarFields from "./specific-fields/HandlebarFields";
+import HandlebarTapeFields from "./specific-fields/HandlebarTapeFields";
 import {
   getDefaultSpecificData,
   hasSpecificFields,
@@ -54,6 +59,11 @@ import {
   CranksetSpecificData,
   DerailleurRearSpecificData,
   PedalsSpecificData,
+  DiscSpecificData,
+  StemSpecificData,
+  HeadsetSpecificData,
+  HandlebarSpecificData,
+  HandlebarTapeSpecificData,
 } from "@/lib/part-specific-data";
 
 interface PartDetailsDialogProps {
@@ -263,6 +273,14 @@ export default function PartDetailsDialog({
             onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
           />
         );
+      case PartType.DISC_FRONT:
+      case PartType.DISC_REAR:
+        return (
+          <DiscFields
+            data={partSpecificData as Partial<DiscSpecificData>}
+            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+          />
+        );
       case PartType.FORK:
         return (
           <ForkFields
@@ -316,6 +334,34 @@ export default function PartDetailsDialog({
         return (
           <PedalsFields
             data={partSpecificData as Partial<PedalsSpecificData>}
+            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.STEM:
+        return (
+          <StemFields
+            data={partSpecificData as Partial<StemSpecificData>}
+            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.HEADSET:
+        return (
+          <HeadsetFields
+            data={partSpecificData as Partial<HeadsetSpecificData>}
+            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.HANDLEBAR:
+        return (
+          <HandlebarFields
+            data={partSpecificData as Partial<HandlebarSpecificData>}
+            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.HANDLEBAR_TAPE:
+        return (
+          <HandlebarTapeFields
+            data={partSpecificData as Partial<HandlebarTapeSpecificData>}
             onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
           />
         );

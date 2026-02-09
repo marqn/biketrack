@@ -81,19 +81,6 @@ const PART_TYPE_MAPPINGS: Record<string, PartType> = {
   'schalthebel': PartType.SHIFTERS,
   'sti': PartType.SHIFTERS,
 
-  // === HAMULCE ===
-  'brakes': PartType.BRAKES,
-  'brake': PartType.BRAKES,
-  'hamulce': PartType.BRAKES,
-  'hamulec': PartType.BRAKES,
-  'bremsen': PartType.BRAKES,
-
-  // === KLAMKI HAMULCOWE ===
-  'brake levers': PartType.BRAKE_LEVERS,
-  'klamki hamulcowe': PartType.BRAKE_LEVERS,
-  'klamki': PartType.BRAKE_LEVERS,
-  'bremshebel': PartType.BRAKE_LEVERS,
-
   // === KLOCKI HAMULCOWE PRZÓD ===
   'front brake pads': PartType.PADS_FRONT,
   'klocki przednie': PartType.PADS_FRONT,

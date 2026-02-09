@@ -27,8 +27,6 @@ export const FALLBACK_EXPECTED_KM: Record<PartType, number> = {
   [PartType.SHIFTERS]: 25000,
 
   // Hamulce
-  [PartType.BRAKES]: 25000,
-  [PartType.BRAKE_LEVERS]: 25000,
   [PartType.PADS_FRONT]: 2500,
   [PartType.PADS_REAR]: 2500,
   [PartType.DISC_FRONT]: 12000,

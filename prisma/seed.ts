@@ -355,25 +355,6 @@ async function main() {
     }
   })
 
-  // --- HAMULCE ---
-  const brakesShimanoGRX = await prisma.partProduct.create({
-    data: {
-      type: PartType.BRAKES,
-      brand: 'Shimano',
-      model: 'GRX BR-RX400',
-      description: 'Hamulce hydrauliczne Shimano GRX'
-    }
-  })
-
-  const brakesSramRival = await prisma.partProduct.create({
-    data: {
-      type: PartType.BRAKES,
-      brand: 'SRAM',
-      model: 'Rival AXS HRD',
-      description: 'Hamulce hydrauliczne SRAM Rival AXS'
-    }
-  })
-
   // --- TARCZE HAMULCOWE ---
   const discShimanoRT70 = await prisma.partProduct.create({
     data: {
@@ -769,7 +750,6 @@ async function main() {
       { bikeProductId: eskerRS30.id, partProductId: cranksetSramRival40T.id, partType: PartType.CRANKSET, expectedKm: 25000 },
       { bikeProductId: eskerRS30.id, partProductId: rdSramRivalXPLR.id, partType: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
       { bikeProductId: eskerRS30.id, partProductId: shiftersSramRivalAXS.id, partType: PartType.SHIFTERS, expectedKm: 25000 },
-      { bikeProductId: eskerRS30.id, partProductId: brakesSramRival.id, partType: PartType.BRAKES, expectedKm: 25000 },
       { bikeProductId: eskerRS30.id, partProductId: padsSram.id, partType: PartType.PADS_FRONT, expectedKm: 2500 },
       { bikeProductId: eskerRS30.id, partProductId: padsSram.id, partType: PartType.PADS_REAR, expectedKm: 2500 },
       { bikeProductId: eskerRS30.id, partProductId: discSramCenterline.id, partType: PartType.DISC_FRONT, expectedKm: 12000 },
@@ -795,7 +775,6 @@ async function main() {
       { bikeProductId: eskerRS20.id, partProductId: cassetteSramRival1044.id, partType: PartType.CASSETTE, expectedKm: 8000 },
       { bikeProductId: eskerRS20.id, partProductId: rdSramApexXPLR.id, partType: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
       { bikeProductId: eskerRS20.id, partProductId: shiftersSramRivalAXS.id, partType: PartType.SHIFTERS, expectedKm: 25000 },
-      { bikeProductId: eskerRS20.id, partProductId: brakesSramRival.id, partType: PartType.BRAKES, expectedKm: 25000 },
       { bikeProductId: eskerRS20.id, partProductId: padsSram.id, partType: PartType.PADS_FRONT, expectedKm: 2500 },
       { bikeProductId: eskerRS20.id, partProductId: padsSram.id, partType: PartType.PADS_REAR, expectedKm: 2500 },
       { bikeProductId: eskerRS20.id, partProductId: discSramCenterline.id, partType: PartType.DISC_FRONT, expectedKm: 12000 },
@@ -819,7 +798,6 @@ async function main() {
       { bikeProductId: eskerRS10.id, partProductId: cranksetShimanoGRX40T.id, partType: PartType.CRANKSET, expectedKm: 25000 },
       { bikeProductId: eskerRS10.id, partProductId: rdShimanoGRXRX822.id, partType: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
       { bikeProductId: eskerRS10.id, partProductId: shiftersShimanoGRX12.id, partType: PartType.SHIFTERS, expectedKm: 25000 },
-      { bikeProductId: eskerRS10.id, partProductId: brakesShimanoGRX.id, partType: PartType.BRAKES, expectedKm: 25000 },
       { bikeProductId: eskerRS10.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_FRONT, expectedKm: 2500 },
       { bikeProductId: eskerRS10.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_REAR, expectedKm: 2500 },
       { bikeProductId: eskerRS10.id, partProductId: discShimanoRT70.id, partType: PartType.DISC_FRONT, expectedKm: 12000 },
@@ -842,7 +820,6 @@ async function main() {
       { bikeProductId: eskerTR.id, partProductId: cranksetShimanoGRX40T.id, partType: PartType.CRANKSET, expectedKm: 25000 },
       { bikeProductId: eskerTR.id, partProductId: rdShimanoGRXRX822.id, partType: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
       { bikeProductId: eskerTR.id, partProductId: shiftersShimanoGRX12.id, partType: PartType.SHIFTERS, expectedKm: 25000 },
-      { bikeProductId: eskerTR.id, partProductId: brakesShimanoGRX.id, partType: PartType.BRAKES, expectedKm: 25000 },
       { bikeProductId: eskerTR.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_FRONT, expectedKm: 2500 },
       { bikeProductId: eskerTR.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_REAR, expectedKm: 2500 },
       { bikeProductId: eskerTR.id, partProductId: discShimanoRT70.id, partType: PartType.DISC_FRONT, expectedKm: 12000 },
@@ -866,7 +843,6 @@ async function main() {
       { bikeProductId: eskerADV30.id, partProductId: cassetteSramXG1046.id, partType: PartType.CASSETTE, expectedKm: 8000 },
       { bikeProductId: eskerADV30.id, partProductId: rdSramRivalXPLR.id, partType: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
       { bikeProductId: eskerADV30.id, partProductId: shiftersSramRivalAXS.id, partType: PartType.SHIFTERS, expectedKm: 25000 },
-      { bikeProductId: eskerADV30.id, partProductId: brakesSramRival.id, partType: PartType.BRAKES, expectedKm: 25000 },
       { bikeProductId: eskerADV30.id, partProductId: padsSram.id, partType: PartType.PADS_FRONT, expectedKm: 2500 },
       { bikeProductId: eskerADV30.id, partProductId: padsSram.id, partType: PartType.PADS_REAR, expectedKm: 2500 },
       { bikeProductId: eskerADV30.id, partProductId: discSramCenterline.id, partType: PartType.DISC_FRONT, expectedKm: 12000 },
@@ -890,7 +866,6 @@ async function main() {
       { bikeProductId: eskerADV10.id, partProductId: cranksetShimanoGRX40T.id, partType: PartType.CRANKSET, expectedKm: 25000 },
       { bikeProductId: eskerADV10.id, partProductId: rdShimanoGRXRX822.id, partType: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
       { bikeProductId: eskerADV10.id, partProductId: shiftersShimanoGRX12.id, partType: PartType.SHIFTERS, expectedKm: 25000 },
-      { bikeProductId: eskerADV10.id, partProductId: brakesShimanoGRX.id, partType: PartType.BRAKES, expectedKm: 25000 },
       { bikeProductId: eskerADV10.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_FRONT, expectedKm: 2500 },
       { bikeProductId: eskerADV10.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_REAR, expectedKm: 2500 },
       { bikeProductId: eskerADV10.id, partProductId: discShimanoRT70.id, partType: PartType.DISC_FRONT, expectedKm: 12000 },
@@ -911,7 +886,6 @@ async function main() {
       { bikeProductId: esker70.id, partProductId: cassetteShimano1142.id, partType: PartType.CASSETTE, expectedKm: 8000 },
       { bikeProductId: esker70.id, partProductId: rdShimanoGRXRX812.id, partType: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
       { bikeProductId: esker70.id, partProductId: shiftersShimanoGRX11.id, partType: PartType.SHIFTERS, expectedKm: 25000 },
-      { bikeProductId: esker70.id, partProductId: brakesShimanoGRX.id, partType: PartType.BRAKES, expectedKm: 25000 },
       { bikeProductId: esker70.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_FRONT, expectedKm: 2500 },
       { bikeProductId: esker70.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_REAR, expectedKm: 2500 },
       { bikeProductId: esker70.id, partProductId: discShimanoRT70.id, partType: PartType.DISC_FRONT, expectedKm: 12000 },
@@ -934,7 +908,6 @@ async function main() {
       { bikeProductId: esker80.id, partProductId: cranksetShimanoGRX2x.id, partType: PartType.CRANKSET, expectedKm: 25000 },
       { bikeProductId: esker80.id, partProductId: rdShimanoGRXRX810.id, partType: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
       { bikeProductId: esker80.id, partProductId: shiftersShimanoGRX11.id, partType: PartType.SHIFTERS, expectedKm: 25000 },
-      { bikeProductId: esker80.id, partProductId: brakesShimanoGRX.id, partType: PartType.BRAKES, expectedKm: 25000 },
       { bikeProductId: esker80.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_FRONT, expectedKm: 2500 },
       { bikeProductId: esker80.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_REAR, expectedKm: 2500 },
       { bikeProductId: esker80.id, partProductId: discShimanoRT70.id, partType: PartType.DISC_FRONT, expectedKm: 12000 },
@@ -957,7 +930,6 @@ async function main() {
       { bikeProductId: esker50Ultra.id, partProductId: cranksetShimanoGRX40T.id, partType: PartType.CRANKSET, expectedKm: 25000 },
       { bikeProductId: esker50Ultra.id, partProductId: rdShimanoGRXRX822.id, partType: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
       { bikeProductId: esker50Ultra.id, partProductId: shiftersShimanoGRX12.id, partType: PartType.SHIFTERS, expectedKm: 25000 },
-      { bikeProductId: esker50Ultra.id, partProductId: brakesShimanoGRX.id, partType: PartType.BRAKES, expectedKm: 25000 },
       { bikeProductId: esker50Ultra.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_FRONT, expectedKm: 2500 },
       { bikeProductId: esker50Ultra.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_REAR, expectedKm: 2500 },
       { bikeProductId: esker50Ultra.id, partProductId: discShimanoRT70.id, partType: PartType.DISC_FRONT, expectedKm: 12000 },
@@ -979,7 +951,6 @@ async function main() {
       { bikeProductId: esker60Ultra.id, partProductId: cranksetShimanoGRX2x.id, partType: PartType.CRANKSET, expectedKm: 25000 },
       { bikeProductId: esker60Ultra.id, partProductId: rdShimanoGRXRX820.id, partType: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
       { bikeProductId: esker60Ultra.id, partProductId: shiftersShimanoGRX12.id, partType: PartType.SHIFTERS, expectedKm: 25000 },
-      { bikeProductId: esker60Ultra.id, partProductId: brakesShimanoGRX.id, partType: PartType.BRAKES, expectedKm: 25000 },
       { bikeProductId: esker60Ultra.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_FRONT, expectedKm: 2500 },
       { bikeProductId: esker60Ultra.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_REAR, expectedKm: 2500 },
       { bikeProductId: esker60Ultra.id, partProductId: discShimanoRT70.id, partType: PartType.DISC_FRONT, expectedKm: 12000 },
@@ -1001,7 +972,6 @@ async function main() {
       { bikeProductId: esker60GRX.id, partProductId: cranksetShimanoGRX2x.id, partType: PartType.CRANKSET, expectedKm: 25000 },
       { bikeProductId: esker60GRX.id, partProductId: rdShimanoGRXRX820.id, partType: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
       { bikeProductId: esker60GRX.id, partProductId: shiftersShimanoGRX12.id, partType: PartType.SHIFTERS, expectedKm: 25000 },
-      { bikeProductId: esker60GRX.id, partProductId: brakesShimanoGRX.id, partType: PartType.BRAKES, expectedKm: 25000 },
       { bikeProductId: esker60GRX.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_FRONT, expectedKm: 2500 },
       { bikeProductId: esker60GRX.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_REAR, expectedKm: 2500 },
       { bikeProductId: esker60GRX.id, partProductId: discShimanoRT70.id, partType: PartType.DISC_FRONT, expectedKm: 12000 },
@@ -1023,7 +993,6 @@ async function main() {
       { bikeProductId: esker40GRX.id, partProductId: cranksetShimanoGRX2x.id, partType: PartType.CRANKSET, expectedKm: 25000 },
       { bikeProductId: esker40GRX.id, partProductId: rdShimanoGRXRX400.id, partType: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
       { bikeProductId: esker40GRX.id, partProductId: shiftersShimanoGRX10.id, partType: PartType.SHIFTERS, expectedKm: 25000 },
-      { bikeProductId: esker40GRX.id, partProductId: brakesShimanoGRX.id, partType: PartType.BRAKES, expectedKm: 25000 },
       { bikeProductId: esker40GRX.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_FRONT, expectedKm: 2500 },
       { bikeProductId: esker40GRX.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_REAR, expectedKm: 2500 },
       { bikeProductId: esker40GRX.id, partProductId: discShimanoRT70.id, partType: PartType.DISC_FRONT, expectedKm: 12000 },
@@ -1045,7 +1014,6 @@ async function main() {
       { bikeProductId: eskerAXSLTD.id, partProductId: cassetteSramRival1044.id, partType: PartType.CASSETTE, expectedKm: 8000 },
       { bikeProductId: eskerAXSLTD.id, partProductId: rdSramApexXPLR.id, partType: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
       { bikeProductId: eskerAXSLTD.id, partProductId: shiftersSramRivalAXS.id, partType: PartType.SHIFTERS, expectedKm: 25000 },
-      { bikeProductId: eskerAXSLTD.id, partProductId: brakesSramRival.id, partType: PartType.BRAKES, expectedKm: 25000 },
       { bikeProductId: eskerAXSLTD.id, partProductId: padsSram.id, partType: PartType.PADS_FRONT, expectedKm: 2500 },
       { bikeProductId: eskerAXSLTD.id, partProductId: padsSram.id, partType: PartType.PADS_REAR, expectedKm: 2500 },
       { bikeProductId: eskerAXSLTD.id, partProductId: discSramCenterline.id, partType: PartType.DISC_FRONT, expectedKm: 12000 },

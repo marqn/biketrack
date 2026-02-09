@@ -102,8 +102,6 @@ enum PartType {
   CLEATS
 
   // Hamulce
-  BRAKES
-  BRAKE_LEVERS
   PADS_FRONT
   PADS_REAR
   DISC_FRONT

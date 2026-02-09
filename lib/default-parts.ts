@@ -22,8 +22,6 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.PEDALS, expectedKm: 30000 },
     { type: PartType.CLEATS, expectedKm: 5000 },
     // Hamulce
-    { type: PartType.BRAKES, expectedKm: 30000 },
-    { type: PartType.BRAKE_LEVERS, expectedKm: 30000 },
     { type: PartType.PADS_FRONT, expectedKm: 3000 },
     { type: PartType.PADS_REAR, expectedKm: 3000 },
     { type: PartType.DISC_FRONT, expectedKm: 15000 },
@@ -62,8 +60,6 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.PEDALS, expectedKm: 25000 },
     { type: PartType.CLEATS, expectedKm: 5000 },
     // Hamulce
-    { type: PartType.BRAKES, expectedKm: 25000 },
-    { type: PartType.BRAKE_LEVERS, expectedKm: 25000 },
     { type: PartType.PADS_FRONT, expectedKm: 2500 },
     { type: PartType.PADS_REAR, expectedKm: 2500 },
     { type: PartType.DISC_FRONT, expectedKm: 12000 },
@@ -106,8 +102,6 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.PEDALS, expectedKm: 20000 },
     { type: PartType.CLEATS, expectedKm: 5000 },
     // Hamulce
-    { type: PartType.BRAKES, expectedKm: 20000 },
-    { type: PartType.BRAKE_LEVERS, expectedKm: 20000 },
     { type: PartType.PADS_FRONT, expectedKm: 2000 },
     { type: PartType.PADS_REAR, expectedKm: 2000 },
     { type: PartType.DISC_FRONT, expectedKm: 10000 },
@@ -146,8 +140,6 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.SHIFTERS, expectedKm: 25000 },
     { type: PartType.PEDALS, expectedKm: 25000 },
     // Hamulce
-    { type: PartType.BRAKES, expectedKm: 25000 },
-    { type: PartType.BRAKE_LEVERS, expectedKm: 25000 },
     { type: PartType.PADS_FRONT, expectedKm: 2000 },
     { type: PartType.PADS_REAR, expectedKm: 2000 },
     // Koła
@@ -196,8 +188,6 @@ export const PART_NAMES: Record<PartType, string> = {
   [PartType.PEDALS]: "Pedały",
   [PartType.CLEATS]: "Bloki SPD",
   // Hamulce
-  [PartType.BRAKES]: "Hamulce",
-  [PartType.BRAKE_LEVERS]: "Dźwignie hamulcowe",
   [PartType.PADS_FRONT]: "Klocki przednie",
   [PartType.PADS_REAR]: "Klocki tylne",
   [PartType.DISC_FRONT]: "Tarcza przednia",
@@ -258,8 +248,6 @@ export const PART_ICONS: Record<PartType, string> = {
   [PartType.PEDALS]: "🦶",
   [PartType.CLEATS]: "👟",
   // Hamulce
-  [PartType.BRAKES]: "🛑",
-  [PartType.BRAKE_LEVERS]: "✋",
   [PartType.PADS_FRONT]: "🧱",
   [PartType.PADS_REAR]: "🧱",
   [PartType.DISC_FRONT]: "💿",
@@ -349,8 +337,6 @@ export const PART_CATEGORIES: Record<PartCategory, { label: string; types: PartT
   brakes: {
     label: "Hamulce",
     types: [
-      PartType.BRAKES,
-      PartType.BRAKE_LEVERS,
       PartType.PADS_FRONT,
       PartType.PADS_REAR,
       PartType.DISC_FRONT,
