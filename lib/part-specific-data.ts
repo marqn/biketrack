@@ -64,7 +64,7 @@ export type FrameSpecificData = {
   brakeType: "rim" | "disc" | "disc-hydraulic" | "v-brake";
   wheelSize: "24" | "26" | "27.5" | "28" | "29";
   frameSize: "xs" | "s" | "m" | "l" | "xl" | "xxl" | "one-size";
-  gender: "women" | "men";
+  gender: "women" | "men" | "unisex";
 };
 
 export type BottomBracketSpecificData = {

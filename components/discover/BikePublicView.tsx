@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Bike as BikeIcon, MapPin, LogIn } from "lucide-react";
+import { Dialog, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
+import { Bike as BikeIcon, MapPin, LogIn, X } from "lucide-react";
 import { bikeTypeLabels } from "@/lib/types";
 import { BikeType, PartType } from "@/lib/generated/prisma";
 import { BikePublicParts } from "./BikePublicParts";
@@ -51,6 +53,8 @@ interface BikePublicViewProps {
 }
 
 export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: BikePublicViewProps) {
+  const [imageOpen, setImageOpen] = useState(false);
+
   const bikeTitle = bike.brand || bike.model
     ? `${bike.brand ?? ""} ${bike.model ?? ""}`.trim()
     : bikeTypeLabels[bike.type];
@@ -68,7 +72,10 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: Bik
       <div className="bg-card rounded-xl border overflow-hidden">
         {/* Zdjęcie roweru */}
         {bike.imageUrl ? (
-          <div className="w-full h-64 bg-muted">
+          <div
+            className="w-full h-64 bg-muted cursor-pointer"
+            onClick={() => setImageOpen(true)}
+          >
             <img
               src={bike.imageUrl}
               alt={bikeTitle}
@@ -79,6 +86,33 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: Bik
           <div className="w-full h-40 bg-muted flex items-center justify-center">
             <BikeIcon className="h-16 w-16 text-muted-foreground/30" />
           </div>
+        )}
+
+        {/* Pełnoekranowe zdjęcie */}
+        {bike.imageUrl && (
+          <Dialog open={imageOpen} onOpenChange={setImageOpen}>
+            <DialogPortal>
+              <DialogOverlay className="bg-black/80" />
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                onClick={() => setImageOpen(false)}
+              >
+                <button
+                  onClick={() => setImageOpen(false)}
+                  className="absolute top-4 right-4 z-50 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                  <span className="sr-only">Zamknij</span>
+                </button>
+                <img
+                  src={bike.imageUrl}
+                  alt={bikeTitle}
+                  className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
+            </DialogPortal>
+          </Dialog>
         )}
 
         <div className="p-6">

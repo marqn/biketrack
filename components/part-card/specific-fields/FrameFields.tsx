@@ -50,6 +50,7 @@ const FRAME_SIZES = [
 const GENDERS = [
   { value: "women", label: "Damska" },
   { value: "men", label: "Męska" },
+  { value: "unisex", label: "Unisex" },
 ];
 
 export default function FrameFields({ data, onChange }: FrameFieldsProps) {
