@@ -11,7 +11,14 @@
       "Bash(grep:*)",
       "Bash(npx next build:*)",
       "Bash(xargs:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "WebFetch(domain:www.vinciwheels.com)",
+      "WebFetch(domain:dandyhorse.cc)",
+      "WebFetch(domain:evanlite.com)",
+      "WebFetch(domain:www.sram.com)",
+      "WebFetch(domain:support.zipp.com)",
+      "WebFetch(domain:www.elite-wheels.com)",
+      "WebFetch(domain:www.lightbicycle.com)"
     ]
   }
 }

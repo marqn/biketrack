@@ -32,6 +32,7 @@ import PadsFields from "./specific-fields/PadsFields";
 import ForkFields from "./specific-fields/ForkFields";
 import SeatpostFields from "./specific-fields/SeatpostFields";
 import SpokesFields from "./specific-fields/SpokesFields";
+import RimsFields from "./specific-fields/RimsFields";
 import HubsFields from "./specific-fields/HubsFields";
 import FrameFields from "./specific-fields/FrameFields";
 import BottomBracketFields from "./specific-fields/BottomBracketFields";
@@ -53,6 +54,7 @@ import {
   ForkSpecificData,
   SeatpostSpecificData,
   SpokesSpecificData,
+  RimsSpecificData,
   HubsSpecificData,
   FrameSpecificData,
   BottomBracketSpecificData,
@@ -299,6 +301,13 @@ export default function PartDetailsDialog({
         return (
           <SpokesFields
             data={partSpecificData as Partial<SpokesSpecificData>}
+            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.RIMS:
+        return (
+          <RimsFields
+            data={partSpecificData as Partial<RimsSpecificData>}
             onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
           />
         );

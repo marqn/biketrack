@@ -43,6 +43,16 @@ export type SpokesSpecificData = {
   material: "aluminum" | "brass" | "stainless-steel";
 };
 
+export type RimsSpecificData = {
+  material: "aluminum" | "carbon";
+  rimDepth: number; // mm (profil obręczy)
+  internalWidth: number; // mm (szerokość wewnętrzna)
+  hookless: boolean;
+  tubelessReady: boolean;
+  brakeType: "disc" | "rim";
+  wheelSize: "26" | "27.5" | "28" | "29";
+};
+
 export type HubsSpecificData = {
   discMount: "centerlock" | "6-bolt" | "none";
   bearings: "loose-ball" | "cartridge";
@@ -158,7 +168,7 @@ export type PartSpecificDataMap = {
   [PartType.DERAILLEUR_FRONT]: Record<string, never>;
   [PartType.SHIFTERS]: Record<string, never>;
   [PartType.CLEATS]: Record<string, never>;
-  [PartType.RIMS]: Record<string, never>;
+  [PartType.RIMS]: RimsSpecificData;
   [PartType.GRIPS]: Record<string, never>;
   [PartType.SADDLE]: Record<string, never>;
   [PartType.FENDER_FRONT]: Record<string, never>;
@@ -190,6 +200,7 @@ export function getDefaultSpecificData(
     [PartType.FORK]: { wheelSize: "28", material: "aluminum" },
     [PartType.SEATPOST]: { material: "aluminum" },
     [PartType.SPOKES]: { material: "stainless-steel" },
+    [PartType.RIMS]: { material: "aluminum", rimDepth: 30, internalWidth: 21, hookless: false, tubelessReady: false, brakeType: "disc", wheelSize: "28" },
     [PartType.HUBS]: { discMount: "centerlock", bearings: "cartridge", holes: 32 },
     [PartType.BOTTOM_BRACKET]: { shellType: "bsa" },
     [PartType.CRANKSET]: { chainring: 34, length: "170" },
@@ -226,6 +237,7 @@ export function hasSpecificFields(type: PartType): boolean {
     PartType.FORK,
     PartType.SEATPOST,
     PartType.SPOKES,
+    PartType.RIMS,
     PartType.HUBS,
     PartType.BOTTOM_BRACKET,
     PartType.CRANKSET,
