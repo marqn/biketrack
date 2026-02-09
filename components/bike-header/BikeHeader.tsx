@@ -165,6 +165,7 @@ export function BikeHeader({
   };
 
   const handleSwitchBike = (bikeId: string) => {
+    if (bikeId === bike.id) return;
     document.cookie = `selectedBikeId=${bikeId};path=/;max-age=${60 * 60 * 24 * 365}`;
     window.dispatchEvent(new CustomEvent("bike-changed"));
     router.refresh();
