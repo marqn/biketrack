@@ -19,6 +19,11 @@ export type PadsSpecificData = {
   material: "organic" | "metallic" | "semi-metallic";
 };
 
+export type ForkSpecificData = {
+  wheelSize: "20" | "26" | "27.5" | "28" | "29";
+  material: "aluminum" | "steel" | "carbon" | "titanium";
+};
+
 export type SuspensionSpecificData = {
   travel: number; // mm
 };
@@ -54,6 +59,7 @@ export type PartSpecificDataMap = {
   [PartType.CASSETTE]: CassetteSpecificData;
   [PartType.PADS_FRONT]: PadsSpecificData;
   [PartType.PADS_REAR]: PadsSpecificData;
+  [PartType.FORK]: ForkSpecificData;
   [PartType.SUSPENSION_FORK]: SuspensionSpecificData;
   [PartType.CHAINRING_1X]: ChainringSpecificData;
   [PartType.TUBELESS_SEALANT]: TubelessSealantSpecificData;
@@ -77,6 +83,7 @@ export function getDefaultSpecificData(
     [PartType.CASSETTE]: { range: "11-34", speeds: 11 },
     [PartType.PADS_FRONT]: { material: "organic" },
     [PartType.PADS_REAR]: { material: "organic" },
+    [PartType.FORK]: { wheelSize: "28", material: "aluminum" },
     [PartType.SUSPENSION_FORK]: { travel: 100 },
     [PartType.CHAINRING_1X]: { teeth: 32 },
     [PartType.TUBELESS_SEALANT]: { volume: 60 },
@@ -100,6 +107,7 @@ export function hasSpecificFields(type: PartType): boolean {
     PartType.CASSETTE,
     PartType.PADS_FRONT,
     PartType.PADS_REAR,
+    PartType.FORK,
     PartType.SUSPENSION_FORK,
     PartType.CHAINRING_1X,
     PartType.TUBELESS_SEALANT,

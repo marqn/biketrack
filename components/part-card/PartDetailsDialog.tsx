@@ -29,6 +29,7 @@ import TireFields from "./specific-fields/TireFields";
 import ChainFields from "./specific-fields/ChainFields";
 import CassetteFields from "./specific-fields/CassetteFields";
 import PadsFields from "./specific-fields/PadsFields";
+import ForkFields from "./specific-fields/ForkFields";
 import {
   getDefaultSpecificData,
   hasSpecificFields,
@@ -36,6 +37,7 @@ import {
   ChainSpecificData,
   CassetteSpecificData,
   PadsSpecificData,
+  ForkSpecificData,
 } from "@/lib/part-specific-data";
 
 interface PartDetailsDialogProps {
@@ -235,6 +237,13 @@ export default function PartDetailsDialog({
         return (
           <PadsFields
             data={partSpecificData as Partial<PadsSpecificData>}
+            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.FORK:
+        return (
+          <ForkFields
+            data={partSpecificData as Partial<ForkSpecificData>}
             onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
           />
         );
