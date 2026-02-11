@@ -14,6 +14,10 @@ import {
   PART_UI,
   PartCategory,
   getPartCategory,
+  getHiddenPartsByBrakeType,
+  extractBrakeType,
+  getHiddenPartsByTubelessStatus,
+  extractTubelessStatus,
 } from "@/lib/default-parts";
 import { PartReplacement, BikePartWithProduct } from "@/lib/types";
 
@@ -32,6 +36,7 @@ type ExistingPart = {
   replacements: PartReplacement[];
   createdAt?: Date | string;
   installedAt?: Date | string | null;
+  partSpecificData?: unknown;
 };
 
 interface PartsAccordionProps {
@@ -47,8 +52,14 @@ export default function PartsAccordion({
   existingParts,
   chainChildren,
 }: PartsAccordionProps) {
-  // Grupuj części według kategorii
+  // Grupuj części według kategorii (z filtrowaniem wg typu hamulców)
   const partsByCategory = React.useMemo(() => {
+    const brakeType = extractBrakeType(existingParts);
+    const hiddenByBrake = getHiddenPartsByBrakeType(brakeType);
+    const tubelessStatus = extractTubelessStatus(existingParts);
+    const hiddenByTubeless = getHiddenPartsByTubelessStatus(tubelessStatus);
+    const hiddenParts = new Set([...hiddenByBrake, ...hiddenByTubeless]);
+
     const categories: Record<
       PartCategory,
       Array<{
@@ -67,6 +78,8 @@ export default function PartsAccordion({
 
     // Dla każdej domyślnej części, znajdź kategorię i dodaj
     for (const defaultPart of defaultParts) {
+      if (hiddenParts.has(defaultPart.type)) continue;
+
       const category = getPartCategory(defaultPart.type);
       if (category) {
         const existingPart = existingParts.find(

@@ -100,12 +100,15 @@ enum PartType {
   SHIFTERS
   PEDALS
   CLEATS
+  SHIFT_CABLES
 
   // Hamulce
   PADS_FRONT
   PADS_REAR
   DISC_FRONT
   DISC_REAR
+  BRAKE_CABLES
+  BRAKE_FLUID
 
   // Koła
   HUBS
@@ -113,6 +116,8 @@ enum PartType {
   SPOKES
   TIRE_FRONT
   TIRE_REAR
+  INNER_TUBE_FRONT
+  INNER_TUBE_REAR
   TUBELESS_SEALANT
 
   // Kierownica i cockpit
@@ -142,6 +147,11 @@ enum PartType {
 
   // Inne
   LUBRICANT
+
+  // Przestarzałe (zachowane dla kompatybilności z DB)
+  CHAINRING_1X
+  BRAKES
+  BRAKE_LEVERS
 
   // E-bike
   MOTOR

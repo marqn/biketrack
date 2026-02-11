@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { PartType } from "@/lib/generated/prisma";
-import { PART_CATEGORIES, PART_NAMES, PART_ICONS, type PartCategory } from "@/lib/default-parts";
+import { PART_CATEGORIES, PART_NAMES, PART_ICONS, type PartCategory, getHiddenPartsByBrakeType, extractBrakeType, getHiddenPartsByTubelessStatus, extractTubelessStatus } from "@/lib/default-parts";
 
 interface BikePublicPartsProps {
   parts: Array<{
@@ -12,6 +12,7 @@ interface BikePublicPartsProps {
     wearKm: number;
     expectedKm: number;
     isInstalled: boolean;
+    partSpecificData?: unknown;
     product: {
       id: string;
       brand: string;
@@ -26,10 +27,18 @@ interface BikePublicPartsProps {
 export function BikePublicParts({ parts }: BikePublicPartsProps) {
   if (parts.length === 0) return null;
 
+  // Filtruj części wg typu hamulców i tubeless
+  const brakeType = extractBrakeType(parts);
+  const hiddenByBrake = getHiddenPartsByBrakeType(brakeType);
+  const tubelessStatus = extractTubelessStatus(parts);
+  const hiddenByTubeless = getHiddenPartsByTubelessStatus(tubelessStatus);
+  const hiddenParts = new Set([...hiddenByBrake, ...hiddenByTubeless]);
+  const visibleParts = parts.filter((p) => !hiddenParts.has(p.type));
+
   // Pogrupuj części według kategorii
   const partsByCategory = new Map<PartCategory, typeof parts>();
 
-  for (const part of parts) {
+  for (const part of visibleParts) {
     for (const [category, data] of Object.entries(PART_CATEGORIES)) {
       if (data.types.includes(part.type)) {
         const existing = partsByCategory.get(category as PartCategory) || [];

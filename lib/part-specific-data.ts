@@ -84,6 +84,10 @@ export type TubelessSealantSpecificData = {
   volume: number; // ml
 };
 
+export type InnerTubeSpecificData = {
+  valveType: "presta" | "schrader" | "dunlop";
+};
+
 export type PedalsSpecificData = {
   clipless: "no" | "yes" | "one-sided" | "magnetic" | "two-sided";
   bearings: "ceramic" | "needle" | "ball" | "cartridge" | "steel" | "bushing";
@@ -151,6 +155,8 @@ export type PartSpecificDataMap = {
   [PartType.CRANKSET]: CranksetSpecificData;
   [PartType.SUSPENSION_FORK]: SuspensionSpecificData;
   [PartType.TUBELESS_SEALANT]: TubelessSealantSpecificData;
+  [PartType.INNER_TUBE_FRONT]: InnerTubeSpecificData;
+  [PartType.INNER_TUBE_REAR]: InnerTubeSpecificData;
   [PartType.DROPPER_POST]: SuspensionSpecificData;
   [PartType.SUSPENSION_SEATPOST]: SuspensionSpecificData;
   [PartType.PEDALS]: PedalsSpecificData;
@@ -182,6 +188,13 @@ export type PartSpecificDataMap = {
   [PartType.LIGHT_REAR]: Record<string, never>;
   [PartType.BELL]: Record<string, never>;
   [PartType.COMPUTER]: Record<string, never>;
+  [PartType.BRAKE_CABLES]: Record<string, never>;
+  [PartType.BRAKE_FLUID]: Record<string, never>;
+  [PartType.SHIFT_CABLES]: Record<string, never>;
+  // Przestarzałe
+  [PartType.CHAINRING_1X]: Record<string, never>;
+  [PartType.BRAKES]: Record<string, never>;
+  [PartType.BRAKE_LEVERS]: Record<string, never>;
 };
 
 export function getDefaultSpecificData(
@@ -206,6 +219,8 @@ export function getDefaultSpecificData(
     [PartType.CRANKSET]: { chainring: 34, length: "170" },
     [PartType.SUSPENSION_FORK]: { travel: 100 },
     [PartType.TUBELESS_SEALANT]: { volume: 60 },
+    [PartType.INNER_TUBE_FRONT]: { valveType: "presta" },
+    [PartType.INNER_TUBE_REAR]: { valveType: "presta" },
     [PartType.DROPPER_POST]: { travel: 150 },
     [PartType.SUSPENSION_SEATPOST]: { travel: 50 },
     [PartType.PEDALS]: { clipless: "no", bearings: "cartridge", platform: true, bodyMaterial: "aluminum" },
@@ -249,6 +264,8 @@ export function hasSpecificFields(type: PartType): boolean {
     PartType.HANDLEBAR_TAPE,
     PartType.SUSPENSION_FORK,
     PartType.TUBELESS_SEALANT,
+    PartType.INNER_TUBE_FRONT,
+    PartType.INNER_TUBE_REAR,
     PartType.DROPPER_POST,
     PartType.SUSPENSION_SEATPOST,
     PartType.LUBRICANT,

@@ -168,6 +168,27 @@ const PART_TYPE_MAPPINGS: Record<string, PartType> = {
   'opony': PartType.TIRE_FRONT,
   'reifen': PartType.TIRE_FRONT,
 
+  // === DĘTKA PRZEDNIA ===
+  'front inner tube': PartType.INNER_TUBE_FRONT,
+  'inner tube front': PartType.INNER_TUBE_FRONT,
+  'dętka przednia': PartType.INNER_TUBE_FRONT,
+  'detka przednia': PartType.INNER_TUBE_FRONT,
+  'schlauch vorne': PartType.INNER_TUBE_FRONT,
+
+  // === DĘTKA TYLNA ===
+  'rear inner tube': PartType.INNER_TUBE_REAR,
+  'inner tube rear': PartType.INNER_TUBE_REAR,
+  'dętka tylna': PartType.INNER_TUBE_REAR,
+  'detka tylna': PartType.INNER_TUBE_REAR,
+  'schlauch hinten': PartType.INNER_TUBE_REAR,
+
+  // === DĘTKA (domyślnie przód) ===
+  'inner tube': PartType.INNER_TUBE_FRONT,
+  'tube': PartType.INNER_TUBE_FRONT,
+  'dętka': PartType.INNER_TUBE_FRONT,
+  'detka': PartType.INNER_TUBE_FRONT,
+  'schlauch': PartType.INNER_TUBE_FRONT,
+
   // === MLEKO TUBELESS ===
   'tubeless sealant': PartType.TUBELESS_SEALANT,
   'sealant': PartType.TUBELESS_SEALANT,
@@ -250,6 +271,33 @@ const PART_TYPE_MAPPINGS: Record<string, PartType> = {
   'kontroler': PartType.CONTROLLER,
   'sterownik': PartType.CONTROLLER,
   'display': PartType.CONTROLLER,
+
+  // === LINKI HAMULCOWE ===
+  'brake cables': PartType.BRAKE_CABLES,
+  'brake cable': PartType.BRAKE_CABLES,
+  'linki hamulcowe': PartType.BRAKE_CABLES,
+  'linka hamulcowa': PartType.BRAKE_CABLES,
+  'pancerz hamulcowy': PartType.BRAKE_CABLES,
+  'bowden hamulcowy': PartType.BRAKE_CABLES,
+  'bremszug': PartType.BRAKE_CABLES,
+
+  // === LINKI PRZERZUTKOWE ===
+  'shift cables': PartType.SHIFT_CABLES,
+  'shift cable': PartType.SHIFT_CABLES,
+  'gear cable': PartType.SHIFT_CABLES,
+  'linki przerzutki': PartType.SHIFT_CABLES,
+  'linka przerzutki': PartType.SHIFT_CABLES,
+  'pancerz przerzutkowy': PartType.SHIFT_CABLES,
+  'bowden przerzutkowy': PartType.SHIFT_CABLES,
+  'schaltzug': PartType.SHIFT_CABLES,
+
+  // === PŁYN HAMULCOWY ===
+  'brake fluid': PartType.BRAKE_FLUID,
+  'płyn hamulcowy': PartType.BRAKE_FLUID,
+  'plyn hamulcowy': PartType.BRAKE_FLUID,
+  'olej mineralny': PartType.BRAKE_FLUID,
+  'dot fluid': PartType.BRAKE_FLUID,
+  'bremsflüssigkeit': PartType.BRAKE_FLUID,
 }
 
 /**

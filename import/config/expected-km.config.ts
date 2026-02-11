@@ -25,12 +25,17 @@ export const FALLBACK_EXPECTED_KM: Record<PartType, number> = {
   [PartType.DERAILLEUR_FRONT]: 30000,
   [PartType.DERAILLEUR_REAR]: 15000,
   [PartType.SHIFTERS]: 25000,
+  [PartType.SHIFT_CABLES]: 4000,
+  [PartType.PEDALS]: 25000,
+  [PartType.CLEATS]: 5000,
 
   // Hamulce
   [PartType.PADS_FRONT]: 2500,
   [PartType.PADS_REAR]: 2500,
   [PartType.DISC_FRONT]: 12000,
   [PartType.DISC_REAR]: 12000,
+  [PartType.BRAKE_CABLES]: 2500,
+  [PartType.BRAKE_FLUID]: 10000,
 
   // Koła
   [PartType.HUBS]: 25000,
@@ -38,6 +43,8 @@ export const FALLBACK_EXPECTED_KM: Record<PartType, number> = {
   [PartType.SPOKES]: 25000,
   [PartType.TIRE_FRONT]: 3500,
   [PartType.TIRE_REAR]: 3500,
+  [PartType.INNER_TUBE_FRONT]: 3500,
+  [PartType.INNER_TUBE_REAR]: 3500,
   [PartType.TUBELESS_SEALANT]: 3000,
 
   // Cockpit
@@ -52,6 +59,19 @@ export const FALLBACK_EXPECTED_KM: Record<PartType, number> = {
   [PartType.SUSPENSION_SEATPOST]: 10000,
   [PartType.DROPPER_POST]: 8000,
 
+  // Akcesoria
+  [PartType.FENDER_FRONT]: 50000,
+  [PartType.FENDER_REAR]: 50000,
+  [PartType.KICKSTAND]: 100000,
+  [PartType.RACK]: 80000,
+  [PartType.BAG_SADDLE]: 30000,
+  [PartType.BAG_FRAME]: 30000,
+  [PartType.BOTTLE_CAGE]: 50000,
+  [PartType.LIGHT_FRONT]: 20000,
+  [PartType.LIGHT_REAR]: 20000,
+  [PartType.BELL]: 100000,
+  [PartType.COMPUTER]: 50000,
+
   // Inne
   [PartType.LUBRICANT]: 200,
 
@@ -59,6 +79,11 @@ export const FALLBACK_EXPECTED_KM: Record<PartType, number> = {
   [PartType.MOTOR]: 50000,
   [PartType.BATTERY]: 30000,
   [PartType.CONTROLLER]: 40000,
+
+  // Przestarzałe
+  [PartType.CHAINRING_1X]: 30000,
+  [PartType.BRAKES]: 20000,
+  [PartType.BRAKE_LEVERS]: 30000,
 }
 
 /**

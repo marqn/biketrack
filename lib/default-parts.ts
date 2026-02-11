@@ -21,17 +21,23 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.SHIFTERS, expectedKm: 30000 },
     { type: PartType.PEDALS, expectedKm: 30000 },
     { type: PartType.CLEATS, expectedKm: 5000 },
+    { type: PartType.SHIFT_CABLES, expectedKm: 5000 },
     // Hamulce
     { type: PartType.PADS_FRONT, expectedKm: 3000 },
     { type: PartType.PADS_REAR, expectedKm: 3000 },
     { type: PartType.DISC_FRONT, expectedKm: 15000 },
     { type: PartType.DISC_REAR, expectedKm: 15000 },
+    { type: PartType.BRAKE_CABLES, expectedKm: 3000 },
+    { type: PartType.BRAKE_FLUID, expectedKm: 10000 },
     // Koła
     { type: PartType.HUBS, expectedKm: 30000 },
     { type: PartType.RIMS, expectedKm: 20000 },
     { type: PartType.SPOKES, expectedKm: 30000 },
     { type: PartType.TIRE_FRONT, expectedKm: 4000 },
     { type: PartType.TIRE_REAR, expectedKm: 4000 },
+    { type: PartType.INNER_TUBE_FRONT, expectedKm: 4000 },
+    { type: PartType.INNER_TUBE_REAR, expectedKm: 4000 },
+    { type: PartType.TUBELESS_SEALANT, expectedKm: 3000 },
     // Cockpit
     { type: PartType.STEM, expectedKm: 50000 },
     { type: PartType.HANDLEBAR, expectedKm: 30000 },
@@ -59,17 +65,22 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.SHIFTERS, expectedKm: 25000 },
     { type: PartType.PEDALS, expectedKm: 25000 },
     { type: PartType.CLEATS, expectedKm: 5000 },
+    { type: PartType.SHIFT_CABLES, expectedKm: 4000 },
     // Hamulce
     { type: PartType.PADS_FRONT, expectedKm: 2500 },
     { type: PartType.PADS_REAR, expectedKm: 2500 },
     { type: PartType.DISC_FRONT, expectedKm: 12000 },
     { type: PartType.DISC_REAR, expectedKm: 12000 },
+    { type: PartType.BRAKE_CABLES, expectedKm: 2500 },
+    { type: PartType.BRAKE_FLUID, expectedKm: 10000 },
     // Koła
     { type: PartType.HUBS, expectedKm: 25000 },
     { type: PartType.RIMS, expectedKm: 15000 },
     { type: PartType.SPOKES, expectedKm: 25000 },
     { type: PartType.TIRE_FRONT, expectedKm: 3500 },
     { type: PartType.TIRE_REAR, expectedKm: 3500 },
+    { type: PartType.INNER_TUBE_FRONT, expectedKm: 3500 },
+    { type: PartType.INNER_TUBE_REAR, expectedKm: 3500 },
     { type: PartType.TUBELESS_SEALANT, expectedKm: 3000 },
     // Cockpit
     { type: PartType.STEM, expectedKm: 40000 },
@@ -101,17 +112,22 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.SHIFTERS, expectedKm: 20000 },
     { type: PartType.PEDALS, expectedKm: 20000 },
     { type: PartType.CLEATS, expectedKm: 5000 },
+    { type: PartType.SHIFT_CABLES, expectedKm: 3500 },
     // Hamulce
     { type: PartType.PADS_FRONT, expectedKm: 2000 },
     { type: PartType.PADS_REAR, expectedKm: 2000 },
     { type: PartType.DISC_FRONT, expectedKm: 10000 },
     { type: PartType.DISC_REAR, expectedKm: 10000 },
+    { type: PartType.BRAKE_CABLES, expectedKm: 2000 },
+    { type: PartType.BRAKE_FLUID, expectedKm: 10000 },
     // Koła
     { type: PartType.HUBS, expectedKm: 20000 },
     { type: PartType.RIMS, expectedKm: 12000 },
     { type: PartType.SPOKES, expectedKm: 20000 },
     { type: PartType.TIRE_FRONT, expectedKm: 3000 },
     { type: PartType.TIRE_REAR, expectedKm: 3000 },
+    { type: PartType.INNER_TUBE_FRONT, expectedKm: 3000 },
+    { type: PartType.INNER_TUBE_REAR, expectedKm: 3000 },
     { type: PartType.TUBELESS_SEALANT, expectedKm: 3000 },
     // Cockpit
     { type: PartType.STEM, expectedKm: 30000 },
@@ -139,15 +155,21 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
     { type: PartType.SHIFTERS, expectedKm: 25000 },
     { type: PartType.PEDALS, expectedKm: 25000 },
+    { type: PartType.SHIFT_CABLES, expectedKm: 4000 },
     // Hamulce
     { type: PartType.PADS_FRONT, expectedKm: 2000 },
     { type: PartType.PADS_REAR, expectedKm: 2000 },
+    { type: PartType.BRAKE_CABLES, expectedKm: 2500 },
+    { type: PartType.BRAKE_FLUID, expectedKm: 10000 },
     // Koła
     { type: PartType.HUBS, expectedKm: 25000 },
     { type: PartType.RIMS, expectedKm: 15000 },
     { type: PartType.SPOKES, expectedKm: 25000 },
     { type: PartType.TIRE_FRONT, expectedKm: 3000 },
     { type: PartType.TIRE_REAR, expectedKm: 3000 },
+    { type: PartType.INNER_TUBE_FRONT, expectedKm: 3000 },
+    { type: PartType.INNER_TUBE_REAR, expectedKm: 3000 },
+    { type: PartType.TUBELESS_SEALANT, expectedKm: 3000 },
     // Cockpit
     { type: PartType.STEM, expectedKm: 40000 },
     { type: PartType.HANDLEBAR, expectedKm: 25000 },
@@ -187,17 +209,22 @@ export const PART_NAMES: Record<PartType, string> = {
   [PartType.SHIFTERS]: "Manetki",
   [PartType.PEDALS]: "Pedały",
   [PartType.CLEATS]: "Bloki SPD",
+  [PartType.SHIFT_CABLES]: "Linki przerzutki",
   // Hamulce
   [PartType.PADS_FRONT]: "Klocki przednie",
   [PartType.PADS_REAR]: "Klocki tylne",
   [PartType.DISC_FRONT]: "Tarcza przednia",
   [PartType.DISC_REAR]: "Tarcza tylna",
+  [PartType.BRAKE_CABLES]: "Linki hamulcowe",
+  [PartType.BRAKE_FLUID]: "Płyn hamulcowy",
   // Koła
   [PartType.HUBS]: "Piasty",
   [PartType.RIMS]: "Obręcze",
   [PartType.SPOKES]: "Szprychy",
   [PartType.TIRE_FRONT]: "Opona przednia",
   [PartType.TIRE_REAR]: "Opona tylna",
+  [PartType.INNER_TUBE_FRONT]: "Dętka przednia",
+  [PartType.INNER_TUBE_REAR]: "Dętka tylna",
   [PartType.TUBELESS_SEALANT]: "Mleko tubeless",
   // Cockpit
   [PartType.STEM]: "Mostek",
@@ -227,6 +254,10 @@ export const PART_NAMES: Record<PartType, string> = {
   [PartType.MOTOR]: "Silnik",
   [PartType.BATTERY]: "Akumulator",
   [PartType.CONTROLLER]: "Sterownik",
+  // Przestarzałe
+  [PartType.CHAINRING_1X]: "Zębatka 1x",
+  [PartType.BRAKES]: "Hamulce",
+  [PartType.BRAKE_LEVERS]: "Klamki hamulcowe",
 };
 
 // Emoji dla każdego typu części
@@ -247,17 +278,22 @@ export const PART_ICONS: Record<PartType, string> = {
   [PartType.SHIFTERS]: "🎚️",
   [PartType.PEDALS]: "🦶",
   [PartType.CLEATS]: "👟",
+  [PartType.SHIFT_CABLES]: "🪢",
   // Hamulce
   [PartType.PADS_FRONT]: "🧱",
   [PartType.PADS_REAR]: "🧱",
   [PartType.DISC_FRONT]: "💿",
   [PartType.DISC_REAR]: "💿",
+  [PartType.BRAKE_CABLES]: "🪢",
+  [PartType.BRAKE_FLUID]: "💧",
   // Koła
   [PartType.HUBS]: "🎯",
   [PartType.RIMS]: "⭕",
   [PartType.SPOKES]: "📍",
   [PartType.TIRE_FRONT]: "🛞",
   [PartType.TIRE_REAR]: "🛞",
+  [PartType.INNER_TUBE_FRONT]: "🔵",
+  [PartType.INNER_TUBE_REAR]: "🔵",
   [PartType.TUBELESS_SEALANT]: "🧴",
   // Cockpit
   [PartType.STEM]: "🔧",
@@ -287,6 +323,10 @@ export const PART_ICONS: Record<PartType, string> = {
   [PartType.MOTOR]: "⚡",
   [PartType.BATTERY]: "🔋",
   [PartType.CONTROLLER]: "🎛️",
+  // Przestarzałe
+  [PartType.CHAINRING_1X]: "⚙️",
+  [PartType.BRAKES]: "🛑",
+  [PartType.BRAKE_LEVERS]: "🎚️",
 };
 
 // UI format (emoji | nazwa) - zachowane dla kompatybilności wstecznej
@@ -308,6 +348,7 @@ export function getPartIcon(partType: PartType | string): string {
 
 export const CHAIN_LUBE_INTERVAL_KM = 200;
 export const SEALANT_INTERVAL_DAYS = 90;
+export const BRAKE_FLUID_INTERVAL_DAYS = 730; // 2 lata
 
 // Kategorie części rowerowych
 export type PartCategory = "frame" | "drivetrain" | "brakes" | "wheels" | "cockpit" | "accessories";
@@ -332,6 +373,7 @@ export const PART_CATEGORIES: Record<PartCategory, { label: string; types: PartT
       PartType.SHIFTERS,
       PartType.PEDALS,
       PartType.CLEATS,
+      PartType.SHIFT_CABLES,
     ],
   },
   brakes: {
@@ -341,6 +383,8 @@ export const PART_CATEGORIES: Record<PartCategory, { label: string; types: PartT
       PartType.PADS_REAR,
       PartType.DISC_FRONT,
       PartType.DISC_REAR,
+      PartType.BRAKE_CABLES,
+      PartType.BRAKE_FLUID,
     ],
   },
   wheels: {
@@ -351,6 +395,8 @@ export const PART_CATEGORIES: Record<PartCategory, { label: string; types: PartT
       PartType.SPOKES,
       PartType.TIRE_FRONT,
       PartType.TIRE_REAR,
+      PartType.INNER_TUBE_FRONT,
+      PartType.INNER_TUBE_REAR,
       PartType.TUBELESS_SEALANT,
     ],
   },
@@ -402,3 +448,68 @@ export const EBIKE_PARTS: DefaultPart[] = [
   { type: PartType.BATTERY, expectedKm: 30000 },
   { type: PartType.CONTROLLER, expectedKm: 40000 },
 ];
+
+// Warunkowa widoczność części na podstawie typu hamulców
+export type BrakeType = "rim" | "disc" | "disc-hydraulic" | "v-brake";
+
+export function getHiddenPartsByBrakeType(brakeType: BrakeType | undefined): Set<PartType> {
+  const hidden = new Set<PartType>();
+  switch (brakeType) {
+    case "disc-hydraulic":
+      hidden.add(PartType.BRAKE_CABLES);
+      break;
+    case "disc":
+      hidden.add(PartType.BRAKE_FLUID);
+      break;
+    case "rim":
+    case "v-brake":
+      hidden.add(PartType.BRAKE_FLUID);
+      hidden.add(PartType.DISC_FRONT);
+      hidden.add(PartType.DISC_REAR);
+      break;
+    default:
+      hidden.add(PartType.BRAKE_FLUID);
+      break;
+  }
+  return hidden;
+}
+
+export function extractBrakeType(
+  parts: Array<{ type: PartType; partSpecificData?: unknown }>
+): BrakeType | undefined {
+  const framePart = parts.find((p) => p.type === PartType.FRAME);
+  if (!framePart?.partSpecificData) return undefined;
+  const data = framePart.partSpecificData as Record<string, unknown>;
+  return data.brakeType as BrakeType | undefined;
+}
+
+// Warunkowa widoczność dętek/mleka na podstawie tubeless w oponach
+export function extractTubelessStatus(
+  parts: Array<{ type: PartType; partSpecificData?: unknown }>
+): { front: boolean; rear: boolean } {
+  const frontTire = parts.find((p) => p.type === PartType.TIRE_FRONT);
+  const rearTire = parts.find((p) => p.type === PartType.TIRE_REAR);
+  const frontData = frontTire?.partSpecificData as Record<string, unknown> | undefined;
+  const rearData = rearTire?.partSpecificData as Record<string, unknown> | undefined;
+  return {
+    front: !!frontData?.tubelessReady,
+    rear: !!rearData?.tubelessReady,
+  };
+}
+
+export function getHiddenPartsByTubelessStatus(
+  tubeless: { front: boolean; rear: boolean }
+): Set<PartType> {
+  const hidden = new Set<PartType>();
+  if (tubeless.front) {
+    hidden.add(PartType.INNER_TUBE_FRONT);
+  }
+  if (tubeless.rear) {
+    hidden.add(PartType.INNER_TUBE_REAR);
+  }
+  // Jeśli żadna opona nie jest tubeless → ukryj mleko
+  if (!tubeless.front && !tubeless.rear) {
+    hidden.add(PartType.TUBELESS_SEALANT);
+  }
+  return hidden;
+}

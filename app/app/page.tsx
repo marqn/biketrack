@@ -99,6 +99,7 @@ export default async function AppPage() {
     replacements: p.replacements,
     createdAt: p.createdAt,
     installedAt: p.installedAt,
+    partSpecificData: p.partSpecificData,
   }));
 
   return (

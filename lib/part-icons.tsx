@@ -2,6 +2,7 @@ import {
   Link,
   Settings,
   Disc,
+  Circle,
   CircleArrowOutUpLeft,
   CircleArrowOutUpRight,
   Mountain,
@@ -24,9 +25,14 @@ export const PART_ICON_COMPONENTS: Record<PartType, LucideIcon> = {
   [PartType.HANDLEBAR_TAPE]: Wrench,
   [PartType.SUSPENSION_FORK]: Mountain,
   [PartType.DROPPER_POST]: ChevronUp,
+  [PartType.INNER_TUBE_FRONT]: Circle,
+  [PartType.INNER_TUBE_REAR]: Circle,
   [PartType.TUBELESS_SEALANT]: Wrench,
   [PartType.SUSPENSION_SEATPOST]: Mountain,
   [PartType.LUBRICANT]: Droplet,
+  [PartType.BRAKE_CABLES]: Link,
+  [PartType.SHIFT_CABLES]: Link,
+  [PartType.BRAKE_FLUID]: Droplet,
 };
 
 // Specjalne ikony dla innych typów (np. serwis)

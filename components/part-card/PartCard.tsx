@@ -17,7 +17,7 @@ import ColoredProgress from "@/components/ui/colored-progress";
 import { DialogType } from "@/components/bike-header/BikeHeader";
 import PartDetailsDialog from "./PartDetailsDialog";
 import PartHistoryDialog from "./PartHistoryDialog";
-import { SEALANT_INTERVAL_DAYS } from "@/lib/default-parts";
+import { SEALANT_INTERVAL_DAYS, BRAKE_FLUID_INTERVAL_DAYS } from "@/lib/default-parts";
 import {
   deletePartReplacement,
   updatePartReplacement,
@@ -65,21 +65,24 @@ export default function PartCard({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const isSealant = partType === PartType.TUBELESS_SEALANT;
-  const sealantDate = isSealant
+  const isTimeBased = partType === PartType.TUBELESS_SEALANT || partType === PartType.BRAKE_FLUID;
+  const timeIntervalDays = partType === PartType.BRAKE_FLUID
+    ? BRAKE_FLUID_INTERVAL_DAYS
+    : SEALANT_INTERVAL_DAYS;
+  const timeBasedDate = isTimeBased
     ? (currentPart?.installedAt || createdAt)
     : null;
-  const daysSinceInstall = sealantDate
-    ? Math.floor((Date.now() - new Date(sealantDate).getTime()) / (1000 * 60 * 60 * 24))
+  const daysSinceInstall = timeBasedDate
+    ? Math.floor((Date.now() - new Date(timeBasedDate).getTime()) / (1000 * 60 * 60 * 24))
     : 0;
 
-  const progressPercent = isSealant && sealantDate
-    ? Math.min(Math.round((daysSinceInstall / SEALANT_INTERVAL_DAYS) * 100), 100)
+  const progressPercent = isTimeBased && timeBasedDate
+    ? Math.min(Math.round((daysSinceInstall / timeIntervalDays) * 100), 100)
     : Math.min(Math.round((wearKm / expectedKm) * 100), 100);
 
   // Określ czy jest to edit czy create
   const hasCurrentPart = !!(currentBrand && currentModel);
-  const canReplace = hasCurrentPart || (isSealant && !!currentPart?.installedAt);
+  const canReplace = hasCurrentPart || (isTimeBased && !!currentPart?.installedAt);
 
   async function handleToggleInstalled(checked: boolean) {
     if (!partId) return;
@@ -151,11 +154,11 @@ export default function PartCard({
 
           <div className="text-sm text-muted-foreground items-center flex justify-between">
             <span>
-              {isSealant && sealantDate ? (
+              {isTimeBased && timeBasedDate ? (
                 <>
                   Wiek:{" "}
                   <span className="font-medium text-foreground">{daysSinceInstall}</span>
-                  {" dni "}/ {SEALANT_INTERVAL_DAYS} dni
+                  {" dni "}/ {timeIntervalDays} dni
                 </>
               ) : (
                 <>

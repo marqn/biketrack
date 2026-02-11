@@ -36,6 +36,7 @@ interface BikePublicViewProps {
       wearKm: number;
       expectedKm: number;
       isInstalled: boolean;
+      partSpecificData?: unknown;
       product: {
         id: string;
         brand: string;
