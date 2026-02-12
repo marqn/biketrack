@@ -25,7 +25,7 @@ export default async function HomePage() {
 
     return (
       <div className="min-h-screen bg-linear-to-b from-background to-secondary/20">
-        <div className="flex items-center justify-center px-4 py-24">
+        <div className="flex items-center justify-center px-4 py-4">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <div className="flex justify-center">
               <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center text-6xl">

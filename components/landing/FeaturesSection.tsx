@@ -13,19 +13,19 @@ const features = [
     icon: Bike,
     title: "Śledź swoje rowery",
     description:
-      "Dodaj rowery i monitoruj przebieg każdego z nich. Szosa, gravel, MTB — wszystko w jednym miejscu.",
+      "Dodaj rowery i monitoruj przebieg każdego z nich. Szosa, gravel, MTB a może trenażer — wszystko w jednym miejscu.",
   },
   {
     icon: Wrench,
     title: "Monitoruj zużycie części",
     description:
-      "48 typów części z automatycznym śledzeniem zużycia. Wiedz, kiedy wymienić łańcuch, klocki czy opony.",
+      "Wiele typów części z automatycznym śledzeniem zużycia. Wiedz, kiedy wymienić łańcuch, klocki czy opony.",
   },
   {
     icon: Star,
     title: "Opinie społeczności",
     description:
-      "Sprawdź oceny produktów od prawdziwych użytkowników z weryfikowanymi przebiegami.",
+      "Sprawdź oceny produktów od prawdziwych użytkowników z zweryfikowanymi przebiegami.",
   },
   {
     icon: Bell,
@@ -49,13 +49,13 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section className="py-16">
+    <section className="py-8">
       <div className="max-w-6xl mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-2">
           Dlaczego MBike?
         </h2>
         <p className="text-muted-foreground text-center mb-10">
-          Wszystko, czego potrzebujesz do zarządzania serwisem roweru
+          Wszystko, czego potrzebujesz do zarządzania serwisem swojego roweru
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
