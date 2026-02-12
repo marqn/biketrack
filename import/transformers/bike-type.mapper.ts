@@ -51,6 +51,19 @@ const BIKE_TYPE_MAPPINGS: Record<string, BikeType> = {
   '29er': BikeType.MTB,
   '27.5': BikeType.MTB,
 
+  // === TRAINER / TRENAŻER ===
+  'trainer': BikeType.TRAINER,
+  'trenażer': BikeType.TRAINER,
+  'trenazer': BikeType.TRAINER,
+  'smart trainer': BikeType.TRAINER,
+  'direct drive': BikeType.TRAINER,
+  'wheel-on': BikeType.TRAINER,
+  'rolki': BikeType.TRAINER,
+  'rollers': BikeType.TRAINER,
+  'rower stacjonarny': BikeType.TRAINER,
+  'indoor': BikeType.TRAINER,
+  'stationary': BikeType.TRAINER,
+
   // === OTHER ===
   'other': BikeType.OTHER,
   'inne': BikeType.OTHER,

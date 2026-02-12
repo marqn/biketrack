@@ -356,17 +356,19 @@ export function AddBikeDialog({
                 </div>
               )}
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="new-bike-electric"
-                  checked={isElectric}
-                  onCheckedChange={(checked) => setIsElectric(checked === true)}
-                  disabled={isPending}
-                />
-                <Label htmlFor="new-bike-electric" className="cursor-pointer">
-                  Rower elektryczny (e-bike)
-                </Label>
-              </div>
+              {selectedType !== BikeType.TRAINER && (
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="new-bike-electric"
+                    checked={isElectric}
+                    onCheckedChange={(checked) => setIsElectric(checked === true)}
+                    disabled={isPending}
+                  />
+                  <Label htmlFor="new-bike-electric" className="cursor-pointer">
+                    Rower elektryczny (e-bike)
+                  </Label>
+                </div>
+              )}
 
               <DialogFooter className="flex-col gap-2 sm:flex-col">
                 <Button

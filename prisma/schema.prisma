@@ -73,6 +73,7 @@ enum BikeType {
   GRAVEL
   MTB
   OTHER
+  TRAINER
 }
 
 enum SyncStatus {

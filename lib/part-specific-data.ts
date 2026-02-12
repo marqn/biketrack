@@ -65,6 +65,12 @@ export type FrameSpecificData = {
   wheelSize: "24" | "26" | "27.5" | "28" | "29";
   frameSize: "xs" | "s" | "m" | "l" | "xl" | "xxl" | "one-size";
   gender: "women" | "men" | "unisex";
+  // Pola trenażera (opcjonalne)
+  trainerType?: "direct-drive" | "wheel-on" | "standalone" | "rollers";
+  maxPower?: number;
+  maxSimulatedGrade?: number;
+  connectivity?: ("ant+" | "bluetooth")[];
+  foldable?: boolean;
 };
 
 export type BottomBracketSpecificData = {

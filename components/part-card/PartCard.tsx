@@ -114,7 +114,7 @@ export default function PartCard({
 
   return (
     <>
-      <Card className={`mt-4 ${isAccessory && !isInstalled ? "opacity-50" : ""}`}>
+      <Card className={isAccessory && !isInstalled ? "opacity-50" : ""}>
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
             <PartIcon type={partType} className="w-5 h-5 shrink-0" />

@@ -71,6 +71,7 @@ export const bikeTypeLabels: Record<BikeType, string> = {
   GRAVEL: "🚵 Gravel",
   MTB: "🚵‍♂️ MTB",
   OTHER: "🚲 Inny",
+  TRAINER: "💻🚲 Trenażer",
 };
 
 export const VARIANT_BY_TYPE: Record<string, "default" | "destructive"> = {

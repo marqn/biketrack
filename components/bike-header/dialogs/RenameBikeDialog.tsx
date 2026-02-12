@@ -216,20 +216,22 @@ export function RenameBikeDialog({
               />
             </div>
 
-            <div className="flex items-center space-x-2 pb-2">
-              <Checkbox
-                id="is-electric"
-                checked={isElectric}
-                onCheckedChange={(checked) => setIsElectric(checked === true)}
-                disabled={isLoading}
-              />
-              <Label
-                htmlFor="is-electric"
-                className="cursor-pointer whitespace-nowrap"
-              >
-                E-bike
-              </Label>
-            </div>
+            {type !== BikeType.TRAINER && (
+              <div className="flex items-center space-x-2 pb-2">
+                <Checkbox
+                  id="is-electric"
+                  checked={isElectric}
+                  onCheckedChange={(checked) => setIsElectric(checked === true)}
+                  disabled={isLoading}
+                />
+                <Label
+                  htmlFor="is-electric"
+                  className="cursor-pointer whitespace-nowrap"
+                >
+                  E-bike
+                </Label>
+              </div>
+            )}
           </div>
 
           <BikeBrandModelFields

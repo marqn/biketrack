@@ -247,6 +247,7 @@ export default function PartDetailsDialog({
           <FrameFields
             data={partSpecificData as Partial<FrameSpecificData>}
             onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            bikeType={bikeType}
           />
         );
       case PartType.TIRE_FRONT:

@@ -26,6 +26,7 @@ const bikeTypeLabels: Record<BikeType, string> = {
   GRAVEL: "Gravel",
   MTB: "MTB",
   OTHER: "Inny",
+  TRAINER: "Trenażer",
 };
 
 interface BikeProductFormProps {

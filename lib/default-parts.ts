@@ -8,6 +8,9 @@ const BIKE_TYPE_PART_NAMES: Partial<Record<BikeType, Partial<Record<PartType, st
   GRAVEL: {
     [PartType.SHIFTERS]: "Klamkomanetki",
   },
+  TRAINER: {
+    [PartType.FRAME]: "Trenażer",
+  },
 };
 
 type DefaultPart = {
@@ -197,6 +200,28 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.LIGHT_FRONT, expectedKm: 20000 },
     { type: PartType.LIGHT_REAR, expectedKm: 20000 },
     { type: PartType.BELL, expectedKm: 100000 },
+    { type: PartType.COMPUTER, expectedKm: 50000 },
+  ],
+  TRAINER: [
+    // Trenażer (jednostka)
+    { type: PartType.FRAME, expectedKm: 100000 },
+    { type: PartType.HEADSET, expectedKm: 50000 },
+    { type: PartType.BOTTOM_BRACKET, expectedKm: 20000 },
+    // Napęd
+    { type: PartType.CRANKSET, expectedKm: 40000 },
+    { type: PartType.CHAIN, expectedKm: 5000 },
+    { type: PartType.CASSETTE, expectedKm: 12000 },
+    { type: PartType.PEDALS, expectedKm: 40000 },
+    { type: PartType.CLEATS, expectedKm: 8000 },
+    // Kokpit
+    { type: PartType.STEM, expectedKm: 100000 },
+    { type: PartType.HANDLEBAR, expectedKm: 50000 },
+    { type: PartType.GRIPS, expectedKm: 3000 },
+    // Siodło
+    { type: PartType.SADDLE, expectedKm: 15000 },
+    { type: PartType.SEATPOST, expectedKm: 100000 },
+    // Akcesoria
+    { type: PartType.BOTTLE_CAGE, expectedKm: 100000 },
     { type: PartType.COMPUTER, expectedKm: 50000 },
   ],
 };
