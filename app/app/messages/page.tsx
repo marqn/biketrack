@@ -157,9 +157,6 @@ export default function MessagesPage() {
           <Mail className="w-8 h-8 text-primary-foreground" />
         </div>
         <h1 className="text-3xl font-bold mb-2">Wiadomości</h1>
-        <p className="text-muted-foreground">
-          Powiadomienia o komentarzach, serwisie i stanie części
-        </p>
       </div>
 
       <div className="max-w-2xl mx-auto">
@@ -178,7 +175,7 @@ export default function MessagesPage() {
 
         {/* Empty state */}
         {notifications.length === 0 && (
-          <div className="text-center py-16">
+          <div className="text-center py-8">
             <Inbox className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
             <h2 className="text-lg font-medium mb-1">Brak wiadomości</h2>
             <p className="text-sm text-muted-foreground">

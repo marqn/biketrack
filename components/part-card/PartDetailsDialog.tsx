@@ -20,7 +20,7 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { PartType } from "@/lib/generated/prisma";
+import { BikeType, PartType } from "@/lib/generated/prisma";
 import { PartProduct, BikePartWithProduct } from "@/lib/types";
 import { installPart } from "@/app/app/actions/install-part";
 import { getUserPartReview } from "@/app/app/actions/get-user-part-review";
@@ -44,6 +44,7 @@ import StemFields from "./specific-fields/StemFields";
 import HeadsetFields from "./specific-fields/HeadsetFields";
 import HandlebarFields from "./specific-fields/HandlebarFields";
 import HandlebarTapeFields from "./specific-fields/HandlebarTapeFields";
+import ShiftersFields from "./specific-fields/ShiftersFields";
 import {
   getDefaultSpecificData,
   hasSpecificFields,
@@ -66,6 +67,7 @@ import {
   HeadsetSpecificData,
   HandlebarSpecificData,
   HandlebarTapeSpecificData,
+  ShiftersSpecificData,
 } from "@/lib/part-specific-data";
 
 interface PartDetailsDialogProps {
@@ -76,6 +78,7 @@ interface PartDetailsDialogProps {
   partId: string;
   mode: "create" | "edit" | "replace";
   currentPart?: Partial<BikePartWithProduct> | null;
+  bikeType?: BikeType;
   // Opcjonalne - dla edycji PartReplacement z historii
   onSave?: (data: { brand?: string; model?: string; notes?: string }) => Promise<void>;
   initialBrand?: string;
@@ -91,6 +94,7 @@ export default function PartDetailsDialog({
   partId,
   mode,
   currentPart,
+  bikeType,
   onSave,
   initialBrand,
   initialModel,
@@ -337,6 +341,14 @@ export default function PartDetailsDialog({
           <DerailleurRearFields
             data={partSpecificData as Partial<DerailleurRearSpecificData>}
             onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.SHIFTERS:
+        return (
+          <ShiftersFields
+            data={partSpecificData as Partial<ShiftersSpecificData>}
+            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            showClassicOption={bikeType === BikeType.ROAD}
           />
         );
       case PartType.PEDALS:

@@ -110,6 +110,7 @@ export default async function AppPage() {
 
       <PartsAccordion
         bikeId={bike.id}
+        bikeType={bike.type}
         defaultParts={defaultParts}
         existingParts={existingParts}
         chainChildren={

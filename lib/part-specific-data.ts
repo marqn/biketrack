@@ -95,6 +95,10 @@ export type PedalsSpecificData = {
   bodyMaterial: "aluminum" | "carbon" | "composite" | "nylon" | "steel" | "magnesium" | "plastic" | "titanium" | "fiberglass";
 };
 
+export type ShiftersSpecificData = {
+  isClassicShifter: boolean; // true = klasyczna manetka (starsze szosówki)
+};
+
 export type DerailleurRearSpecificData = {
   speeds: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
   derailleurType: "mechanical" | "electronic" | "wireless";
@@ -172,7 +176,7 @@ export type PartSpecificDataMap = {
   [PartType.CONTROLLER]: ControllerSpecificData;
   // Bez specyficznych pól
   [PartType.DERAILLEUR_FRONT]: Record<string, never>;
-  [PartType.SHIFTERS]: Record<string, never>;
+  [PartType.SHIFTERS]: ShiftersSpecificData;
   [PartType.CLEATS]: Record<string, never>;
   [PartType.RIMS]: RimsSpecificData;
   [PartType.GRIPS]: Record<string, never>;
@@ -224,6 +228,7 @@ export function getDefaultSpecificData(
     [PartType.DROPPER_POST]: { travel: 150 },
     [PartType.SUSPENSION_SEATPOST]: { travel: 50 },
     [PartType.PEDALS]: { clipless: "no", bearings: "cartridge", platform: true, bodyMaterial: "aluminum" },
+    [PartType.SHIFTERS]: { isClassicShifter: false },
     [PartType.DERAILLEUR_REAR]: { speeds: 11, derailleurType: "mechanical", drivetrain: "1x11" },
     [PartType.STEM]: { length: 90, angle: 6, material: "aluminum" },
     [PartType.HEADSET]: { bearings: "cartridge" },
@@ -257,6 +262,7 @@ export function hasSpecificFields(type: PartType): boolean {
     PartType.BOTTOM_BRACKET,
     PartType.CRANKSET,
     PartType.PEDALS,
+    PartType.SHIFTERS,
     PartType.DERAILLEUR_REAR,
     PartType.STEM,
     PartType.HEADSET,

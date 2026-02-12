@@ -19,7 +19,6 @@ export function CommunityStatsSection({ stats }: CommunityStatsSectionProps) {
   const allItems: StatItem[] = [
     { icon: Users, value: stats.totalUsers, label: "rowerzystów" },
     { icon: Bike, value: stats.totalBikes, label: "rowerów" },
-    { icon: Route, value: stats.totalKmTracked, label: "przejechanych km" },
     { icon: Wrench, value: stats.totalReplacements, label: "wymian części" },
     { icon: Star, value: stats.totalReviews, label: "opinii" },
   ];
@@ -36,8 +35,8 @@ export function CommunityStatsSection({ stats }: CommunityStatsSectionProps) {
         </h2>
         <div
           className={`grid grid-cols-2 gap-4 ${
-            items.length >= 5
-              ? "md:grid-cols-3 lg:grid-cols-5"
+            items.length >= 4
+              ? "md:grid-cols-3 lg:grid-cols-4"
               : items.length >= 3
                 ? "md:grid-cols-3"
                 : "md:grid-cols-2"

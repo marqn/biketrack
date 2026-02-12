@@ -4,7 +4,7 @@ import * as React from "react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { NotebookText, Link, Unlink } from "lucide-react";
-import { PartType } from "@/lib/generated/prisma";
+import { BikeType, PartType } from "@/lib/generated/prisma";
 import {
   Card,
   CardHeader,
@@ -41,6 +41,7 @@ interface PartCardProps {
   isAccessory?: boolean;
   isInstalled?: boolean;
   createdAt?: Date | string;
+  bikeType?: BikeType;
 }
 
 export default function PartCard({
@@ -58,6 +59,7 @@ export default function PartCard({
   isAccessory = false,
   isInstalled = true,
   createdAt,
+  bikeType,
 }: PartCardProps) {
   const { activeDialog, openDialog, closeDialog } = useMultiDialog<
     DialogType | "replace" | "history"
@@ -207,6 +209,7 @@ export default function PartCard({
         partId={partId || ""}
         mode={canReplace ? "edit" : "create"}
         currentPart={currentPart}
+        bikeType={bikeType}
       />
 
       {/* Dialog dla wymiany */}
@@ -218,6 +221,7 @@ export default function PartCard({
         partId={partId || ""}
         mode="replace"
         currentPart={currentPart}
+        bikeType={bikeType}
       />
 
       <PartHistoryDialog

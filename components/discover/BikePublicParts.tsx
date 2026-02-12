@@ -2,10 +2,11 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { PartType } from "@/lib/generated/prisma";
-import { PART_CATEGORIES, PART_NAMES, PART_ICONS, type PartCategory, getHiddenPartsByBrakeType, extractBrakeType, getHiddenPartsByTubelessStatus, extractTubelessStatus } from "@/lib/default-parts";
+import { BikeType, PartType } from "@/lib/generated/prisma";
+import { PART_CATEGORIES, PART_ICONS, type PartCategory, getPartNameForBike, getHiddenPartsByBrakeType, extractBrakeType, getHiddenPartsByTubelessStatus, extractTubelessStatus } from "@/lib/default-parts";
 
 interface BikePublicPartsProps {
+  bikeType?: BikeType;
   parts: Array<{
     id: string;
     type: PartType;
@@ -24,7 +25,7 @@ interface BikePublicPartsProps {
   }>;
 }
 
-export function BikePublicParts({ parts }: BikePublicPartsProps) {
+export function BikePublicParts({ parts, bikeType }: BikePublicPartsProps) {
   if (parts.length === 0) return null;
 
   // Filtruj części wg typu hamulców i tubeless
@@ -80,7 +81,7 @@ export function BikePublicParts({ parts }: BikePublicPartsProps) {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium truncate">
-                          {PART_NAMES[part.type]}
+                          {getPartNameForBike(part.type, bikeType, part.partSpecificData)}
                         </span>
                         {part.product && (
                           <span className="text-xs text-muted-foreground truncate">

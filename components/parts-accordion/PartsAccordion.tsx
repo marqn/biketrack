@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { PartType } from "@/lib/generated/prisma";
+import { BikeType, PartType } from "@/lib/generated/prisma";
 import {
   Accordion,
   AccordionContent,
@@ -11,9 +11,9 @@ import {
 import PartCard from "@/components/part-card/PartCard";
 import {
   PART_CATEGORIES,
-  PART_UI,
   PartCategory,
   getPartCategory,
+  getPartUIForBike,
   getHiddenPartsByBrakeType,
   extractBrakeType,
   getHiddenPartsByTubelessStatus,
@@ -41,6 +41,7 @@ type ExistingPart = {
 
 interface PartsAccordionProps {
   bikeId: string;
+  bikeType?: BikeType;
   defaultParts: DefaultPart[];
   existingParts: ExistingPart[];
   chainChildren?: React.ReactNode;
@@ -48,6 +49,7 @@ interface PartsAccordionProps {
 
 export default function PartsAccordion({
   bikeId,
+  bikeType,
   defaultParts,
   existingParts,
   chainChildren,
@@ -118,7 +120,7 @@ export default function PartsAccordion({
                 <PartCard
                   key={partType}
                   partId={existingPart?.id || ""}
-                  partName={PART_UI[partType]}
+                  partName={getPartUIForBike(partType, bikeType, existingPart?.partSpecificData)}
                   expectedKm={expectedKm}
                   wearKm={existingPart?.wearKm || 0}
                   bikeId={bikeId}
@@ -136,6 +138,7 @@ export default function PartsAccordion({
                   isAccessory={category === "accessories"}
                   isInstalled={existingPart?.isInstalled ?? (category !== "accessories")}
                   createdAt={existingPart?.createdAt}
+                  bikeType={bikeType}
                 >
                   {partType === PartType.CHAIN && chainChildren}
                 </PartCard>

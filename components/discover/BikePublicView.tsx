@@ -196,7 +196,7 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: Bik
       {/* Części i komentarze - tylko dla zalogowanych */}
       {isLoggedIn && (
         <>
-          <BikePublicParts parts={bike.parts} />
+          <BikePublicParts parts={bike.parts} bikeType={bike.type} />
           <BikeCommentSection
             bikeId={bike.id}
             isLoggedIn={isLoggedIn}

@@ -1,5 +1,15 @@
 import { BikeType, PartType } from "@/lib/generated/prisma";
 
+// Nazwy części zależne od typu roweru
+const BIKE_TYPE_PART_NAMES: Partial<Record<BikeType, Partial<Record<PartType, string>>>> = {
+  ROAD: {
+    [PartType.SHIFTERS]: "Klamkomanetki",
+  },
+  GRAVEL: {
+    [PartType.SHIFTERS]: "Klamkomanetki",
+  },
+};
+
 type DefaultPart = {
   type: PartType;
   expectedKm: number;
@@ -340,6 +350,24 @@ export const PART_UI: Record<PartType, string> = Object.fromEntries(
 // Funkcje pomocnicze
 export function getPartName(partType: PartType | string): string {
   return PART_NAMES[partType as PartType] || String(partType);
+}
+
+export function getPartNameForBike(partType: PartType, bikeType?: BikeType, partSpecificData?: unknown): string {
+  // Dla SHIFTERS na szosie: checkbox "isClassicShifter" → "Manetki" zamiast "Klamkomanetki"
+  if (partType === PartType.SHIFTERS && partSpecificData) {
+    const data = partSpecificData as Record<string, unknown>;
+    if (data.isClassicShifter) return PART_NAMES[partType];
+  }
+  if (bikeType) {
+    const override = BIKE_TYPE_PART_NAMES[bikeType]?.[partType];
+    if (override) return override;
+  }
+  return PART_NAMES[partType] || String(partType);
+}
+
+export function getPartUIForBike(partType: PartType, bikeType?: BikeType, partSpecificData?: unknown): string {
+  const name = getPartNameForBike(partType, bikeType, partSpecificData);
+  return `${PART_ICONS[partType] || ""} | ${name}`;
 }
 
 export function getPartIcon(partType: PartType | string): string {
