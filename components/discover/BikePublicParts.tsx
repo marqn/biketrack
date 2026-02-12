@@ -3,7 +3,8 @@
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { BikeType, PartType } from "@/lib/generated/prisma";
-import { PART_CATEGORIES, PART_ICONS, type PartCategory, getPartNameForBike, getHiddenPartsByBrakeType, extractBrakeType, getHiddenPartsByTubelessStatus, extractTubelessStatus } from "@/lib/default-parts";
+import { PART_CATEGORIES, type PartCategory, getPartNameForBike, getHiddenPartsByBrakeType, extractBrakeType, getHiddenPartsByTubelessStatus, extractTubelessStatus } from "@/lib/default-parts";
+import { PartIcon } from "@/lib/part-icons";
 
 interface BikePublicPartsProps {
   bikeType?: BikeType;
@@ -74,8 +75,8 @@ export function BikePublicParts({ parts, bikeType }: BikePublicPartsProps) {
                     key={part.id}
                     className="flex items-center gap-3 py-2 px-3 rounded-lg bg-muted/50"
                   >
-                    <span className="text-lg w-7 shrink-0 text-center">
-                      {PART_ICONS[part.type] || ""}
+                    <span className="w-7 shrink-0 flex items-center justify-center">
+                      <PartIcon type={part.type} className="w-5 h-5" />
                     </span>
 
                     <div className="flex-1 min-w-0">

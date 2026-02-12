@@ -273,7 +273,7 @@ export const PART_NAMES: Record<PartType, string> = {
 // Emoji dla każdego typu części
 export const PART_ICONS: Record<PartType, string> = {
   // Rama i widelec
-  [PartType.FRAME]: "🖼️",
+  [PartType.FRAME]: "📐",
   [PartType.FORK]: "🍴",
   [PartType.SUSPENSION_FORK]: "🍴",
   // Stery i suport
@@ -300,8 +300,8 @@ export const PART_ICONS: Record<PartType, string> = {
   [PartType.HUBS]: "🎯",
   [PartType.RIMS]: "⭕",
   [PartType.SPOKES]: "📍",
-  [PartType.TIRE_FRONT]: "🛞",
-  [PartType.TIRE_REAR]: "🛞",
+  [PartType.TIRE_FRONT]: "⭕",
+  [PartType.TIRE_REAR]: "⭕",
   [PartType.INNER_TUBE_FRONT]: "🔵",
   [PartType.INNER_TUBE_REAR]: "🔵",
   [PartType.TUBELESS_SEALANT]: "🧴",

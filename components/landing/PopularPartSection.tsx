@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Gauge, Repeat } from "lucide-react";
-import { getPartName, getPartIcon } from "@/lib/default-parts";
+import { getPartName } from "@/lib/default-parts";
+import { PartIcon } from "@/lib/part-icons";
 import type { PartType } from "@/lib/generated/prisma";
 import type { LandingStats } from "@/app/app/actions/get-landing-stats";
 
@@ -33,8 +34,8 @@ export function PopularPartSection({ stats }: PopularPartSectionProps) {
                   </div>
                   <h3 className="font-semibold">Najczęściej monitorowana</h3>
                 </div>
-                <p className="text-3xl font-bold mb-1">
-                  {getPartIcon(popularPartType.type as PartType)}{" "}
+                <p className="text-3xl font-bold mb-1 flex items-center gap-2">
+                  <PartIcon type={popularPartType.type as PartType} className="w-8 h-8" />
                   {getPartName(popularPartType.type as PartType)}
                 </p>
                 <p className="text-sm text-muted-foreground">
@@ -54,8 +55,8 @@ export function PopularPartSection({ stats }: PopularPartSectionProps) {
                   </div>
                   <h3 className="font-semibold">Najczęściej wymieniana</h3>
                 </div>
-                <p className="text-3xl font-bold mb-1">
-                  {getPartIcon(mostReplacedPart.type as PartType)}{" "}
+                <p className="text-3xl font-bold mb-1 flex items-center gap-2">
+                  <PartIcon type={mostReplacedPart.type as PartType} className="w-8 h-8" />
                   {getPartName(mostReplacedPart.type as PartType)}
                 </p>
                 <p className="text-sm text-muted-foreground">

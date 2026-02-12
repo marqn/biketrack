@@ -13,7 +13,7 @@ import {
   PART_CATEGORIES,
   PartCategory,
   getPartCategory,
-  getPartUIForBike,
+  getPartNameForBike,
   getHiddenPartsByBrakeType,
   extractBrakeType,
   getHiddenPartsByTubelessStatus,
@@ -120,7 +120,7 @@ export default function PartsAccordion({
                 <PartCard
                   key={partType}
                   partId={existingPart?.id || ""}
-                  partName={getPartUIForBike(partType, bikeType, existingPart?.partSpecificData)}
+                  partName={getPartNameForBike(partType, bikeType, existingPart?.partSpecificData)}
                   expectedKm={expectedKm}
                   wearKm={existingPart?.wearKm || 0}
                   bikeId={bikeId}

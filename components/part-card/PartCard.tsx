@@ -5,6 +5,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { NotebookText, Link, Unlink } from "lucide-react";
 import { BikeType, PartType } from "@/lib/generated/prisma";
+import { PartIcon } from "@/lib/part-icons";
 import {
   Card,
   CardHeader,
@@ -115,8 +116,9 @@ export default function PartCard({
     <>
       <Card className={`mt-4 ${isAccessory && !isInstalled ? "opacity-50" : ""}`}>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">
-            {partName}
+          <CardTitle className="text-base flex items-center gap-2">
+            <PartIcon type={partType} className="w-5 h-5 shrink-0" />
+            <span>{partName}</span>
             <p>
               <button
                 onClick={() => openDialog("bike-details")}
