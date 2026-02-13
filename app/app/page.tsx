@@ -3,9 +3,10 @@ import { redirect } from "next/navigation";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import LubeButton from "./lube-button";
+import SealantButton from "./sealant-button";
 import KmForm from "./km-form";
 import { ServiceType } from "@/lib/generated/prisma";
-import { DEFAULT_PARTS, EBIKE_PARTS } from "@/lib/default-parts";
+import { DEFAULT_PARTS, EBIKE_PARTS, extractTubelessStatus } from "@/lib/default-parts";
 import { NotificationsList } from "@/components/notifications-list/NotificationsList";
 import { ensureEmailMissingNotification } from "@/lib/nofifications/emailMissing";
 import PartsAccordion from "@/components/parts-accordion/PartsAccordion";
@@ -32,7 +33,15 @@ export default async function AppPage() {
       },
     },
     services: {
-      where: { type: ServiceType.CHAIN_LUBE },
+      where: {
+        type: {
+          in: [
+            ServiceType.CHAIN_LUBE,
+            ServiceType.SEALANT_FRONT,
+            ServiceType.SEALANT_REAR,
+          ],
+        },
+      },
       orderBy: { createdAt: "desc" } as const,
       include: {
         lubricantProduct: {
@@ -85,7 +94,17 @@ export default async function AppPage() {
     select: { id: true },
   });
 
-  const lastLube = bike.services[0];
+  // Rozdziel service events wg typu
+  const lubeEvents = bike.services.filter(
+    (s) => s.type === ServiceType.CHAIN_LUBE
+  );
+  const sealantFrontEvents = bike.services.filter(
+    (s) => s.type === ServiceType.SEALANT_FRONT
+  );
+  const sealantRearEvents = bike.services.filter(
+    (s) => s.type === ServiceType.SEALANT_REAR
+  );
+  const lastLube = lubeEvents[0];
 
   // Przygotuj dane dla PartsAccordion
   const defaultParts = [...DEFAULT_PARTS[bike.type], ...(bike.isElectric ? EBIKE_PARTS : [])];
@@ -118,8 +137,28 @@ export default async function AppPage() {
             bikeId={bike.id}
             currentKm={bike.totalKm}
             lastLubeKmInitial={lastLube?.kmAtTime}
-            lubeEvents={bike.services}
+            lubeEvents={lubeEvents}
           />
+        }
+        tireFrontChildren={
+          extractTubelessStatus(existingParts).front ? (
+            <SealantButton
+              bikeId={bike.id}
+              currentKm={bike.totalKm}
+              wheel="front"
+              sealantEvents={sealantFrontEvents}
+            />
+          ) : undefined
+        }
+        tireRearChildren={
+          extractTubelessStatus(existingParts).rear ? (
+            <SealantButton
+              bikeId={bike.id}
+              currentKm={bike.totalKm}
+              wheel="rear"
+              sealantEvents={sealantRearEvents}
+            />
+          ) : undefined
         }
       />
     </div>

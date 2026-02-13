@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { PartType, Prisma } from "@/lib/generated/prisma";
+import { PartType, Prisma, ServiceType } from "@/lib/generated/prisma";
 
 export async function replacePart(formData: FormData) {
   const bikeId = formData.get("bikeId") as string;
@@ -58,7 +58,31 @@ export async function replacePart(formData: FormData) {
     },
   });
 
-  revalidatePath("/app"); // 👈 DODANE - główna strona
+  // Przy wymianie opony — wyczyść historię mleka tubeless dla tego koła
+  if (partType === PartType.TIRE_FRONT || partType === PartType.TIRE_REAR) {
+    const sealantType =
+      partType === PartType.TIRE_FRONT
+        ? ServiceType.SEALANT_FRONT
+        : ServiceType.SEALANT_REAR;
+
+    // Usuń powiązane opinie
+    const sealantEvents = await prisma.serviceEvent.findMany({
+      where: { bikeId, type: sealantType },
+      select: { id: true },
+    });
+    if (sealantEvents.length > 0) {
+      await prisma.partReview.deleteMany({
+        where: {
+          serviceEventId: { in: sealantEvents.map((e) => e.id) },
+        },
+      });
+      await prisma.serviceEvent.deleteMany({
+        where: { bikeId, type: sealantType },
+      });
+    }
+  }
+
+  revalidatePath("/app");
   revalidatePath(`/app/bikes/${bikeId}`);
 }
 

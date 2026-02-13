@@ -165,6 +165,8 @@ enum PartType {
 enum ServiceType {
   CHAIN_LUBE
   CHAIN_REPLACE
+  SEALANT_FRONT
+  SEALANT_REAR
 }
 
 model Bike {

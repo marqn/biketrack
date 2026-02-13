@@ -45,6 +45,8 @@ interface PartsAccordionProps {
   defaultParts: DefaultPart[];
   existingParts: ExistingPart[];
   chainChildren?: React.ReactNode;
+  tireFrontChildren?: React.ReactNode;
+  tireRearChildren?: React.ReactNode;
 }
 
 export default function PartsAccordion({
@@ -53,6 +55,8 @@ export default function PartsAccordion({
   defaultParts,
   existingParts,
   chainChildren,
+  tireFrontChildren,
+  tireRearChildren,
 }: PartsAccordionProps) {
   // Grupuj części według kategorii (z filtrowaniem wg typu hamulców)
   const partsByCategory = React.useMemo(() => {
@@ -149,6 +153,8 @@ export default function PartsAccordion({
                   bikeType={bikeType}
                 >
                   {partType === PartType.CHAIN && chainChildren}
+                  {partType === PartType.TIRE_FRONT && tireFrontChildren}
+                  {partType === PartType.TIRE_REAR && tireRearChildren}
                 </PartCard>
               ))}
             </div>

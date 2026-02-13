@@ -563,15 +563,15 @@ export function getHiddenPartsByTubelessStatus(
   tubeless: { front: boolean; rear: boolean }
 ): Set<PartType> {
   const hidden = new Set<PartType>();
+  // Mleko tubeless jest teraz prezentowane wewnątrz kart opon (jak smarowanie w łańcuchu)
+  // — zawsze ukrywamy osobne karty mleka
+  hidden.add(PartType.TUBELESS_SEALANT_FRONT);
+  hidden.add(PartType.TUBELESS_SEALANT_REAR);
   if (tubeless.front) {
     hidden.add(PartType.INNER_TUBE_FRONT);
-  } else {
-    hidden.add(PartType.TUBELESS_SEALANT_FRONT);
   }
   if (tubeless.rear) {
     hidden.add(PartType.INNER_TUBE_REAR);
-  } else {
-    hidden.add(PartType.TUBELESS_SEALANT_REAR);
   }
   return hidden;
 }

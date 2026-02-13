@@ -122,6 +122,29 @@ export interface ServiceEvent extends LubeEvent {
   type: string;
 }
 
+export interface SealantEvent {
+  id: string;
+  lubricantBrand: string | null;
+  lubricantProductId: string | null;
+  lubricantProduct?: {
+    id: string;
+    brand: string;
+    model: string;
+    specifications: unknown;
+    averageRating: number | null;
+    totalReviews: number;
+  } | null;
+  notes: string | null;
+  kmAtTime: number;
+  createdAt: Date | string;
+  type: string;
+  reviews?: Array<{
+    id: string;
+    rating: number;
+    reviewText: string | null;
+  }>;
+}
+
 export interface BikeInfo {
   id: string;
   name: string | null;
