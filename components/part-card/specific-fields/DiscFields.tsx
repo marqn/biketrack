@@ -18,8 +18,6 @@ interface DiscFieldsProps {
 export default function DiscFields({ data, onChange }: DiscFieldsProps) {
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">Specyfikacja tarczy</h4>
-
       <div className="space-y-2">
         <Label htmlFor="disc-mount">Mocowanie tarczy</Label>
         <Select

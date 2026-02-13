@@ -264,7 +264,7 @@ export function RenameBikeDialog({
           {/* Zdjęcie roweru */}
           <div className="space-y-2">
             <Label>Zdjęcie roweru</Label>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-col">
               <div className="relative w-32 h-24 rounded-lg border-2 border-dashed border-muted-foreground/25 flex items-center justify-center overflow-hidden bg-muted/50">
                 {bikeImage ? (
                   <>

@@ -18,8 +18,6 @@ interface HeadsetFieldsProps {
 export default function HeadsetFields({ data, onChange }: HeadsetFieldsProps) {
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">Specyfikacja sterów</h4>
-
       <div className="space-y-2">
         <Label htmlFor="headset-bearings">Łożyska</Label>
         <Select

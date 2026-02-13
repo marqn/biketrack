@@ -18,7 +18,10 @@ import ColoredProgress from "@/components/ui/colored-progress";
 import { DialogType } from "@/components/bike-header/BikeHeader";
 import PartDetailsDialog from "./PartDetailsDialog";
 import PartHistoryDialog from "./PartHistoryDialog";
-import { SEALANT_INTERVAL_DAYS, BRAKE_FLUID_INTERVAL_DAYS } from "@/lib/default-parts";
+import {
+  SEALANT_INTERVAL_DAYS,
+  BRAKE_FLUID_INTERVAL_DAYS,
+} from "@/lib/default-parts";
 import {
   deletePartReplacement,
   updatePartReplacement,
@@ -68,24 +71,31 @@ export default function PartCard({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const isTimeBased = partType === PartType.TUBELESS_SEALANT || partType === PartType.BRAKE_FLUID;
-  const timeIntervalDays = partType === PartType.BRAKE_FLUID
-    ? BRAKE_FLUID_INTERVAL_DAYS
-    : SEALANT_INTERVAL_DAYS;
+  const isTimeBased =
+    partType === PartType.TUBELESS_SEALANT || partType === PartType.BRAKE_FLUID;
+  const timeIntervalDays =
+    partType === PartType.BRAKE_FLUID
+      ? BRAKE_FLUID_INTERVAL_DAYS
+      : SEALANT_INTERVAL_DAYS;
   const timeBasedDate = isTimeBased
-    ? (currentPart?.installedAt || createdAt)
+    ? currentPart?.installedAt || createdAt
     : null;
   const daysSinceInstall = timeBasedDate
-    ? Math.floor((Date.now() - new Date(timeBasedDate).getTime()) / (1000 * 60 * 60 * 24))
+    ? Math.floor(
+        (Date.now() - new Date(timeBasedDate).getTime()) /
+          (1000 * 60 * 60 * 24),
+      )
     : 0;
 
-  const progressPercent = isTimeBased && timeBasedDate
-    ? Math.min(Math.round((daysSinceInstall / timeIntervalDays) * 100), 100)
-    : Math.min(Math.round((wearKm / expectedKm) * 100), 100);
+  const progressPercent =
+    isTimeBased && timeBasedDate
+      ? Math.min(Math.round((daysSinceInstall / timeIntervalDays) * 100), 100)
+      : Math.min(Math.round((wearKm / expectedKm) * 100), 100);
 
   // Określ czy jest to edit czy create
   const hasCurrentPart = !!(currentBrand && currentModel);
-  const canReplace = hasCurrentPart || (isTimeBased && !!currentPart?.installedAt);
+  const canReplace =
+    hasCurrentPart || (isTimeBased && !!currentPart?.installedAt);
 
   async function handleToggleInstalled(checked: boolean) {
     if (!partId) return;
@@ -104,7 +114,7 @@ export default function PartCard({
 
   async function handleEdit(
     replacementId: string,
-    data: { brand?: string; model?: string; notes?: string }
+    data: { brand?: string; model?: string; notes?: string },
   ) {
     startTransition(async () => {
       await updatePartReplacement(replacementId, data);
@@ -116,21 +126,21 @@ export default function PartCard({
     <>
       <Card className={isAccessory && !isInstalled ? "opacity-50" : ""}>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <PartIcon type={partType} className="w-5 h-5 shrink-0" />
-            <span>{partName}</span>
-            <p>
-              <button
-                onClick={() => openDialog("bike-details")}
-                className="text-xs text-muted-foreground relative after:absolute after:bottom-0 after:left-1/2 after:h-[2px] after:w-0 after:bg-current after:transition-all after:duration-300 after:-translate-x-1/2 hover:after:w-full cursor-pointer"
-              >
-                {currentBrand || currentModel
-                  ? currentBrand && currentModel
-                    ? `${currentBrand} ${currentModel}`
-                    : currentBrand || currentModel
-                  : "Dodaj model"}
-              </button>
-            </p>
+          <CardTitle className="text-base flex items-center gap-2 flex-col items-start">
+            <div className="flex items-center gap-2">
+              <PartIcon type={partType} className="w-5 h-5 shrink-0" />
+              {partName}
+            </div>
+            <button
+              onClick={() => openDialog("bike-details")}
+              className="text-xs text-muted-foreground relative after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-0 after:bg-current after:transition-all after:duration-300 after:-translate-x-1/2 hover:after:w-full cursor-pointer"
+            >
+              {currentBrand || currentModel
+                ? currentBrand && currentModel
+                  ? `${currentBrand} ${currentModel}`
+                  : currentBrand || currentModel
+                : "Dodaj model"}
+            </button>
           </CardTitle>
           <CardAction className="flex items-center gap-2">
             {progressPercent >= 100 && <span>🚨</span>}
@@ -161,7 +171,9 @@ export default function PartCard({
               {isTimeBased && timeBasedDate ? (
                 <>
                   Wiek:{" "}
-                  <span className="font-medium text-foreground">{daysSinceInstall}</span>
+                  <span className="font-medium text-foreground">
+                    {daysSinceInstall}
+                  </span>
                   {" dni "}/ {timeIntervalDays} dni
                 </>
               ) : (

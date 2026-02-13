@@ -36,8 +36,6 @@ const HOLES = [
 export default function HubsFields({ data, onChange }: HubsFieldsProps) {
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">Specyfikacja piast</h4>
-
       <div className="space-y-2">
         <Label htmlFor="hubs-disc-mount">Mocowanie tarczy</Label>
         <Select

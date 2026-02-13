@@ -27,8 +27,6 @@ export default function StemFields({ data, onChange }: StemFieldsProps) {
 
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">Specyfikacja mostka</h4>
-
       <div className="space-y-2">
         <Label htmlFor="stem-length">Długość (mm)</Label>
         <div className="flex items-center gap-2">

@@ -48,8 +48,6 @@ const BODY_MATERIAL_OPTIONS: { value: PedalsSpecificData["bodyMaterial"]; label:
 export default function PedalsFields({ data, onChange }: PedalsFieldsProps) {
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">Specyfikacja pedałów</h4>
-
       <div className="space-y-2">
         <Label htmlFor="pedals-clipless">Zatrzaskowe</Label>
         <Select

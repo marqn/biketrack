@@ -15,8 +15,6 @@ export default function ShiftersFields({ data, onChange, showClassicOption }: Sh
 
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">Specyfikacja manetek</h4>
-
       <div className="flex items-center space-x-2">
         <Checkbox
           id="classic-shifter"

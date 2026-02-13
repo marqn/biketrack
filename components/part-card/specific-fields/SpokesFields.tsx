@@ -24,8 +24,6 @@ const MATERIALS = [
 export default function SpokesFields({ data, onChange }: SpokesFieldsProps) {
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">Specyfikacja szprych</h4>
-
       <div className="space-y-2">
         <Label htmlFor="spokes-material">Materiał</Label>
         <Select

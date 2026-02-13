@@ -35,8 +35,6 @@ export default function DerailleurRearFields({
 }: DerailleurRearFieldsProps) {
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">Specyfikacja przerzutki tylnej</h4>
-
       <div className="space-y-2">
         <Label htmlFor="derailleur-speeds">Liczba rzędów</Label>
         <Select

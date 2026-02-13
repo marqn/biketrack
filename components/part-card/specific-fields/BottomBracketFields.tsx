@@ -26,8 +26,6 @@ const SHELL_TYPES = [
 export default function BottomBracketFields({ data, onChange }: BottomBracketFieldsProps) {
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">Specyfikacja suportu</h4>
-
       <div className="space-y-2">
         <Label htmlFor="bb-shell-type">Typ mufy ramy</Label>
         <Select

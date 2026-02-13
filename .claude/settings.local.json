@@ -18,7 +18,12 @@
       "WebFetch(domain:www.sram.com)",
       "WebFetch(domain:support.zipp.com)",
       "WebFetch(domain:www.elite-wheels.com)",
-      "WebFetch(domain:www.lightbicycle.com)"
+      "WebFetch(domain:www.lightbicycle.com)",
+      "WebFetch(domain:cloud-api.wahooligan.com)",
+      "WebFetch(domain:developers.wahooligan.com)",
+      "WebFetch(domain:docs.allauth.org)",
+      "Bash(wc:*)",
+      "Bash(node -e:*)"
     ]
   }
 }

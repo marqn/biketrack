@@ -28,8 +28,6 @@ export default function RimsFields({ data, onChange }: RimsFieldsProps) {
 
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">Specyfikacja koła</h4>
-
       <div className="space-y-2">
         <Label htmlFor="rims-material">Materiał</Label>
         <Select

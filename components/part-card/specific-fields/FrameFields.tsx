@@ -69,10 +69,6 @@ export default function FrameFields({ data, onChange, bikeType }: FrameFieldsPro
 
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">
-        {isTrainer ? "Specyfikacja trenażera" : "Specyfikacja ramy"}
-      </h4>
-
       {isTrainer ? (
         <>
           <div className="space-y-2">

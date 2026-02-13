@@ -39,8 +39,6 @@ export default function TireFields({ data, onChange }: TireFieldsProps) {
 
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">Specyfikacja opony</h4>
-
       <div className="space-y-2">
         <Label htmlFor="tire-bead">Typ</Label>
         <Select

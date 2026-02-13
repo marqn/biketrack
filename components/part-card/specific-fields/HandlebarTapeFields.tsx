@@ -26,8 +26,6 @@ export default function HandlebarTapeFields({ data, onChange }: HandlebarTapeFie
 
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">Specyfikacja owijki</h4>
-
       <div className="space-y-2">
         <Label htmlFor="tape-material">Materiał</Label>
         <Select

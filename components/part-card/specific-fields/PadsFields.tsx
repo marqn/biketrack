@@ -20,8 +20,6 @@ export default function PadsFields({ data, onChange }: PadsFieldsProps) {
 
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">Specyfikacja klocków</h4>
-
       <div className="space-y-2">
         <Label htmlFor="pads-brake-type">Typ hamulca</Label>
         <Select

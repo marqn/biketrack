@@ -95,6 +95,14 @@ export default function PartsAccordion({
       }
     }
 
+    // Sortuj akcesoria: zamontowane najpierw, potem nieaktywne
+    categories.accessories.sort((a, b) => {
+      const aInstalled = a.existingPart?.isInstalled ?? false;
+      const bInstalled = b.existingPart?.isInstalled ?? false;
+      if (aInstalled === bInstalled) return 0;
+      return aInstalled ? -1 : 1;
+    });
+
     return categories;
   }, [defaultParts, existingParts]);
 

@@ -26,8 +26,6 @@ export default function HandlebarFields({ data, onChange }: HandlebarFieldsProps
 
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">Specyfikacja kierownicy</h4>
-
       <div className="space-y-2">
         <Label htmlFor="handlebar-material">Materiał</Label>
         <Select

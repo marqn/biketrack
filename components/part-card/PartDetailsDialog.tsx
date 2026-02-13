@@ -15,7 +15,17 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
@@ -80,7 +90,11 @@ interface PartDetailsDialogProps {
   currentPart?: Partial<BikePartWithProduct> | null;
   bikeType?: BikeType;
   // Opcjonalne - dla edycji PartReplacement z historii
-  onSave?: (data: { brand?: string; model?: string; notes?: string }) => Promise<void>;
+  onSave?: (data: {
+    brand?: string;
+    model?: string;
+    notes?: string;
+  }) => Promise<void>;
   initialBrand?: string;
   initialModel?: string;
   initialNotes?: string;
@@ -100,16 +114,18 @@ export default function PartDetailsDialog({
   initialModel,
   initialNotes,
 }: PartDetailsDialogProps) {
-  const [selectedProduct, setSelectedProduct] = useState<PartProduct | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<PartProduct | null>(
+    null,
+  );
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
   const [installedAt, setInstalledAt] = useState<string>("");
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
-  const [partSpecificData, setPartSpecificData] = useState<Record<string, unknown>>(
-    getDefaultSpecificData(partType) as Record<string, unknown>
-  );
+  const [partSpecificData, setPartSpecificData] = useState<
+    Record<string, unknown>
+  >(getDefaultSpecificData(partType) as Record<string, unknown>);
   const [unknownProduct, setUnknownProduct] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isLoadingReview, setIsLoadingReview] = useState(false);
@@ -133,9 +149,13 @@ export default function PartDetailsDialog({
         }
 
         if (currentPart.partSpecificData) {
-          setPartSpecificData(currentPart.partSpecificData as Record<string, unknown>);
+          setPartSpecificData(
+            currentPart.partSpecificData as Record<string, unknown>,
+          );
         } else {
-          setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
+          setPartSpecificData(
+            getDefaultSpecificData(partType) as Record<string, unknown>,
+          );
         }
 
         // Załaduj opinię użytkownika z bazy danych
@@ -165,7 +185,9 @@ export default function PartDetailsDialog({
         setUnknownProduct(true);
         const date = new Date(currentPart.installedAt);
         setInstalledAt(format(date, "yyyy-MM-dd"));
-        setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
+        setPartSpecificData(
+          getDefaultSpecificData(partType) as Record<string, unknown>,
+        );
         setRating(0);
         setReviewText("");
       } else if (initialBrand || initialModel) {
@@ -176,7 +198,9 @@ export default function PartDetailsDialog({
         setUnknownProduct(false);
         const today = new Date();
         setInstalledAt(format(today, "yyyy-MM-dd"));
-        setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
+        setPartSpecificData(
+          getDefaultSpecificData(partType) as Record<string, unknown>,
+        );
         setRating(0);
         setReviewText(initialNotes || "");
       } else {
@@ -187,7 +211,9 @@ export default function PartDetailsDialog({
         setUnknownProduct(false);
         const today = new Date();
         setInstalledAt(format(today, "yyyy-MM-dd"));
-        setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
+        setPartSpecificData(
+          getDefaultSpecificData(partType) as Record<string, unknown>,
+        );
         setRating(0);
         setReviewText("");
       }
@@ -197,7 +223,15 @@ export default function PartDetailsDialog({
     if (open) {
       initDialog();
     }
-  }, [open, mode, currentPart, partType, initialBrand, initialModel, initialNotes]);
+  }, [
+    open,
+    mode,
+    currentPart,
+    partType,
+    initialBrand,
+    initialModel,
+    initialNotes,
+  ]);
 
   const isSealant = partType === PartType.TUBELESS_SEALANT;
 
@@ -223,7 +257,9 @@ export default function PartDetailsDialog({
             brand: brand.trim(),
             model: model.trim(),
             installedAt: installedAt ? new Date(installedAt) : undefined,
-            partSpecificData: hasSpecificFields(partType) ? partSpecificData : undefined,
+            partSpecificData: hasSpecificFields(partType)
+              ? partSpecificData
+              : undefined,
             rating: rating > 0 ? rating : undefined,
             reviewText: reviewText.trim() || undefined,
             mode,
@@ -246,7 +282,9 @@ export default function PartDetailsDialog({
         return (
           <FrameFields
             data={partSpecificData as Partial<FrameSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
             bikeType={bikeType}
           />
         );
@@ -255,21 +293,27 @@ export default function PartDetailsDialog({
         return (
           <TireFields
             data={partSpecificData as Partial<TireSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.CHAIN:
         return (
           <ChainFields
             data={partSpecificData as Partial<ChainSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.CASSETTE:
         return (
           <CassetteFields
             data={partSpecificData as Partial<CassetteSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.PADS_FRONT:
@@ -277,7 +321,9 @@ export default function PartDetailsDialog({
         return (
           <PadsFields
             data={partSpecificData as Partial<PadsSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.DISC_FRONT:
@@ -285,70 +331,90 @@ export default function PartDetailsDialog({
         return (
           <DiscFields
             data={partSpecificData as Partial<DiscSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.FORK:
         return (
           <ForkFields
             data={partSpecificData as Partial<ForkSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.SEATPOST:
         return (
           <SeatpostFields
             data={partSpecificData as Partial<SeatpostSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.SPOKES:
         return (
           <SpokesFields
             data={partSpecificData as Partial<SpokesSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.RIMS:
         return (
           <RimsFields
             data={partSpecificData as Partial<RimsSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.HUBS:
         return (
           <HubsFields
             data={partSpecificData as Partial<HubsSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.BOTTOM_BRACKET:
         return (
           <BottomBracketFields
             data={partSpecificData as Partial<BottomBracketSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.CRANKSET:
         return (
           <CranksetFields
             data={partSpecificData as Partial<CranksetSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.DERAILLEUR_REAR:
         return (
           <DerailleurRearFields
             data={partSpecificData as Partial<DerailleurRearSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.SHIFTERS:
         return (
           <ShiftersFields
             data={partSpecificData as Partial<ShiftersSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
             showClassicOption={bikeType === BikeType.ROAD}
           />
         );
@@ -356,35 +422,45 @@ export default function PartDetailsDialog({
         return (
           <PedalsFields
             data={partSpecificData as Partial<PedalsSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.STEM:
         return (
           <StemFields
             data={partSpecificData as Partial<StemSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.HEADSET:
         return (
           <HeadsetFields
             data={partSpecificData as Partial<HeadsetSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.HANDLEBAR:
         return (
           <HandlebarFields
             data={partSpecificData as Partial<HandlebarSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       case PartType.HANDLEBAR_TAPE:
         return (
           <HandlebarTapeFields
             data={partSpecificData as Partial<HandlebarTapeSpecificData>}
-            onChange={(data) => setPartSpecificData(data as Record<string, unknown>)}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
           />
         );
       default:
@@ -400,8 +476,9 @@ export default function PartDetailsDialog({
             {mode === "edit"
               ? "Edytuj szczegóły"
               : mode === "replace"
-              ? "Wymień"
-              : "Dodaj szczegóły"}: {partName}
+                ? "Wymień"
+                : "Dodaj szczegóły"}
+            : {partName}
           </DialogTitle>
           <DialogDescription>
             {mode === "replace"
@@ -416,7 +493,7 @@ export default function PartDetailsDialog({
         >
           {/* === Podstawowe informacje === */}
           <div className="space-y-4">
-            <h4 className="text-sm font-medium">Podstawowe informacje</h4>
+            <h3 className="text-base font-semibold">Podstawowe informacje</h3>
 
             {isSealant && (
               <div className="flex items-center space-x-2">
@@ -454,7 +531,7 @@ export default function PartDetailsDialog({
                   setSelectedProduct(product);
                   if (product && product.specifications) {
                     setPartSpecificData(
-                      product.specifications as Record<string, unknown>
+                      product.specifications as Record<string, unknown>,
                     );
                   }
                 }}
@@ -464,19 +541,21 @@ export default function PartDetailsDialog({
 
           {/* === Data montażu === */}
           <div className="space-y-4">
-            <h4 className="text-sm font-medium">Data montażu</h4>
+            <h3 className="text-base font-semibold">Data montażu</h3>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal",
-                    !installedAt && "text-muted-foreground"
+                    !installedAt && "text-muted-foreground",
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {installedAt
-                    ? format(new Date(installedAt), "d MMMM yyyy", { locale: pl })
+                    ? format(new Date(installedAt), "d MMMM yyyy", {
+                        locale: pl,
+                      })
                     : "Wybierz datę"}
                 </Button>
               </PopoverTrigger>
@@ -497,19 +576,39 @@ export default function PartDetailsDialog({
           </div>
 
           {/* === Specyficzne pola dla typu części === */}
-          {renderSpecificFields()}
-
+          {(() => {
+            const fields = renderSpecificFields();
+            if (!fields) return null;
+            return (
+              <Accordion
+                type="single"
+                collapsible
+                defaultValue={
+                  mode === "edit" && currentPart?.partSpecificData
+                    ? "specific-fields"
+                    : undefined
+                }
+              >
+                <AccordionItem value="specific-fields" className="border">
+                  <AccordionTrigger className="cursor-pointer text-base font-semibold">
+                    Szczegółowe parametry (opcjonalne / zalecane)
+                  </AccordionTrigger>
+                  <AccordionContent>{fields}</AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            );
+          })()}
           {/* === Opinia === */}
           {!unknownProduct && (
             <div className="space-y-4">
-              <h4 className="text-sm font-medium">
+              <h3 className="text-base font-semibold">
                 Opinia (opcjonalnie)
                 {isLoadingReview && (
                   <span className="ml-2 text-xs text-muted-foreground">
                     Ładowanie...
                   </span>
                 )}
-              </h4>
+              </h3>
 
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (

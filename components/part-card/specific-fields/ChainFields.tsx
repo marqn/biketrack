@@ -46,8 +46,6 @@ export default function ChainFields({ data, onChange }: ChainFieldsProps) {
 
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">Specyfikacja łańcucha</h4>
-
       <div className="space-y-2">
         <Label htmlFor="chain-speeds">Liczba rzędów</Label>
         <div className="flex items-center gap-2">
