@@ -3,7 +3,8 @@
 import * as React from "react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { NotebookText, Link, Unlink } from "lucide-react";
+import { NotebookText, Link, Unlink, Pencil } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { BikeType, PartType } from "@/lib/generated/prisma";
 import { PartIcon } from "@/lib/part-icons";
 import {
@@ -94,8 +95,9 @@ export default function PartCard({
 
   // Określ czy jest to edit czy create
   const hasCurrentPart = !!(currentBrand && currentModel);
+  const isUnknownProduct = !hasCurrentPart && !!currentPart?.installedAt;
   const canReplace =
-    hasCurrentPart || (isTimeBased && !!currentPart?.installedAt);
+    hasCurrentPart || isUnknownProduct || (isTimeBased && !!currentPart?.installedAt);
 
   async function handleToggleInstalled(checked: boolean) {
     if (!partId) return;
@@ -133,13 +135,22 @@ export default function PartCard({
             </div>
             <button
               onClick={() => openDialog("bike-details")}
-              className="text-xs text-muted-foreground relative after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-0 after:bg-current after:transition-all after:duration-300 after:-translate-x-1/2 hover:after:w-full cursor-pointer"
+              className={cn(
+                "text-xs relative after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-0 after:bg-current after:transition-all after:duration-300 after:-translate-x-1/2 hover:after:w-full cursor-pointer flex items-center gap-1",
+                currentBrand || currentModel
+                  ? "text-muted-foreground"
+                  : isUnknownProduct
+                    ? "text-primary"
+                    : "text-muted-foreground"
+              )}
             >
               {currentBrand || currentModel
                 ? currentBrand && currentModel
                   ? `${currentBrand} ${currentModel}`
                   : currentBrand || currentModel
-                : "Dodaj model"}
+                : isUnknownProduct
+                  ? <><Pencil className="w-3 h-3" />Uzupełnij markę i model</>
+                  : "Dodaj model"}
             </button>
           </CardTitle>
           <CardAction className="flex items-center gap-2">

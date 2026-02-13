@@ -43,6 +43,9 @@ export interface InstallPartInput {
   // Tryb operacji
   mode: "create" | "edit" | "replace";
 
+  // Użytkownik nie zna marki i modelu
+  unknownProduct?: boolean;
+
   // @deprecated - użyj mode: "replace" zamiast tego
   isReplacement?: boolean;
 }
@@ -130,7 +133,7 @@ export async function installPart(data: InstallPartInput) {
   await prisma.bikePart.update({
     where: { id: data.partId },
     data: {
-      productId,
+      productId: data.unknownProduct ? null : productId,
       installedAt: data.installedAt || new Date(),
       partSpecificData: data.partSpecificData as any,
       // Jeśli to wymiana, wyzeruj zużycie
@@ -139,7 +142,7 @@ export async function installPart(data: InstallPartInput) {
   });
 
   // Obsługa PartReplacement dla trybu "create", "edit" i nowej części przy "replace"
-  if ((mode === "create" || mode === "replace") && (data.brand || data.model || productId || part.type === PartType.TUBELESS_SEALANT)) {
+  if ((mode === "create" || mode === "replace") && (data.brand || data.model || productId || data.unknownProduct)) {
     // Tryb create lub replace - utwórz nowy rekord PartReplacement dla nowej części
     await prisma.partReplacement.create({
       data: {

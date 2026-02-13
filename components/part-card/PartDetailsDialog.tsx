@@ -177,8 +177,8 @@ export default function PartDetailsDialog({
           setRating(0);
           setReviewText("");
         }
-      } else if (mode === "edit" && isSealant && currentPart?.installedAt) {
-        // Tryb edycji mleka tubeless bez produktu (tylko data)
+      } else if (mode === "edit" && !currentPart?.product && currentPart?.installedAt) {
+        // Tryb edycji części bez produktu (nieznana marka/model)
         setSelectedProduct(null);
         setBrand("");
         setModel("");
@@ -233,8 +233,6 @@ export default function PartDetailsDialog({
     initialNotes,
   ]);
 
-  const isSealant = partType === PartType.TUBELESS_SEALANT;
-
   async function handleSave() {
     if (!unknownProduct && (!brand.trim() || !model.trim())) {
       alert("Proszę podać markę i model");
@@ -263,6 +261,7 @@ export default function PartDetailsDialog({
             rating: rating > 0 ? rating : undefined,
             reviewText: reviewText.trim() || undefined,
             mode,
+            unknownProduct,
           });
         }
         onOpenChange(false);
@@ -495,30 +494,28 @@ export default function PartDetailsDialog({
           <div className="space-y-4">
             <h3 className="text-base font-semibold">Podstawowe informacje</h3>
 
-            {isSealant && (
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="unknown-product"
-                  checked={unknownProduct}
-                  onCheckedChange={(checked) => {
-                    setUnknownProduct(checked === true);
-                    if (checked) {
-                      setBrand("");
-                      setModel("");
-                      setSelectedProduct(null);
-                      setRating(0);
-                      setReviewText("");
-                    }
-                  }}
-                />
-                <Label
-                  htmlFor="unknown-product"
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Nie znam produktu / Chcę tylko zapisać datę
-                </Label>
-              </div>
-            )}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="unknown-product"
+                checked={unknownProduct}
+                onCheckedChange={(checked) => {
+                  setUnknownProduct(checked === true);
+                  if (checked) {
+                    setBrand("");
+                    setModel("");
+                    setSelectedProduct(null);
+                    setRating(0);
+                    setReviewText("");
+                  }
+                }}
+              />
+              <Label
+                htmlFor="unknown-product"
+                className="text-sm font-normal cursor-pointer"
+              >
+                Nie znam marki i modelu
+              </Label>
+            </div>
 
             {!unknownProduct && (
               <BrandModelFields
