@@ -45,7 +45,8 @@ export const FALLBACK_EXPECTED_KM: Record<PartType, number> = {
   [PartType.TIRE_REAR]: 3500,
   [PartType.INNER_TUBE_FRONT]: 3500,
   [PartType.INNER_TUBE_REAR]: 3500,
-  [PartType.TUBELESS_SEALANT]: 3000,
+  [PartType.TUBELESS_SEALANT_FRONT]: 3000,
+  [PartType.TUBELESS_SEALANT_REAR]: 3000,
 
   // Cockpit
   [PartType.STEM]: 40000,
@@ -81,6 +82,7 @@ export const FALLBACK_EXPECTED_KM: Record<PartType, number> = {
   [PartType.CONTROLLER]: 40000,
 
   // Przestarzałe
+  [PartType.TUBELESS_SEALANT]: 3000,
   [PartType.CHAINRING_1X]: 30000,
   [PartType.BRAKES]: 20000,
   [PartType.BRAKE_LEVERS]: 30000,

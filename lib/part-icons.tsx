@@ -215,7 +215,8 @@ export const PART_ICON_COMPONENTS: Partial<Record<PartType, LucideIcon>> = {
   [PartType.TIRE_REAR]: BikeTireIcon,
   [PartType.INNER_TUBE_FRONT]: InnerTubeIcon,
   [PartType.INNER_TUBE_REAR]: InnerTubeIcon,
-  [PartType.TUBELESS_SEALANT]: Wrench,
+  [PartType.TUBELESS_SEALANT_FRONT]: Droplet,
+  [PartType.TUBELESS_SEALANT_REAR]: Droplet,
   // Cockpit
   [PartType.STEM]: StemIcon,
   [PartType.HANDLEBAR]: HandlebarIcon,

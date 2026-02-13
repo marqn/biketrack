@@ -190,12 +190,12 @@ const PART_TYPE_MAPPINGS: Record<string, PartType> = {
   'schlauch': PartType.INNER_TUBE_FRONT,
 
   // === MLEKO TUBELESS ===
-  'tubeless sealant': PartType.TUBELESS_SEALANT,
-  'sealant': PartType.TUBELESS_SEALANT,
-  'mleko tubeless': PartType.TUBELESS_SEALANT,
-  'mleko': PartType.TUBELESS_SEALANT,
-  'uszczelniacz': PartType.TUBELESS_SEALANT,
-  'dichtmilch': PartType.TUBELESS_SEALANT,
+  'tubeless sealant': PartType.TUBELESS_SEALANT_FRONT,
+  'sealant': PartType.TUBELESS_SEALANT_FRONT,
+  'mleko tubeless': PartType.TUBELESS_SEALANT_FRONT,
+  'mleko': PartType.TUBELESS_SEALANT_FRONT,
+  'uszczelniacz': PartType.TUBELESS_SEALANT_FRONT,
+  'dichtmilch': PartType.TUBELESS_SEALANT_FRONT,
 
   // === MOSTEK ===
   'stem': PartType.STEM,

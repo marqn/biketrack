@@ -4,10 +4,10 @@ import { ensureNotification } from "../utils/ensureNotification"
 import { SEALANT_INTERVAL_DAYS } from "@/lib/default-parts";
 
 export async function tubelessSealantRule(bikeId: string) {
-  const part = await prisma.bikePart.findFirst({
+  const parts = await prisma.bikePart.findMany({
     where: {
       bikeId,
-      type: PartType.TUBELESS_SEALANT,
+      type: { in: [PartType.TUBELESS_SEALANT_FRONT, PartType.TUBELESS_SEALANT_REAR] },
     },
     include: {
       bike: {
@@ -18,22 +18,24 @@ export async function tubelessSealantRule(bikeId: string) {
     },
   })
 
-  if (!part) return
+  for (const part of parts) {
+    const referenceDate = part.installedAt || part.createdAt
+    const daysSince =
+      (Date.now() - referenceDate.getTime()) / (1000 * 60 * 60 * 24)
 
-  const referenceDate = part.installedAt || part.createdAt
-  const daysSince =
-    (Date.now() - referenceDate.getTime()) / (1000 * 60 * 60 * 24)
+    if (daysSince < SEALANT_INTERVAL_DAYS) continue
 
-  if (daysSince < SEALANT_INTERVAL_DAYS) return
+    const label = part.type === PartType.TUBELESS_SEALANT_FRONT ? "przednie" : "tylne"
 
-  await ensureNotification({
-    userId: part.bike.userId,
-    type: NotificationType.SERVICE_DUE,
-    title: "Wymień mleko tubeless",
-    message: `Od ostatniej wymiany mleka minęło ${Math.floor(
-      daysSince
-    )} dni.`,
-    bikeId,
-    partId: part.id,
-  })
+    await ensureNotification({
+      userId: part.bike.userId,
+      type: NotificationType.SERVICE_DUE,
+      title: `Wymień mleko tubeless (${label})`,
+      message: `Od ostatniej wymiany mleka minęło ${Math.floor(
+        daysSince
+      )} dni.`,
+      bikeId,
+      partId: part.id,
+    })
+  }
 }

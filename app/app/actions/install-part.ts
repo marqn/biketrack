@@ -22,6 +22,11 @@ function getCanonicalPartType(partType: PartType): PartType {
     return PartType.DISC_FRONT;
   }
 
+  // Mleko tubeless zawsze przechowujemy jako TUBELESS_SEALANT_FRONT
+  if (partType === PartType.TUBELESS_SEALANT_FRONT || partType === PartType.TUBELESS_SEALANT_REAR) {
+    return PartType.TUBELESS_SEALANT_FRONT;
+  }
+
   // Wszystkie inne części pozostają bez zmian
   return partType;
 }

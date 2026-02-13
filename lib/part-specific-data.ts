@@ -164,7 +164,8 @@ export type PartSpecificDataMap = {
   [PartType.BOTTOM_BRACKET]: BottomBracketSpecificData;
   [PartType.CRANKSET]: CranksetSpecificData;
   [PartType.SUSPENSION_FORK]: SuspensionSpecificData;
-  [PartType.TUBELESS_SEALANT]: TubelessSealantSpecificData;
+  [PartType.TUBELESS_SEALANT_FRONT]: TubelessSealantSpecificData;
+  [PartType.TUBELESS_SEALANT_REAR]: TubelessSealantSpecificData;
   [PartType.INNER_TUBE_FRONT]: InnerTubeSpecificData;
   [PartType.INNER_TUBE_REAR]: InnerTubeSpecificData;
   [PartType.DROPPER_POST]: SuspensionSpecificData;
@@ -202,6 +203,7 @@ export type PartSpecificDataMap = {
   [PartType.BRAKE_FLUID]: Record<string, never>;
   [PartType.SHIFT_CABLES]: Record<string, never>;
   // Przestarzałe
+  [PartType.TUBELESS_SEALANT]: TubelessSealantSpecificData;
   [PartType.CHAINRING_1X]: Record<string, never>;
   [PartType.BRAKES]: Record<string, never>;
   [PartType.BRAKE_LEVERS]: Record<string, never>;
@@ -228,7 +230,8 @@ export function getDefaultSpecificData(
     [PartType.BOTTOM_BRACKET]: { shellType: "bsa" },
     [PartType.CRANKSET]: { chainring: 34, length: "170" },
     [PartType.SUSPENSION_FORK]: { travel: 100 },
-    [PartType.TUBELESS_SEALANT]: { volume: 60 },
+    [PartType.TUBELESS_SEALANT_FRONT]: { volume: 60 },
+    [PartType.TUBELESS_SEALANT_REAR]: { volume: 60 },
     [PartType.INNER_TUBE_FRONT]: { valveType: "presta" },
     [PartType.INNER_TUBE_REAR]: { valveType: "presta" },
     [PartType.DROPPER_POST]: { travel: 150 },
@@ -275,7 +278,8 @@ export function hasSpecificFields(type: PartType): boolean {
     PartType.HANDLEBAR,
     PartType.HANDLEBAR_TAPE,
     PartType.SUSPENSION_FORK,
-    PartType.TUBELESS_SEALANT,
+    PartType.TUBELESS_SEALANT_FRONT,
+    PartType.TUBELESS_SEALANT_REAR,
     PartType.INNER_TUBE_FRONT,
     PartType.INNER_TUBE_REAR,
     PartType.DROPPER_POST,

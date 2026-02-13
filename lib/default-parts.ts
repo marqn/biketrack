@@ -50,7 +50,8 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.TIRE_REAR, expectedKm: 4000 },
     { type: PartType.INNER_TUBE_FRONT, expectedKm: 4000 },
     { type: PartType.INNER_TUBE_REAR, expectedKm: 4000 },
-    { type: PartType.TUBELESS_SEALANT, expectedKm: 3000 },
+    { type: PartType.TUBELESS_SEALANT_FRONT, expectedKm: 3000 },
+    { type: PartType.TUBELESS_SEALANT_REAR, expectedKm: 3000 },
     // Cockpit
     { type: PartType.STEM, expectedKm: 50000 },
     { type: PartType.HANDLEBAR, expectedKm: 30000 },
@@ -94,7 +95,8 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.TIRE_REAR, expectedKm: 3500 },
     { type: PartType.INNER_TUBE_FRONT, expectedKm: 3500 },
     { type: PartType.INNER_TUBE_REAR, expectedKm: 3500 },
-    { type: PartType.TUBELESS_SEALANT, expectedKm: 3000 },
+    { type: PartType.TUBELESS_SEALANT_FRONT, expectedKm: 3000 },
+    { type: PartType.TUBELESS_SEALANT_REAR, expectedKm: 3000 },
     // Cockpit
     { type: PartType.STEM, expectedKm: 40000 },
     { type: PartType.HANDLEBAR, expectedKm: 25000 },
@@ -141,7 +143,8 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.TIRE_REAR, expectedKm: 3000 },
     { type: PartType.INNER_TUBE_FRONT, expectedKm: 3000 },
     { type: PartType.INNER_TUBE_REAR, expectedKm: 3000 },
-    { type: PartType.TUBELESS_SEALANT, expectedKm: 3000 },
+    { type: PartType.TUBELESS_SEALANT_FRONT, expectedKm: 3000 },
+    { type: PartType.TUBELESS_SEALANT_REAR, expectedKm: 3000 },
     // Cockpit
     { type: PartType.STEM, expectedKm: 30000 },
     { type: PartType.HANDLEBAR, expectedKm: 20000 },
@@ -182,7 +185,8 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.TIRE_REAR, expectedKm: 3000 },
     { type: PartType.INNER_TUBE_FRONT, expectedKm: 3000 },
     { type: PartType.INNER_TUBE_REAR, expectedKm: 3000 },
-    { type: PartType.TUBELESS_SEALANT, expectedKm: 3000 },
+    { type: PartType.TUBELESS_SEALANT_FRONT, expectedKm: 3000 },
+    { type: PartType.TUBELESS_SEALANT_REAR, expectedKm: 3000 },
     // Cockpit
     { type: PartType.STEM, expectedKm: 40000 },
     { type: PartType.HANDLEBAR, expectedKm: 25000 },
@@ -260,7 +264,8 @@ export const PART_NAMES: Record<PartType, string> = {
   [PartType.TIRE_REAR]: "Opona tylna",
   [PartType.INNER_TUBE_FRONT]: "Dętka przednia",
   [PartType.INNER_TUBE_REAR]: "Dętka tylna",
-  [PartType.TUBELESS_SEALANT]: "Mleko tubeless",
+  [PartType.TUBELESS_SEALANT_FRONT]: "Mleko tubeless przód",
+  [PartType.TUBELESS_SEALANT_REAR]: "Mleko tubeless tył",
   // Cockpit
   [PartType.STEM]: "Mostek",
   [PartType.HANDLEBAR]: "Kierownica",
@@ -290,6 +295,7 @@ export const PART_NAMES: Record<PartType, string> = {
   [PartType.BATTERY]: "Akumulator",
   [PartType.CONTROLLER]: "Sterownik",
   // Przestarzałe
+  [PartType.TUBELESS_SEALANT]: "Mleko tubeless",
   [PartType.CHAINRING_1X]: "Zębatka 1x",
   [PartType.BRAKES]: "Hamulce",
   [PartType.BRAKE_LEVERS]: "Klamki hamulcowe",
@@ -329,7 +335,8 @@ export const PART_ICONS: Record<PartType, string> = {
   [PartType.TIRE_REAR]: "⭕",
   [PartType.INNER_TUBE_FRONT]: "🔵",
   [PartType.INNER_TUBE_REAR]: "🔵",
-  [PartType.TUBELESS_SEALANT]: "🧴",
+  [PartType.TUBELESS_SEALANT_FRONT]: "🧴",
+  [PartType.TUBELESS_SEALANT_REAR]: "🧴",
   // Cockpit
   [PartType.STEM]: "🔧",
   [PartType.HANDLEBAR]: "🎛️",
@@ -359,6 +366,7 @@ export const PART_ICONS: Record<PartType, string> = {
   [PartType.BATTERY]: "🔋",
   [PartType.CONTROLLER]: "🎛️",
   // Przestarzałe
+  [PartType.TUBELESS_SEALANT]: "🧴",
   [PartType.CHAINRING_1X]: "⚙️",
   [PartType.BRAKES]: "🛑",
   [PartType.BRAKE_LEVERS]: "🎚️",
@@ -450,7 +458,8 @@ export const PART_CATEGORIES: Record<PartCategory, { label: string; types: PartT
       PartType.TIRE_REAR,
       PartType.INNER_TUBE_FRONT,
       PartType.INNER_TUBE_REAR,
-      PartType.TUBELESS_SEALANT,
+      PartType.TUBELESS_SEALANT_FRONT,
+      PartType.TUBELESS_SEALANT_REAR,
     ],
   },
   cockpit: {
@@ -556,13 +565,13 @@ export function getHiddenPartsByTubelessStatus(
   const hidden = new Set<PartType>();
   if (tubeless.front) {
     hidden.add(PartType.INNER_TUBE_FRONT);
+  } else {
+    hidden.add(PartType.TUBELESS_SEALANT_FRONT);
   }
   if (tubeless.rear) {
     hidden.add(PartType.INNER_TUBE_REAR);
-  }
-  // Jeśli żadna opona nie jest tubeless → ukryj mleko
-  if (!tubeless.front && !tubeless.rear) {
-    hidden.add(PartType.TUBELESS_SEALANT);
+  } else {
+    hidden.add(PartType.TUBELESS_SEALANT_REAR);
   }
   return hidden;
 }

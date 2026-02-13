@@ -247,7 +247,7 @@ async function main() {
   // --- MLEKO TUBELESS ---
   const sealantStans = await prisma.partProduct.create({
     data: {
-      type: PartType.TUBELESS_SEALANT,
+      type: PartType.TUBELESS_SEALANT_FRONT,
       brand: 'Stans NoTubes',
       model: 'Race Sealant',
       description: 'Mleko tubeless Stans'
@@ -762,7 +762,7 @@ async function main() {
       { bikeProductId: eskerRS30.id, partProductId: handlebarTapeFizik.id, partType: PartType.HANDLEBAR_TAPE, expectedKm: 5000 },
       { bikeProductId: eskerRS30.id, partProductId: saddleFizikTerraArgo.id, partType: PartType.SADDLE, expectedKm: 15000 },
       { bikeProductId: eskerRS30.id, partProductId: seatpostCarbon.id, partType: PartType.SEATPOST, expectedKm: 40000 },
-      { bikeProductId: eskerRS30.id, partProductId: sealantStans.id, partType: PartType.TUBELESS_SEALANT, expectedKm: 3000 },
+      { bikeProductId: eskerRS30.id, partProductId: sealantStans.id, partType: PartType.TUBELESS_SEALANT_FRONT, expectedKm: 3000 },
     ]
   })
 
@@ -784,7 +784,7 @@ async function main() {
       { bikeProductId: eskerRS20.id, partProductId: tireSchwalbeGOneRS45.id, partType: PartType.TIRE_REAR, expectedKm: 4000 },
       { bikeProductId: eskerRS20.id, partProductId: handlebarTapeFizik.id, partType: PartType.HANDLEBAR_TAPE, expectedKm: 5000 },
       { bikeProductId: eskerRS20.id, partProductId: saddleFizikTerraArgo.id, partType: PartType.SADDLE, expectedKm: 15000 },
-      { bikeProductId: eskerRS20.id, partProductId: sealantStans.id, partType: PartType.TUBELESS_SEALANT, expectedKm: 3000 },
+      { bikeProductId: eskerRS20.id, partProductId: sealantStans.id, partType: PartType.TUBELESS_SEALANT_FRONT, expectedKm: 3000 },
     ]
   })
 
@@ -830,7 +830,7 @@ async function main() {
       { bikeProductId: eskerTR.id, partProductId: handlebarTapeFizik.id, partType: PartType.HANDLEBAR_TAPE, expectedKm: 5000 },
       { bikeProductId: eskerTR.id, partProductId: saddleFizik.id, partType: PartType.SADDLE, expectedKm: 15000 },
       { bikeProductId: eskerTR.id, partProductId: seatpostDropperXFusion.id, partType: PartType.SEATPOST, expectedKm: 20000 },
-      { bikeProductId: eskerTR.id, partProductId: sealantStans.id, partType: PartType.TUBELESS_SEALANT, expectedKm: 3000 },
+      { bikeProductId: eskerTR.id, partProductId: sealantStans.id, partType: PartType.TUBELESS_SEALANT_FRONT, expectedKm: 3000 },
     ]
   })
 
@@ -852,7 +852,7 @@ async function main() {
       { bikeProductId: eskerADV30.id, partProductId: tireSchwalbeGOneRS45.id, partType: PartType.TIRE_REAR, expectedKm: 4000 },
       { bikeProductId: eskerADV30.id, partProductId: handlebarTapeFizik.id, partType: PartType.HANDLEBAR_TAPE, expectedKm: 5000 },
       { bikeProductId: eskerADV30.id, partProductId: saddleFizikTerraArgo.id, partType: PartType.SADDLE, expectedKm: 15000 },
-      { bikeProductId: eskerADV30.id, partProductId: sealantStans.id, partType: PartType.TUBELESS_SEALANT, expectedKm: 3000 },
+      { bikeProductId: eskerADV30.id, partProductId: sealantStans.id, partType: PartType.TUBELESS_SEALANT_FRONT, expectedKm: 3000 },
     ]
   })
 
@@ -1022,7 +1022,7 @@ async function main() {
       { bikeProductId: eskerAXSLTD.id, partProductId: tireSchwalbeGOneRS45.id, partType: PartType.TIRE_REAR, expectedKm: 4000 },
       { bikeProductId: eskerAXSLTD.id, partProductId: handlebarTapeFizik.id, partType: PartType.HANDLEBAR_TAPE, expectedKm: 5000 },
       { bikeProductId: eskerAXSLTD.id, partProductId: saddleFizik.id, partType: PartType.SADDLE, expectedKm: 15000 },
-      { bikeProductId: eskerAXSLTD.id, partProductId: sealantStans.id, partType: PartType.TUBELESS_SEALANT, expectedKm: 3000 },
+      { bikeProductId: eskerAXSLTD.id, partProductId: sealantStans.id, partType: PartType.TUBELESS_SEALANT_FRONT, expectedKm: 3000 },
     ]
   })
 
@@ -1036,7 +1036,7 @@ async function main() {
       { bikeProductId: topstoneCarbon1.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_FRONT, expectedKm: 2500 },
       { bikeProductId: topstoneCarbon1.id, partProductId: padsShimanoGRX.id, partType: PartType.PADS_REAR, expectedKm: 2500 },
       { bikeProductId: topstoneCarbon1.id, partProductId: cranksetShimanoGRX40T.id, partType: PartType.CRANKSET, expectedKm: 10000 },
-      { bikeProductId: topstoneCarbon1.id, partProductId: sealantStans.id, partType: PartType.TUBELESS_SEALANT, expectedKm: 3000 },
+      { bikeProductId: topstoneCarbon1.id, partProductId: sealantStans.id, partType: PartType.TUBELESS_SEALANT_FRONT, expectedKm: 3000 },
     ]
   })
 

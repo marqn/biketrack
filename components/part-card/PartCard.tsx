@@ -73,7 +73,7 @@ export default function PartCard({
   const router = useRouter();
 
   const isTimeBased =
-    partType === PartType.TUBELESS_SEALANT || partType === PartType.BRAKE_FLUID;
+    partType === PartType.TUBELESS_SEALANT_FRONT || partType === PartType.TUBELESS_SEALANT_REAR || partType === PartType.BRAKE_FLUID;
   const timeIntervalDays =
     partType === PartType.BRAKE_FLUID
       ? BRAKE_FLUID_INTERVAL_DAYS
