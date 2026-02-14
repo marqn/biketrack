@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 
 const MAX_IMAGES_BIKE = 3;
 const MAX_IMAGES_PART = 3;
+const MAX_IMAGES_REVIEW = 3;
 
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
@@ -22,7 +23,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
         const payload = JSON.parse(clientPayload || "{}");
         const { type, entityId } = payload as {
-          type: "bike" | "part" | "avatar";
+          type: "bike" | "part" | "avatar" | "review";
           entityId: string;
         };
 
@@ -56,6 +57,15 @@ export async function POST(request: Request): Promise<NextResponse> {
         } else if (type === "avatar") {
           if (entityId !== session.user.id) {
             throw new Error("Brak uprawnień");
+          }
+        } else if (type === "review") {
+          // Dla recenzji sprawdzamy tylko czy produkt istnieje
+          // entityId = productId (recenzja może jeszcze nie istnieć)
+          const product = await prisma.partProduct.findUnique({
+            where: { id: entityId },
+          });
+          if (!product) {
+            throw new Error("Produkt nie istnieje");
           }
         }
 

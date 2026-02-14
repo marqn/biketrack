@@ -10,7 +10,7 @@ import { compressImage } from "@/lib/image-compression";
 interface ImageUploaderProps {
   images: string[];
   maxImages: number;
-  entityType: "bike" | "part" | "avatar";
+  entityType: "bike" | "part" | "avatar" | "review";
   entityId: string;
   onImagesChange: (urls: string[]) => void;
   variant?: "grid" | "avatar";
@@ -18,7 +18,7 @@ interface ImageUploaderProps {
 }
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_SIZE = 10 * 1024 * 1024; // 5MB
 
 export function ImageUploader({
   images,
@@ -49,7 +49,7 @@ export function ImageUploader({
       return;
     }
     if (file.size > MAX_SIZE) {
-      setError("Maksymalny rozmiar: 5MB");
+      setError("Maksymalny rozmiar: 10MB");
       return;
     }
 

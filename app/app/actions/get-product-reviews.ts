@@ -19,6 +19,7 @@ export interface ReviewWithUser {
   reviewText: string | null;
   pros: string[];
   cons: string[];
+  images: string[];
   kmUsed: number;
   bikeType: BikeType;
   verified: boolean;
@@ -73,7 +74,7 @@ export async function getProductReviews({
     ...(bikeTypeFilter && { bikeType: bikeTypeFilter }),
   };
 
-  const [reviews, totalCount, product, partsWithImages] = await Promise.all([
+  const [reviews, totalCount, product, partsWithImages, reviewsWithImages] = await Promise.all([
     prisma.partReview.findMany({
       where,
       orderBy,
@@ -85,6 +86,7 @@ export async function getProductReviews({
         reviewText: true,
         pros: true,
         cons: true,
+        images: true,
         kmUsed: true,
         bikeType: true,
         verified: true,
@@ -125,9 +127,21 @@ export async function getProductReviews({
       select: { images: true },
       take: 9,
     }),
+    // Pobierz zdjęcia z recenzji
+    prisma.partReview.findMany({
+      where: {
+        productId,
+        images: { isEmpty: false },
+      },
+      select: { images: true },
+      take: 9,
+    }),
   ]);
 
-  const communityImages = partsWithImages.flatMap((p) => p.images).slice(0, 9);
+  const communityImages = [
+    ...partsWithImages.flatMap((p) => p.images),
+    ...reviewsWithImages.flatMap((r) => r.images),
+  ].slice(0, 9);
 
   return {
     reviews,

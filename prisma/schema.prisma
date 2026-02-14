@@ -304,6 +304,9 @@ model PartReview {
   pros String[] @default([])
   cons String[] @default([])
 
+  // Zdjęcia
+  images String[] @default([])
+
   // Weryfikacja
   verified Boolean @default(true) // true jeśli linked do rzeczywistego BikePart/ServiceEvent
 

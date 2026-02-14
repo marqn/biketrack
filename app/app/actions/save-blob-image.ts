@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 export async function saveBlobImage(
-  entityType: "bike" | "part" | "avatar",
+  entityType: "bike" | "part" | "avatar" | "review",
   entityId: string,
   blobUrl: string
 ) {
@@ -79,6 +79,24 @@ export async function saveBlobImage(
       await prisma.user.update({
         where: { id: entityId },
         data: { image: blobUrl },
+      });
+    } else if (entityType === "review") {
+      const review = await prisma.partReview.findUnique({
+        where: { id: entityId },
+        select: { userId: true, images: true },
+      });
+      if (!review || review.userId !== session.user.id) {
+        return { success: false, error: "Brak uprawnień" };
+      }
+      if (review.images.length >= 3) {
+        return { success: false, error: "Maksymalnie 3 zdjęcia" };
+      }
+
+      await prisma.partReview.update({
+        where: { id: entityId },
+        data: {
+          images: { push: blobUrl },
+        },
       });
     }
 

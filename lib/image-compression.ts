@@ -1,6 +1,6 @@
 import imageCompression from "browser-image-compression";
 
-type ImageEntityType = "bike" | "part" | "avatar";
+type ImageEntityType = "bike" | "part" | "avatar" | "review";
 
 interface CompressionConfig {
   maxSizeMB: number;
@@ -22,6 +22,11 @@ const COMPRESSION_CONFIGS: Record<ImageEntityType, CompressionConfig> = {
   avatar: {
     maxSizeMB: 0.3,
     maxWidthOrHeight: 512,
+    fileType: "image/webp",
+  },
+  review: {
+    maxSizeMB: 0.8,
+    maxWidthOrHeight: 1200,
     fileType: "image/webp",
   },
 };

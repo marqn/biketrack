@@ -49,6 +49,7 @@ interface ProductReviewsClientProps {
     pros: string[];
     cons: string[];
     bikeType: BikeType;
+    images: string[];
   } | null;
   userId: string;
   communityImages?: string[];

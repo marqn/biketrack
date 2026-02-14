@@ -13,6 +13,7 @@ export interface AddProductReviewInput {
   pros?: string[];
   cons?: string[];
   bikeType: BikeType;
+  images?: string[];
 }
 
 export async function addProductReview(data: AddProductReviewInput) {
@@ -46,6 +47,10 @@ export async function addProductReview(data: AddProductReviewInput) {
     },
   });
 
+  const imageUrls = (data.images || []).filter(
+    (url) => url.startsWith("https://") && url.includes(".public.blob.vercel-storage.com")
+  ).slice(0, 3);
+
   if (existingReview) {
     await prisma.partReview.update({
       where: { id: existingReview.id },
@@ -55,6 +60,7 @@ export async function addProductReview(data: AddProductReviewInput) {
         pros: data.pros || [],
         cons: data.cons || [],
         bikeType: data.bikeType,
+        images: imageUrls,
       },
     });
   } else {
@@ -66,6 +72,7 @@ export async function addProductReview(data: AddProductReviewInput) {
         reviewText: data.reviewText || null,
         pros: data.pros || [],
         cons: data.cons || [],
+        images: imageUrls,
         kmUsed: 0,
         kmAtReview: userBike?.totalKm || 0,
         bikeType: data.bikeType,
@@ -116,6 +123,7 @@ export async function getUserProductReview(productId: string) {
       pros: true,
       cons: true,
       bikeType: true,
+      images: true,
     },
   });
 

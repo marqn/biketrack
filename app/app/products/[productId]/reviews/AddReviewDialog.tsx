@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -23,6 +23,13 @@ import {
 import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels } from "@/lib/types";
 import { addProductReview } from "@/app/app/actions/add-product-review";
+import { upload } from "@vercel/blob/client";
+import { compressImage } from "@/lib/image-compression";
+import { Plus, X, Loader2 } from "lucide-react";
+
+const MAX_IMAGES = 3;
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 interface ExistingReview {
   id: string;
@@ -31,6 +38,7 @@ interface ExistingReview {
   pros: string[];
   cons: string[];
   bikeType: BikeType;
+  images: string[];
 }
 
 interface AddReviewDialogProps {
@@ -54,9 +62,15 @@ export function AddReviewDialog({
   const [bikeType, setBikeType] = useState<BikeType>(
     existingReview?.bikeType || BikeType.ROAD
   );
+  const [images, setImages] = useState<string[]>(
+    existingReview?.images || []
+  );
+  const [uploading, setUploading] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
@@ -64,14 +78,58 @@ export function AddReviewDialog({
         setRating(existingReview.rating);
         setReviewText(existingReview.reviewText || "");
         setBikeType(existingReview.bikeType);
+        setImages(existingReview.images || []);
       } else {
         setRating(0);
         setReviewText("");
         setBikeType(BikeType.ROAD);
+        setImages([]);
       }
       setError(null);
+      setImageError(null);
     }
   }, [open, existingReview]);
+
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (fileInputRef.current) fileInputRef.current.value = "";
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setImageError("Dozwolone formaty: JPG, PNG, WebP");
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      setImageError("Maksymalny rozmiar: 5MB");
+      return;
+    }
+
+    setImageError(null);
+    setUploading(true);
+
+    try {
+      const compressedFile = await compressImage(file, "review");
+
+      const blob = await upload(compressedFile.name, compressedFile, {
+        access: "public",
+        handleUploadUrl: "/api/upload",
+        clientPayload: JSON.stringify({ type: "review", entityId: productId }),
+      });
+
+      setImages((prev) => [...prev, blob.url]);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Błąd podczas uploadu";
+      setImageError(message);
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function handleRemoveImage(url: string) {
+    setImages((prev) => prev.filter((u) => u !== url));
+  }
 
   function handleSubmit() {
     if (rating === 0) {
@@ -88,6 +146,7 @@ export function AddReviewDialog({
           rating,
           reviewText: reviewText.trim() || undefined,
           bikeType,
+          images,
         });
         onOpenChange(false);
         router.refresh();
@@ -111,6 +170,61 @@ export function AddReviewDialog({
         </DialogHeader>
 
         <div className="space-y-4 py-4">
+
+          {/* Images */}
+          <div className="space-y-2">
+            <Label>Zdjęcia (opcjonalnie)</Label>
+            <div className="flex flex-wrap gap-2">
+              {images.map((url) => (
+                <div
+                  key={url}
+                  className="relative w-20 h-20 rounded-lg border overflow-hidden bg-muted/50 group"
+                >
+                  <img
+                    src={url}
+                    alt="Zdjęcie recenzji"
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(url)}
+                    disabled={isPending}
+                    className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-background/80 hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors opacity-0 group-hover:opacity-100"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+
+              {images.length < MAX_IMAGES && (
+                <label className="w-20 h-20 rounded-lg border-2 border-dashed border-muted-foreground/25 flex flex-col items-center justify-center gap-1 cursor-pointer text-muted-foreground hover:text-foreground hover:border-foreground/25 transition-colors bg-muted/50">
+                  {uploading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <>
+                      <Plus className="h-4 w-4" />
+                      <span className="text-[10px]">Dodaj</span>
+                    </>
+                  )}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    disabled={uploading || isPending}
+                  />
+                </label>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {images.length}/{MAX_IMAGES} zdjęć (JPG/PNG/WebP)
+            </p>
+            {imageError && (
+              <p className="text-xs text-destructive">{imageError}</p>
+            )}
+          </div>
+          
           {/* Star Rating */}
           <div className="space-y-2">
             <Label>Ocena *</Label>
@@ -165,6 +279,8 @@ export function AddReviewDialog({
             />
           </div>
 
+          
+
           {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
 
@@ -172,7 +288,7 @@ export function AddReviewDialog({
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Anuluj
           </Button>
-          <Button onClick={handleSubmit} disabled={isPending || rating === 0}>
+          <Button onClick={handleSubmit} disabled={isPending || rating === 0 || uploading}>
             {isPending ? "Zapisuje..." : "Zapisz"}
           </Button>
         </DialogFooter>
