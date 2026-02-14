@@ -21,7 +21,7 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
-import { Star, Users, Route, Plus, ArrowLeft } from "lucide-react";
+import { Star, Users, Route, Plus, ArrowLeft, Package } from "lucide-react";
 import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels } from "@/lib/types";
 import { getPartName } from "@/lib/default-parts";
@@ -99,14 +99,27 @@ export function ProductReviewsClient({
       {/* Product Header */}
       <Card>
         <CardHeader>
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="text-2xl">
-                {product.brand} {product.model}
-              </CardTitle>
-              <p className="text-muted-foreground">
-                {getPartName(product.type as PartType)}
-              </p>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-4">
+              {product.officialImageUrl ? (
+                <img
+                  src={product.officialImageUrl}
+                  alt={`${product.brand} ${product.model}`}
+                  className="w-20 h-20 rounded-lg object-cover border bg-muted shrink-0"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-lg border bg-muted flex items-center justify-center shrink-0">
+                  <Package className="w-8 h-8 text-muted-foreground/30" />
+                </div>
+              )}
+              <div>
+                <CardTitle className="text-2xl">
+                  {product.brand} {product.model}
+                </CardTitle>
+                <p className="text-muted-foreground">
+                  {getPartName(product.type as PartType)}
+                </p>
+              </div>
             </div>
             <Button onClick={() => setShowAddDialog(true)}>
               <Plus className="w-4 h-4 mr-2" />

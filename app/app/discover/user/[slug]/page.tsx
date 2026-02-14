@@ -25,6 +25,7 @@ export default async function UserPublicPage({ params }: UserPublicPageProps) {
           type: true,
           isElectric: true,
           totalKm: true,
+          images: true,
           imageUrl: true,
           _count: {
             select: { comments: { where: { isHidden: false, parentId: null } } },

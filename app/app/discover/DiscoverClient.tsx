@@ -24,6 +24,7 @@ type BikeData = {
   type: BikeType;
   isElectric: boolean;
   totalKm: number;
+  images: string[];
   imageUrl: string | null;
   user: { name: string | null; image: string | null };
   _count: { comments: number };

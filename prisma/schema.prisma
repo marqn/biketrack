@@ -182,7 +182,8 @@ model Bike {
   totalKm      Int      @default(0)
   isPublic     Boolean  @default(false)  // Czy rower jest widoczny publicznie
   slug         String?  @unique          // URL-friendly identyfikator dla strony publicznej
-  imageUrl     String?  @db.Text         // Zdjęcie roweru (base64)
+  images       String[] @default([])      // Vercel Blob URLs (do 3 zdjęć)
+  imageUrl     String?  @db.Text         // TYMCZASOWO - stare base64, usunąć po migracji
 
   user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   parts            BikePart[]
@@ -209,6 +210,7 @@ model BikePart {
   productId String? // Referencja do globalnego produktu
   installedAt DateTime? // Data montażu
   partSpecificData Json? // Specyficzne dane dla tej instancji części
+  images       String[] @default([]) // Vercel Blob URLs (do 3 zdjęć)
 
   bike         Bike              @relation(fields: [bikeId], references: [id], onDelete: Cascade)
   product      PartProduct?      @relation(fields: [productId], references: [id], onDelete: SetNull)

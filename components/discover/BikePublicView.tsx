@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
-import { Bike as BikeIcon, MapPin, LogIn, X } from "lucide-react";
+import { Bike as BikeIcon, MapPin, LogIn, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { bikeTypeLabels } from "@/lib/types";
 import { BikeType, PartType } from "@/lib/generated/prisma";
 import { BikePublicParts } from "./BikePublicParts";
@@ -22,7 +22,8 @@ interface BikePublicViewProps {
     description: string | null;
     isElectric: boolean;
     totalKm: number;
-    imageUrl: string | null;
+    images?: string[];
+    imageUrl?: string | null;
     slug: string | null;
     user: {
       id: string;
@@ -55,6 +56,11 @@ interface BikePublicViewProps {
 
 export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: BikePublicViewProps) {
   const [imageOpen, setImageOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const allImages = bike.images?.length ? bike.images : bike.imageUrl ? [bike.imageUrl] : [];
+  const hasImages = allImages.length > 0;
+  const hasMultipleImages = allImages.length > 1;
 
   const bikeTitle = bike.brand || bike.model
     ? `${bike.brand ?? ""} ${bike.model ?? ""}`.trim()
@@ -71,17 +77,48 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: Bik
     <div className="space-y-6">
       {/* Header z informacjami o rowerze */}
       <div className="bg-card rounded-xl border overflow-hidden">
-        {/* Zdjęcie roweru */}
-        {bike.imageUrl ? (
+        {/* Zdjęcia roweru */}
+        {hasImages ? (
           <div
-            className="w-full h-64 bg-muted cursor-pointer"
+            className="relative w-full h-64 bg-muted cursor-pointer group"
             onClick={() => setImageOpen(true)}
           >
             <img
-              src={bike.imageUrl}
+              src={allImages[currentImageIndex]}
               alt={bikeTitle}
               className="w-full h-full object-cover"
             />
+            {hasMultipleImages && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex((i) => (i - 1 + allImages.length) % allImages.length);
+                  }}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 text-white hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex((i) => (i + 1) % allImages.length);
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 text-white hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                  {allImages.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(i); }}
+                      className={`w-2 h-2 rounded-full transition-colors ${i === currentImageIndex ? "bg-white" : "bg-white/50"}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         ) : (
           <div className="w-full h-40 bg-muted flex items-center justify-center">
@@ -90,7 +127,7 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: Bik
         )}
 
         {/* Pełnoekranowe zdjęcie */}
-        {bike.imageUrl && (
+        {hasImages && (
           <Dialog open={imageOpen} onOpenChange={setImageOpen}>
             <DialogPortal>
               <DialogOverlay className="bg-black/80" />
@@ -105,12 +142,45 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: Bik
                   <X className="h-6 w-6" />
                   <span className="sr-only">Zamknij</span>
                 </button>
+                {hasMultipleImages && (
+                  <>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentImageIndex((i) => (i - 1 + allImages.length) % allImages.length);
+                      }}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 z-50 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
+                    >
+                      <ChevronLeft className="h-6 w-6" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentImageIndex((i) => (i + 1) % allImages.length);
+                      }}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 z-50 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
+                    >
+                      <ChevronRight className="h-6 w-6" />
+                    </button>
+                  </>
+                )}
                 <img
-                  src={bike.imageUrl}
+                  src={allImages[currentImageIndex]}
                   alt={bikeTitle}
                   className="max-w-full max-h-[90vh] object-contain rounded-lg"
                   onClick={(e) => e.stopPropagation()}
                 />
+                {hasMultipleImages && (
+                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+                    {allImages.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(i); }}
+                        className={`w-2.5 h-2.5 rounded-full transition-colors ${i === currentImageIndex ? "bg-white" : "bg-white/50"}`}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </DialogPortal>
           </Dialog>

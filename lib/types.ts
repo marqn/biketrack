@@ -221,5 +221,6 @@ export interface BikePartWithProduct {
   productId: string | null;
   installedAt: Date | string | null;
   partSpecificData: unknown;
+  images: string[];
   product: PartProduct | null;
 }

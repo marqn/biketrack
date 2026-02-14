@@ -16,7 +16,8 @@ interface BikeCardProps {
     type: BikeType;
     isElectric: boolean;
     totalKm: number;
-    imageUrl: string | null;
+    images?: string[];
+    imageUrl?: string | null;
     user?: {
       name: string | null;
       image: string | null;
@@ -30,6 +31,8 @@ export function BikeCard({ bike }: BikeCardProps) {
 
   if (!bike.slug) return null;
 
+  const displayImage = bike.images?.length ? bike.images[0] : bike.imageUrl ?? null;
+
   const bikeTitle = bike.brand || bike.model
     ? `${bike.brand ?? ""} ${bike.model ?? ""}`.trim()
     : bikeTypeLabels[bike.type];
@@ -41,13 +44,13 @@ export function BikeCard({ bike }: BikeCardProps) {
     >
       {/* Miniatura */}
       <div className="relative w-full h-36 bg-muted flex items-center justify-center overflow-hidden">
-        {bike.imageUrl ? (
+        {displayImage ? (
           <>
             {!imageLoaded && (
               <Loader2 className="h-8 w-8 text-muted-foreground/40 animate-spin absolute" />
             )}
             <img
-              src={bike.imageUrl}
+              src={displayImage}
               alt={bikeTitle}
               className={`w-full h-full object-cover group-hover:scale-105 transition-transform ${!imageLoaded ? "opacity-0" : "opacity-100"}`}
               onLoad={() => setImageLoaded(true)}

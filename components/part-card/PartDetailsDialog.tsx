@@ -34,6 +34,7 @@ import { BikeType, PartType } from "@/lib/generated/prisma";
 import { PartProduct, BikePartWithProduct } from "@/lib/types";
 import { installPart } from "@/app/app/actions/install-part";
 import { getUserPartReview } from "@/app/app/actions/get-user-part-review";
+import { ImageUploader } from "@/components/ui/image-uploader";
 import BrandModelFields from "./BrandModelFields";
 import TireFields from "./specific-fields/TireFields";
 import ChainFields from "./specific-fields/ChainFields";
@@ -127,6 +128,7 @@ export default function PartDetailsDialog({
     Record<string, unknown>
   >(getDefaultSpecificData(partType) as Record<string, unknown>);
   const [unknownProduct, setUnknownProduct] = useState(false);
+  const [partImages, setPartImages] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
   const [isLoadingReview, setIsLoadingReview] = useState(false);
   const router = useRouter();
@@ -218,6 +220,7 @@ export default function PartDetailsDialog({
         setReviewText("");
       }
       setHoveredRating(0);
+      setPartImages((currentPart as { images?: string[] })?.images ?? []);
     }
 
     if (open) {
@@ -535,6 +538,20 @@ export default function PartDetailsDialog({
               />
             )}
           </div>
+
+          {/* === Zdjęcia części === */}
+          {!onSave && (
+            <div className="space-y-4">
+              <h3 className="text-base font-semibold">Zdjęcia (opcjonalnie)</h3>
+              <ImageUploader
+                images={partImages}
+                maxImages={3}
+                entityType="part"
+                entityId={partId}
+                onImagesChange={setPartImages}
+              />
+            </div>
+          )}
 
           {/* === Data montażu === */}
           <div className="space-y-4">

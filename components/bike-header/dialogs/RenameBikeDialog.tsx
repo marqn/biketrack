@@ -26,11 +26,8 @@ import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels, BikeProduct } from "@/lib/types";
 import BikeBrandModelFields from "@/components/bike/BikeBrandModelFields";
 import { toggleBikeVisibility } from "@/app/app/actions/toggle-bike-visibility";
-import {
-  uploadBikeImage,
-  removeBikeImage,
-} from "@/app/app/actions/upload-bike-image";
-import { Camera, Copy, Check, X } from "lucide-react";
+import { ImageUploader } from "@/components/ui/image-uploader";
+import { Copy, Check } from "lucide-react";
 import Link from "next/link";
 import { VisibilityButton } from "@/components/icon/visibility-button/VisibilityButton";
 
@@ -48,6 +45,7 @@ interface RenameBikeDialogProps {
     isPublic?: boolean;
     slug?: string | null;
     imageUrl?: string | null;
+    images?: string[];
   };
   onSave: (data: {
     brand: string;
@@ -74,8 +72,8 @@ export function RenameBikeDialog({
   const [isElectric, setIsElectric] = useState(bike.isElectric ?? false);
   const [description, setDescription] = useState(bike.description ?? "");
   const [isPublic, setIsPublic] = useState(bike.isPublic ?? false);
-  const [bikeImage, setBikeImage] = useState<string | null>(
-    bike.imageUrl ?? null,
+  const [bikeImages, setBikeImages] = useState<string[]>(
+    bike.images?.length ? bike.images : bike.imageUrl ? [bike.imageUrl] : [],
   );
 
   const [isLoading, setIsLoading] = useState(false);
@@ -100,23 +98,6 @@ export function RenameBikeDialog({
     } finally {
       setVisibilityLoading(false);
     }
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64 = reader.result as string;
-      setBikeImage(base64);
-      await uploadBikeImage(bike.id, base64);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleRemoveImage = async () => {
-    setBikeImage(null);
-    await removeBikeImage(bike.id);
   };
 
   const handleSave = async () => {
@@ -152,7 +133,9 @@ export function RenameBikeDialog({
       setDescription(bike.description ?? "");
       setIsPublic(bike.isPublic ?? false);
       setVisibilitySlug(bike.slug ?? null);
-      setBikeImage(bike.imageUrl ?? null);
+      setBikeImages(
+        bike.images?.length ? bike.images : bike.imageUrl ? [bike.imageUrl] : [],
+      );
     }
     onOpenChange(open);
   };
@@ -261,51 +244,16 @@ export function RenameBikeDialog({
             </p>
           </div>
 
-          {/* Zdjęcie roweru */}
+          {/* Zdjęcia roweru */}
           <div className="space-y-2">
-            <Label>Zdjęcie roweru</Label>
-            <div className="flex items-center gap-4 flex-col">
-              <div className="relative w-32 h-24 rounded-lg border-2 border-dashed border-muted-foreground/25 flex items-center justify-center overflow-hidden bg-muted/50">
-                {bikeImage ? (
-                  <>
-                    <img
-                      src={bikeImage}
-                      alt="Rower"
-                      className="w-full h-full object-cover"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleRemoveImage}
-                      className="absolute top-1 right-1 p-0.5 rounded-full bg-background/80 hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </>
-                ) : (
-                  <label className="cursor-pointer flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
-                    <Camera className="h-6 w-6" />
-                    <span className="text-xs">Dodaj zdjęcie</span>
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-                  </label>
-                )}
-              </div>
-              {bikeImage && (
-                <label className="cursor-pointer text-sm text-primary hover:underline">
-                  Zmień zdjęcie
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                </label>
-              )}
-            </div>
+            <Label>Zdjęcia roweru</Label>
+            <ImageUploader
+              images={bikeImages}
+              maxImages={3}
+              entityType="bike"
+              entityId={bike.id}
+              onImagesChange={setBikeImages}
+            />
           </div>
 
           {/* Widoczność publiczna */}

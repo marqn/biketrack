@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  Camera,
   Mail,
   User,
   Lock,
@@ -13,6 +12,7 @@ import {
   Scale,
   Info,
 } from "lucide-react";
+import { ImageUploader } from "@/components/ui/image-uploader";
 import { useRouter } from "next/navigation";
 
 interface UserData {
@@ -118,37 +118,6 @@ export default function ProfilePage() {
 
     fetchUser();
   }, []);
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64Image = reader.result as string;
-
-        try {
-          const response = await fetch("/api/user/profile", {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image: base64Image }),
-          });
-
-          const data = await response.json();
-
-          if (data.success && user) {
-            setUser({ ...user, image: base64Image });
-            setSuccessMessage("Avatar zaktualizowany!");
-            setTimeout(() => setSuccessMessage(""), 3000);
-
-            router.refresh();
-          }
-        } catch (error) {
-          console.error("Błąd aktualizacji avatara:", error);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   const validateEmail = (email: string): boolean => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -364,38 +333,22 @@ export default function ProfilePage() {
         {/* Avatar Section */}
         <div className="bg-card rounded-xl border p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">Zdjęcie profilowe</h2>
-          <div className="flex items-center gap-6">
-            <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center overflow-hidden">
-                {user.image ? (
-                  <img
-                    src={user.image}
-                    alt="Avatar"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <User className="w-12 h-12 text-white" />
-                )}
-              </div>
-              <label className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-2 cursor-pointer hover:bg-blue-700 transition-colors">
-                <Camera className="w-4 h-4" />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-              </label>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">
-                Kliknij ikonę aparatu, aby zmienić zdjęcie
-              </p>
-              <p className="text-xs text-muted-foreground">
-                JPG, PNG lub GIF (max. 5MB)
-              </p>
-            </div>
-          </div>
+          <ImageUploader
+            images={user.image ? [user.image] : []}
+            maxImages={1}
+            entityType="avatar"
+            entityId={user.id}
+            onImagesChange={(urls) => {
+              const newImage = urls[0] ?? null;
+              setUser({ ...user, image: newImage });
+              if (newImage) {
+                setSuccessMessage("Avatar zaktualizowany!");
+                setTimeout(() => setSuccessMessage(""), 3000);
+                router.refresh();
+              }
+            }}
+            variant="avatar"
+          />
         </div>
 
         {/* Name Section */}

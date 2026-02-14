@@ -23,7 +23,8 @@
       "WebFetch(domain:developers.wahooligan.com)",
       "WebFetch(domain:docs.allauth.org)",
       "Bash(wc:*)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(npm install:*)"
     ]
   }
 }

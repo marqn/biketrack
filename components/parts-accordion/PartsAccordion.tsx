@@ -37,6 +37,7 @@ type ExistingPart = {
   createdAt?: Date | string;
   installedAt?: Date | string | null;
   partSpecificData?: unknown;
+  images?: string[];
 };
 
 interface PartsAccordionProps {

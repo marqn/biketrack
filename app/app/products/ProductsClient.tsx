@@ -21,7 +21,7 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, Package } from "lucide-react";
 import { PartType } from "@/lib/generated/prisma";
 import { getPartName, PART_NAMES } from "@/lib/default-parts";
 import { ProductSortBy, ProductListItem } from "@/app/app/actions/get-products";
@@ -213,8 +213,21 @@ export function ProductsClient({
 
 function ProductCard({ product }: { product: ProductListItem }) {
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="hover:shadow-lg transition-shadow overflow-hidden">
       <Link href={`/app/products/${product.id}/reviews`}>
+        {product.officialImageUrl ? (
+          <div className="w-full h-36 bg-muted">
+            <img
+              src={product.officialImageUrl}
+              alt={`${product.brand} ${product.model}`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ) : (
+          <div className="w-full h-36 bg-muted flex items-center justify-center">
+            <Package className="h-12 w-12 text-muted-foreground/30" />
+          </div>
+        )}
         <CardContent className="p-6">
           <div className="flex items-start justify-between mb-3">
             <div>

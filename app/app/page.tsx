@@ -119,6 +119,7 @@ export default async function AppPage() {
     createdAt: p.createdAt,
     installedAt: p.installedAt,
     partSpecificData: p.partSpecificData,
+    images: p.images,
   }));
 
   return (

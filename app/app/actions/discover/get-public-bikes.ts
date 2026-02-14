@@ -60,6 +60,7 @@ export async function getPublicBikes({
           type: true,
           isElectric: true,
           totalKm: true,
+          images: true,
           imageUrl: true,
           user: {
             select: {

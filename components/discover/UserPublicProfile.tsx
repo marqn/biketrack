@@ -19,7 +19,8 @@ interface UserPublicProfileProps {
     type: BikeType;
     isElectric: boolean;
     totalKm: number;
-    imageUrl: string | null;
+    images?: string[];
+    imageUrl?: string | null;
     _count: { comments: number };
   }>;
 }

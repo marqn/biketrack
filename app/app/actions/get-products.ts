@@ -18,6 +18,7 @@ export interface ProductListItem {
   type: string;
   brand: string;
   model: string;
+  officialImageUrl: string | null;
   averageRating: number | null;
   totalReviews: number;
   totalInstallations: number;
@@ -67,6 +68,7 @@ export async function getProducts({
         type: true,
         brand: true,
         model: true,
+        officialImageUrl: true,
         averageRating: true,
         totalReviews: true,
         totalInstallations: true,
