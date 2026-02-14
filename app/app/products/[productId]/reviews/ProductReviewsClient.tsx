@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -92,13 +91,13 @@ export function ProductReviewsClient({
   return (
     <div className="space-y-6">
       {/* Back link */}
-      <Link
-        href="/app/products"
+      <button
+        onClick={() => router.back()}
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
-        Powrót do listy produktów
-      </Link>
+        Powrót
+      </button>
 
       {/* Product Header */}
       <Card>

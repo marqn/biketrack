@@ -175,7 +175,7 @@ export function AddReviewDialog({
 
           {/* Images */}
           <div className="space-y-2">
-            <Label>Zdjęcia (opcjonalnie)</Label>
+            <Label>Zdjęcie</Label>
             <div className="flex flex-wrap gap-2">
               {images.map((url) => (
                 <div

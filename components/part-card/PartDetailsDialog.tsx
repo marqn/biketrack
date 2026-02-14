@@ -554,7 +554,7 @@ export default function PartDetailsDialog({
           {/* === Zdjęcia części === */}
           {!onSave && (
             <div className="space-y-4">
-              <h3 className="text-base font-semibold">Zdjęcia (opcjonalnie)</h3>
+              <h3 className="text-base font-semibold">Zdjęcie</h3>
               <ImageUploader
                 images={partImages}
                 maxImages={3}
