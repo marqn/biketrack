@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { BikeType, PartType } from "@/lib/generated/prisma";
@@ -85,9 +86,12 @@ export function BikePublicParts({ parts, bikeType }: BikePublicPartsProps) {
                           {getPartNameForBike(part.type, bikeType, part.partSpecificData)}
                         </span>
                         {part.product && (
-                          <span className="text-xs text-muted-foreground truncate">
+                          <Link
+                            href={`/app/products/${part.product.id}/reviews`}
+                            className="text-xs text-muted-foreground truncate hover:text-foreground hover:underline transition-colors"
+                          >
                             {part.product.brand} {part.product.model}
-                          </span>
+                          </Link>
                         )}
                       </div>
                       <div className="flex items-center gap-2 mt-1">
