@@ -40,6 +40,8 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.PADS_REAR, expectedKm: 3000 },
     { type: PartType.DISC_FRONT, expectedKm: 15000 },
     { type: PartType.DISC_REAR, expectedKm: 15000 },
+    { type: PartType.BRAKE_CALIPER_FRONT, expectedKm: 50000 },
+    { type: PartType.BRAKE_CALIPER_REAR, expectedKm: 50000 },
     { type: PartType.BRAKE_CABLES, expectedKm: 3000 },
     { type: PartType.BRAKE_FLUID, expectedKm: 10000 },
     // Koła
@@ -85,6 +87,8 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.PADS_REAR, expectedKm: 2500 },
     { type: PartType.DISC_FRONT, expectedKm: 12000 },
     { type: PartType.DISC_REAR, expectedKm: 12000 },
+    { type: PartType.BRAKE_CALIPER_FRONT, expectedKm: 50000 },
+    { type: PartType.BRAKE_CALIPER_REAR, expectedKm: 50000 },
     { type: PartType.BRAKE_CABLES, expectedKm: 2500 },
     { type: PartType.BRAKE_FLUID, expectedKm: 10000 },
     // Koła
@@ -133,6 +137,8 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.PADS_REAR, expectedKm: 2000 },
     { type: PartType.DISC_FRONT, expectedKm: 10000 },
     { type: PartType.DISC_REAR, expectedKm: 10000 },
+    { type: PartType.BRAKE_CALIPER_FRONT, expectedKm: 40000 },
+    { type: PartType.BRAKE_CALIPER_REAR, expectedKm: 40000 },
     { type: PartType.BRAKE_CABLES, expectedKm: 2000 },
     { type: PartType.BRAKE_FLUID, expectedKm: 10000 },
     // Koła
@@ -175,6 +181,10 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     // Hamulce
     { type: PartType.PADS_FRONT, expectedKm: 2000 },
     { type: PartType.PADS_REAR, expectedKm: 2000 },
+    { type: PartType.DISC_FRONT, expectedKm: 15000 },
+    { type: PartType.DISC_REAR, expectedKm: 15000 },
+    { type: PartType.BRAKE_CALIPER_FRONT, expectedKm: 50000 },
+    { type: PartType.BRAKE_CALIPER_REAR, expectedKm: 50000 },
     { type: PartType.BRAKE_CABLES, expectedKm: 2500 },
     { type: PartType.BRAKE_FLUID, expectedKm: 10000 },
     // Koła
@@ -254,6 +264,8 @@ export const PART_NAMES: Record<PartType, string> = {
   [PartType.PADS_REAR]: "Klocki tylne",
   [PartType.DISC_FRONT]: "Tarcza przednia",
   [PartType.DISC_REAR]: "Tarcza tylna",
+  [PartType.BRAKE_CALIPER_FRONT]: "Zacisk hamulca przód",
+  [PartType.BRAKE_CALIPER_REAR]: "Zacisk hamulca tył",
   [PartType.BRAKE_CABLES]: "Linki hamulcowe",
   [PartType.BRAKE_FLUID]: "Płyn hamulcowy",
   // Koła
@@ -325,6 +337,8 @@ export const PART_ICONS: Record<PartType, string> = {
   [PartType.PADS_REAR]: "🧱",
   [PartType.DISC_FRONT]: "💿",
   [PartType.DISC_REAR]: "💿",
+  [PartType.BRAKE_CALIPER_FRONT]: "🔧",
+  [PartType.BRAKE_CALIPER_REAR]: "🔧",
   [PartType.BRAKE_CABLES]: "🪢",
   [PartType.BRAKE_FLUID]: "💧",
   // Koła
@@ -444,6 +458,8 @@ export const PART_CATEGORIES: Record<PartCategory, { label: string; types: PartT
       PartType.PADS_REAR,
       PartType.DISC_FRONT,
       PartType.DISC_REAR,
+      PartType.BRAKE_CALIPER_FRONT,
+      PartType.BRAKE_CALIPER_REAR,
       PartType.BRAKE_CABLES,
       PartType.BRAKE_FLUID,
     ],
@@ -528,9 +544,13 @@ export function getHiddenPartsByBrakeType(brakeType: BrakeType | undefined): Set
       hidden.add(PartType.BRAKE_FLUID);
       hidden.add(PartType.DISC_FRONT);
       hidden.add(PartType.DISC_REAR);
+      hidden.add(PartType.BRAKE_CALIPER_FRONT);
+      hidden.add(PartType.BRAKE_CALIPER_REAR);
       break;
     default:
       hidden.add(PartType.BRAKE_FLUID);
+      hidden.add(PartType.BRAKE_CALIPER_FRONT);
+      hidden.add(PartType.BRAKE_CALIPER_REAR);
       break;
   }
   return hidden;

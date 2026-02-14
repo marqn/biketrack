@@ -49,7 +49,7 @@ export function AdminSidebar() {
           href="/app"
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
         >
-          Wrocdo aplikacji
+          Wroc do aplikacji
         </Link>
       </div>
     </aside>

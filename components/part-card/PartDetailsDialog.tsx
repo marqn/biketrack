@@ -51,6 +51,7 @@ import CranksetFields from "./specific-fields/CranksetFields";
 import DerailleurRearFields from "./specific-fields/DerailleurRearFields";
 import PedalsFields from "./specific-fields/PedalsFields";
 import DiscFields from "./specific-fields/DiscFields";
+import BrakeCaliperFields from "./specific-fields/BrakeCaliperFields";
 import StemFields from "./specific-fields/StemFields";
 import HeadsetFields from "./specific-fields/HeadsetFields";
 import HandlebarFields from "./specific-fields/HandlebarFields";
@@ -79,6 +80,7 @@ import {
   HandlebarSpecificData,
   HandlebarTapeSpecificData,
   ShiftersSpecificData,
+  BrakeCaliperSpecificData,
 } from "@/lib/part-specific-data";
 
 interface PartDetailsDialogProps {
@@ -333,6 +335,16 @@ export default function PartDetailsDialog({
         return (
           <DiscFields
             data={partSpecificData as Partial<DiscSpecificData>}
+            onChange={(data) =>
+              setPartSpecificData(data as Record<string, unknown>)
+            }
+          />
+        );
+      case PartType.BRAKE_CALIPER_FRONT:
+      case PartType.BRAKE_CALIPER_REAR:
+        return (
+          <BrakeCaliperFields
+            data={partSpecificData as Partial<BrakeCaliperSpecificData>}
             onChange={(data) =>
               setPartSpecificData(data as Record<string, unknown>)
             }

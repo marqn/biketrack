@@ -145,6 +145,10 @@ export type BatterySpecificData = {
   voltage: number; // V
 };
 
+export type BrakeCaliperSpecificData = {
+  pistons: 1 | 2 | 3 | 4;
+};
+
 export type ControllerSpecificData = Record<string, never>;
 
 export type PartSpecificDataMap = {
@@ -157,6 +161,8 @@ export type PartSpecificDataMap = {
   [PartType.PADS_REAR]: PadsSpecificData;
   [PartType.DISC_FRONT]: DiscSpecificData;
   [PartType.DISC_REAR]: DiscSpecificData;
+  [PartType.BRAKE_CALIPER_FRONT]: BrakeCaliperSpecificData;
+  [PartType.BRAKE_CALIPER_REAR]: BrakeCaliperSpecificData;
   [PartType.FORK]: ForkSpecificData;
   [PartType.SEATPOST]: SeatpostSpecificData;
   [PartType.SPOKES]: SpokesSpecificData;
@@ -222,6 +228,8 @@ export function getDefaultSpecificData(
     [PartType.PADS_REAR]: { rimBrake: false, material: "organic" },
     [PartType.DISC_FRONT]: { discMount: "centerlock", size: "160" },
     [PartType.DISC_REAR]: { discMount: "centerlock", size: "160" },
+    [PartType.BRAKE_CALIPER_FRONT]: { pistons: 2 },
+    [PartType.BRAKE_CALIPER_REAR]: { pistons: 2 },
     [PartType.FORK]: { wheelSize: "28", material: "aluminum" },
     [PartType.SEATPOST]: { material: "aluminum" },
     [PartType.SPOKES]: { material: "stainless-steel" },
@@ -263,6 +271,8 @@ export function hasSpecificFields(type: PartType): boolean {
     PartType.PADS_REAR,
     PartType.DISC_FRONT,
     PartType.DISC_REAR,
+    PartType.BRAKE_CALIPER_FRONT,
+    PartType.BRAKE_CALIPER_REAR,
     PartType.FORK,
     PartType.SEATPOST,
     PartType.SPOKES,
