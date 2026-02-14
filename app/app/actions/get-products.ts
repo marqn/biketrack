@@ -18,7 +18,7 @@ export interface ProductListItem {
   type: string;
   brand: string;
   model: string;
-  officialImageUrl: string | null;
+  imageUrl: string | null;
   averageRating: number | null;
   totalReviews: number;
   totalInstallations: number;
@@ -57,7 +57,7 @@ export async function getProducts({
     }),
   };
 
-  const [products, totalCount] = await Promise.all([
+  const [rawProducts, totalCount] = await Promise.all([
     prisma.partProduct.findMany({
       where,
       orderBy,
@@ -74,10 +74,22 @@ export async function getProducts({
         totalInstallations: true,
         averageKmLifespan: true,
         createdAt: true,
+        // Pobierz pierwsze zdjęcie z powiązanych części użytkowników
+        bikeParts: {
+          where: { images: { isEmpty: false } },
+          select: { images: true },
+          take: 1,
+        },
       },
     }),
     prisma.partProduct.count({ where }),
   ]);
+
+  // Użyj officialImageUrl lub pierwszego zdjęcia z części użytkowników
+  const products = rawProducts.map(({ bikeParts, officialImageUrl, ...rest }) => ({
+    ...rest,
+    imageUrl: officialImageUrl || bikeParts[0]?.images[0] || null,
+  }));
 
   return {
     products,

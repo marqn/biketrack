@@ -215,10 +215,10 @@ function ProductCard({ product }: { product: ProductListItem }) {
   return (
     <Card className="hover:shadow-lg transition-shadow overflow-hidden">
       <Link href={`/app/products/${product.id}/reviews`}>
-        {product.officialImageUrl ? (
+        {product.imageUrl ? (
           <div className="w-full h-36 bg-muted">
             <img
-              src={product.officialImageUrl}
+              src={product.imageUrl}
               alt={`${product.brand} ${product.model}`}
               className="w-full h-full object-cover"
             />

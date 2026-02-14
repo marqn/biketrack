@@ -51,6 +51,7 @@ export interface GetProductReviewsResult {
   totalPages: number;
   currentPage: number;
   product: ProductDetails | null;
+  communityImages: string[];
 }
 
 export async function getProductReviews({
@@ -72,7 +73,7 @@ export async function getProductReviews({
     ...(bikeTypeFilter && { bikeType: bikeTypeFilter }),
   };
 
-  const [reviews, totalCount, product] = await Promise.all([
+  const [reviews, totalCount, product, partsWithImages] = await Promise.all([
     prisma.partReview.findMany({
       where,
       orderBy,
@@ -115,7 +116,18 @@ export async function getProductReviews({
         specifications: true,
       },
     }),
+    // Pobierz zdjęcia użytkowników z części powiązanych z tym produktem
+    prisma.bikePart.findMany({
+      where: {
+        productId,
+        images: { isEmpty: false },
+      },
+      select: { images: true },
+      take: 9,
+    }),
   ]);
+
+  const communityImages = partsWithImages.flatMap((p) => p.images).slice(0, 9);
 
   return {
     reviews,
@@ -123,5 +135,6 @@ export async function getProductReviews({
     totalPages: Math.ceil(totalCount / pageSize),
     currentPage: page,
     product,
+    communityImages,
   };
 }

@@ -60,6 +60,7 @@ export default async function ProductReviewsPage({
         bikeTypeFilter={bikeTypeFilter}
         userReview={userReview}
         userId={session.user.id}
+        communityImages={result.communityImages}
       />
     </div>
   );

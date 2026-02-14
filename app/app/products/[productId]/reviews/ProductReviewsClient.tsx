@@ -21,7 +21,7 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
-import { Star, Users, Route, Plus, ArrowLeft, Package } from "lucide-react";
+import { Star, Users, Route, Plus, ArrowLeft, Package, ImageIcon, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels } from "@/lib/types";
 import { getPartName } from "@/lib/default-parts";
@@ -51,6 +51,7 @@ interface ProductReviewsClientProps {
     bikeType: BikeType;
   } | null;
   userId: string;
+  communityImages?: string[];
 }
 
 export function ProductReviewsClient({
@@ -63,10 +64,12 @@ export function ProductReviewsClient({
   bikeTypeFilter,
   userReview,
   userId,
+  communityImages = [],
 }: ProductReviewsClientProps) {
   const router = useRouter();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   function updateParams(updates: Record<string, string | undefined>) {
     const params = new URLSearchParams();
@@ -101,9 +104,9 @@ export function ProductReviewsClient({
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-4">
-              {product.officialImageUrl ? (
+              {(product.officialImageUrl || communityImages[0]) ? (
                 <img
-                  src={product.officialImageUrl}
+                  src={(product.officialImageUrl || communityImages[0])!}
                   alt={`${product.brand} ${product.model}`}
                   className="w-20 h-20 rounded-lg object-cover border bg-muted shrink-0"
                 />
@@ -154,6 +157,75 @@ export function ProductReviewsClient({
           </div>
         </CardContent>
       </Card>
+
+      {/* Zdjęcia społeczności */}
+      {communityImages.length > 0 && (
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <ImageIcon className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-medium">Zdjęcia użytkowników</span>
+            </div>
+            <div className="flex gap-2 overflow-x-auto">
+              {communityImages.map((url, i) => (
+                <img
+                  key={i}
+                  src={url}
+                  alt={`Zdjęcie ${i + 1}`}
+                  className="w-24 h-24 rounded-lg object-cover border shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => setLightboxIndex(i)}
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Lightbox */}
+      {lightboxIndex !== null && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          onClick={() => setLightboxIndex(null)}
+        >
+          <button
+            className="absolute top-4 right-4 text-white/70 hover:text-white"
+            onClick={() => setLightboxIndex(null)}
+          >
+            <X className="w-8 h-8" />
+          </button>
+          {communityImages.length > 1 && (
+            <>
+              <button
+                className="absolute left-4 text-white/70 hover:text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex((lightboxIndex - 1 + communityImages.length) % communityImages.length);
+                }}
+              >
+                <ChevronLeft className="w-10 h-10" />
+              </button>
+              <button
+                className="absolute right-4 text-white/70 hover:text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex((lightboxIndex + 1) % communityImages.length);
+                }}
+              >
+                <ChevronRight className="w-10 h-10" />
+              </button>
+            </>
+          )}
+          <img
+            src={communityImages[lightboxIndex]}
+            alt={`Zdjęcie ${lightboxIndex + 1}`}
+            className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="absolute bottom-4 text-white/60 text-sm">
+            {lightboxIndex + 1} / {communityImages.length}
+          </div>
+        </div>
+      )}
 
       {/* Filter/Sort Controls */}
       <div className="flex flex-wrap gap-4 items-center">
