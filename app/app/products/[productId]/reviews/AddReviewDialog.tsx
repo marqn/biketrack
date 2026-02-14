@@ -24,12 +24,14 @@ import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels } from "@/lib/types";
 import { addProductReview } from "@/app/app/actions/add-product-review";
 import { upload } from "@vercel/blob/client";
-import { compressImage } from "@/lib/image-compression";
+import {
+  compressImage,
+  IMAGE_ALLOWED_TYPES,
+  IMAGE_MAX_SIZE,
+} from "@/lib/image-compression";
 import { Plus, X, Loader2 } from "lucide-react";
 
 const MAX_IMAGES = 3;
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 interface ExistingReview {
   id: string;
@@ -96,12 +98,12 @@ export function AddReviewDialog({
 
     if (fileInputRef.current) fileInputRef.current.value = "";
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    if (!IMAGE_ALLOWED_TYPES.includes(file.type)) {
       setImageError("Dozwolone formaty: JPG, PNG, WebP");
       return;
     }
-    if (file.size > MAX_FILE_SIZE) {
-      setImageError("Maksymalny rozmiar: 5MB");
+    if (file.size > IMAGE_MAX_SIZE) {
+      setImageError("Maksymalny rozmiar: 10MB");
       return;
     }
 

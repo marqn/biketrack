@@ -5,20 +5,22 @@ import { upload } from "@vercel/blob/client";
 import { deleteBlobImage } from "@/app/app/actions/delete-blob-image";
 import { saveBlobImage } from "@/app/app/actions/save-blob-image";
 import { Camera, X, Plus, Loader2 } from "lucide-react";
-import { compressImage } from "@/lib/image-compression";
+import {
+  compressImage,
+  IMAGE_ALLOWED_TYPES,
+  IMAGE_MAX_SIZE,
+  type ImageEntityType,
+} from "@/lib/image-compression";
 
 interface ImageUploaderProps {
   images: string[];
   maxImages: number;
-  entityType: "bike" | "part" | "avatar" | "review";
+  entityType: ImageEntityType;
   entityId: string;
   onImagesChange: (urls: string[]) => void;
   variant?: "grid" | "avatar";
   className?: string;
 }
-
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_SIZE = 10 * 1024 * 1024; // 5MB
 
 export function ImageUploader({
   images,
@@ -44,11 +46,11 @@ export function ImageUploader({
     if (inputRef.current) inputRef.current.value = "";
 
     // Walidacja client-side
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    if (!IMAGE_ALLOWED_TYPES.includes(file.type)) {
       setError("Dozwolone formaty: JPG, PNG, WebP");
       return;
     }
-    if (file.size > MAX_SIZE) {
+    if (file.size > IMAGE_MAX_SIZE) {
       setError("Maksymalny rozmiar: 10MB");
       return;
     }
@@ -72,7 +74,7 @@ export function ImageUploader({
         return;
       }
 
-      onImagesChange([...images, blob.url]);
+      onImagesChange(maxImages === 1 ? [blob.url] : [...images, blob.url]);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Błąd podczas uploadu";
