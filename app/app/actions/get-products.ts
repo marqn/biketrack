@@ -80,15 +80,21 @@ export async function getProducts({
           select: { images: true },
           take: 1,
         },
+        // Pobierz pierwsze zdjęcie z recenzji
+        reviews: {
+          where: { images: { isEmpty: false } },
+          select: { images: true },
+          take: 1,
+        },
       },
     }),
     prisma.partProduct.count({ where }),
   ]);
 
-  // Użyj officialImageUrl lub pierwszego zdjęcia z części użytkowników
-  const products = rawProducts.map(({ bikeParts, officialImageUrl, ...rest }) => ({
+  // Użyj officialImageUrl, zdjęcia z części użytkowników lub zdjęcia z recenzji
+  const products = rawProducts.map(({ bikeParts, reviews, officialImageUrl, ...rest }) => ({
     ...rest,
-    imageUrl: officialImageUrl || bikeParts[0]?.images[0] || null,
+    imageUrl: officialImageUrl || bikeParts[0]?.images[0] || reviews[0]?.images[0] || null,
   }));
 
   return {
