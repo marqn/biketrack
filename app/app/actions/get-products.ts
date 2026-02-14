@@ -69,6 +69,7 @@ export async function getProducts({
         brand: true,
         model: true,
         officialImageUrl: true,
+        images: true,
         averageRating: true,
         totalReviews: true,
         totalInstallations: true,
@@ -91,10 +92,10 @@ export async function getProducts({
     prisma.partProduct.count({ where }),
   ]);
 
-  // Użyj officialImageUrl, zdjęcia z części użytkowników lub zdjęcia z recenzji
-  const products = rawProducts.map(({ bikeParts, reviews, officialImageUrl, ...rest }) => ({
+  // Użyj officialImageUrl, zdjęcia produktu (admin), zdjęcia z części użytkowników lub zdjęcia z recenzji
+  const products = rawProducts.map(({ bikeParts, reviews, officialImageUrl, images, ...rest }) => ({
     ...rest,
-    imageUrl: officialImageUrl || bikeParts[0]?.images[0] || reviews[0]?.images[0] || null,
+    imageUrl: officialImageUrl || images[0] || bikeParts[0]?.images[0] || reviews[0]?.images[0] || null,
   }));
 
   return {

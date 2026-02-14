@@ -7,7 +7,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { revalidatePath } from "next/cache";
 
 export async function deleteBlobImage(
-  entityType: "bike" | "part" | "avatar" | "review",
+  entityType: "bike" | "part" | "avatar" | "review" | "product",
   entityId: string,
   imageUrl: string
 ) {
@@ -69,6 +69,32 @@ export async function deleteBlobImage(
       await prisma.user.update({
         where: { id: entityId },
         data: { image: null },
+      });
+    } else if (entityType === "product") {
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { role: true },
+      });
+      if (user?.role !== "ADMIN") {
+        return { success: false, error: "Brak uprawnień" };
+      }
+      const product = await prisma.partProduct.findUnique({
+        where: { id: entityId },
+        select: { images: true },
+      });
+      if (!product) {
+        return { success: false, error: "Produkt nie istnieje" };
+      }
+
+      if (imageUrl.includes(".public.blob.vercel-storage.com")) {
+        await del(imageUrl);
+      }
+
+      await prisma.partProduct.update({
+        where: { id: entityId },
+        data: {
+          images: product.images.filter((url) => url !== imageUrl),
+        },
       });
     } else if (entityType === "review") {
       const review = await prisma.partReview.findUnique({

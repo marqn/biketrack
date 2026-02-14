@@ -1,6 +1,6 @@
 import imageCompression from "browser-image-compression";
 
-export type ImageEntityType = "bike" | "part" | "avatar" | "review";
+export type ImageEntityType = "bike" | "part" | "avatar" | "review" | "product";
 
 export const IMAGE_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 export const IMAGE_MAX_SIZE = 10 * 1024 * 1024; // 10MB
@@ -30,6 +30,11 @@ const COMPRESSION_CONFIGS: Record<ImageEntityType, CompressionConfig> = {
   review: {
     maxSizeMB: 0.8,
     maxWidthOrHeight: 1200,
+    fileType: "image/webp",
+  },
+  product: {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 1920,
     fileType: "image/webp",
   },
 };

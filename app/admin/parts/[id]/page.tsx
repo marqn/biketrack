@@ -16,7 +16,12 @@ export default async function EditPartPage({
 
   return (
     <div className="max-w-2xl">
-      <PartProductForm initialData={product} />
+      <PartProductForm
+        initialData={{
+          ...product,
+          specifications: product.specifications as Record<string, unknown> | null,
+        }}
+      />
     </div>
   );
 }

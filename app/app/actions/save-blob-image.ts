@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 export async function saveBlobImage(
-  entityType: "bike" | "part" | "avatar" | "review",
+  entityType: "bike" | "part" | "avatar" | "review" | "product",
   entityId: string,
   blobUrl: string
 ) {
@@ -79,6 +79,31 @@ export async function saveBlobImage(
       await prisma.user.update({
         where: { id: entityId },
         data: { image: blobUrl },
+      });
+    } else if (entityType === "product") {
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { role: true },
+      });
+      if (user?.role !== "ADMIN") {
+        return { success: false, error: "Brak uprawnień" };
+      }
+      const product = await prisma.partProduct.findUnique({
+        where: { id: entityId },
+        select: { images: true },
+      });
+      if (!product) {
+        return { success: false, error: "Produkt nie istnieje" };
+      }
+      if (product.images.length >= 3) {
+        return { success: false, error: "Maksymalnie 3 zdjęcia" };
+      }
+
+      await prisma.partProduct.update({
+        where: { id: entityId },
+        data: {
+          images: { push: blobUrl },
+        },
       });
     } else if (entityType === "review") {
       const review = await prisma.partReview.findUnique({

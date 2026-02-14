@@ -21,6 +21,61 @@ import {
 } from "../_actions/part-products";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PART_NAMES } from "@/lib/default-parts";
+import { Copy, Check } from "lucide-react";
+import { ImageUploader } from "@/components/ui/image-uploader";
+import {
+  getDefaultSpecificData,
+  hasSpecificFields,
+  type TireSpecificData,
+  type ChainSpecificData,
+  type CassetteSpecificData,
+  type PadsSpecificData,
+  type ForkSpecificData,
+  type SeatpostSpecificData,
+  type SpokesSpecificData,
+  type RimsSpecificData,
+  type HubsSpecificData,
+  type FrameSpecificData,
+  type BottomBracketSpecificData,
+  type CranksetSpecificData,
+  type DerailleurRearSpecificData,
+  type PedalsSpecificData,
+  type DiscSpecificData,
+  type StemSpecificData,
+  type HeadsetSpecificData,
+  type HandlebarSpecificData,
+  type HandlebarTapeSpecificData,
+  type ShiftersSpecificData,
+  type BrakeCaliperSpecificData,
+  type SuspensionSpecificData,
+  type TubelessSealantSpecificData,
+  type InnerTubeSpecificData,
+  type LubricantSpecificData,
+  type MotorSpecificData,
+  type BatterySpecificData,
+} from "@/lib/part-specific-data";
+import TireFields from "@/components/part-card/specific-fields/TireFields";
+import ChainFields from "@/components/part-card/specific-fields/ChainFields";
+import CassetteFields from "@/components/part-card/specific-fields/CassetteFields";
+import PadsFields from "@/components/part-card/specific-fields/PadsFields";
+import ForkFields from "@/components/part-card/specific-fields/ForkFields";
+import SeatpostFields from "@/components/part-card/specific-fields/SeatpostFields";
+import SpokesFields from "@/components/part-card/specific-fields/SpokesFields";
+import RimsFields from "@/components/part-card/specific-fields/RimsFields";
+import HubsFields from "@/components/part-card/specific-fields/HubsFields";
+import FrameFields from "@/components/part-card/specific-fields/FrameFields";
+import BottomBracketFields from "@/components/part-card/specific-fields/BottomBracketFields";
+import CranksetFields from "@/components/part-card/specific-fields/CranksetFields";
+import DerailleurRearFields from "@/components/part-card/specific-fields/DerailleurRearFields";
+import PedalsFields from "@/components/part-card/specific-fields/PedalsFields";
+import DiscFields from "@/components/part-card/specific-fields/DiscFields";
+import BrakeCaliperFields from "@/components/part-card/specific-fields/BrakeCaliperFields";
+import StemFields from "@/components/part-card/specific-fields/StemFields";
+import HeadsetFields from "@/components/part-card/specific-fields/HeadsetFields";
+import HandlebarFields from "@/components/part-card/specific-fields/HandlebarFields";
+import HandlebarTapeFields from "@/components/part-card/specific-fields/HandlebarTapeFields";
+import ShiftersFields from "@/components/part-card/specific-fields/ShiftersFields";
+import LubricantFields from "@/components/part-card/specific-fields/LubricantFields";
 
 interface PartProductFormProps {
   initialData?: {
@@ -29,8 +84,8 @@ interface PartProductFormProps {
     brand: string;
     model: string;
     description?: string | null;
-    officialImageUrl?: string | null;
-    officialPrice?: number | string | null;
+    specifications?: Record<string, unknown> | null;
+    images?: string[];
   };
 }
 
@@ -46,10 +101,19 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
   const [description, setDescription] = useState(
     initialData?.description || ""
   );
-  const [imageUrl, setImageUrl] = useState(initialData?.officialImageUrl || "");
-  const [price, setPrice] = useState(
-    initialData?.officialPrice?.toString() || ""
+  const [specifications, setSpecifications] = useState<Record<string, unknown>>(
+    (initialData?.specifications as Record<string, unknown>) ||
+      (getDefaultSpecificData(initialData?.type || PartType.CHAIN) as Record<string, unknown>)
   );
+  const [images, setImages] = useState<string[]>(initialData?.images || []);
+  const [copied, setCopied] = useState(false);
+
+  function handlePartTypeChange(newType: PartType) {
+    setPartType(newType);
+    setSpecifications(
+      getDefaultSpecificData(newType) as Record<string, unknown>
+    );
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -60,17 +124,15 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
         brand,
         model,
         description: description || null,
-        officialImageUrl: imageUrl || null,
-        officialPrice: price ? parseFloat(price) : null,
+        specifications: hasSpecificFields(partType) ? specifications : null,
       };
 
       if (initialData) {
         await updatePartProduct(initialData.id, data);
-        router.refresh();
       } else {
-        const product = await createPartProduct(data);
-        router.push(`/admin/parts/${product.id}`);
+        await createPartProduct(data);
       }
+      router.push("/admin/parts");
     });
   }
 
@@ -84,6 +146,287 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
     });
   }
 
+  function renderSpecificFields() {
+    if (!hasSpecificFields(partType)) return null;
+
+    switch (partType) {
+      case PartType.FRAME:
+        return (
+          <FrameFields
+            data={specifications as Partial<FrameSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.TIRE_FRONT:
+      case PartType.TIRE_REAR:
+        return (
+          <TireFields
+            data={specifications as Partial<TireSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.CHAIN:
+        return (
+          <ChainFields
+            data={specifications as Partial<ChainSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.CASSETTE:
+        return (
+          <CassetteFields
+            data={specifications as Partial<CassetteSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.PADS_FRONT:
+      case PartType.PADS_REAR:
+        return (
+          <PadsFields
+            data={specifications as Partial<PadsSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.DISC_FRONT:
+      case PartType.DISC_REAR:
+        return (
+          <DiscFields
+            data={specifications as Partial<DiscSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.BRAKE_CALIPER_FRONT:
+      case PartType.BRAKE_CALIPER_REAR:
+        return (
+          <BrakeCaliperFields
+            data={specifications as Partial<BrakeCaliperSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.FORK:
+        return (
+          <ForkFields
+            data={specifications as Partial<ForkSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.SEATPOST:
+        return (
+          <SeatpostFields
+            data={specifications as Partial<SeatpostSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.SPOKES:
+        return (
+          <SpokesFields
+            data={specifications as Partial<SpokesSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.RIMS:
+        return (
+          <RimsFields
+            data={specifications as Partial<RimsSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.HUBS:
+        return (
+          <HubsFields
+            data={specifications as Partial<HubsSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.BOTTOM_BRACKET:
+        return (
+          <BottomBracketFields
+            data={specifications as Partial<BottomBracketSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.CRANKSET:
+        return (
+          <CranksetFields
+            data={specifications as Partial<CranksetSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.DERAILLEUR_REAR:
+        return (
+          <DerailleurRearFields
+            data={specifications as Partial<DerailleurRearSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.SHIFTERS:
+        return (
+          <ShiftersFields
+            data={specifications as Partial<ShiftersSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.PEDALS:
+        return (
+          <PedalsFields
+            data={specifications as Partial<PedalsSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.STEM:
+        return (
+          <StemFields
+            data={specifications as Partial<StemSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.HEADSET:
+        return (
+          <HeadsetFields
+            data={specifications as Partial<HeadsetSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.HANDLEBAR:
+        return (
+          <HandlebarFields
+            data={specifications as Partial<HandlebarSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.HANDLEBAR_TAPE:
+        return (
+          <HandlebarTapeFields
+            data={specifications as Partial<HandlebarTapeSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.SUSPENSION_FORK:
+      case PartType.DROPPER_POST:
+      case PartType.SUSPENSION_SEATPOST:
+        return (
+          <div className="space-y-2">
+            <Label>Skok (mm)</Label>
+            <Input
+              type="number"
+              value={(specifications as Partial<SuspensionSpecificData>).travel || ""}
+              onChange={(e) =>
+                setSpecifications({ ...specifications, travel: Number(e.target.value) })
+              }
+              placeholder="np. 100"
+            />
+          </div>
+        );
+      case PartType.TUBELESS_SEALANT_FRONT:
+      case PartType.TUBELESS_SEALANT_REAR:
+        return (
+          <div className="space-y-2">
+            <Label>Objętość (ml)</Label>
+            <Input
+              type="number"
+              value={(specifications as Partial<TubelessSealantSpecificData>).volume || ""}
+              onChange={(e) =>
+                setSpecifications({ ...specifications, volume: Number(e.target.value) })
+              }
+              placeholder="np. 60"
+            />
+          </div>
+        );
+      case PartType.INNER_TUBE_FRONT:
+      case PartType.INNER_TUBE_REAR:
+        return (
+          <div className="space-y-2">
+            <Label>Typ wentyla</Label>
+            <Select
+              value={(specifications as Partial<InnerTubeSpecificData>).valveType || "presta"}
+              onValueChange={(v) =>
+                setSpecifications({ ...specifications, valveType: v })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="presta">Presta</SelectItem>
+                <SelectItem value="schrader">Schrader</SelectItem>
+                <SelectItem value="dunlop">Dunlop</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        );
+      case PartType.LUBRICANT:
+        return (
+          <LubricantFields
+            data={specifications as Partial<LubricantSpecificData>}
+            onChange={(data) => setSpecifications(data as Record<string, unknown>)}
+          />
+        );
+      case PartType.MOTOR:
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Moc (W)</Label>
+              <Input
+                type="number"
+                value={(specifications as Partial<MotorSpecificData>).power || ""}
+                onChange={(e) =>
+                  setSpecifications({ ...specifications, power: Number(e.target.value) })
+                }
+                placeholder="np. 250"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Typ silnika</Label>
+              <Select
+                value={(specifications as Partial<MotorSpecificData>).motorType || "mid-drive"}
+                onValueChange={(v) =>
+                  setSpecifications({ ...specifications, motorType: v })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mid-drive">Centralny</SelectItem>
+                  <SelectItem value="hub-front">Piasta przednia</SelectItem>
+                  <SelectItem value="hub-rear">Piasta tylna</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        );
+      case PartType.BATTERY:
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Pojemność (Wh)</Label>
+              <Input
+                type="number"
+                value={(specifications as Partial<BatterySpecificData>).capacity || ""}
+                onChange={(e) =>
+                  setSpecifications({ ...specifications, capacity: Number(e.target.value) })
+                }
+                placeholder="np. 500"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Napięcie (V)</Label>
+              <Input
+                type="number"
+                value={(specifications as Partial<BatterySpecificData>).voltage || ""}
+                onChange={(e) =>
+                  setSpecifications({ ...specifications, voltage: Number(e.target.value) })
+                }
+                placeholder="np. 36"
+              />
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -92,12 +435,12 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="partType">Typ czesci</Label>
             <Select
               value={partType}
-              onValueChange={(v) => setPartType(v as PartType)}
+              onValueChange={(v) => handlePartTypeChange(v as PartType)}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -125,26 +468,29 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="model">Model</Label>
-              <Input
-                id="model"
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-                required
-                placeholder="np. CN-HG901"
-              />
+              <div className="flex gap-1">
+                <Input
+                  id="model"
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                  required
+                  placeholder="np. CN-HG901"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="shrink-0"
+                  onClick={() => {
+                    navigator.clipboard.writeText(model);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 1500);
+                  }}
+                >
+                  {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="price">Cena (PLN)</Label>
-            <Input
-              id="price"
-              type="number"
-              step="0.01"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="np. 199.99"
-            />
           </div>
 
           <div className="space-y-2">
@@ -158,15 +504,29 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="imageUrl">URL obrazka</Label>
-            <Input
-              id="imageUrl"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://..."
-            />
-          </div>
+          {/* === Zdjęcia produktu === */}
+          {initialData && (
+            <div className="space-y-2">
+              <Label>Zdjęcia produktu</Label>
+              <ImageUploader
+                images={images}
+                maxImages={3}
+                entityType="product"
+                entityId={initialData.id}
+                onImagesChange={setImages}
+              />
+            </div>
+          )}
+
+          {/* === Parametry szczegółowe === */}
+          {hasSpecificFields(partType) && (
+            <div className="space-y-2">
+              <Label>Parametry szczegółowe</Label>
+              <div className="space-y-4 rounded-md border p-4">
+                {renderSpecificFields()}
+              </div>
+            </div>
+          )}
 
           <div className="flex gap-2 pt-4">
             <Button type="submit" disabled={isPending}>

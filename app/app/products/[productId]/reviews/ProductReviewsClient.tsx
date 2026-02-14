@@ -105,9 +105,9 @@ export function ProductReviewsClient({
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-4">
-              {(product.officialImageUrl || communityImages[0]) ? (
+              {(product.officialImageUrl || product.images?.[0] || communityImages[0]) ? (
                 <img
-                  src={(product.officialImageUrl || communityImages[0])!}
+                  src={(product.officialImageUrl || product.images?.[0] || communityImages[0])!}
                   alt={`${product.brand} ${product.model}`}
                   className="w-20 h-20 rounded-lg object-cover border bg-muted shrink-0"
                 />

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { revalidatePath } from "next/cache";
-import { PartType } from "@/lib/generated/prisma";
+import { PartType, Prisma } from "@/lib/generated/prisma";
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
@@ -60,8 +60,7 @@ export async function createPartProduct(data: {
   brand: string;
   model: string;
   description?: string | null;
-  officialImageUrl?: string | null;
-  officialPrice?: number | null;
+  specifications?: Record<string, unknown> | null;
 }) {
   await requireAdmin();
 
@@ -71,8 +70,7 @@ export async function createPartProduct(data: {
       brand: data.brand.trim(),
       model: data.model.trim(),
       description: data.description || undefined,
-      officialImageUrl: data.officialImageUrl || undefined,
-      officialPrice: data.officialPrice || undefined,
+      specifications: (data.specifications as Prisma.InputJsonValue) || undefined,
     },
   });
 
@@ -87,8 +85,7 @@ export async function updatePartProduct(
     brand?: string;
     model?: string;
     description?: string | null;
-    officialImageUrl?: string | null;
-    officialPrice?: number | null;
+    specifications?: Record<string, unknown> | null;
   }
 ) {
   await requireAdmin();
@@ -96,9 +93,11 @@ export async function updatePartProduct(
   const product = await prisma.partProduct.update({
     where: { id },
     data: {
-      ...data,
+      type: data.type,
       brand: data.brand?.trim(),
       model: data.model?.trim(),
+      description: data.description,
+      specifications: (data.specifications as Prisma.InputJsonValue) ?? undefined,
     },
   });
 

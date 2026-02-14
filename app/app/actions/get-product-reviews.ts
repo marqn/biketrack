@@ -39,6 +39,7 @@ export interface ProductDetails {
   brand: string;
   model: string;
   officialImageUrl: string | null;
+  images: string[];
   averageRating: number | null;
   totalReviews: number;
   totalInstallations: number;
@@ -111,6 +112,7 @@ export async function getProductReviews({
         brand: true,
         model: true,
         officialImageUrl: true,
+        images: true,
         averageRating: true,
         totalReviews: true,
         totalInstallations: true,

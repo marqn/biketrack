@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil } from "lucide-react";
+import { Plus } from "lucide-react";
 import { PART_NAMES } from "@/lib/default-parts";
 import { PartType } from "@/lib/generated/prisma";
 import { DeleteButton } from "../_components/DeleteButton";
@@ -36,44 +36,41 @@ export default async function PartsPage() {
             <TableHead>Typ</TableHead>
             <TableHead>Marka</TableHead>
             <TableHead>Model</TableHead>
-            <TableHead>Cena</TableHead>
-            <TableHead className="w-[100px]">Akcje</TableHead>
+            <TableHead className="w-20">Akcje</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {products.map((product) => (
-            <TableRow key={product.id}>
+            <TableRow key={product.id} className="group">
               <TableCell>
-                <Badge variant="outline">
-                  {PART_NAMES[product.type as PartType] || product.type}
-                </Badge>
+                <Link href={`/admin/parts/${product.id}`} className="block">
+                  <Badge variant="outline">
+                    {PART_NAMES[product.type as PartType] || product.type}
+                  </Badge>
+                </Link>
               </TableCell>
-              <TableCell className="font-medium">{product.brand}</TableCell>
-              <TableCell>{product.model}</TableCell>
-              <TableCell>
-                {product.officialPrice
-                  ? `${product.officialPrice} PLN`
-                  : "-"}
+              <TableCell className="font-medium">
+                <Link href={`/admin/parts/${product.id}`} className="block">
+                  {product.brand}
+                </Link>
               </TableCell>
               <TableCell>
-                <div className="flex gap-1">
-                  <Link href={`/admin/parts/${product.id}`}>
-                    <Button variant="ghost" size="sm">
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                  <DeleteButton
-                    id={product.id}
-                    onDelete={deletePartProduct}
-                    confirmMessage="Czy na pewno chcesz usunac ta czesc?"
-                  />
-                </div>
+                <Link href={`/admin/parts/${product.id}`} className="block">
+                  {product.model}
+                </Link>
+              </TableCell>
+              <TableCell>
+                <DeleteButton
+                  id={product.id}
+                  onDelete={deletePartProduct}
+                  confirmMessage="Czy na pewno chcesz usunac ta czesc?"
+                />
               </TableCell>
             </TableRow>
           ))}
           {products.length === 0 && (
             <TableRow>
-              <TableCell colSpan={5} className="text-center text-muted-foreground">
+              <TableCell colSpan={4} className="text-center text-muted-foreground">
                 Brak części w bazie
               </TableCell>
             </TableRow>

@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 const MAX_IMAGES_BIKE = 3;
 const MAX_IMAGES_PART = 3;
 const MAX_IMAGES_REVIEW = 3;
+const MAX_IMAGES_PRODUCT = 3;
 
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
@@ -23,7 +24,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
         const payload = JSON.parse(clientPayload || "{}");
         const { type, entityId } = payload as {
-          type: "bike" | "part" | "avatar" | "review";
+          type: "bike" | "part" | "avatar" | "review" | "product";
           entityId: string;
         };
 
@@ -57,6 +58,24 @@ export async function POST(request: Request): Promise<NextResponse> {
         } else if (type === "avatar") {
           if (entityId !== session.user.id) {
             throw new Error("Brak uprawnień");
+          }
+        } else if (type === "product") {
+          const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { role: true },
+          });
+          if (user?.role !== "ADMIN") {
+            throw new Error("Brak uprawnień");
+          }
+          const product = await prisma.partProduct.findUnique({
+            where: { id: entityId },
+            select: { images: true },
+          });
+          if (!product) {
+            throw new Error("Produkt nie istnieje");
+          }
+          if (product.images.length >= MAX_IMAGES_PRODUCT) {
+            throw new Error(`Maksymalnie ${MAX_IMAGES_PRODUCT} zdjęcia`);
           }
         } else if (type === "review") {
           // Dla recenzji sprawdzamy tylko czy produkt istnieje
