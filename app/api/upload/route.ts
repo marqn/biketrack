@@ -65,7 +65,7 @@ export async function POST(request: Request): Promise<NextResponse> {
             "image/png",
             "image/webp",
           ],
-          maximumSizeInBytes: 5 * 1024 * 1024, // 5MB
+          maximumSizeInBytes: 2 * 1024 * 1024, // 2MB (po kompresji client-side)
           addRandomSuffix: true,
         };
       },

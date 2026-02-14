@@ -5,6 +5,7 @@ import { upload } from "@vercel/blob/client";
 import { deleteBlobImage } from "@/app/app/actions/delete-blob-image";
 import { saveBlobImage } from "@/app/app/actions/save-blob-image";
 import { Camera, X, Plus, Loader2 } from "lucide-react";
+import { compressImage } from "@/lib/image-compression";
 
 interface ImageUploaderProps {
   images: string[];
@@ -56,7 +57,9 @@ export function ImageUploader({
     setUploading(true);
 
     try {
-      const blob = await upload(file.name, file, {
+      const compressedFile = await compressImage(file, entityType);
+
+      const blob = await upload(compressedFile.name, compressedFile, {
         access: "public",
         handleUploadUrl: "/api/upload",
         clientPayload: JSON.stringify({ type: entityType, entityId }),
@@ -206,7 +209,7 @@ export function ImageUploader({
 
       {maxImages > 1 && (
         <p className="text-xs text-muted-foreground">
-          {images.length}/{maxImages} zdjęć (max 5MB, JPG/PNG/WebP)
+          {images.length}/{maxImages} zdjęć (JPG/PNG/WebP, kompresowane automatycznie)
         </p>
       )}
     </div>
