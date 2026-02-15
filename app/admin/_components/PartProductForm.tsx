@@ -6,7 +6,6 @@ import { PartType } from "@/lib/generated/prisma";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -83,9 +82,13 @@ interface PartProductFormProps {
     type: PartType;
     brand: string;
     model: string;
-    description?: string | null;
     specifications?: Record<string, unknown> | null;
     officialImageUrl?: string | null;
+    officialPrice?: string | number | null;
+    averageRating?: number | null;
+    totalReviews?: number | null;
+    averageKmLifespan?: number | null;
+    totalInstallations?: number | null;
   };
 }
 
@@ -98,12 +101,24 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
   );
   const [brand, setBrand] = useState(initialData?.brand || "");
   const [model, setModel] = useState(initialData?.model || "");
-  const [description, setDescription] = useState(
-    initialData?.description || ""
-  );
   const [specifications, setSpecifications] = useState<Record<string, unknown>>(
     (initialData?.specifications as Record<string, unknown>) ||
       (getDefaultSpecificData(initialData?.type || PartType.CHAIN) as Record<string, unknown>)
+  );
+  const [officialPrice, setOfficialPrice] = useState<string>(
+    initialData?.officialPrice?.toString() || ""
+  );
+  const [averageRating, setAverageRating] = useState<string>(
+    initialData?.averageRating?.toString() || "0"
+  );
+  const [totalReviews, setTotalReviews] = useState<string>(
+    initialData?.totalReviews?.toString() || "0"
+  );
+  const [averageKmLifespan, setAverageKmLifespan] = useState<string>(
+    initialData?.averageKmLifespan?.toString() || "0"
+  );
+  const [totalInstallations, setTotalInstallations] = useState<string>(
+    initialData?.totalInstallations?.toString() || "0"
   );
   const [officialImageUrl, setOfficialImageUrl] = useState<string | null>(initialData?.officialImageUrl || null);
   const [copied, setCopied] = useState(false);
@@ -123,8 +138,12 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
         type: partType,
         brand,
         model,
-        description: description || null,
         specifications: hasSpecificFields(partType) ? specifications : null,
+        officialPrice: officialPrice ? parseFloat(officialPrice) : null,
+        averageRating: averageRating ? parseFloat(averageRating) : 0,
+        totalReviews: totalReviews ? parseInt(totalReviews) : 0,
+        averageKmLifespan: averageKmLifespan ? parseInt(averageKmLifespan) : 0,
+        totalInstallations: totalInstallations ? parseInt(totalInstallations) : 0,
       };
 
       if (initialData) {
@@ -494,14 +513,6 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Opis</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Opcjonalny opis czesci..."
-              rows={3}
-            />
           </div>
 
           {/* === Zdjęcie produktu === */}
@@ -524,6 +535,57 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
               <Label>Parametry szczegółowe</Label>
               <div className="space-y-4 rounded-md border p-4">
                 {renderSpecificFields()}
+              </div>
+            </div>
+          )}
+
+          {/* === Statystyki === */}
+          {initialData && (
+            <div className="space-y-2">
+              <Label>Statystyki</Label>
+              <div className="grid grid-cols-2 gap-4 rounded-md border p-4">
+                <div className="space-y-2">
+                  <Label htmlFor="averageRating">Średnia ocena</Label>
+                  <Input
+                    id="averageRating"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="5"
+                    value={averageRating}
+                    onChange={(e) => setAverageRating(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="totalReviews">Liczba opinii</Label>
+                  <Input
+                    id="totalReviews"
+                    type="number"
+                    min="0"
+                    value={totalReviews}
+                    onChange={(e) => setTotalReviews(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="averageKmLifespan">Średnia żywotność (km)</Label>
+                  <Input
+                    id="averageKmLifespan"
+                    type="number"
+                    min="0"
+                    value={averageKmLifespan}
+                    onChange={(e) => setAverageKmLifespan(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="totalInstallations">Liczba instalacji</Label>
+                  <Input
+                    id="totalInstallations"
+                    type="number"
+                    min="0"
+                    value={totalInstallations}
+                    onChange={(e) => setTotalInstallations(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
           )}

@@ -84,8 +84,12 @@ export async function updatePartProduct(
     type?: PartType;
     brand?: string;
     model?: string;
-    description?: string | null;
     specifications?: Record<string, unknown> | null;
+    officialPrice?: number | null;
+    averageRating?: number | null;
+    totalReviews?: number | null;
+    averageKmLifespan?: number | null;
+    totalInstallations?: number | null;
   }
 ) {
   await requireAdmin();
@@ -96,8 +100,12 @@ export async function updatePartProduct(
       type: data.type,
       brand: data.brand?.trim(),
       model: data.model?.trim(),
-      description: data.description,
       specifications: (data.specifications as Prisma.InputJsonValue) ?? undefined,
+      officialPrice: data.officialPrice,
+      averageRating: data.averageRating,
+      totalReviews: data.totalReviews ?? undefined,
+      averageKmLifespan: data.averageKmLifespan ?? undefined,
+      totalInstallations: data.totalInstallations ?? undefined,
     },
   });
 
@@ -110,6 +118,24 @@ export async function deletePartProduct(id: string) {
   await requireAdmin();
 
   await prisma.partProduct.delete({ where: { id } });
+
+  revalidatePath("/admin/parts");
+}
+
+export async function getPartReviews(productId: string) {
+  return prisma.partReview.findMany({
+    where: { productId },
+    include: {
+      user: { select: { id: true, name: true, email: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function deletePartReview(id: string) {
+  await requireAdmin();
+
+  await prisma.partReview.delete({ where: { id } });
 
   revalidatePath("/admin/parts");
 }
