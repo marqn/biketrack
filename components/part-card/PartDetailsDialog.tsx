@@ -553,7 +553,7 @@ export default function PartDetailsDialog({
           </div>
 
           {/* === Zdjęcie części === */}
-          {!onSave && !unknownProduct && selectedProduct && (
+          {!unknownProduct && selectedProduct && (
             <div className="space-y-4">
               <h3 className="text-base font-semibold">Zdjęcie</h3>
               {displayImage ? (
