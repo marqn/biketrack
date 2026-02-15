@@ -114,6 +114,12 @@ export function BikeHeader({
 
   useEffect(() => {
     if (!hasStrava || isSyncing) return;
+    // If already synced, show Strava icon statically without animation
+    if (syncDate) {
+      setShowStrava(true);
+      setIconVisible(true);
+      return;
+    }
     // Start fade in
     const fadeInTimeout = setTimeout(() => setIconVisible(true), 50);
     const interval = setInterval(() => {
@@ -129,7 +135,7 @@ export function BikeHeader({
       clearTimeout(fadeInTimeout);
       clearInterval(interval);
     };
-  }, [hasStrava, isSyncing]);
+  }, [hasStrava, isSyncing, syncDate]);
 
   const handleStravaSync = () => {
     startSync(async () => {
@@ -365,13 +371,6 @@ export function BikeHeader({
                           >
                             <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
                           </svg>
-                        )}
-                      </span>
-                      <span className={`absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full ${syncDate ? "bg-green-500" : "bg-destructive"}`}>
-                        {syncDate ? (
-                          <Check className="h-2.5 w-2.5 text-white" />
-                        ) : (
-                          <X className="h-2.5 w-2.5 text-destructive-foreground" />
                         )}
                       </span>
                     </Button>

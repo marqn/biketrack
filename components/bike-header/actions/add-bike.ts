@@ -159,6 +159,7 @@ export async function addBike({
           productId: p.productId || undefined,
           installedAt: p.productId ? new Date() : undefined,
           isInstalled: getPartCategory(p.type) !== "accessories",
+          wearKm: totalKm,
         })),
       },
     },
