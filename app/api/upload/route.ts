@@ -59,13 +59,6 @@ export async function POST(request: Request): Promise<NextResponse> {
             throw new Error("Brak uprawnień");
           }
         } else if (type === "product") {
-          const user = await prisma.user.findUnique({
-            where: { id: session.user.id },
-            select: { role: true },
-          });
-          if (user?.role !== "ADMIN") {
-            throw new Error("Brak uprawnień");
-          }
           const product = await prisma.partProduct.findUnique({
             where: { id: entityId },
             select: { officialImageUrl: true },

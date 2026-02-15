@@ -34,6 +34,7 @@ import { BikeType, PartType } from "@/lib/generated/prisma";
 import { PartProduct, BikePartWithProduct } from "@/lib/types";
 import { installPart } from "@/app/app/actions/install-part";
 import { getUserPartReview } from "@/app/app/actions/get-user-part-review";
+import { ImageUploader } from "@/components/ui/image-uploader";
 import BrandModelFields from "./BrandModelFields";
 import TireFields from "./specific-fields/TireFields";
 import ChainFields from "./specific-fields/ChainFields";
@@ -552,31 +553,55 @@ export default function PartDetailsDialog({
           </div>
 
           {/* === Zdjęcie części === */}
-          {!onSave && !unknownProduct && displayImage && (
+          {!onSave && !unknownProduct && selectedProduct && (
             <div className="space-y-4">
               <h3 className="text-base font-semibold">Zdjęcie</h3>
-              <button
-                type="button"
-                onClick={() => setLightboxOpen(true)}
-                className="w-24 h-24 rounded-lg border overflow-hidden bg-muted/50 cursor-pointer hover:ring-2 hover:ring-primary transition-all"
-              >
-                <img
-                  key={displayImage}
-                  src={displayImage}
-                  alt="Zdjęcie części"
-                  className="w-full h-full object-cover"
-                />
-              </button>
-              {lightboxOpen && (
-                <div
-                  className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
-                  onClick={() => setLightboxOpen(false)}
-                >
-                  <img
-                    src={displayImage}
-                    alt="Zdjęcie części"
-                    className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
-                    onClick={(e) => e.stopPropagation()}
+              {displayImage ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setLightboxOpen(true)}
+                    className="w-24 h-24 rounded-lg border overflow-hidden bg-muted/50 cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+                  >
+                    <img
+                      key={displayImage}
+                      src={displayImage}
+                      alt="Zdjęcie części"
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                  {lightboxOpen && (
+                    <div
+                      className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+                      onClick={() => setLightboxOpen(false)}
+                    >
+                      <img
+                        src={displayImage}
+                        alt="Zdjęcie części"
+                        className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Ten produkt nie ma jeszcze zdjęcia. Możesz je dodać.
+                  </p>
+                  <ImageUploader
+                    images={[]}
+                    maxImages={1}
+                    entityType="product"
+                    entityId={selectedProduct.id}
+                    onImagesChange={(urls) => {
+                      if (urls[0]) {
+                        setSelectedProduct({
+                          ...selectedProduct,
+                          officialImageUrl: urls[0],
+                        });
+                      }
+                    }}
                   />
                 </div>
               )}

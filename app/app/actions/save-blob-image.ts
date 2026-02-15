@@ -81,13 +81,6 @@ export async function saveBlobImage(
         data: { image: blobUrl },
       });
     } else if (entityType === "product") {
-      const user = await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { role: true },
-      });
-      if (user?.role !== "ADMIN") {
-        return { success: false, error: "Brak uprawnień" };
-      }
       const product = await prisma.partProduct.findUnique({
         where: { id: entityId },
         select: { officialImageUrl: true },
