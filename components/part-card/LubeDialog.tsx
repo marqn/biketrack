@@ -196,30 +196,6 @@ export default function LubeDialog({
             <span className="font-medium">{currentKm} km</span>
           </div>
 
-          {/* Checkbox "Nie znam produktu" */}
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="unknown-product"
-              checked={unknownProduct}
-              onCheckedChange={(checked) => {
-                setUnknownProduct(checked === true);
-                if (checked) {
-                  setBrand("");
-                  setModel("");
-                  setSelectedProduct(null);
-                  setRating(0);
-                  setReviewText("");
-                }
-              }}
-            />
-            <Label
-              htmlFor="unknown-product"
-              className="text-sm font-normal cursor-pointer"
-            >
-              Nie znam produktu / Chcę tylko zapisać smarowanie
-            </Label>
-          </div>
-
           {!unknownProduct && (
             <>
               {/* Wybór produktu - zawsze widoczny */}

@@ -9,13 +9,21 @@ import { revalidatePath } from "next/cache";
 
 const SYNC_COOLDOWN_MS = 60 * 60 * 1000; // 1 godzina
 
+export type StravaSyncUpdate = {
+  bikeName: string;
+  oldKm: number;
+  newKm: number;
+  diffKm: number;
+};
+
 export async function syncStravaDistances(force = false): Promise<{
   synced: number;
   skipped: boolean;
+  updates: StravaSyncUpdate[];
 }> {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
-    return { synced: 0, skipped: false };
+    return { synced: 0, skipped: false, updates: [] };
   }
 
   // Sprawdź cooldown (pomiń przy force)
@@ -28,7 +36,7 @@ export async function syncStravaDistances(force = false): Promise<{
     if (user?.lastStravaSync) {
       const elapsed = Date.now() - user.lastStravaSync.getTime();
       if (elapsed < SYNC_COOLDOWN_MS) {
-        return { synced: 0, skipped: true };
+        return { synced: 0, skipped: true, updates: [] };
       }
     }
   }
@@ -48,7 +56,7 @@ export async function syncStravaDistances(force = false): Promise<{
         where: { id: session.user.id },
         data: { lastStravaSync: new Date() },
       });
-      return { synced: 0, skipped: false };
+      return { synced: 0, skipped: false, updates: [] };
     }
 
     // Mapa: stravaGearId -> dystans w km
@@ -67,10 +75,14 @@ export async function syncStravaDistances(force = false): Promise<{
         id: true,
         stravaGearId: true,
         totalKm: true,
+        brand: true,
+        model: true,
+        type: true,
       },
     });
 
     let syncedCount = 0;
+    const updates: StravaSyncUpdate[] = [];
 
     for (const bike of userBikes) {
       const stravaKm = stravaDistanceMap.get(bike.stravaGearId!);
@@ -93,6 +105,17 @@ export async function syncStravaDistances(force = false): Promise<{
         }),
       ]);
 
+      const bikeName = (bike.brand || bike.model)
+        ? `${bike.brand ?? ""} ${bike.model ?? ""}`.trim()
+        : bike.type;
+
+      updates.push({
+        bikeName,
+        oldKm: bike.totalKm,
+        newKm: stravaKm,
+        diffKm,
+      });
+
       await checkBikeNotifications(bike.id);
       syncedCount++;
     }
@@ -107,9 +130,9 @@ export async function syncStravaDistances(force = false): Promise<{
       revalidatePath("/app");
     }
 
-    return { synced: syncedCount, skipped: false };
+    return { synced: syncedCount, skipped: false, updates };
   } catch (error) {
     console.error("Strava sync error:", error);
-    return { synced: 0, skipped: false };
+    return { synced: 0, skipped: false, updates: [] };
   }
 }

@@ -2,6 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
+import { Toaster } from "@/components/ui/sonner";
 import { JetBrains_Mono } from "next/font/google";
 
 const font = JetBrains_Mono({
@@ -24,7 +25,10 @@ export default function RootLayout({
   return (
     <html lang="pl" className={font.variable}>
       <body className="antialiased">
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );

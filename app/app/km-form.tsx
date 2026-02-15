@@ -11,6 +11,7 @@ import {
 import { updateBikeKm } from "./actions/update-bike-km";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Minus } from "lucide-react";
 
@@ -36,12 +37,19 @@ export default function KmForm({ bikeId, initialKm }: Props) {
 
   async function action(formData: FormData) {
     const newKm = Number(formData.get("newKm"));
+    const prevKm = optimisticKm;
 
     startTransition(() => {
       setOptimisticKm(newKm);
     });
 
     await updateBikeKm(formData);
+
+    toast.success(`Zapisano przebieg: ${newKm.toLocaleString("pl-PL")} km`, {
+      description: prevKm !== newKm
+        ? `Zmiana: ${prevKm.toLocaleString("pl-PL")} → ${newKm.toLocaleString("pl-PL")} km`
+        : undefined,
+    });
   }
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);

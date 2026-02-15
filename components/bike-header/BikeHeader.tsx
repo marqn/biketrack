@@ -51,6 +51,7 @@ import { Bike, BikeType } from "@/lib/generated/prisma";
 import { signOut } from "next-auth/react";
 import { useNotifications } from "@/app/hooks/useNotifications";
 import { syncStravaDistances } from "@/app/app/actions/sync-strava-distances";
+import { toast } from "sonner";
 import { deleteAccount } from "./actions/delete-account";
 import { deleteBike } from "./actions/delete-bike";
 import { updateBike } from "./actions/update-bike";
@@ -142,6 +143,11 @@ export function BikeHeader({
       const result = await syncStravaDistances(true);
       if (result.synced > 0) {
         router.refresh();
+        for (const update of result.updates) {
+          toast.success(`${update.bikeName}: +${update.diffKm} km`, {
+            description: `Przebieg: ${update.oldKm.toLocaleString("pl-PL")} → ${update.newKm.toLocaleString("pl-PL")} km`,
+          });
+        }
       }
       setSyncDate(new Date().toISOString());
       setHasSynced(true);
