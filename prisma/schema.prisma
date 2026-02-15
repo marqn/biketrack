@@ -39,6 +39,8 @@ model User {
   partReviews    PartReview[]
   bikeComments   BikeComment[]
   commentReports CommentReport[]
+
+  createdAt DateTime @default(now())
 }
 
 model Account {
