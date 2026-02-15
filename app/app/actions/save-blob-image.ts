@@ -45,8 +45,8 @@ export async function saveBlobImage(
       if (!part || part.bike.userId !== session.user.id) {
         return { success: false, error: "Brak uprawnień" };
       }
-      if (part.images.length >= 3) {
-        return { success: false, error: "Maksymalnie 3 zdjęcia" };
+      if (part.images.length >= 1) {
+        return { success: false, error: "Maksymalnie 1 zdjęcie" };
       }
 
       await prisma.bikePart.update({
@@ -90,19 +90,19 @@ export async function saveBlobImage(
       }
       const product = await prisma.partProduct.findUnique({
         where: { id: entityId },
-        select: { images: true },
+        select: { officialImageUrl: true },
       });
       if (!product) {
         return { success: false, error: "Produkt nie istnieje" };
       }
-      if (product.images.length >= 3) {
-        return { success: false, error: "Maksymalnie 3 zdjęcia" };
+      if (product.officialImageUrl) {
+        return { success: false, error: "Produkt ma już zdjęcie" };
       }
 
       await prisma.partProduct.update({
         where: { id: entityId },
         data: {
-          images: { push: blobUrl },
+          officialImageUrl: blobUrl,
         },
       });
     } else if (entityType === "review") {

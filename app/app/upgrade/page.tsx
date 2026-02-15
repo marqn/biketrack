@@ -36,7 +36,7 @@ const plans = [
   {
     id: "1month",
     name: "Miesięczny",
-    price: "3",
+    price: "4",
     period: "/ miesiąc",
     duration: "1 miesiąc",
     description: "Idealne na próbę",

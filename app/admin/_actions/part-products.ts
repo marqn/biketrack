@@ -22,6 +22,7 @@ export async function getPartProducts(params: {
   page?: number;
   search?: string;
   type?: PartType;
+  all?: boolean;
 }) {
   const pageSize = 20;
   const page = params.page || 1;
@@ -39,9 +40,8 @@ export async function getPartProducts(params: {
   const [products, total] = await Promise.all([
     prisma.partProduct.findMany({
       where,
-      orderBy: [{ type: "asc" }, { brand: "asc" }, { model: "asc" }],
-      skip: (page - 1) * pageSize,
-      take: pageSize,
+      orderBy: [{ type: "asc" }, { brand: "asc" }, { model: "asc" }, { createdAt: "desc" }],
+      ...(params.all ? {} : { skip: (page - 1) * pageSize, take: pageSize }),
     }),
     prisma.partProduct.count({ where }),
   ]);

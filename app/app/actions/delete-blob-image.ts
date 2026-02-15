@@ -80,7 +80,7 @@ export async function deleteBlobImage(
       }
       const product = await prisma.partProduct.findUnique({
         where: { id: entityId },
-        select: { images: true },
+        select: { officialImageUrl: true },
       });
       if (!product) {
         return { success: false, error: "Produkt nie istnieje" };
@@ -93,7 +93,7 @@ export async function deleteBlobImage(
       await prisma.partProduct.update({
         where: { id: entityId },
         data: {
-          images: product.images.filter((url) => url !== imageUrl),
+          officialImageUrl: null,
         },
       });
     } else if (entityType === "review") {

@@ -174,6 +174,7 @@ export interface PartProduct {
   averageKmLifespan: number | null;
   totalInstallations: number;
   specifications: unknown;
+  images: string[];
   createdAt: Date | string;
   updatedAt: Date | string;
 }

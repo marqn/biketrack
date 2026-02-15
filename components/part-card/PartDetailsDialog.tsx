@@ -34,7 +34,6 @@ import { BikeType, PartType } from "@/lib/generated/prisma";
 import { PartProduct, BikePartWithProduct } from "@/lib/types";
 import { installPart } from "@/app/app/actions/install-part";
 import { getUserPartReview } from "@/app/app/actions/get-user-part-review";
-import { ImageUploader } from "@/components/ui/image-uploader";
 import BrandModelFields from "./BrandModelFields";
 import TireFields from "./specific-fields/TireFields";
 import ChainFields from "./specific-fields/ChainFields";
@@ -130,10 +129,12 @@ export default function PartDetailsDialog({
     Record<string, unknown>
   >(getDefaultSpecificData(partType) as Record<string, unknown>);
   const [unknownProduct, setUnknownProduct] = useState(false);
-  const [partImages, setPartImages] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
   const [isLoadingReview, setIsLoadingReview] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const router = useRouter();
+
+  const displayImage = selectedProduct?.officialImageUrl || null;
 
   useEffect(() => {
     async function initDialog() {
@@ -222,7 +223,6 @@ export default function PartDetailsDialog({
         setReviewText("");
       }
       setHoveredRating(0);
-      setPartImages((currentPart as { images?: string[] })?.images ?? []);
     }
 
     if (open) {
@@ -537,8 +537,8 @@ export default function PartDetailsDialog({
                 partType={partType}
                 brand={brand}
                 model={model}
-                onBrandChange={(newBrand) => setBrand(newBrand)}
-                onModelChange={(newModel) => setModel(newModel)}
+                onBrandChange={(newBrand) => { setBrand(newBrand); setSelectedProduct(null); }}
+                onModelChange={(newModel) => { setModel(newModel); setSelectedProduct(null); }}
                 onProductSelect={(product) => {
                   setSelectedProduct(product);
                   if (product && product.specifications) {
@@ -551,17 +551,35 @@ export default function PartDetailsDialog({
             )}
           </div>
 
-          {/* === Zdjęcia części === */}
-          {!onSave && (
+          {/* === Zdjęcie części === */}
+          {!onSave && !unknownProduct && displayImage && (
             <div className="space-y-4">
               <h3 className="text-base font-semibold">Zdjęcie</h3>
-              <ImageUploader
-                images={partImages}
-                maxImages={3}
-                entityType="part"
-                entityId={partId}
-                onImagesChange={setPartImages}
-              />
+              <button
+                type="button"
+                onClick={() => setLightboxOpen(true)}
+                className="w-24 h-24 rounded-lg border overflow-hidden bg-muted/50 cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+              >
+                <img
+                  key={displayImage}
+                  src={displayImage}
+                  alt="Zdjęcie części"
+                  className="w-full h-full object-cover"
+                />
+              </button>
+              {lightboxOpen && (
+                <div
+                  className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+                  onClick={() => setLightboxOpen(false)}
+                >
+                  <img
+                    src={displayImage}
+                    alt="Zdjęcie części"
+                    className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
+              )}
             </div>
           )}
 

@@ -16,8 +16,6 @@ export function DeleteButton({ id, onDelete, confirmMessage = "Czy na pewno chce
   const router = useRouter();
 
   function handleDelete() {
-    if (!confirm(confirmMessage)) return;
-
     startTransition(async () => {
       await onDelete(id);
       router.refresh();

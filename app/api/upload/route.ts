@@ -5,9 +5,8 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 
 const MAX_IMAGES_BIKE = 3;
-const MAX_IMAGES_PART = 3;
+const MAX_IMAGES_PART = 1;
 const MAX_IMAGES_REVIEW = 3;
-const MAX_IMAGES_PRODUCT = 3;
 
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
@@ -69,13 +68,13 @@ export async function POST(request: Request): Promise<NextResponse> {
           }
           const product = await prisma.partProduct.findUnique({
             where: { id: entityId },
-            select: { images: true },
+            select: { officialImageUrl: true },
           });
           if (!product) {
             throw new Error("Produkt nie istnieje");
           }
-          if (product.images.length >= MAX_IMAGES_PRODUCT) {
-            throw new Error(`Maksymalnie ${MAX_IMAGES_PRODUCT} zdjęcia`);
+          if (product.officialImageUrl) {
+            throw new Error("Produkt ma już zdjęcie");
           }
         } else if (type === "review") {
           // Dla recenzji sprawdzamy tylko czy produkt istnieje
