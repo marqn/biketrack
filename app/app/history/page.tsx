@@ -281,15 +281,24 @@ const BikePartsHistory: React.FC = () => {
         <Card className="hover:shadow-lg transition-shadow duration-300">
           <CardHeader>
             <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="text-xl mb-1">
-                  {part.brand && part.model
-                    ? `${part.brand} ${part.model}`
-                    : getPartName(part.partType)}
-                </CardTitle>
-                <CardDescription className="text-base">
-                  {getPartName(part.partType)}
-                </CardDescription>
+              <div className="flex items-center gap-3">
+                {part.product?.officialImageUrl && (
+                  <img
+                    src={part.product.officialImageUrl}
+                    alt={`${part.brand} ${part.model}`}
+                    className="w-12 h-12 rounded-lg object-cover border shrink-0"
+                  />
+                )}
+                <div>
+                  <CardTitle className="text-xl mb-1">
+                    {part.brand && part.model
+                      ? `${part.brand} ${part.model}`
+                      : getPartName(part.partType)}
+                  </CardTitle>
+                  <CardDescription className="text-base">
+                    {getPartName(part.partType)}
+                  </CardDescription>
+                </div>
               </div>
               <div className="flex gap-2">
                 <Button

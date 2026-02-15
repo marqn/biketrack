@@ -241,8 +241,9 @@ model PartReplacement {
   kmAtReplacement Int // Przebieg roweru w momencie wymiany
   kmUsed          Int // Ile km przejechał komponent (wearKm w momencie wymiany)
 
-  bike Bike     @relation(fields: [bikeId], references: [id], onDelete: Cascade)
-  part BikePart @relation(fields: [partId], references: [id], onDelete: Cascade)
+  bike    Bike         @relation(fields: [bikeId], references: [id], onDelete: Cascade)
+  part    BikePart     @relation(fields: [partId], references: [id], onDelete: Cascade)
+  product PartProduct? @relation(fields: [productId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
 
@@ -277,6 +278,7 @@ model PartProduct {
   bikeParts           BikePart[]
   reviews             PartReview[]
   serviceEvents       ServiceEvent[]
+  partReplacements    PartReplacement[]
   bikeProductDefaults BikeProductDefaultPart[]
 
   createdAt DateTime @default(now())

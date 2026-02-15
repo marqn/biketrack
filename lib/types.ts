@@ -93,6 +93,9 @@ export interface PartReplacement {
   kmUsed: number;
   createdAt?: Date | string;
   partType?: string;
+  product?: {
+    officialImageUrl: string | null;
+  } | null;
 }
 
 export interface LubeEvent {

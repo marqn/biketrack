@@ -57,6 +57,11 @@ export async function GET(request: NextRequest) {
           kmAtReplacement: true,
           kmUsed: true,
           createdAt: true,
+          product: {
+            select: {
+              officialImageUrl: true,
+            },
+          },
         },
       });
 
@@ -125,6 +130,11 @@ export async function GET(request: NextRequest) {
           kmAtReplacement: true,
           kmUsed: true,
           createdAt: true,
+          product: {
+            select: {
+              officialImageUrl: true,
+            },
+          },
         },
       });
 
