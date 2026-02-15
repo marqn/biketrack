@@ -153,9 +153,9 @@ export default function PartsAccordion({
                   createdAt={existingPart?.createdAt}
                   bikeType={bikeType}
                 >
-                  {partType === PartType.CHAIN && chainChildren}
-                  {partType === PartType.TIRE_FRONT && tireFrontChildren}
-                  {partType === PartType.TIRE_REAR && tireRearChildren}
+                  {partType === PartType.CHAIN ? chainChildren :
+                   partType === PartType.TIRE_FRONT ? tireFrontChildren :
+                   partType === PartType.TIRE_REAR ? tireRearChildren : null}
                 </PartCard>
               ))}
             </div>
