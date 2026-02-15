@@ -16,7 +16,7 @@ import { PartType } from "@/lib/generated/prisma";
 import { DeleteButton } from "../_components/DeleteButton";
 
 export default async function PartsPage() {
-  const { products } = await getPartProducts({});
+  const { products } = await getPartProducts({ all: true });
 
   return (
     <div className="space-y-6">
