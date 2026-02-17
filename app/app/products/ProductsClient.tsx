@@ -225,7 +225,7 @@ function ProductCard({ product }: { product: ProductListItem }) {
           </div>
         ) : (
           <div className="w-full h-36 bg-muted flex items-center justify-center">
-            <Package className="h-12 w-12 text-muted-foreground/30" />
+            <Package className="h-12 w-12 text-muted-foreground/50" strokeWidth={1} />
           </div>
         )}
         <CardContent className="p-6">
