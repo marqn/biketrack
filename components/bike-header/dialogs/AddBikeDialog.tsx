@@ -24,6 +24,7 @@ import {
 } from "../actions/get-strava-bikes";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface AddBikeDialogProps {
   open: boolean;
@@ -152,6 +153,10 @@ export function AddBikeDialog({
         document.cookie = `selectedBikeId=${result.bikeId};path=/;max-age=${60 * 60 * 24 * 365}`;
         onBikeAdded?.(result.bikeId);
         handleOpenChange(false);
+        const bikeName = [brand, model].filter(Boolean).join(" ");
+        toast.success("Dodano nowy rower", {
+          description: bikeName || undefined,
+        });
         router.refresh();
       } else {
         setError(result.error || "Wystąpił błąd");
@@ -180,6 +185,7 @@ export function AddBikeDialog({
         document.cookie = `selectedBikeId=${result.bikeId};path=/;max-age=${60 * 60 * 24 * 365}`;
         onBikeAdded?.(result.bikeId);
         handleOpenChange(false);
+        toast.success("Dodano nowy rower");
         router.refresh();
       } else {
         setError(result.error || "Wystąpił błąd");

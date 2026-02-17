@@ -47,7 +47,7 @@ export default function KmForm({ bikeId, initialKm }: Props) {
 
     toast.success(`Zapisano przebieg: ${newKm.toLocaleString("pl-PL")} km`, {
       description: prevKm !== newKm
-        ? `Zmiana: ${prevKm.toLocaleString("pl-PL")} → ${newKm.toLocaleString("pl-PL")} km`
+        ? `Zmiana: ${prevKm.toLocaleString("pl-PL")} km → ${newKm.toLocaleString("pl-PL")} km`
         : undefined,
     });
   }

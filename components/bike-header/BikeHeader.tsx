@@ -185,6 +185,7 @@ export function BikeHeader({
 
   const handleDeleteBike = async () => {
     if (!bikeToDelete) return;
+    const deletedBike = bikes.find((b) => b.id === bikeToDelete);
     const result = await deleteBike(bikeToDelete);
     if (result.success) {
       // Jeśli usunięto aktywny rower, przełącz na pierwszy dostępny
@@ -196,7 +197,14 @@ export function BikeHeader({
       }
       setBikeToDelete(null);
       closeDialog();
+      toast.success("Rower został usunięty", {
+        description: deletedBike
+          ? `${deletedBike.brand ?? ""} ${deletedBike.model ?? ""}`.trim() || undefined
+          : undefined,
+      });
       router.refresh();
+    } else {
+      toast.error(result.error || "Nie udało się usunąć roweru");
     }
   };
 

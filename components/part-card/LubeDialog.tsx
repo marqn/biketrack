@@ -19,6 +19,7 @@ import { PartProduct } from "@/lib/types";
 import { LubricantSpecificData } from "@/lib/part-specific-data";
 import { getUserLubricantReview } from "@/app/app/actions/get-user-lubricant-review";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface LubeDialogProps {
   open: boolean;
@@ -151,6 +152,9 @@ export default function LubeDialog({
         unknownProduct,
         rating: rating > 0 ? rating : undefined,
         reviewText: reviewText.trim() || undefined,
+      });
+      toast.success("Łańcuch nasmarowany", {
+        description: brand && model ? `${brand} ${model}` : undefined,
       });
       // Reset form
       setBrand("");
