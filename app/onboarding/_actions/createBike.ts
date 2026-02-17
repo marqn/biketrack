@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { BikeType } from "@/lib/generated/prisma";
-import { DEFAULT_PARTS, EBIKE_PARTS, getPartCategory } from "@/lib/default-parts";
+import { DEFAULT_PARTS, EBIKE_PARTS, getPartCategory, TOGGLEABLE_PARTS } from "@/lib/default-parts";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 // Normalizacja tekstu do Title Case (np. "trek" -> "Trek", "CANNONDALE" -> "Cannondale")
@@ -136,7 +136,7 @@ export async function createBike({ type, brand, model, year, bikeProductId, isEl
           expectedKm: p.expectedKm,
           productId: p.productId || undefined,
           installedAt: p.productId ? new Date() : undefined,
-          isInstalled: getPartCategory(p.type) !== "accessories",
+          isInstalled: getPartCategory(p.type) !== "accessories" && !TOGGLEABLE_PARTS.has(p.type),
         })),
       },
     },

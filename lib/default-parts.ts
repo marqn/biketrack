@@ -77,6 +77,7 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.CRANKSET, expectedKm: 25000 },
     { type: PartType.CHAIN, expectedKm: 2000 },
     { type: PartType.CASSETTE, expectedKm: 6000 },
+    { type: PartType.DERAILLEUR_FRONT, expectedKm: 25000 },
     { type: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
     { type: PartType.SHIFTERS, expectedKm: 25000 },
     { type: PartType.PEDALS, expectedKm: 25000 },
@@ -127,6 +128,7 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.CRANKSET, expectedKm: 20000 },
     { type: PartType.CHAIN, expectedKm: 1800 },
     { type: PartType.CASSETTE, expectedKm: 5000 },
+    { type: PartType.DERAILLEUR_FRONT, expectedKm: 15000 },
     { type: PartType.DERAILLEUR_REAR, expectedKm: 12000 },
     { type: PartType.SHIFTERS, expectedKm: 20000 },
     { type: PartType.PEDALS, expectedKm: 20000 },
@@ -174,6 +176,7 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.CRANKSET, expectedKm: 25000 },
     { type: PartType.CHAIN, expectedKm: 1800 },
     { type: PartType.CASSETTE, expectedKm: 5000 },
+    { type: PartType.DERAILLEUR_FRONT, expectedKm: 20000 },
     { type: PartType.DERAILLEUR_REAR, expectedKm: 15000 },
     { type: PartType.SHIFTERS, expectedKm: 25000 },
     { type: PartType.PEDALS, expectedKm: 25000 },
@@ -420,6 +423,11 @@ export function getPartUIForBike(partType: PartType, bikeType?: BikeType, partSp
 export function getPartIcon(partType: PartType | string): string {
   return PART_ICONS[partType as PartType] || "";
 }
+
+// Części, które nie są akcesoriami, ale mogą być wyłączone (np. przerzutka przednia w rowerach 1x)
+export const TOGGLEABLE_PARTS = new Set<PartType>([
+  PartType.DERAILLEUR_FRONT,
+]);
 
 export const CHAIN_LUBE_INTERVAL_KM = 200;
 export const SEALANT_INTERVAL_DAYS = 90;

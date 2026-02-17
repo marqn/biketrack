@@ -18,6 +18,7 @@ import {
   extractBrakeType,
   getHiddenPartsByTubelessStatus,
   extractTubelessStatus,
+  TOGGLEABLE_PARTS,
 } from "@/lib/default-parts";
 import { PartReplacement, BikePartWithProduct } from "@/lib/types";
 
@@ -108,6 +109,25 @@ export default function PartsAccordion({
       return aInstalled ? -1 : 1;
     });
 
+    // Sortuj toggleable parts w pozostałych kategoriach (zamontowane najpierw)
+    for (const cat of Object.keys(categories) as PartCategory[]) {
+      if (cat === "accessories") continue;
+      const hasToggleable = categories[cat].some((p) => TOGGLEABLE_PARTS.has(p.partType));
+      if (hasToggleable) {
+        categories[cat].sort((a, b) => {
+          const aToggleable = TOGGLEABLE_PARTS.has(a.partType);
+          const bToggleable = TOGGLEABLE_PARTS.has(b.partType);
+          if (!aToggleable && !bToggleable) return 0;
+          if (!aToggleable) return -1;
+          if (!bToggleable) return 1;
+          const aInstalled = a.existingPart?.isInstalled ?? true;
+          const bInstalled = b.existingPart?.isInstalled ?? true;
+          if (aInstalled === bInstalled) return 0;
+          return aInstalled ? -1 : 1;
+        });
+      }
+    }
+
     return categories;
   }, [defaultParts, existingParts]);
 
@@ -148,7 +168,7 @@ export default function PartsAccordion({
                     existingPart?.replacements?.[0]?.model
                   }
                   currentPart={existingPart as BikePartWithProduct | undefined}
-                  isAccessory={category === "accessories"}
+                  isAccessory={category === "accessories" || TOGGLEABLE_PARTS.has(partType)}
                   isInstalled={existingPart?.isInstalled ?? (category !== "accessories")}
                   createdAt={existingPart?.createdAt}
                   bikeType={bikeType}
