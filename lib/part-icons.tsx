@@ -75,6 +75,14 @@ const CassetteIcon = createBikeIcon("CassetteIcon", <>
   <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
 </>);
 
+// Przerzutka przód (obejma na rurze + cage przesuwający łańcuch)
+const FrontDerailleurIcon = createBikeIcon("FrontDerailleurIcon", <>
+  <rect x="4" y="2" width="6" height="8" rx="1" />
+  <line x1="7" y1="10" x2="7" y2="14" strokeWidth="1.5" />
+  <path d="M3 14 L11 14 L13 18 L3 18 Z" />
+  <line x1="13" y1="18" x2="18" y2="22" strokeWidth="1.5" />
+</>);
+
 // Przerzutka tył (ramię + dwa kółka jockey + cage)
 const RearDerailleurIcon = createBikeIcon("RearDerailleurIcon", <>
   <path d="M4 2 L8 7 L8 11" strokeWidth="1.5" />
@@ -198,6 +206,7 @@ export const PART_ICON_COMPONENTS: Partial<Record<PartType, LucideIcon>> = {
   [PartType.CRANKSET]: CranksetIcon,
   [PartType.CHAIN]: Link,
   [PartType.CASSETTE]: CassetteIcon,
+  [PartType.DERAILLEUR_FRONT]: FrontDerailleurIcon,
   [PartType.DERAILLEUR_REAR]: RearDerailleurIcon,
   [PartType.SHIFTERS]: ShiftersIcon,
   [PartType.PEDALS]: PedalsIcon,

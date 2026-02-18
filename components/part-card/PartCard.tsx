@@ -162,7 +162,7 @@ export default function PartCard({
                 onClick={() => handleToggleInstalled(!isInstalled)}
                 disabled={isPending}
                 title={isInstalled ? "Zdejmij z roweru" : "Zamontuj na rowerze"}
-                className="h-8 w-8"
+                className="h-8 w-8 cursor-pointer"
               >
                 {isInstalled ? (
                   <Link className="h-4 w-4" />
