@@ -21,7 +21,7 @@ import { bikeTypeLabels, BikeProduct } from "@/lib/types";
 import { ArrowLeft } from "lucide-react";
 
 export default function SimpleOnboardingFlow() {
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [selectedType, setSelectedType] = useState<BikeType | null>(null);
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
@@ -29,19 +29,36 @@ export default function SimpleOnboardingFlow() {
   const [selectedProduct, setSelectedProduct] = useState<BikeProduct | null>(null);
   const [isElectric, setIsElectric] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   function handleTypeSelect(type: BikeType) {
     setSelectedType(type);
     setStep(2);
   }
 
-  function handleBack() {
+  function handleBackToType() {
     setStep(1);
     setSelectedType(null);
   }
 
+  function handleDetailsNext() {
+    setStep(3);
+  }
+
+  function handleDetailsSkip() {
+    setBrand("");
+    setModel("");
+    setYear(new Date().getFullYear().toString());
+    setSelectedProduct(null);
+    setStep(3);
+  }
+
+  function handleBackToDetails() {
+    setStep(2);
+  }
+
   function handleSubmit() {
-    if (!selectedType) return;
+    if (!selectedType || !termsAccepted) return;
 
     startTransition(async () => {
       await createBike({
@@ -55,31 +72,19 @@ export default function SimpleOnboardingFlow() {
     });
   }
 
-  function handleSkip() {
-    if (!selectedType) return;
-
-    startTransition(async () => {
-      await createBike({
-        type: selectedType,
-        brand: null,
-        model: null,
-        year: null,
-        isElectric,
-      });
-    });
-  }
-
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">
-            {step === 1 ? "Witaj!" : "Szczegóły roweru"}
+            {step === 1 && "Witaj!"}
+            {step === 2 && "Szczegóły roweru"}
+            {step === 3 && "Regulamin"}
           </CardTitle>
           <CardDescription className="text-base">
-            {step === 1
-              ? "Wybierz typ swojego roweru"
-              : "Podaj markę i model (opcjonalnie)"}
+            {step === 1 && "Wybierz typ swojego roweru"}
+            {step === 2 && "Podaj markę i model (opcjonalnie)"}
+            {step === 3 && "Zapoznaj się z regulaminem serwisu"}
           </CardDescription>
         </CardHeader>
 
@@ -107,9 +112,8 @@ export default function SimpleOnboardingFlow() {
           {step === 2 && (
             <>
               <button
-                onClick={handleBack}
+                onClick={handleBackToType}
                 className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                disabled={isPending}
               >
                 <ArrowLeft className="h-4 w-4" />
                 Zmień typ roweru
@@ -154,17 +158,15 @@ export default function SimpleOnboardingFlow() {
 
               <div className="space-y-3 pt-2">
                 <Button
-                  onClick={handleSubmit}
-                  disabled={isPending}
+                  onClick={handleDetailsNext}
                   className="w-full"
                   size="lg"
                 >
-                  {isPending ? "Tworzenie..." : "Dalej"}
+                  Dalej
                 </Button>
 
                 <Button
-                  onClick={handleSkip}
-                  disabled={isPending}
+                  onClick={handleDetailsSkip}
                   variant="outline"
                   className="w-full"
                   size="lg"
@@ -172,6 +174,52 @@ export default function SimpleOnboardingFlow() {
                   Pomiń
                 </Button>
               </div>
+            </>
+          )}
+
+          {step === 3 && (
+            <>
+              <button
+                onClick={handleBackToDetails}
+                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Wróć
+              </button>
+
+              <div className="h-60 custom-scrollbar overflow-y-auto rounded-md border p-4">
+                <div className="text-sm text-muted-foreground space-y-3">
+                  <p className="font-semibold text-foreground">Regulamin korzystania z serwisu MBike</p>
+                  <p>1. Serwis MBike służy do zarządzania rowerami, śledzenia przebiegu oraz planowania serwisowania części rowerowych.</p>
+                  <p>2. Użytkownik zobowiązuje się do podawania prawdziwych informacji dotyczących swoich rowerów i ich stanu technicznego.</p>
+                  <p>3. Dane użytkownika są przechowywane zgodnie z polityką prywatności i nie są udostępniane osobom trzecim bez zgody użytkownika.</p>
+                  <p>4. Użytkownik ponosi pełną odpowiedzialność za stan techniczny swojego roweru. Informacje o serwisowaniu mają charakter wyłącznie pomocniczy.</p>
+                  <p>5. Zabrania się wykorzystywania serwisu w sposób niezgodny z jego przeznaczeniem, w tym publikowania treści obraźliwych lub niezgodnych z prawem.</p>
+                  <p>6. Administracja zastrzega sobie prawo do usunięcia konta użytkownika w przypadku naruszenia regulaminu.</p>
+                  <p>7. Serwis jest udostępniany w stanie &quot;tak jak jest&quot; (as is). Administracja nie ponosi odpowiedzialności za ewentualne przerwy w działaniu serwisu.</p>
+                  <p>8. Regulamin może ulec zmianie. O istotnych zmianach użytkownicy zostaną poinformowani za pośrednictwem serwisu.</p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="terms-accepted"
+                  checked={termsAccepted}
+                  onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                />
+                <Label htmlFor="terms-accepted" className="cursor-pointer text-sm">
+                  Zapoznałem/am się z regulaminem i akceptuję jego postanowienia
+                </Label>
+              </div>
+
+              <Button
+                onClick={handleSubmit}
+                disabled={!termsAccepted || isPending}
+                className="w-full"
+                size="lg"
+              >
+                {isPending ? "Tworzenie..." : "Dalej"}
+              </Button>
             </>
           )}
         </CardContent>

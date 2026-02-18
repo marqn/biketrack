@@ -44,13 +44,14 @@ export default function StravaOnboardingPage() {
   const [stravaBikes, setStravaBikes] = useState<StravaBike[]>([]);
   const [selectedBikeId, setSelectedBikeId] = useState<string>("");
   const [selectedBike, setSelectedBike] = useState<StravaBike | null>(null);
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [selectedType, setSelectedType] = useState<BikeType | null>(null);
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
   const [year, setYear] = useState(new Date().getFullYear().toString());
   const [isElectric, setIsElectric] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     loadStravaBikes();
@@ -84,6 +85,17 @@ export default function StravaOnboardingPage() {
     setStep(3);
   }
 
+  function handleDetailsNext() {
+    setStep(4);
+  }
+
+  function handleDetailsSkip() {
+    setBrand("");
+    setModel("");
+    setYear(new Date().getFullYear().toString());
+    setStep(4);
+  }
+
   function handleBackToStrava() {
     setStep(1);
     setSelectedType(null);
@@ -93,8 +105,12 @@ export default function StravaOnboardingPage() {
     setStep(2);
   }
 
+  function handleBackToDetails() {
+    setStep(3);
+  }
+
   function handleSubmit() {
-    if (!selectedType || !selectedBike) return;
+    if (!selectedType || !selectedBike || !termsAccepted) return;
 
     startTransition(async () => {
       await createBike({
@@ -102,24 +118,6 @@ export default function StravaOnboardingPage() {
         brand: brand || null,
         model: model || null,
         year: year ? parseInt(year, 10) : null,
-        totalKm: selectedBike.distance
-          ? Math.round(selectedBike.distance / 1000)
-          : 0,
-        isElectric,
-        stravaGearId: selectedBike.id,
-      });
-    });
-  }
-
-  function handleSkip() {
-    if (!selectedType || !selectedBike) return;
-
-    startTransition(async () => {
-      await createBike({
-        type: selectedType,
-        brand: null,
-        model: null,
-        year: null,
         totalKm: selectedBike.distance
           ? Math.round(selectedBike.distance / 1000)
           : 0,
@@ -152,6 +150,7 @@ export default function StravaOnboardingPage() {
             {step === 1 && "Witaj! 🚴"}
             {step === 2 && "Typ roweru"}
             {step === 3 && "Szczegóły roweru"}
+            {step === 4 && "Regulamin"}
           </CardTitle>
           <CardDescription className="text-base">
             {step === 1 &&
@@ -170,6 +169,7 @@ export default function StravaOnboardingPage() {
               ))}
             {step === 2 && "Wybierz typ swojego roweru"}
             {step === 3 && "Podaj markę i model (opcjonalnie)"}
+            {step === 4 && "Zapoznaj się z regulaminem serwisu"}
           </CardDescription>
         </CardHeader>
 
@@ -230,7 +230,6 @@ export default function StravaOnboardingPage() {
               <button
                 onClick={handleBackToType}
                 className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                disabled={isPending}
               >
                 <ArrowLeft className="h-4 w-4" />
                 Zmień typ roweru
@@ -285,17 +284,15 @@ export default function StravaOnboardingPage() {
 
               <div className="space-y-3 pt-2">
                 <Button
-                  onClick={handleSubmit}
-                  disabled={isPending}
+                  onClick={handleDetailsNext}
                   className="w-full"
                   size="lg"
                 >
-                  {isPending ? "Tworzenie..." : "Dalej"}
+                  Dalej
                 </Button>
 
                 <Button
-                  onClick={handleSkip}
-                  disabled={isPending}
+                  onClick={handleDetailsSkip}
                   variant="outline"
                   className="w-full"
                   size="lg"
@@ -303,6 +300,53 @@ export default function StravaOnboardingPage() {
                   Pomiń
                 </Button>
               </div>
+            </>
+          )}
+
+          {/* Krok 4: Regulamin */}
+          {step === 4 && (
+            <>
+              <button
+                onClick={handleBackToDetails}
+                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Wróć
+              </button>
+
+              <div className="h-60 custom-scrollbar overflow-y-auto rounded-md border p-4">
+                <div className="text-sm text-muted-foreground space-y-3">
+                  <p className="font-semibold text-foreground">Regulamin korzystania z serwisu MBike</p>
+                  <p>1. Serwis MBike służy do zarządzania rowerami, śledzenia przebiegu oraz planowania serwisowania części rowerowych.</p>
+                  <p>2. Użytkownik zobowiązuje się do podawania prawdziwych informacji dotyczących swoich rowerów i ich stanu technicznego.</p>
+                  <p>3. Dane użytkownika są przechowywane zgodnie z polityką prywatności i nie są udostępniane osobom trzecim bez zgody użytkownika.</p>
+                  <p>4. Użytkownik ponosi pełną odpowiedzialność za stan techniczny swojego roweru. Informacje o serwisowaniu mają charakter wyłącznie pomocniczy.</p>
+                  <p>5. Zabrania się wykorzystywania serwisu w sposób niezgodny z jego przeznaczeniem, w tym publikowania treści obraźliwych lub niezgodnych z prawem.</p>
+                  <p>6. Administracja zastrzega sobie prawo do usunięcia konta użytkownika w przypadku naruszenia regulaminu.</p>
+                  <p>7. Serwis jest udostępniany w stanie &quot;tak jak jest&quot; (as is). Administracja nie ponosi odpowiedzialności za ewentualne przerwy w działaniu serwisu.</p>
+                  <p>8. Regulamin może ulec zmianie. O istotnych zmianach użytkownicy zostaną poinformowani za pośrednictwem serwisu.</p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="terms-accepted"
+                  checked={termsAccepted}
+                  onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                />
+                <Label htmlFor="terms-accepted" className="cursor-pointer text-sm">
+                  Zapoznałem/am się z regulaminem i akceptuję jego postanowienia
+                </Label>
+              </div>
+
+              <Button
+                onClick={handleSubmit}
+                disabled={!termsAccepted || isPending}
+                className="w-full"
+                size="lg"
+              >
+                {isPending ? "Tworzenie..." : "Dalej"}
+              </Button>
             </>
           )}
         </CardContent>
