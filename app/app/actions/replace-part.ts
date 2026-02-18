@@ -39,7 +39,7 @@ export async function replacePart(formData: FormData) {
       partId: part.id,
       partType,
       productId: part.productId,
-      brand: part.product?.brand || brand?.trim() || null,
+      brand: part.product?.brand || brand?.trim().toUpperCase() || null,
       model: part.product?.model || model?.trim() || null,
       notes: notes?.trim() || null,
       kmAtReplacement: bike.totalKm,
@@ -153,7 +153,7 @@ export async function updatePartReplacement(
   const replacement = await prisma.partReplacement.update({
     where: { id: replacementId },
     data: {
-      brand: data.brand?.trim() || null,
+      brand: data.brand?.trim().toUpperCase() || null,
       model: data.model?.trim() || null,
       notes: data.notes?.trim() || null,
     },

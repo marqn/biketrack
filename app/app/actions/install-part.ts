@@ -92,7 +92,7 @@ export async function installPart(data: InstallPartInput) {
           partId: part.id,
           partType: part.type,
           productId: part.productId,
-          brand: part.product?.brand || data.brand?.trim() || null,
+          brand: part.product?.brand || data.brand?.trim().toUpperCase() || null,
           model: part.product?.model || data.model?.trim() || null,
           notes: null,
           kmAtReplacement: part.bike.totalKm,
@@ -105,18 +105,19 @@ export async function installPart(data: InstallPartInput) {
   // Jeśli nie wybrano produktu, utwórz nowy (upsert)
   if (!productId && data.brand && data.model) {
     const canonicalType = getCanonicalPartType(part.type);
+    const normalizedBrand = data.brand.trim().toUpperCase();
 
     const product = await prisma.partProduct.upsert({
       where: {
         type_brand_model: {
           type: canonicalType,
-          brand: data.brand,
+          brand: normalizedBrand,
           model: data.model,
         },
       },
       create: {
         type: canonicalType,
-        brand: data.brand,
+        brand: normalizedBrand,
         model: data.model,
         specifications: data.partSpecificData as any,
         totalInstallations: 1,
@@ -155,7 +156,7 @@ export async function installPart(data: InstallPartInput) {
         partId: part.id,
         partType: part.type,
         productId: productId || null,
-        brand: data.brand?.trim() || null,
+        brand: data.brand?.trim().toUpperCase() || null,
         model: data.model?.trim() || null,
         notes: null,
         kmAtReplacement: part.bike.totalKm,
@@ -174,7 +175,7 @@ export async function installPart(data: InstallPartInput) {
         where: { id: existingReplacement.id },
         data: {
           productId: productId || existingReplacement.productId,
-          brand: data.brand?.trim() || existingReplacement.brand,
+          brand: data.brand?.trim().toUpperCase() || existingReplacement.brand,
           model: data.model?.trim() || existingReplacement.model,
         },
       });
@@ -186,7 +187,7 @@ export async function installPart(data: InstallPartInput) {
           partId: part.id,
           partType: part.type,
           productId: productId || null,
-          brand: data.brand?.trim() || null,
+          brand: data.brand?.trim().toUpperCase() || null,
           model: data.model?.trim() || null,
           notes: null,
           kmAtReplacement: part.bike.totalKm,

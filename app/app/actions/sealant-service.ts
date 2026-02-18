@@ -39,7 +39,7 @@ export async function changeSealant(input: ChangeSealantInput) {
     wheel === "front" ? ServiceType.SEALANT_FRONT : ServiceType.SEALANT_REAR;
 
   let finalProductId = productId;
-  let finalBrand = brand?.trim() || null;
+  let finalBrand = brand?.trim().toUpperCase() || null;
 
   // Jeśli użytkownik podał markę i model, ale nie ma productId - utwórz/znajdź produkt
   if (!finalProductId && finalBrand && model?.trim() && !unknownProduct) {
@@ -211,7 +211,7 @@ export async function updateSealantEvent(
   await prisma.serviceEvent.update({
     where: { id: eventId },
     data: {
-      lubricantBrand: data.lubricantBrand?.trim() || null,
+      lubricantBrand: data.lubricantBrand?.trim().toUpperCase() || null,
       lubricantProductId: data.lubricantProductId,
       notes: data.notes?.trim() || null,
     },

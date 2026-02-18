@@ -67,7 +67,7 @@ export async function createPartProduct(data: {
   const product = await prisma.partProduct.create({
     data: {
       type: data.type,
-      brand: data.brand.trim(),
+      brand: data.brand.trim().toUpperCase(),
       model: data.model.trim(),
       description: data.description || undefined,
       specifications: (data.specifications as Prisma.InputJsonValue) || undefined,
@@ -98,7 +98,7 @@ export async function updatePartProduct(
     where: { id },
     data: {
       type: data.type,
-      brand: data.brand?.trim(),
+      brand: data.brand?.trim().toUpperCase(),
       model: data.model?.trim(),
       specifications: (data.specifications as Prisma.InputJsonValue) ?? undefined,
       officialPrice: data.officialPrice,

@@ -62,8 +62,8 @@ export async function createBike({ type, brand, model, year, bikeProductId, isEl
       finalModel = existingProduct.model;
       resolvedBikeProductId = existingProduct.id;
     } else {
-      // Nowy produkt - normalizuj do Title Case
-      finalBrand = toTitleCase(finalBrand);
+      // Nowy produkt - normalizuj brand do UPPER CASE
+      finalBrand = finalBrand.toUpperCase();
       finalModel = toTitleCase(finalModel);
 
       const newProduct = await prisma.bikeProduct.create({

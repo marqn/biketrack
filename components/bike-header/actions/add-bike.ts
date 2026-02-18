@@ -85,7 +85,7 @@ export async function addBike({
       finalModel = existingProduct.model;
       resolvedBikeProductId = existingProduct.id;
     } else {
-      finalBrand = toTitleCase(finalBrand);
+      finalBrand = finalBrand.toUpperCase();
       finalModel = toTitleCase(finalModel);
 
       const newProduct = await prisma.bikeProduct.create({

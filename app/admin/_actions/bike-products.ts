@@ -79,7 +79,7 @@ export async function createBikeProduct(data: {
   const product = await prisma.bikeProduct.create({
     data: {
       bikeType: data.bikeType,
-      brand: data.brand.trim(),
+      brand: data.brand.trim().toUpperCase(),
       model: data.model.trim(),
       year: data.year || undefined,
       description: data.description || undefined,
@@ -108,7 +108,7 @@ export async function updateBikeProduct(
     where: { id },
     data: {
       ...data,
-      brand: data.brand?.trim(),
+      brand: data.brand?.trim().toUpperCase(),
       model: data.model?.trim(),
     },
   });
