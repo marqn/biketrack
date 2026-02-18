@@ -228,6 +228,7 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
     { type: PartType.CRANKSET, expectedKm: 40000 },
     { type: PartType.CHAIN, expectedKm: 5000 },
     { type: PartType.CASSETTE, expectedKm: 12000 },
+    { type: PartType.DERAILLEUR_FRONT, expectedKm: 40000 },
     { type: PartType.PEDALS, expectedKm: 40000 },
     { type: PartType.CLEATS, expectedKm: 8000 },
     // Kokpit
@@ -428,6 +429,17 @@ export function getPartIcon(partType: PartType | string): string {
 export const TOGGLEABLE_PARTS = new Set<PartType>([
   PartType.DERAILLEUR_FRONT,
 ]);
+
+// Domyślny stan isInstalled dla części przy tworzeniu roweru
+export function getDefaultIsInstalled(partType: PartType, bikeType: BikeType): boolean {
+  if (getPartCategory(partType) === "accessories") return false;
+  if (!TOGGLEABLE_PARTS.has(partType)) return true;
+  // Przerzutka przód domyślnie zainstalowana dla OTHER i TRAINER
+  if (partType === PartType.DERAILLEUR_FRONT) {
+    return bikeType === "OTHER" || bikeType === "TRAINER";
+  }
+  return false;
+}
 
 export const CHAIN_LUBE_INTERVAL_KM = 200;
 export const SEALANT_INTERVAL_DAYS = 90;

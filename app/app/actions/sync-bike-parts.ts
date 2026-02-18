@@ -2,8 +2,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { DEFAULT_PARTS, getPartCategory, TOGGLEABLE_PARTS } from "@/lib/default-parts";
-import { BikeType, PartType } from "@/lib/generated/prisma";
+import { DEFAULT_PARTS, getDefaultIsInstalled } from "@/lib/default-parts";
+import { BikeType } from "@/lib/generated/prisma";
 
 /**
  * Synchronizuje części roweru z aktualnymi DEFAULT_PARTS.
@@ -46,7 +46,7 @@ export async function syncBikeParts(bikeId: string) {
         type: p.type,
         expectedKm: p.expectedKm,
         wearKm: bike.totalKm,
-        isInstalled: getPartCategory(p.type) !== "accessories" && !TOGGLEABLE_PARTS.has(p.type),
+        isInstalled: getDefaultIsInstalled(p.type, bike.type as BikeType),
       })),
     });
     addedCount = missingParts.length;

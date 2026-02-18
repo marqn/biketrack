@@ -129,7 +129,7 @@ export default function PartsAccordion({
     }
 
     return categories;
-  }, [defaultParts, existingParts]);
+  }, [defaultParts, existingParts, bikeType]);
 
   // Filtruj puste kategorie
   const nonEmptyCategories = Object.entries(partsByCategory).filter(
