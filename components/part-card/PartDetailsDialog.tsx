@@ -488,7 +488,7 @@ export default function PartDetailsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh]">
         <DialogHeader className="shrink-0">
-          <DialogTitle>
+          <DialogTitle className="py-2">
             {mode === "edit"
               ? "Edytuj szczegóły"
               : mode === "replace"

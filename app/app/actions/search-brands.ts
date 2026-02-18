@@ -3,6 +3,12 @@
 import { prisma } from "@/lib/prisma";
 import { PartType } from "@/lib/generated/prisma";
 
+// Normalizacja marki: tylko pierwsza litera wielka, reszta bez zmian
+function capitalizeFirst(text: string): string {
+  if (!text) return text;
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 // Pomocnicza funkcja do grupowania typów części które współdzielą produkty
 function getRelatedPartTypes(partType: PartType): PartType[] {
   // Opony przednie i tylne współdzielą te same produkty
@@ -22,6 +28,25 @@ function getRelatedPartTypes(partType: PartType): PartType[] {
 
   // Wszystkie inne części są unikalne
   return [partType];
+}
+
+export async function getPopularBrands(partTypeStr: string) {
+  const partType = PartType[partTypeStr as keyof typeof PartType];
+  if (!partType) return [];
+
+  const relatedTypes = getRelatedPartTypes(partType);
+
+  const brands = await prisma.partProduct.groupBy({
+    by: ["brand"],
+    where: {
+      OR: relatedTypes.map((t) => ({ type: t })),
+    },
+    _count: { brand: true },
+    orderBy: { _count: { brand: "desc" } },
+    take: 5,
+  });
+
+  return brands.map((b) => capitalizeFirst(b.brand));
 }
 
 export async function searchBrands(partTypeStr: string, query: string) {
@@ -51,7 +76,16 @@ export async function searchBrands(partTypeStr: string, query: string) {
     take: 10,
   });
 
-  return products.map((p) => p.brand);
+  // Normalizuj i deduplikuj marki (case-insensitive)
+  const seen = new Set<string>();
+  return products
+    .map((p) => capitalizeFirst(p.brand))
+    .filter((brand) => {
+      const key = brand.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
 }
 
 export async function searchModels(
@@ -82,8 +116,18 @@ export async function searchModels(
       AND: whereConditions,
     },
     orderBy: [{ averageRating: "desc" }, { totalReviews: "desc" }],
-    take: 10,
+    take: 20, // Pobierz więcej, bo po deduplikacji może być mniej
   });
 
-  return products;
+  // Normalizuj nazwy modeli i deduplikuj (case-insensitive)
+  const seen = new Set<string>();
+  return products
+    .map((p) => ({ ...p, brand: capitalizeFirst(p.brand) }))
+    .filter((p) => {
+      const key = p.model.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 10);
 }

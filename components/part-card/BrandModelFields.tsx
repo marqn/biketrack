@@ -5,9 +5,16 @@ import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { PartType } from "@/lib/generated/prisma";
 import { PartProduct } from "@/lib/types";
-import { searchBrands, searchModels } from "@/app/app/actions/search-brands";
+import { searchBrands, searchModels, getPopularBrands } from "@/app/app/actions/search-brands";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+
+// Normalizacja marki: tylko pierwsza litera wielka, reszta bez zmian
+function capitalizeFirst(text: string): string {
+  if (!text) return text;
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
 
 interface BrandModelFieldsProps {
   partType: PartType;
@@ -38,7 +45,14 @@ export default function BrandModelFields({
   const [modelNotFound, setModelNotFound] = useState(false);
   const [selectedBrandIndex, setSelectedBrandIndex] = useState(-1);
   const [selectedModelIndex, setSelectedModelIndex] = useState(-1);
+  const [popularBrands, setPopularBrands] = useState<string[]>([]);
   const userChangedBrandRef = useRef(false);
+  const modelInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch popular brands on mount
+  useEffect(() => {
+    getPopularBrands(partType).then(setPopularBrands);
+  }, [partType]);
 
   // Search brands
   useEffect(() => {
@@ -238,7 +252,10 @@ export default function BrandModelFields({
             }}
             onKeyDown={handleBrandKeyDown}
             onFocus={() => setShowBrandSuggestions(true)}
-            onBlur={() => setTimeout(() => setShowBrandSuggestions(false), 200)}
+            onBlur={() => {
+              setTimeout(() => setShowBrandSuggestions(false), 200);
+              if (brand) onBrandChange(capitalizeFirst(brand));
+            }}
             className="pr-8"
           />
           {brand && (
@@ -277,6 +294,27 @@ export default function BrandModelFields({
             ))}
           </div>
         )}
+
+        {/* Popular brands badges */}
+        {!brand && popularBrands.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {popularBrands.map((brandName) => (
+              <Badge
+                key={brandName}
+                variant="secondary"
+                className="cursor-pointer hover:bg-secondary/80"
+                onClick={() => {
+                  userChangedBrandRef.current = true;
+                  onBrandChange(brandName);
+                  setShowBrandSuggestions(false);
+                  setTimeout(() => modelInputRef.current?.focus(), 0);
+                }}
+              >
+                {brandName}
+              </Badge>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Model field */}
@@ -287,6 +325,7 @@ export default function BrandModelFields({
         <div className="relative">
           <Input
             id="model"
+            ref={modelInputRef}
             placeholder="np. GP5000, XT CN-M8100"
             value={model}
             onChange={(e) => {
@@ -308,7 +347,10 @@ export default function BrandModelFields({
                 triggerModelSearch();
               }
             }}
-            onBlur={() => setTimeout(() => setShowModelSuggestions(false), 200)}
+            onBlur={() => {
+              setTimeout(() => setShowModelSuggestions(false), 200);
+              if (model) onModelChange(capitalizeFirst(model));
+            }}
             disabled={!brand}
             className="pr-8"
           />
