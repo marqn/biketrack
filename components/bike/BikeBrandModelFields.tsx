@@ -264,7 +264,7 @@ export default function BikeBrandModelFields({
 
         {/* Brand suggestions dropdown */}
         {showBrandSuggestions && brandSuggestions.length > 0 && (
-          <div className="absolute z-10 w-full mt-1 bg-popover border rounded-md shadow-md max-h-48 overflow-y-auto">
+          <div className="absolute z-10 w-full mt-1 bg-popover border rounded-md shadow-md max-h-48 overflow-y-auto custom-scrollbar">
             {brandSuggestions.map((brandName, index) => (
               <button
                 key={brandName}
@@ -344,7 +344,7 @@ export default function BikeBrandModelFields({
               </div>
             )}
             {modelSuggestions.length > 0 && (
-              <div className="absolute z-10 w-full mt-1 bg-popover border rounded-md shadow-md max-h-60 overflow-y-auto">
+              <div className="absolute z-10 w-full mt-1 bg-popover border rounded-md shadow-md max-h-60 overflow-y-auto custom-scrollbar">
                 {modelSuggestions.map((product, index) => (
                   <button
                     key={product.id}
