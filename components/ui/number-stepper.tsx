@@ -10,6 +10,7 @@ interface NumberStepperProps {
   /** Which step buttons to show, e.g. [1, 10] or [1, 10, 100]. Default: [1, 10] */
   steps?: number[];
   min?: number;
+  max?: number;
   disabled?: boolean;
   /** When true, the value cannot go below its initial value (set on first render) */
   incrementOnly?: boolean;
@@ -24,6 +25,7 @@ export default function NumberStepper({
   onChange,
   steps = [1, 10],
   min = 0,
+  max,
   disabled = false,
   incrementOnly = false,
   name,
@@ -41,7 +43,10 @@ export default function NumberStepper({
   }, [value]);
 
   const effectiveMin = incrementOnly ? Math.max(min, initialValueRef.current) : min;
-  const clamp = useCallback((v: number) => Math.max(effectiveMin, v), [effectiveMin]);
+  const clamp = useCallback(
+    (v: number) => Math.min(max ?? Infinity, Math.max(effectiveMin, v)),
+    [effectiveMin, max]
+  );
 
   const startHold = useCallback(
     (amount: number) => {
@@ -129,7 +134,7 @@ export default function NumberStepper({
           variant="outline"
           size="icon"
           {...holdProps(step)}
-          disabled={disabled}
+          disabled={disabled || (max != null && value >= max)}
           className="shrink-0"
           title={`+${step}`}
         >

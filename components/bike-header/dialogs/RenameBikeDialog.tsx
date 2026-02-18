@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import NumberStepper from "@/components/ui/number-stepper";
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
@@ -185,17 +186,14 @@ export function RenameBikeDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="bike-year">Rok</Label>
-              <Input
-                id="bike-year"
-                type="number"
-                placeholder="2023"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
+              <Label>Rok</Label>
+              <NumberStepper
+                value={year ? parseInt(year, 10) : new Date().getFullYear()}
+                onChange={(v) => setYear(v.toString())}
+                steps={[1]}
                 min={1990}
                 max={new Date().getFullYear() + 1}
                 disabled={isLoading}
-                className="w-24"
               />
             </div>
 

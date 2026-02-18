@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import NumberStepper from "@/components/ui/number-stepper";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels, BikeProduct } from "@/lib/types";
@@ -338,13 +339,11 @@ export function AddBikeDialog({
               />
 
               <div className="space-y-2">
-                <Label htmlFor="new-bike-year">Rok modelowy</Label>
-                <Input
-                  id="new-bike-year"
-                  type="number"
-                  placeholder="np. 2023"
-                  value={year}
-                  onChange={(e) => setYear(e.target.value)}
+                <Label>Rok modelowy</Label>
+                <NumberStepper
+                  value={year ? parseInt(year, 10) : new Date().getFullYear()}
+                  onChange={(v) => setYear(v.toString())}
+                  steps={[1]}
                   min={1990}
                   max={new Date().getFullYear() + 1}
                   disabled={isPending}

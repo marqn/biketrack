@@ -1,9 +1,7 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Minus, Plus } from "lucide-react";
+import NumberStepper from "@/components/ui/number-stepper";
 import {
   Select,
   SelectContent,
@@ -20,9 +18,6 @@ interface HandlebarTapeFieldsProps {
 
 export default function HandlebarTapeFields({ data, onChange }: HandlebarTapeFieldsProps) {
   const thickness = data.thickness || 2.5;
-
-  const clamp = (val: number, min: number, max: number) =>
-    Math.round(Math.max(min, Math.min(max, val)) * 10) / 10;
 
   return (
     <div className="space-y-4">
@@ -60,42 +55,14 @@ export default function HandlebarTapeFields({ data, onChange }: HandlebarTapeFie
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="tape-thickness">Grubość (mm)</Label>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={() => onChange({ ...data, thickness: clamp(thickness - 0.1, 1.5, 4.5) })}
-            disabled={thickness <= 1.5}
-          >
-            <Minus className="h-4 w-4" />
-          </Button>
-          <Input
-            id="tape-thickness"
-            type="number"
-            min={1.5}
-            max={4.5}
-            step={0.1}
-            value={thickness}
-            onChange={(e) => {
-              const num = Number(e.target.value);
-              if (num) onChange({ ...data, thickness: clamp(num, 1.5, 4.5) });
-            }}
-            className="text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={() => onChange({ ...data, thickness: clamp(thickness + 0.1, 1.5, 4.5) })}
-            disabled={thickness >= 4.5}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
+        <Label>Grubość (mm)</Label>
+        <NumberStepper
+          value={thickness}
+          onChange={(v) => onChange({ ...data, thickness: Math.round(v * 10) / 10 })}
+          steps={[0.1]}
+          min={1.5}
+          max={4.5}
+        />
       </div>
     </div>
   );

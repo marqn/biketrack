@@ -1,10 +1,8 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Minus, Plus } from "lucide-react";
+import NumberStepper from "@/components/ui/number-stepper";
 import {
   Select,
   SelectContent,
@@ -22,9 +20,6 @@ interface RimsFieldsProps {
 export default function RimsFields({ data, onChange }: RimsFieldsProps) {
   const rimDepth = data.rimDepth || 30;
   const internalWidth = data.internalWidth || 21;
-
-  const clamp = (val: number, min: number, max: number) =>
-    Math.max(min, Math.min(max, val));
 
   return (
     <div className="space-y-4">
@@ -47,79 +42,25 @@ export default function RimsFields({ data, onChange }: RimsFieldsProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="rims-depth">Profil obręczy (mm)</Label>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={() => onChange({ ...data, rimDepth: clamp(rimDepth - 5, 15, 90) })}
-            disabled={rimDepth <= 15}
-          >
-            <Minus className="h-4 w-4" />
-          </Button>
-          <Input
-            id="rims-depth"
-            type="number"
-            min={15}
-            max={90}
-            value={rimDepth}
-            onChange={(e) => {
-              const num = Number(e.target.value);
-              if (num) onChange({ ...data, rimDepth: clamp(num, 15, 90) });
-            }}
-            className="text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={() => onChange({ ...data, rimDepth: clamp(rimDepth + 5, 15, 90) })}
-            disabled={rimDepth >= 90}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
+        <Label>Profil obręczy (mm)</Label>
+        <NumberStepper
+          value={rimDepth}
+          onChange={(v) => onChange({ ...data, rimDepth: v })}
+          steps={[5]}
+          min={15}
+          max={90}
+        />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="rims-internal-width">Szerokość wewnętrzna (mm)</Label>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={() => onChange({ ...data, internalWidth: clamp(internalWidth - 1, 13, 45) })}
-            disabled={internalWidth <= 13}
-          >
-            <Minus className="h-4 w-4" />
-          </Button>
-          <Input
-            id="rims-internal-width"
-            type="number"
-            min={13}
-            max={45}
-            value={internalWidth}
-            onChange={(e) => {
-              const num = Number(e.target.value);
-              if (num) onChange({ ...data, internalWidth: clamp(num, 13, 45) });
-            }}
-            className="text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={() => onChange({ ...data, internalWidth: clamp(internalWidth + 1, 13, 45) })}
-            disabled={internalWidth >= 45}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
+        <Label>Szerokość wewnętrzna (mm)</Label>
+        <NumberStepper
+          value={internalWidth}
+          onChange={(v) => onChange({ ...data, internalWidth: v })}
+          steps={[1]}
+          min={13}
+          max={45}
+        />
       </div>
 
       <div className="flex items-center space-x-2">

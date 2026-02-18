@@ -6,6 +6,7 @@ import { PartType } from "@/lib/generated/prisma";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import NumberStepper from "@/components/ui/number-stepper";
 import {
   Select,
   SelectContent,
@@ -326,12 +327,13 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
         return (
           <div className="space-y-2">
             <Label>Skok (mm)</Label>
-            <Input
-              type="number"
-              value={(specifications as Partial<SuspensionSpecificData>).travel || ""}
-              onChange={(e) =>
-                setSpecifications({ ...specifications, travel: Number(e.target.value) })
+            <NumberStepper
+              value={(specifications as Partial<SuspensionSpecificData>).travel || 0}
+              onChange={(v) =>
+                setSpecifications({ ...specifications, travel: v || undefined })
               }
+              steps={[10]}
+              min={0}
               placeholder="np. 100"
             />
           </div>
@@ -341,12 +343,13 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
         return (
           <div className="space-y-2">
             <Label>Objętość (ml)</Label>
-            <Input
-              type="number"
-              value={(specifications as Partial<TubelessSealantSpecificData>).volume || ""}
-              onChange={(e) =>
-                setSpecifications({ ...specifications, volume: Number(e.target.value) })
+            <NumberStepper
+              value={(specifications as Partial<TubelessSealantSpecificData>).volume || 0}
+              onChange={(v) =>
+                setSpecifications({ ...specifications, volume: v || undefined })
               }
+              steps={[10]}
+              min={0}
               placeholder="np. 60"
             />
           </div>
@@ -385,12 +388,13 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Moc (W)</Label>
-              <Input
-                type="number"
-                value={(specifications as Partial<MotorSpecificData>).power || ""}
-                onChange={(e) =>
-                  setSpecifications({ ...specifications, power: Number(e.target.value) })
+              <NumberStepper
+                value={(specifications as Partial<MotorSpecificData>).power || 0}
+                onChange={(v) =>
+                  setSpecifications({ ...specifications, power: v || undefined })
                 }
+                steps={[10, 50]}
+                min={0}
                 placeholder="np. 250"
               />
             </div>
@@ -419,23 +423,25 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Pojemność (Wh)</Label>
-              <Input
-                type="number"
-                value={(specifications as Partial<BatterySpecificData>).capacity || ""}
-                onChange={(e) =>
-                  setSpecifications({ ...specifications, capacity: Number(e.target.value) })
+              <NumberStepper
+                value={(specifications as Partial<BatterySpecificData>).capacity || 0}
+                onChange={(v) =>
+                  setSpecifications({ ...specifications, capacity: v || undefined })
                 }
+                steps={[10, 100]}
+                min={0}
                 placeholder="np. 500"
               />
             </div>
             <div className="space-y-2">
               <Label>Napięcie (V)</Label>
-              <Input
-                type="number"
-                value={(specifications as Partial<BatterySpecificData>).voltage || ""}
-                onChange={(e) =>
-                  setSpecifications({ ...specifications, voltage: Number(e.target.value) })
+              <NumberStepper
+                value={(specifications as Partial<BatterySpecificData>).voltage || 0}
+                onChange={(v) =>
+                  setSpecifications({ ...specifications, voltage: v || undefined })
                 }
+                steps={[1]}
+                min={0}
                 placeholder="np. 36"
               />
             </div>
@@ -545,45 +551,40 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
               <Label>Statystyki</Label>
               <div className="grid grid-cols-2 gap-4 rounded-md border p-4">
                 <div className="space-y-2">
-                  <Label htmlFor="averageRating">Średnia ocena</Label>
-                  <Input
-                    id="averageRating"
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="5"
-                    value={averageRating}
-                    onChange={(e) => setAverageRating(e.target.value)}
+                  <Label>Średnia ocena</Label>
+                  <NumberStepper
+                    value={averageRating ? parseFloat(averageRating) : 0}
+                    onChange={(v) => setAverageRating(Math.round(v * 10) / 10 + "")}
+                    steps={[0.1]}
+                    min={0}
+                    max={5}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="totalReviews">Liczba opinii</Label>
-                  <Input
-                    id="totalReviews"
-                    type="number"
-                    min="0"
-                    value={totalReviews}
-                    onChange={(e) => setTotalReviews(e.target.value)}
+                  <Label>Liczba opinii</Label>
+                  <NumberStepper
+                    value={totalReviews ? parseInt(totalReviews, 10) : 0}
+                    onChange={(v) => setTotalReviews(v.toString())}
+                    steps={[1]}
+                    min={0}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="averageKmLifespan">Średnia żywotność (km)</Label>
-                  <Input
-                    id="averageKmLifespan"
-                    type="number"
-                    min="0"
-                    value={averageKmLifespan}
-                    onChange={(e) => setAverageKmLifespan(e.target.value)}
+                  <Label>Średnia żywotność (km)</Label>
+                  <NumberStepper
+                    value={averageKmLifespan ? parseInt(averageKmLifespan, 10) : 0}
+                    onChange={(v) => setAverageKmLifespan(v.toString())}
+                    steps={[100, 1000]}
+                    min={0}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="totalInstallations">Liczba instalacji</Label>
-                  <Input
-                    id="totalInstallations"
-                    type="number"
-                    min="0"
-                    value={totalInstallations}
-                    onChange={(e) => setTotalInstallations(e.target.value)}
+                  <Label>Liczba instalacji</Label>
+                  <NumberStepper
+                    value={totalInstallations ? parseInt(totalInstallations, 10) : 0}
+                    onChange={(v) => setTotalInstallations(v.toString())}
+                    steps={[1]}
+                    min={0}
                   />
                 </div>
               </div>

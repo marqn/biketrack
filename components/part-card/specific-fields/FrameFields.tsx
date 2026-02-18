@@ -1,8 +1,8 @@
 "use client";
 
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import NumberStepper from "@/components/ui/number-stepper";
 import {
   Select,
   SelectContent,
@@ -93,28 +93,24 @@ export default function FrameFields({ data, onChange, bikeType }: FrameFieldsPro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="max-power">Maks. moc oporu (W)</Label>
-            <Input
-              id="max-power"
-              type="number"
+            <Label>Maks. moc oporu (W)</Label>
+            <NumberStepper
+              value={data.maxPower ?? 0}
+              onChange={(v) => onChange({ ...data, maxPower: v || undefined })}
+              steps={[10, 100]}
+              min={0}
               placeholder="np. 2200"
-              value={data.maxPower ?? ""}
-              onChange={(e) =>
-                onChange({ ...data, maxPower: e.target.value ? Number(e.target.value) : undefined })
-              }
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="max-grade">Maks. symulowane nachylenie (%)</Label>
-            <Input
-              id="max-grade"
-              type="number"
+            <Label>Maks. symulowane nachylenie (%)</Label>
+            <NumberStepper
+              value={data.maxSimulatedGrade ?? 0}
+              onChange={(v) => onChange({ ...data, maxSimulatedGrade: v || undefined })}
+              steps={[1, 5]}
+              min={0}
               placeholder="np. 20"
-              value={data.maxSimulatedGrade ?? ""}
-              onChange={(e) =>
-                onChange({ ...data, maxSimulatedGrade: e.target.value ? Number(e.target.value) : undefined })
-              }
             />
           </div>
 

@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import NumberStepper from "@/components/ui/number-stepper";
 import {
   Select,
   SelectContent,
@@ -248,13 +249,11 @@ export default function StravaOnboardingPage() {
               />
 
               <div className="space-y-2">
-                <Label htmlFor="bike-year">Rok modelowy</Label>
-                <Input
-                  id="bike-year"
-                  type="number"
-                  placeholder="np. 2023"
-                  value={year}
-                  onChange={(e) => setYear(e.target.value)}
+                <Label>Rok modelowy</Label>
+                <NumberStepper
+                  value={year ? parseInt(year, 10) : new Date().getFullYear()}
+                  onChange={(v) => setYear(v.toString())}
+                  steps={[1]}
                   min={1990}
                   max={new Date().getFullYear() + 1}
                 />

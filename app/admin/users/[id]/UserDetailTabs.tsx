@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import NumberStepper from "@/components/ui/number-stepper";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -247,12 +248,11 @@ export function UserDetailTabs({ user, bikes, comments }: UserDetailTabsProps) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="weight">Waga (kg)</Label>
-                    <Input
-                      id="weight"
-                      type="number"
-                      value={weight}
-                      onChange={(e) => setWeight(e.target.value)}
+                    <Label>Waga (kg)</Label>
+                    <NumberStepper
+                      value={weight ? parseInt(weight, 10) : 75}
+                      onChange={(v) => setWeight(v.toString())}
+                      steps={[1]}
                       min={30}
                       max={200}
                     />

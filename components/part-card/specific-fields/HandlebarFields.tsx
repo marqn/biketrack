@@ -1,9 +1,7 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Minus, Plus } from "lucide-react";
+import NumberStepper from "@/components/ui/number-stepper";
 import {
   Select,
   SelectContent,
@@ -20,9 +18,6 @@ interface HandlebarFieldsProps {
 
 export default function HandlebarFields({ data, onChange }: HandlebarFieldsProps) {
   const width = data.width || 420;
-
-  const clamp = (val: number, min: number, max: number) =>
-    Math.max(min, Math.min(max, val));
 
   return (
     <div className="space-y-4">
@@ -48,41 +43,14 @@ export default function HandlebarFields({ data, onChange }: HandlebarFieldsProps
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="handlebar-width">Szerokość (mm)</Label>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={() => onChange({ ...data, width: clamp(width - 10, 400, 750) })}
-            disabled={width <= 400}
-          >
-            <Minus className="h-4 w-4" />
-          </Button>
-          <Input
-            id="handlebar-width"
-            type="number"
-            min={400}
-            max={750}
-            value={width}
-            onChange={(e) => {
-              const num = Number(e.target.value);
-              if (num) onChange({ ...data, width: clamp(num, 400, 750) });
-            }}
-            className="text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={() => onChange({ ...data, width: clamp(width + 10, 400, 750) })}
-            disabled={width >= 750}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
+        <Label>Szerokość (mm)</Label>
+        <NumberStepper
+          value={width}
+          onChange={(v) => onChange({ ...data, width: v })}
+          steps={[10]}
+          min={400}
+          max={750}
+        />
       </div>
     </div>
   );

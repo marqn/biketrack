@@ -12,6 +12,7 @@ import {
   Scale,
   Info,
 } from "lucide-react";
+import NumberStepper from "@/components/ui/number-stepper";
 import { ImageUploader } from "@/components/ui/image-uploader";
 import { useRouter } from "next/navigation";
 
@@ -482,16 +483,12 @@ export default function ProfilePage() {
           {isEditing.weight ? (
             <div>
               <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  value={formData.weight}
-                  onChange={(e) =>
-                    setFormData({ ...formData, weight: e.target.value })
-                  }
-                  className="w-32 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent bg-background"
-                  placeholder="np. 75"
-                  min="20"
-                  max="300"
+                <NumberStepper
+                  value={formData.weight ? parseInt(formData.weight, 10) : 75}
+                  onChange={(v) => setFormData({ ...formData, weight: v.toString() })}
+                  steps={[1]}
+                  min={20}
+                  max={300}
                 />
                 <span className="text-muted-foreground">kg</span>
               </div>
