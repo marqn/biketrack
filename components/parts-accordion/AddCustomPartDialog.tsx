@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import NumberStepper from "@/components/ui/number-stepper";
 import { createCustomPart } from "@/app/app/actions/custom-part";
 
 interface AddCustomPartDialogProps {
@@ -29,7 +30,7 @@ export default function AddCustomPartDialog({
   category,
 }: AddCustomPartDialogProps) {
   const [name, setName] = useState("");
-  const [expectedKm, setExpectedKm] = useState("");
+  const [expectedKm, setExpectedKm] = useState(0);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -38,10 +39,10 @@ export default function AddCustomPartDialog({
 
     startTransition(async () => {
       try {
-        const km = expectedKm ? parseInt(expectedKm, 10) : undefined;
+        const km = expectedKm > 0 ? expectedKm : undefined;
         await createCustomPart(bikeId, name.trim(), category, km);
         setName("");
-        setExpectedKm("");
+        setExpectedKm(0);
         onOpenChange(false);
         router.refresh();
       } catch (error) {
@@ -78,13 +79,12 @@ export default function AddCustomPartDialog({
             <Label htmlFor="custom-part-km">
               Limit km <span className="text-muted-foreground font-normal">(opcjonalnie)</span>
             </Label>
-            <Input
-              id="custom-part-km"
-              type="number"
-              placeholder="np. 5000"
-              min={0}
+            <NumberStepper
               value={expectedKm}
-              onChange={(e) => setExpectedKm(e.target.value)}
+              onChange={setExpectedKm}
+              steps={[10,100]}
+              min={0}
+              placeholder="np. 5000"
               onKeyDown={(e) => e.key === "Enter" && handleSave()}
             />
             <p className="text-xs text-muted-foreground">
