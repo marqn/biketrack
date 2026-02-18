@@ -44,6 +44,13 @@ export async function updateBikeKm(formData: FormData) {
         wearKm: { increment: diffKm },
       },
     }),
+
+    prisma.customPart.updateMany({
+      where: { bikeId },
+      data: {
+        wearKm: { increment: diffKm },
+      },
+    }),
   ]);
 
   await checkBikeNotifications(bikeId); // Przekaż prisma

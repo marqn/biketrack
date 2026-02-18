@@ -32,6 +32,7 @@ export default async function AppPage() {
         },
       },
     },
+    customParts: true,
     services: {
       where: {
         type: {
@@ -121,6 +122,16 @@ export default async function AppPage() {
     partSpecificData: p.partSpecificData,
     images: p.images,
   }));
+  const customParts = bike.customParts.map((cp) => ({
+    id: cp.id,
+    name: cp.name,
+    category: cp.category,
+    wearKm: cp.wearKm,
+    expectedKm: cp.expectedKm,
+    brand: cp.brand,
+    model: cp.model,
+    installedAt: cp.installedAt,
+  }));
 
   return (
     <div className="space-y-6 lg:px-24 lg:space-6">
@@ -133,6 +144,7 @@ export default async function AppPage() {
         bikeType={bike.type}
         defaultParts={defaultParts}
         existingParts={existingParts}
+        customParts={customParts}
         chainChildren={
           <LubeButton
             bikeId={bike.id}

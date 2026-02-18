@@ -103,6 +103,12 @@ export async function syncStravaDistances(force = false): Promise<{
             wearKm: { increment: diffKm },
           },
         }),
+        prisma.customPart.updateMany({
+          where: { bikeId: bike.id },
+          data: {
+            wearKm: { increment: diffKm },
+          },
+        }),
       ]);
 
       const bikeName = (bike.brand || bike.model)

@@ -191,6 +191,7 @@ model Bike {
 
   user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   parts            BikePart[]
+  customParts      CustomPart[]
   services         ServiceEvent[]
   partReplacements PartReplacement[]
   comments         BikeComment[]
@@ -226,6 +227,27 @@ model BikePart {
   @@unique([bikeId, type])
   @@index([bikeId])
   @@index([productId])
+}
+
+// Customowe części użytkownika (poza predefiniowaną listą PartType)
+model CustomPart {
+  id         String    @id @default(cuid())
+  bikeId     String
+  name       String    // Nazwa zdefiniowana przez użytkownika, np. "Pancerz"
+  category   String    // Klucz kategorii: "frame", "drivetrain", "brakes", "wheels", "cockpit", "accessories"
+
+  wearKm     Int       @default(0)
+  expectedKm Int       @default(0) // 0 = brak limitu
+
+  brand       String?
+  model       String?
+  installedAt DateTime?
+
+  bike Bike @relation(fields: [bikeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([bikeId])
 }
 
 // 👇 NOWY MODEL - Historia wymian
