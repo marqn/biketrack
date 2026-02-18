@@ -59,7 +59,7 @@ export async function searchModels(
   brand: string,
   query: string
 ) {
-  if (!brand || query.length < 1) return [];
+  if (!brand) return [];
 
   // Konwersja stringa na enum - pobieramy wartość z obiektu PartType
   const partType = PartType[partTypeStr as keyof typeof PartType];
@@ -67,14 +67,19 @@ export async function searchModels(
 
   const relatedTypes = getRelatedPartTypes(partType);
 
-  // Używamy OR zamiast in dla lepszej kompatybilności z typami enum
+  // Budujemy warunki - filtr modelu tylko gdy query niepuste
+  const whereConditions = [
+    { OR: relatedTypes.map((t: PartType) => ({ type: t })) },
+    { brand: { equals: brand, mode: "insensitive" as const } },
+  ];
+
+  if (query.length > 0) {
+    whereConditions.push({ model: { contains: query, mode: "insensitive" as const } } as any);
+  }
+
   const products = await prisma.partProduct.findMany({
     where: {
-      AND: [
-        { OR: relatedTypes.map((t) => ({ type: t })) },
-        { brand: { equals: brand, mode: "insensitive" } },
-        { model: { contains: query, mode: "insensitive" } },
-      ],
+      AND: whereConditions,
     },
     orderBy: [{ averageRating: "desc" }, { totalReviews: "desc" }],
     take: 10,

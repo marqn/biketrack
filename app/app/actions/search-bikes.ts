@@ -23,13 +23,18 @@ export async function searchBikeBrands(query: string) {
 }
 
 export async function searchBikeModels(brand: string, query: string) {
-  if (!brand || query.length < 1) return [];
+  if (!brand) return [];
+
+  const where: any = {
+    brand: { equals: brand, mode: "insensitive" },
+  };
+
+  if (query.length > 0) {
+    where.model = { contains: query, mode: "insensitive" };
+  }
 
   const products = await prisma.bikeProduct.findMany({
-    where: {
-      brand: { equals: brand, mode: "insensitive" },
-      model: { contains: query, mode: "insensitive" },
-    },
+    where,
     orderBy: [{ model: "asc" }],
     take: 10,
   });

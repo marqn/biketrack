@@ -30,6 +30,7 @@ export default function BikeBrandModelFields({
   const [modelSuggestions, setModelSuggestions] = useState<BikeProduct[]>([]);
   const [showBrandSuggestions, setShowBrandSuggestions] = useState(false);
   const [showModelSuggestions, setShowModelSuggestions] = useState(false);
+  const [isSearchingModels, setIsSearchingModels] = useState(false);
   const [lastBrandQuery, setLastBrandQuery] = useState("");
   const [lastModelQuery, setLastModelQuery] = useState("");
   const [brandNotFound, setBrandNotFound] = useState(false);
@@ -79,12 +80,14 @@ export default function BikeBrandModelFields({
     }
 
     const timer = setTimeout(async () => {
-      if (brand && model.length >= 1) {
+      if (brand) {
+        setIsSearchingModels(true);
         const results = await searchBikeModels(brand, model);
-        setModelSuggestions(results);
+        setModelSuggestions(results as unknown as BikeProduct[]);
         setLastModelQuery(model);
         setModelNotFound(results.length === 0);
         setSelectedModelIndex(-1);
+        setIsSearchingModels(false);
       } else {
         setModelSuggestions([]);
         setModelNotFound(false);
@@ -158,7 +161,28 @@ export default function BikeBrandModelFields({
     }
   };
 
+  const triggerModelSearch = async () => {
+    if (!brand || isSearchingModels) return;
+    setIsSearchingModels(true);
+    const results = await searchBikeModels(brand, model);
+    setModelSuggestions(results as unknown as BikeProduct[]);
+    setModelNotFound(results.length === 0);
+    setLastModelQuery(model);
+    setSelectedModelIndex(-1);
+    setIsSearchingModels(false);
+  };
+
   const handleModelKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // ArrowDown na pustym polu z wybraną marką: otwórz dropdown z modelami
+    if (e.key === "ArrowDown" && brand && (!showModelSuggestions || modelSuggestions.length === 0)) {
+      e.preventDefault();
+      setShowModelSuggestions(true);
+      if (modelSuggestions.length === 0 && !isSearchingModels) {
+        triggerModelSearch();
+      }
+      return;
+    }
+
     if (!showModelSuggestions || modelSuggestions.length === 0) return;
 
     switch (e.key) {
@@ -283,7 +307,12 @@ export default function BikeBrandModelFields({
               }
             }}
             onKeyDown={handleModelKeyDown}
-            onFocus={() => setShowModelSuggestions(true)}
+            onFocus={() => {
+              setShowModelSuggestions(true);
+              if (brand && modelSuggestions.length === 0 && !isSearchingModels) {
+                triggerModelSearch();
+              }
+            }}
             onBlur={() => setTimeout(() => setShowModelSuggestions(false), 200)}
             disabled={!brand}
             className="pr-8"
@@ -301,34 +330,43 @@ export default function BikeBrandModelFields({
         </div>
 
         {/* Model suggestions dropdown */}
-        {showModelSuggestions && modelSuggestions.length > 0 && (
-          <div className="absolute z-10 w-full mt-1 bg-popover border rounded-md shadow-md max-h-60 overflow-y-auto">
-            {modelSuggestions.map((product, index) => (
-              <button
-                key={product.id}
-                type="button"
-                className={`w-full px-3 py-2 text-left transition-colors ${
-                  index === selectedModelIndex ? "bg-accent" : "hover:bg-accent"
-                }`}
-                onMouseDown={() => {
-                  onModelChange(product.model);
-                  onProductSelect(product);
-                  setShowModelSuggestions(false);
-                  setSelectedModelIndex(-1);
-                }}
-                onMouseEnter={() => setSelectedModelIndex(index)}
-              >
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium">{product.model}</span>
-                  {product.year && (
-                    <span className="text-xs text-muted-foreground">
-                      Rok: {product.year}
-                    </span>
-                  )}
-                </div>
-              </button>
-            ))}
-          </div>
+        {showModelSuggestions && brand && (
+          <>
+            {isSearchingModels && modelSuggestions.length === 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-popover border rounded-md shadow-md p-3">
+                <span className="text-sm text-muted-foreground">Szukam modeli...</span>
+              </div>
+            )}
+            {modelSuggestions.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-popover border rounded-md shadow-md max-h-60 overflow-y-auto">
+                {modelSuggestions.map((product, index) => (
+                  <button
+                    key={product.id}
+                    type="button"
+                    className={`w-full px-3 py-2 text-left transition-colors ${
+                      index === selectedModelIndex ? "bg-accent" : "hover:bg-accent"
+                    }`}
+                    onMouseDown={() => {
+                      onModelChange(product.model);
+                      onProductSelect(product);
+                      setShowModelSuggestions(false);
+                      setSelectedModelIndex(-1);
+                    }}
+                    onMouseEnter={() => setSelectedModelIndex(index)}
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">{product.model}</span>
+                      {product.year && (
+                        <span className="text-xs text-muted-foreground">
+                          Rok: {product.year}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
