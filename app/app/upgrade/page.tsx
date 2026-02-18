@@ -36,7 +36,7 @@ const plans = [
   {
     id: "1month",
     name: "Miesięczny",
-    price: "4",
+    price: "5.99",
     period: "/ miesiąc",
     duration: "1 miesiąc",
     description: "Idealne na próbę",
@@ -55,11 +55,11 @@ const plans = [
   {
     id: "12months",
     name: "Roczny",
-    price: "30",
+    price: "35",
     period: "/ 12 miesięcy",
     duration: "12 miesięcy",
     description: "Najlepsza opłacalność",
-    pricePerMonth: "2,50",
+    pricePerMonth: "2,92",
     popular: false,
   },
 ];
