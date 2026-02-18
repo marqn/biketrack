@@ -1,9 +1,7 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Minus, Plus } from "lucide-react";
+import NumberStepper from "@/components/ui/number-stepper";
 import { ChainSpecificData } from "@/lib/part-specific-data";
 
 interface ChainFieldsProps {
@@ -11,35 +9,33 @@ interface ChainFieldsProps {
   onChange: (data: Partial<ChainSpecificData>) => void;
 }
 
-const CHAIN_SPEEDS = [1, 5, 6, 7, 8, 9, 10, 11, 12, 13] as const;
+const CHAIN_SPEEDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] as const;
 
 export default function ChainFields({ data, onChange }: ChainFieldsProps) {
-  const value = data.speeds || 0;
-  const currentIndex = CHAIN_SPEEDS.indexOf(value as typeof CHAIN_SPEEDS[number]);
+  const speeds = data.speeds || 1;
 
-  const handleDecrement = () => {
-    if (currentIndex > 0) {
-      onChange({ ...data, speeds: CHAIN_SPEEDS[currentIndex - 1] });
-    } else if (currentIndex === -1) {
-      const closest = CHAIN_SPEEDS.findLast((s) => s < value) ?? CHAIN_SPEEDS[0];
-      onChange({ ...data, speeds: closest });
+  const handleChange = (v: number) => {
+    // Valid speed — use directly (handles direct input of valid values)
+    if ((CHAIN_SPEEDS as readonly number[]).includes(v)) {
+      onChange({ ...data, speeds: v as ChainSpecificData["speeds"] });
+      return;
     }
-  };
 
-  const handleIncrement = () => {
-    if (currentIndex >= 0 && currentIndex < CHAIN_SPEEDS.length - 1) {
-      onChange({ ...data, speeds: CHAIN_SPEEDS[currentIndex + 1] });
-    } else if (currentIndex === -1) {
-      const closest = CHAIN_SPEEDS.find((s) => s > value) ?? CHAIN_SPEEDS[CHAIN_SPEEDS.length - 1];
-      onChange({ ...data, speeds: closest });
+    // Small change (button press, step=1) — jump to next/prev valid speed
+    if (Math.abs(v - speeds) <= 1) {
+      if (v > speeds) {
+        const next = CHAIN_SPEEDS.find((s) => s > speeds);
+        if (next !== undefined) onChange({ ...data, speeds: next });
+      } else if (v < speeds) {
+        const prev = [...CHAIN_SPEEDS].reverse().find((s) => s < speeds);
+        if (prev !== undefined) onChange({ ...data, speeds: prev });
+      }
+      return;
     }
-  };
 
-  const handleInputChange = (raw: string) => {
-    const num = Number(raw);
-    if (!num) return;
-    const closest = CHAIN_SPEEDS.reduce((prev, curr) =>
-      Math.abs(curr - num) < Math.abs(prev - num) ? curr : prev
+    // Large change (direct input of invalid value) — snap to nearest
+    const closest = CHAIN_SPEEDS.reduce((p, c) =>
+      Math.abs(c - v) < Math.abs(p - v) ? c : p,
     );
     onChange({ ...data, speeds: closest });
   };
@@ -47,37 +43,15 @@ export default function ChainFields({ data, onChange }: ChainFieldsProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="chain-speeds">Liczba rzędów</Label>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={handleDecrement}
-            disabled={currentIndex === 0 || (currentIndex === -1 && value <= CHAIN_SPEEDS[0])}
-          >
-            <Minus className="h-4 w-4" />
-          </Button>
-          <Input
-            id="chain-speeds"
-            type="number"
-            placeholder="1"
-            value={value || ""}
-            onChange={(e) => handleInputChange(e.target.value)}
-            className="text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={handleIncrement}
-            disabled={currentIndex === CHAIN_SPEEDS.length - 1}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
+        <Label>Liczba rzędów</Label>
+        <NumberStepper
+          className="px-32"
+          value={speeds}
+          onChange={handleChange}
+          steps={[1]}
+          min={1}
+          max={13}
+        />
       </div>
     </div>
   );
