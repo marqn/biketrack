@@ -27,13 +27,20 @@ export async function searchLubricantModels(
   brand: string,
   query: string
 ): Promise<PartProduct[]> {
-  if (!brand || query.length < 1) return [];
+  if (!brand) return [];
+
+  const whereConditions: any[] = [
+    { type: PartType.LUBRICANT },
+    { brand: { equals: brand, mode: "insensitive" } },
+  ];
+
+  if (query.length > 0) {
+    whereConditions.push({ model: { contains: query, mode: "insensitive" } });
+  }
 
   const products = await prisma.partProduct.findMany({
     where: {
-      type: PartType.LUBRICANT,
-      brand: { equals: brand, mode: "insensitive" },
-      model: { contains: query, mode: "insensitive" },
+      AND: whereConditions,
     },
     orderBy: [{ averageRating: "desc" }, { totalReviews: "desc" }],
     take: 10,
