@@ -38,6 +38,8 @@ export default function BikeBrandModelFields({
   const [selectedBrandIndex, setSelectedBrandIndex] = useState(-1);
   const [selectedModelIndex, setSelectedModelIndex] = useState(-1);
   const userChangedBrandRef = useRef(false);
+  const brandInputRef = useRef<HTMLInputElement>(null);
+  const modelInputRef = useRef<HTMLInputElement>(null);
 
   // Search brands
   useEffect(() => {
@@ -119,6 +121,7 @@ export default function BikeBrandModelFields({
     setBrandNotFound(false);
     setLastBrandQuery("");
     setSelectedBrandIndex(-1);
+    setTimeout(() => brandInputRef.current?.focus(), 0);
   };
 
   const handleClearModel = () => {
@@ -128,6 +131,7 @@ export default function BikeBrandModelFields({
     setModelNotFound(false);
     setLastModelQuery("");
     setSelectedModelIndex(-1);
+    setTimeout(() => modelInputRef.current?.focus(), 0);
   };
 
   const handleBrandKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -222,6 +226,7 @@ export default function BikeBrandModelFields({
         <div className="relative">
           <Input
             id="bike-brand"
+            ref={brandInputRef}
             placeholder="np. Cannondale, Trek, Specialized"
             value={brand}
             onChange={(e) => {
@@ -288,6 +293,7 @@ export default function BikeBrandModelFields({
         <div className="relative">
           <Input
             id="bike-model"
+            ref={modelInputRef}
             placeholder="np. Topstone Carbon, Domane SL 7"
             value={model}
             onChange={(e) => {

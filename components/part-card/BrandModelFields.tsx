@@ -47,6 +47,7 @@ export default function BrandModelFields({
   const [selectedModelIndex, setSelectedModelIndex] = useState(-1);
   const [popularBrands, setPopularBrands] = useState<string[]>([]);
   const userChangedBrandRef = useRef(false);
+  const brandInputRef = useRef<HTMLInputElement>(null);
   const modelInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch popular brands on mount
@@ -130,6 +131,7 @@ export default function BrandModelFields({
     setBrandNotFound(false);
     setLastBrandQuery("");
     setSelectedBrandIndex(-1);
+    setTimeout(() => brandInputRef.current?.focus(), 0);
   };
 
   const handleClearModel = () => {
@@ -139,6 +141,7 @@ export default function BrandModelFields({
     setModelNotFound(false);
     setLastModelQuery("");
     setSelectedModelIndex(-1);
+    setTimeout(() => modelInputRef.current?.focus(), 0);
   };
 
   const handleBrandKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -235,6 +238,7 @@ export default function BrandModelFields({
         <div className="relative">
           <Input
             id="brand"
+            ref={brandInputRef}
             placeholder="np. Continental, Shimano, SRAM"
             value={brand}
             onChange={(e) => {

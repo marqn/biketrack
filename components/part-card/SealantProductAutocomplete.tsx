@@ -37,6 +37,8 @@ export default function SealantProductAutocomplete({
   const [selectedBrandIndex, setSelectedBrandIndex] = useState(-1);
   const [selectedModelIndex, setSelectedModelIndex] = useState(-1);
   const userChangedBrandRef = useRef(false);
+  const brandInputRef = useRef<HTMLInputElement>(null);
+  const modelInputRef = useRef<HTMLInputElement>(null);
 
   // Wyszukaj marki
   useEffect(() => {
@@ -116,6 +118,7 @@ export default function SealantProductAutocomplete({
     setBrandNotFound(false);
     setLastBrandQuery("");
     setSelectedBrandIndex(-1);
+    setTimeout(() => brandInputRef.current?.focus(), 0);
   };
 
   const handleClearModel = () => {
@@ -125,6 +128,7 @@ export default function SealantProductAutocomplete({
     setModelNotFound(false);
     setLastModelQuery("");
     setSelectedModelIndex(-1);
+    setTimeout(() => modelInputRef.current?.focus(), 0);
   };
 
   const handleBrandKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -198,6 +202,7 @@ export default function SealantProductAutocomplete({
         <div className="relative">
           <Input
             id="sealant-brand"
+            ref={brandInputRef}
             placeholder="np. Stan's NoTubes, Muc-Off, Orange Seal"
             value={brand}
             onChange={(e) => {
@@ -262,6 +267,7 @@ export default function SealantProductAutocomplete({
         <div className="relative">
           <Input
             id="sealant-model"
+            ref={modelInputRef}
             placeholder="np. Race Sealant, No Puncture Hassle"
             value={model}
             onChange={(e) => {
