@@ -133,6 +133,7 @@ export default function PartDetailsDialog({
   const [isPending, startTransition] = useTransition();
   const [isLoadingReview, setIsLoadingReview] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const router = useRouter();
 
   const displayImage = selectedProduct?.officialImageUrl || null;
@@ -611,7 +612,7 @@ export default function PartDetailsDialog({
           {/* === Data montażu === */}
           <div className="space-y-4">
             <h3 className="text-base font-semibold">Data montażu</h3>
-            <Popover>
+            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -636,6 +637,7 @@ export default function PartDetailsDialog({
                     if (date) {
                       setInstalledAt(format(date, "yyyy-MM-dd"));
                     }
+                    setCalendarOpen(false);
                   }}
                   disabled={(date) => date > new Date()}
                   locale={pl}
@@ -658,7 +660,7 @@ export default function PartDetailsDialog({
                     : undefined
                 }
               >
-                <AccordionItem value="specific-fields" className="border">
+                <AccordionItem value="specific-fields" className="border p-2">
                   <AccordionTrigger className="cursor-pointer text-base font-semibold">
                     Szczegółowe parametry (opcjonalne / zalecane)
                   </AccordionTrigger>
