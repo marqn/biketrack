@@ -7,7 +7,7 @@ import { PartProduct } from "@/lib/types";
 import {
   searchSealantBrands,
   searchSealantModels,
-} from "@/app/app/actions/search-sealants";
+} from "@/app/actions/search-sealants";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 

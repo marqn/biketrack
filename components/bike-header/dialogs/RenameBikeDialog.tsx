@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,7 +27,7 @@ import {
 import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels, BikeProduct } from "@/lib/types";
 import BikeBrandModelFields from "@/components/bike/BikeBrandModelFields";
-import { toggleBikeVisibility } from "@/app/app/actions/toggle-bike-visibility";
+import { toggleBikeVisibility } from "@/app/actions/toggle-bike-visibility";
 import { ImageUploader } from "@/components/ui/image-uploader";
 import { Copy, Check } from "lucide-react";
 import Link from "next/link";
@@ -64,6 +65,7 @@ export function RenameBikeDialog({
   bike,
   onSave,
 }: RenameBikeDialogProps) {
+  const t = useTranslations();
   const [brand, setBrand] = useState(bike.brand ?? "");
   const [model, setModel] = useState(bike.model ?? "");
   const [year, setYear] = useState(
@@ -151,10 +153,9 @@ export function RenameBikeDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-h-[90vh]">
         <DialogHeader className="shrink-0">
-          <DialogTitle>Edytuj rower</DialogTitle>
+          <DialogTitle>{t("bikes.editBike")}</DialogTitle>
           <DialogDescription>
-            Typ roweru jest wymagany. Marka i model są opcjonalne, ale pomagają
-            w dopasowaniu komponentów.
+            {t("bikes.editBikeDescription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -165,7 +166,7 @@ export function RenameBikeDialog({
           <div className="flex gap-4 items-end">
             <div className="space-y-2">
               <Label htmlFor="bike-type">
-                Typ roweru <span className="text-destructive">*</span>
+                {t("bikes.bikeType")} <span className="text-destructive">*</span>
               </Label>
               <Select
                 value={type}
@@ -173,12 +174,12 @@ export function RenameBikeDialog({
                 disabled={isLoading}
               >
                 <SelectTrigger id="bike-type" className="w-36">
-                  <SelectValue placeholder="Wybierz typ" />
+                  <SelectValue placeholder={t("bikes.selectType")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(bikeTypeLabels).map(([value, label]) => (
+                  {Object.values(BikeType).map((value) => (
                     <SelectItem key={value} value={value}>
-                      {label}
+                      {t(`bikeTypes.${value}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -186,7 +187,7 @@ export function RenameBikeDialog({
             </div>
 
             <div className="space-y-2">
-              <Label>Rok</Label>
+              <Label>{t("bikes.year")}</Label>
               <NumberStepper
                 value={year ? parseInt(year, 10) : new Date().getFullYear()}
                 onChange={(v) => setYear(v.toString())}
@@ -224,7 +225,7 @@ export function RenameBikeDialog({
           />
 
           <div className="space-y-2">
-            <Label htmlFor="bike-description">Opisz swój rower</Label>
+            <Label htmlFor="bike-description">{t("bikes.describeYourBike")}</Label>
             <Textarea
               id="bike-description"
               placeholder="np. Mój główny rower do codziennych dojazdów, z dodatkowym oświetleniem i sakwami..."

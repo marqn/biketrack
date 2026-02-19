@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,10 +26,11 @@ export function ConfirmDeleteDialog({
   open,
   onConfirm,
   onOpenChange,
-  title = "Usunąć wpis z historii?",
+  title,
   description,
   itemName,
 }: ConfirmDeleteDialogProps) {
+  const t = useTranslations();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleConfirm = async () => {
@@ -43,25 +45,23 @@ export function ConfirmDeleteDialog({
   const getDescription = () => {
     if (description) return description;
 
-    const baseText =
-      "Ta operacja jest nieodwracalna. Wpis zostanie trwale usunięty";
     if (itemName) {
-      return `${baseText} z historii ${itemName}.`;
+      return t("common.deleteConfirmationWithItem", { item: itemName });
     }
-    return `${baseText}.`;
+    return t("common.deleteConfirmation");
   };
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogTitle>{title || t("common.deleteEntryQuestion")}</AlertDialogTitle>
           <AlertDialogDescription>{getDescription()}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>Anuluj</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeleting}>{t("common.cancel")}</AlertDialogCancel>
           <AlertDialogAction onClick={handleConfirm} disabled={isDeleting}>
-            {isDeleting ? "Usuwanie..." : "Usuń"}
+            {isDeleting ? t("common.deleting") : t("common.delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

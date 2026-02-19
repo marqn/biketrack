@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import SealantProductAutocomplete from "./SealantProductAutocomplete";
 import { PartProduct } from "@/lib/types";
-import { getUserSealantReview } from "@/app/app/actions/get-user-sealant-review";
+import { getUserSealantReview } from "@/app/actions/get-user-sealant-review";
 import { Loader2 } from "lucide-react";
 
 interface SealantDialogProps {
@@ -43,6 +44,7 @@ export default function SealantDialog({
   lastSealantProduct,
   onChangeSealant,
 }: SealantDialogProps) {
+  const t = useTranslations();
   const [unknownProduct, setUnknownProduct] = useState(false);
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");

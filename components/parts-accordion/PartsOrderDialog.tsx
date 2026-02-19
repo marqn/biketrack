@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { ArrowUpDown, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,8 +25,6 @@ import {
 import { Sortable, SortableItem } from "@/components/ui/sortable";
 import { PartType } from "@/lib/generated/prisma";
 import {
-  PART_CATEGORIES,
-  PART_NAMES,
   PART_ICONS,
   type PartCategory,
 } from "@/lib/default-parts";
@@ -33,7 +32,7 @@ import {
   savePartsDisplayOrder,
   resetPartsDisplayOrder,
   type PartsDisplayOrder,
-} from "@/app/app/actions/parts-display-order";
+} from "@/app/actions/parts-display-order";
 import { toast } from "sonner";
 
 // Ikony kategorii
@@ -64,6 +63,7 @@ export default function PartsOrderDialog({
   currentOrder,
   visibleParts,
 }: PartsOrderDialogProps) {
+  const t = useTranslations();
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
@@ -85,7 +85,7 @@ export default function PartsOrderDialog({
       setCategoryOrder(
         catOrder.map((cat) => ({
           id: cat,
-          label: PART_CATEGORIES[cat].label,
+          label: t(`partCategories.${cat}`),
           icon: CATEGORY_ICONS[cat],
         }))
       );
@@ -112,7 +112,7 @@ export default function PartsOrderDialog({
         }
         parts[cat] = ordered.map((pt) => ({
           id: pt,
-          label: PART_NAMES[pt as keyof typeof PART_NAMES] ?? pt,
+          label: t(`parts.partNames.${pt}`),
           icon: PART_ICONS[pt as keyof typeof PART_ICONS] ?? "",
         }));
       }
@@ -136,9 +136,9 @@ export default function PartsOrderDialog({
       await savePartsDisplayOrder(order);
       router.refresh();
       setOpen(false);
-      toast.success("Kolejność zapisana");
+      toast.success(t("parts.orderSaved"));
     } catch {
-      toast.error("Nie udało się zapisać kolejności");
+      toast.error(t("parts.orderSaveError"));
     } finally {
       setSaving(false);
     }
@@ -150,9 +150,9 @@ export default function PartsOrderDialog({
       await resetPartsDisplayOrder();
       router.refresh();
       setOpen(false);
-      toast.success("Przywrócono domyślną kolejność");
+      toast.success(t("parts.orderReset"));
     } catch {
-      toast.error("Nie udało się zresetować kolejności");
+      toast.error(t("parts.orderResetError"));
     } finally {
       setSaving(false);
     }
@@ -165,24 +165,24 @@ export default function PartsOrderDialog({
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
           <ArrowUpDown className="size-4" />
-          Kolejność
+          {t("parts.displayOrder")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md max-h-[90vh]">
         <DialogHeader className="shrink-0">
-          <DialogTitle>Kolejność wyświetlania</DialogTitle>
+          <DialogTitle>{t("parts.displayOrderTitle")}</DialogTitle>
           <DialogDescription>
-            Przeciągnij elementy, aby zmienić kolejność kategorii i części.
+            {t("parts.displayOrderDescription")}
           </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="categories" className="mt-2">
           <TabsList className="w-full">
             <TabsTrigger value="categories" className="flex-1">
-              Kategorie
+              {t("parts.categoriesTab")}
             </TabsTrigger>
             <TabsTrigger value="parts" className="flex-1">
-              Części
+              {t("parts.partsTab")}
             </TabsTrigger>
           </TabsList>
 
@@ -254,10 +254,10 @@ export default function PartsOrderDialog({
             className="gap-2"
           >
             <RotateCcw className="size-3.5" />
-            Domyślna
+            {t("common.defaultOrder")}
           </Button>
           <Button onClick={handleSave} disabled={saving} size="sm">
-            {saving ? "Zapisywanie..." : "Zapisz"}
+            {saving ? t("common.saving") : t("common.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

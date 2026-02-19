@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
+import { useTranslations } from "next-intl";
 
 import {
   Dialog,
@@ -33,6 +33,7 @@ export default function ReplacePartDialog({
   currentModel,
   onReplace,
 }: ReplacePartDialogProps) {
+  const t = useTranslations();
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
   const [notes, setNotes] = useState("");
@@ -72,20 +73,20 @@ export default function ReplacePartDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Wymień: {partName}</DialogTitle>
+          <DialogTitle>{t("services.replaceTitle")}: {partName}</DialogTitle>
           <DialogDescription>
-            Dodaj informacje o nowym komponencie
+            {t("services.addComponentInfo")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="brand">
-              Marka <span className="text-destructive">*</span>
+              {t("services.brand")} <span className="text-destructive">*</span>
             </Label>
             <Input
               id="brand"
-              placeholder="np. Shimano, SRAM, KMC"
+              placeholder={t("services.brandPlaceholder")}
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
               required
@@ -94,11 +95,11 @@ export default function ReplacePartDialog({
 
           <div className="space-y-2">
             <Label htmlFor="model">
-              Model <span className="text-destructive">*</span>
+              {t("services.model")} <span className="text-destructive">*</span>
             </Label>
             <Input
               id="model"
-              placeholder="np. XT CN-M8100, GX Eagle"
+              placeholder={t("services.modelPlaceholder")}
               value={model}
               onChange={(e) => setModel(e.target.value)}
               required
@@ -106,10 +107,10 @@ export default function ReplacePartDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes">Notatki</Label>
+            <Label htmlFor="notes">{t("services.notes")}</Label>
             <Textarea
               id="notes"
-              placeholder="Opcjonalne notatki, np. sklep, cena, przyczyna wymiany..."
+              placeholder={t("services.notesPlaceholder")}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
@@ -119,10 +120,10 @@ export default function ReplacePartDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Anuluj
+            {t("common.cancel")}
           </Button>
           <Button onClick={handleReplace} disabled={isReplacing || !canSubmit}>
-            {isReplacing ? "Wymieniam..." : "Wymień komponent"}
+            {isReplacing ? t("parts.replacing") : t("services.replaceComponent")}
           </Button>
         </DialogFooter>
       </DialogContent>

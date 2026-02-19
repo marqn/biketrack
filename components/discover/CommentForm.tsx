@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { addComment } from "@/app/app/actions/comments/add-comment";
+import { addComment } from "@/app/actions/comments/add-comment";
 import { Lightbulb, MessageSquare, HelpCircle } from "lucide-react";
 
 const COMMENT_TYPES = [

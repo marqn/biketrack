@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { syncStravaDistances } from "@/app/app/actions/sync-strava-distances";
+import { syncStravaDistances } from "@/app/actions/sync-strava-distances";
 
 export function StravaSyncTrigger() {
   const hasFired = useRef(false);

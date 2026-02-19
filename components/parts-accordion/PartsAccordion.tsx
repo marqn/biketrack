@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { BikeType, PartType } from "@/lib/generated/prisma";
 import {
   Accordion,
@@ -12,7 +13,6 @@ import PartCard from "@/components/part-card/PartCard";
 import CustomPartCard from "./CustomPartCard";
 import AddCustomPartCard from "./AddCustomPartCard";
 import {
-  PART_CATEGORIES,
   PartCategory,
   getPartCategory,
   getPartNameForBike,
@@ -23,7 +23,7 @@ import {
   TOGGLEABLE_PARTS,
 } from "@/lib/default-parts";
 import { PartReplacement, BikePartWithProduct } from "@/lib/types";
-import type { PartsDisplayOrder } from "@/app/app/actions/parts-display-order";
+import type { PartsDisplayOrder } from "@/app/actions/parts-display-order";
 import PartsOrderDialog from "./PartsOrderDialog";
 
 type DefaultPart = {
@@ -79,6 +79,7 @@ export default function PartsAccordion({
   tireRearChildren,
   partsDisplayOrder,
 }: PartsAccordionProps) {
+  const t = useTranslations();
   // Grupuj części według kategorii (z filtrowaniem wg typu hamulców)
   const partsByCategory = React.useMemo(() => {
     const brakeType = extractBrakeType(existingParts);
@@ -210,7 +211,7 @@ export default function PartsAccordion({
         return (
           <AccordionItem key={category} value={category} className="border rounded-lg px-4">
             <AccordionTrigger className="text-lg font-semibold">
-              {PART_CATEGORIES[category].label}
+              {t(`partCategories.${category}`)}
             </AccordionTrigger>
             <AccordionContent>
               <div className="grid gap-4 grid-cols-1 md:grid-cols-2">

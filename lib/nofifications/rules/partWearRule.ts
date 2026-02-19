@@ -17,8 +17,8 @@ export async function partWearRule(
     await ensureNotification({
       userId: part.bike.userId,
       type: NotificationType.PART_WORN,
-      title: "Zużyty komponent",
-      message: `Komponent ${PART_UI[part.type]} w rowerze ${bikeName} przekroczył przewidywany przebieg.`,
+      title: "Worn component",
+      message: `Component ${PART_UI[part.type]} on bike ${bikeName} has exceeded expected mileage.`,
       bikeId: part.bikeId,
       partId: part.id,
     })
@@ -26,8 +26,8 @@ export async function partWearRule(
     await ensureNotification({
       userId: part.bike.userId,
       type: NotificationType.PART_NEAR_WORN,
-      title: "Zbliżające się zużycie",
-      message: `Komponent ${PART_UI[part.type]} w rowerze ${bikeName} zbliża się do końca żywotności.`,
+      title: "Approaching wear limit",
+      message: `Component ${PART_UI[part.type]} on bike ${bikeName} is approaching end of lifespan.`,
       bikeId: part.bikeId,
       partId: part.id,
     })

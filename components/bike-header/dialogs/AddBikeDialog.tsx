@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,7 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import NumberStepper from "@/components/ui/number-stepper";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { BikeType } from "@/lib/generated/prisma";
-import { bikeTypeLabels, BikeProduct } from "@/lib/types";
+import { BikeProduct } from "@/lib/types";
 import BikeBrandModelFields from "@/components/bike/BikeBrandModelFields";
 import { addBike } from "../actions/add-bike";
 import {
@@ -41,6 +42,7 @@ export function AddBikeDialog({
   onBikeAdded,
 }: AddBikeDialogProps) {
   const router = useRouter();
+  const t = useTranslations();
   const [step, setStep] = useState<Step>("loading");
   const [stravaBikes, setStravaBikes] = useState<StravaBikeForImport[]>([]);
   const [selectedStravaBike, setSelectedStravaBike] =
@@ -155,12 +157,12 @@ export function AddBikeDialog({
         onBikeAdded?.(result.bikeId);
         handleOpenChange(false);
         const bikeName = [brand, model].filter(Boolean).join(" ");
-        toast.success("Dodano nowy rower", {
+        toast.success(t("bikes.bikeAdded"), {
           description: bikeName || undefined,
         });
         router.refresh();
       } else {
-        setError(result.error || "Wystąpił błąd");
+        setError(result.error || t("errors.generic"));
       }
     });
   }
@@ -186,10 +188,10 @@ export function AddBikeDialog({
         document.cookie = `selectedBikeId=${result.bikeId};path=/;max-age=${60 * 60 * 24 * 365}`;
         onBikeAdded?.(result.bikeId);
         handleOpenChange(false);
-        toast.success("Dodano nowy rower");
+        toast.success(t("bikes.bikeAdded"));
         router.refresh();
       } else {
-        setError(result.error || "Wystąpił błąd");
+        setError(result.error || t("errors.generic"));
       }
     });
   }
@@ -197,28 +199,28 @@ export function AddBikeDialog({
   function getTitle() {
     switch (step) {
       case "loading":
-        return "Dodaj nowy rower";
+        return t("bikes.addBike");
       case "strava":
-        return "Importuj ze Strava";
+        return t("bikes.importFromStrava");
       case "type":
-        return "Wybierz typ roweru";
+        return t("bikes.selectBikeType");
       case "details":
-        return "Szczegóły roweru";
+        return t("bikes.bikeDetails");
     }
   }
 
   function getDescription() {
     switch (step) {
       case "loading":
-        return "Sprawdzanie dostępnych rowerów...";
+        return t("bikes.checkingAvailableBikes");
       case "strava":
-        return `Znaleźliśmy ${stravaBikes.length} ${stravaBikes.length === 1 ? "rower" : stravaBikes.length < 5 ? "rowery" : "rowerów"} w Twoim koncie Strava`;
+        return t("bikes.foundStravaBikes", { count: stravaBikes.length });
       case "type":
         return selectedStravaBike
-          ? `${selectedStravaBike.name} - wybierz typ`
-          : "Wybierz typ nowego roweru";
+          ? t("bikes.selectTypeForBike", { name: selectedStravaBike.name })
+          : t("bikes.selectNewBikeType");
       case "details":
-        return "Podaj markę i model (opcjonalnie)";
+        return t("bikes.enterBrandModel");
     }
   }
 
@@ -277,7 +279,7 @@ export function AddBikeDialog({
                   onClick={handleAddManually}
                   className="w-full"
                 >
-                  Dodaj ręcznie
+                  {t("bikes.addManually")}
                 </Button>
               </div>
             </div>
@@ -292,7 +294,7 @@ export function AddBikeDialog({
                   className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  Wróć do wyboru ze Strava
+                  {t("bikes.backToStrava")}
                 </button>
               )}
               <div className="flex justify-center">
@@ -304,7 +306,7 @@ export function AddBikeDialog({
                       onClick={() => handleTypeSelect(type)}
                       className="h-16 text-base text-center rounded-xl"
                     >
-                      {bikeTypeLabels[type]}
+                      {t(`bikeTypes.${type}`)}
                     </ToggleGroupItem>
                   ))}
                 </ToggleGroup>
@@ -322,7 +324,7 @@ export function AddBikeDialog({
                 disabled={isPending}
               >
                 <ArrowLeft className="h-4 w-4" />
-                Zmień typ roweru
+                {t("bikes.changeBikeType")}
               </button>
 
               <BikeBrandModelFields
@@ -339,7 +341,7 @@ export function AddBikeDialog({
               />
 
               <div className="space-y-2">
-                <Label>Rok modelowy</Label>
+                <Label>{t("bikes.modelYear")}</Label>
                 <NumberStepper
                   value={year ? parseInt(year, 10) : new Date().getFullYear()}
                   onChange={(v) => setYear(v.toString())}
@@ -352,7 +354,7 @@ export function AddBikeDialog({
 
               {selectedStravaBike && (
                 <div className="space-y-2">
-                  <Label>Przebieg (km)</Label>
+                  <Label>{t("bikes.mileageKm")}</Label>
                   <Input
                     type="number"
                     value={Math.round(selectedStravaBike.distance / 1000)}
@@ -370,7 +372,7 @@ export function AddBikeDialog({
                     disabled={isPending}
                   />
                   <Label htmlFor="new-bike-electric" className="cursor-pointer">
-                    Rower elektryczny (e-bike)
+                    {t("bikes.electricBike")}
                   </Label>
                 </div>
               )}
@@ -384,7 +386,7 @@ export function AddBikeDialog({
                   {isPending && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  {isPending ? "Dodawanie..." : "Dodaj rower"}
+                  {isPending ? t("common.adding") : t("bikes.addBike")}
                 </Button>
                 <Button
                   onClick={handleSkip}
@@ -392,7 +394,7 @@ export function AddBikeDialog({
                   variant="outline"
                   className="w-full"
                 >
-                  Pomiń szczegóły
+                  {t("bikes.skipDetails")}
                 </Button>
               </DialogFooter>
             </>

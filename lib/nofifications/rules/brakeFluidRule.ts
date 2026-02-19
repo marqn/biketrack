@@ -29,10 +29,10 @@ export async function brakeFluidRule(bikeId: string) {
   await ensureNotification({
     userId: part.bike.userId,
     type: NotificationType.SERVICE_DUE,
-    title: "Wymień płyn hamulcowy",
-    message: `Od ostatniej wymiany płynu hamulcowego minęło ${Math.floor(
+    title: "Replace brake fluid",
+    message: `It's been ${Math.floor(
       daysSince
-    )} dni.`,
+    )} days since the last brake fluid change.`,
     bikeId,
     partId: part.id,
   })

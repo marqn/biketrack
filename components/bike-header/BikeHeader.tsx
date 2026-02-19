@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -50,7 +52,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Bike, BikeType } from "@/lib/generated/prisma";
 import { signOut } from "next-auth/react";
 import { useNotifications } from "@/app/hooks/useNotifications";
-import { syncStravaDistances } from "@/app/app/actions/sync-strava-distances";
+import { syncStravaDistances } from "@/app/actions/sync-strava-distances";
 import { toast } from "sonner";
 import { deleteAccount } from "./actions/delete-account";
 import { deleteBike } from "./actions/delete-bike";
@@ -95,6 +97,7 @@ export function BikeHeader({
   lastStravaSync,
   hasStrava,
 }: BikeHeaderProps) {
+  const t = useTranslations();
   const router = useRouter();
   const pathname = usePathname();
   const { activeDialog, openDialog, closeDialog } =
@@ -145,7 +148,7 @@ export function BikeHeader({
         router.refresh();
         for (const update of result.updates) {
           toast.success(`${update.bikeName}: +${update.diffKm} km`, {
-            description: `Przebieg: ${update.oldKm.toLocaleString("pl-PL")} → ${update.newKm.toLocaleString("pl-PL")} km`,
+            description: `${update.oldKm.toLocaleString()} → ${update.newKm.toLocaleString()} km`,
           });
         }
       }
@@ -197,14 +200,14 @@ export function BikeHeader({
       }
       setBikeToDelete(null);
       closeDialog();
-      toast.success("Rower został usunięty", {
+      toast.success(t("bikes.bikeDeleted"), {
         description: deletedBike
           ? `${deletedBike.brand ?? ""} ${deletedBike.model ?? ""}`.trim() || undefined
           : undefined,
       });
       router.refresh();
     } else {
-      toast.error(result.error || "Nie udało się usunąć roweru");
+      toast.error(result.error || t("bikes.bikeDeleteFailed"));
     }
   };
 
@@ -229,7 +232,7 @@ export function BikeHeader({
       });
     } catch (error) {
       console.error("Error deleting account:", error);
-      alert("Wystąpił błąd podczas usuwania konta");
+      alert(t("bikes.deleteAccountError"));
     }
   };
 
@@ -281,7 +284,7 @@ export function BikeHeader({
                       <ChevronDown className="h-3 w-3 text-muted-foreground" />
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {bike.type} {bike.totalKm.toLocaleString("pl-PL")} km
+                      {bike.type} {bike.totalKm.toLocaleString()} km
                     </p>
                   </div>
                 </Button>
@@ -302,7 +305,7 @@ export function BikeHeader({
                         {getBikeLabel(b)}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {b.type} · {b.totalKm.toLocaleString("pl-PL")} km
+                        {b.type} · {b.totalKm.toLocaleString()} km
                       </p>
                     </div>
                     <div className="flex items-center gap-1 ml-2">
@@ -330,7 +333,7 @@ export function BikeHeader({
                 {/* Edytuj aktywny rower */}
                 <DropdownMenuItem onClick={() => openDialog("rename-bike")}>
                   <Pencil className="mr-2 h-4 w-4" />
-                  Edytuj rower
+                  {t("bikes.editBike")}
                 </DropdownMenuItem>
 
                 {/* Dodaj rower - premium lub upgrade CTA */}
@@ -341,13 +344,13 @@ export function BikeHeader({
                   >
                     <Plus className="mr-2 h-4 w-4" />
                     {canAddBike
-                      ? "Dodaj rower"
-                      : `Limit ${bikes.length}/10 rowerów`}
+                      ? t("bikes.addBike")
+                      : t("bikes.bikeLimit", { count: bikes.length })}
                   </DropdownMenuItem>
                 ) : (
                   <DropdownMenuItem onClick={() => router.push("/app/upgrade")}>
                     <Lock className="mr-2 h-4 w-4" />
-                    Odblokuj więcej rowerów
+                    {t("bikes.unlockMoreBikes")}
                     <Crown className="ml-auto h-3 w-3 text-yellow-500" />
                   </DropdownMenuItem>
                 )}
@@ -392,9 +395,9 @@ export function BikeHeader({
                 </TooltipTrigger>
                 <TooltipContent>
                   {syncDate ? (
-                    <p>Strava sync: {new Date(syncDate).toLocaleString("pl-PL")}</p>
+                    <p>{t("strava.syncDate", { date: new Date(syncDate).toLocaleString() })}</p>
                   ) : (
-                    <p>Strava: oczekuje na synchronizację</p>
+                    <p>{t("strava.awaitingSync")}</p>
                   )}
                 </TooltipContent>
               </Tooltip>
@@ -416,7 +419,7 @@ export function BikeHeader({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Panel Admina</p>
+                  <p>{t("nav.adminPanel")}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -434,7 +437,7 @@ export function BikeHeader({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Strona startowa</p>
+                <p>{t("nav.home")}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -453,7 +456,7 @@ export function BikeHeader({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Historia</p>
+                <p>{t("nav.history")}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -474,7 +477,7 @@ export function BikeHeader({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Produkty</p>
+                <p>{t("nav.products")}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -495,7 +498,7 @@ export function BikeHeader({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Odkrywaj</p>
+                <p>{t("nav.discover")}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -522,10 +525,12 @@ export function BikeHeader({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Wiadomości</p>
+                <p>{t("nav.messages")}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+
+          <LanguageSwitcher />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -563,12 +568,12 @@ export function BikeHeader({
 
               <DropdownMenuItem onClick={() => router.push("/app/profile")}>
                 <UserIcon className="mr-2 h-4 w-4" />
-                Profil
+                {t("nav.profile")}
               </DropdownMenuItem>
 
               <DropdownMenuItem onClick={() => router.push("/app/upgrade")}>
                 <CreditCard className="mr-2 h-4 w-4" />
-                Premium
+                {t("nav.premium")}
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
@@ -577,11 +582,11 @@ export function BikeHeader({
                 onClick={() => signOut({ callbackUrl: "/login" })}
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                Wyloguj
+                {t("auth.logout")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => openDialog("delete-account")}>
                 <Delete className="mr-2 h-4 w-4" />
-                Usuń konto
+                {t("auth.deleteAccount")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -622,8 +627,8 @@ export function BikeHeader({
           }
         }}
         onConfirm={handleDeleteBike}
-        title="Usunąć rower?"
-        description="Ta operacja jest nieodwracalna. Rower wraz z całą historią serwisów i części zostanie trwale usunięty."
+        title={t("bikes.deleteBikeTitle")}
+        description={t("bikes.deleteBikeDescription")}
       />
     </header>
   );

@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { PartType } from "@/lib/generated/prisma";
 import { PartProduct } from "@/lib/types";
-import { searchBrands, searchModels, getPopularBrands } from "@/app/app/actions/search-brands";
+import { searchBrands, searchModels, getPopularBrands } from "@/app/actions/search-brands";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";

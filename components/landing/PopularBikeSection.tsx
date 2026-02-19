@@ -3,16 +3,19 @@ import { Badge } from "@/components/ui/badge";
 import { Trophy } from "lucide-react";
 import { bikeTypeLabels } from "@/lib/types";
 import type { BikeType } from "@/lib/generated/prisma";
-import type { LandingStats } from "@/app/app/actions/get-landing-stats";
+import type { LandingStats } from "@/app/actions/get-landing-stats";
+import { getTranslations } from "next-intl/server";
 
 interface PopularBikeSectionProps {
   stats: LandingStats;
 }
 
-export function PopularBikeSection({ stats }: PopularBikeSectionProps) {
+export async function PopularBikeSection({ stats }: PopularBikeSectionProps) {
   const { popularBikeBrand, bikeTypeDistribution } = stats;
 
   if (!popularBikeBrand && bikeTypeDistribution.length === 0) return null;
+
+  const t = await getTranslations("landing");
 
   const totalBikesInDist = bikeTypeDistribution.reduce(
     (sum, item) => sum + item.count,
@@ -23,10 +26,10 @@ export function PopularBikeSection({ stats }: PopularBikeSectionProps) {
     <section className="py-12">
       <div className="max-w-6xl mx-auto px-4">
         <h2 className="text-2xl font-bold text-center mb-2">
-          Najpopularniejsze rowery
+          {t("popularBikes")}
         </h2>
         <p className="text-muted-foreground text-center mb-8">
-          Na czym jeżdżą nasi użytkownicy
+          {t("popularBikesDescription")}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -38,7 +41,7 @@ export function PopularBikeSection({ stats }: PopularBikeSectionProps) {
                     <Trophy className="h-5 w-5 text-yellow-500" />
                   </div>
                   <div>
-                    <Badge variant="secondary">Najpopularniejsza marka</Badge>
+                    <Badge variant="secondary">{t("popularBrand")}</Badge>
                   </div>
                 </div>
                 <p className="text-3xl font-bold mb-1">
@@ -46,12 +49,7 @@ export function PopularBikeSection({ stats }: PopularBikeSectionProps) {
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {popularBikeBrand.count}{" "}
-                  {popularBikeBrand.count === 1
-                    ? "rower"
-                    : popularBikeBrand.count < 5
-                      ? "rowery"
-                      : "rowerów"}{" "}
-                  w serwisie
+                  {t("bikesInService")}
                 </p>
               </CardContent>
             </Card>
@@ -60,7 +58,7 @@ export function PopularBikeSection({ stats }: PopularBikeSectionProps) {
           {bikeTypeDistribution.length > 0 && (
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-semibold mb-4">Typy rowerów</h3>
+                <h3 className="font-semibold mb-4">{t("bikeTypes")}</h3>
                 <div className="space-y-3">
                   {bikeTypeDistribution.map((item) => {
                     const percentage = Math.round(

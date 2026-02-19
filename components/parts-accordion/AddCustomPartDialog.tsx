@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -14,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import NumberStepper from "@/components/ui/number-stepper";
-import { createCustomPart } from "@/app/app/actions/custom-part";
+import { createCustomPart } from "@/app/actions/custom-part";
 
 interface AddCustomPartDialogProps {
   open: boolean;
@@ -29,6 +30,7 @@ export default function AddCustomPartDialog({
   bikeId,
   category,
 }: AddCustomPartDialogProps) {
+  const t = useTranslations();
   const [name, setName] = useState("");
   const [expectedKm, setExpectedKm] = useState(0);
   const [isPending, startTransition] = useTransition();
@@ -47,7 +49,7 @@ export default function AddCustomPartDialog({
         router.refresh();
       } catch (error) {
         console.error("Error creating custom part:", error);
-        alert("Wystąpił błąd podczas tworzenia części");
+        alert(t("parts.errorCreatingPart"));
       }
     });
   }
@@ -56,18 +58,18 @@ export default function AddCustomPartDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Dodaj własną część</DialogTitle>
+          <DialogTitle>{t("parts.addCustomPart")}</DialogTitle>
           <DialogDescription>
-            Podaj nazwę części i opcjonalnie limit km
+            {t("partsOrder.enterPartDetails")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="custom-part-name">Nazwa części</Label>
+            <Label htmlFor="custom-part-name">{t("parts.customPartName")}</Label>
             <Input
               id="custom-part-name"
-              placeholder="np. Pancerz, Osłona łańcucha..."
+              placeholder={t("parts.customPartPlaceholder")}
               value={name}
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSave()}
@@ -77,7 +79,7 @@ export default function AddCustomPartDialog({
 
           <div className="space-y-2">
             <Label htmlFor="custom-part-km">
-              Limit km <span className="text-muted-foreground font-normal">(opcjonalnie)</span>
+              {t("parts.kmLimit")} <span className="text-muted-foreground font-normal">({t("common.optional")})</span>
             </Label>
             <NumberStepper
               value={expectedKm}

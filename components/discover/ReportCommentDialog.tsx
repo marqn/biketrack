@@ -13,7 +13,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { reportComment } from "@/app/app/actions/comments/report-comment";
+import { reportComment } from "@/app/actions/comments/report-comment";
 
 const REPORT_REASONS = [
   { value: "SPAM", label: "Spam" },

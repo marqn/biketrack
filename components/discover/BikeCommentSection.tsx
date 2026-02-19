@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
 import { CommentForm } from "./CommentForm";
 import { CommentCard } from "./CommentCard";
-import { getComments } from "@/app/app/actions/comments/get-comments";
+import { getComments } from "@/app/actions/comments/get-comments";
 
 interface BikeCommentSectionProps {
   bikeId: string;

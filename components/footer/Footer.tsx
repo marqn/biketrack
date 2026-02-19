@@ -2,8 +2,10 @@
 
 import { Bike, Heart } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export function Footer() {
+  const t = useTranslations();
   const currentYear = new Date().getFullYear();
   const startYear = 2025;
   const yearDisplay =
@@ -20,15 +22,15 @@ export function Footer() {
                 href="/app/blog"
                 className="font-semibold text-foreground hover:underline"
               >
-                Aktualności
+                {t("nav.news")}
               </Link>
               <Link
                 href="/app/contact"
                 className="font-semibold text-foreground hover:underline"
               >
-                Kontakt
+                {t("nav.contact")}
               </Link>
-              <p>© {yearDisplay} MBike. Wszelkie prawa zastrzeżone.</p>
+              <p>© {yearDisplay} MBike. {t("common.allRightsReserved")}</p>
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-1">

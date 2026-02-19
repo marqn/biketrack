@@ -22,7 +22,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import ColoredProgress from "@/components/ui/colored-progress";
-import { replaceCustomPart, deleteCustomPart } from "@/app/app/actions/custom-part";
+import { replaceCustomPart, deleteCustomPart } from "@/app/actions/custom-part";
 import { useMultiDialog } from "@/lib/hooks/useDialog";
 import CustomPartDetailsDialog from "./CustomPartDetailsDialog";
 

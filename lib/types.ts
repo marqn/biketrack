@@ -66,12 +66,21 @@ export interface ServiceRecord {
   product?: ComponentProduct
 }
 
+export const bikeTypeEmojis: Record<BikeType, string> = {
+  ROAD: "🚴",
+  GRAVEL: "🚵",
+  MTB: "🚵‍♂️",
+  OTHER: "🚲",
+  TRAINER: "💻",
+};
+
+// bikeTypeLabels kept for backward compatibility - use t(`bikeTypes.${type}`) for translations
 export const bikeTypeLabels: Record<BikeType, string> = {
-  ROAD: "🚴 Szosa",
+  ROAD: "🚴 Road",
   GRAVEL: "🚵 Gravel",
   MTB: "🚵‍♂️ MTB",
-  OTHER: "🚲 Inny",
-  TRAINER: "💻 Trenażer",
+  OTHER: "🚲 Other",
+  TRAINER: "💻 Trainer",
 };
 
 export const VARIANT_BY_TYPE: Record<string, "default" | "destructive"> = {

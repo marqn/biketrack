@@ -23,7 +23,7 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { updateCustomPart } from "@/app/app/actions/custom-part";
+import { updateCustomPart } from "@/app/actions/custom-part";
 
 interface CustomPartDetailsDialogProps {
   open: boolean;

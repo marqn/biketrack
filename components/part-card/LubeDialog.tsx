@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -17,7 +18,7 @@ import LubricantProductAutocomplete from "./LubricantProductAutocomplete";
 import LubricantFields from "./specific-fields/LubricantFields";
 import { PartProduct } from "@/lib/types";
 import { LubricantSpecificData } from "@/lib/part-specific-data";
-import { getUserLubricantReview } from "@/app/app/actions/get-user-lubricant-review";
+import { getUserLubricantReview } from "@/app/actions/get-user-lubricant-review";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -49,6 +50,7 @@ export default function LubeDialog({
   lastLubricantProduct,
   onLube,
 }: LubeDialogProps) {
+  const t = useTranslations();
   const [unknownProduct, setUnknownProduct] = useState(false);
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
@@ -153,7 +155,7 @@ export default function LubeDialog({
         rating: rating > 0 ? rating : undefined,
         reviewText: reviewText.trim() || undefined,
       });
-      toast.success("Łańcuch nasmarowany", {
+      toast.success(t("services.chainLubricated"), {
         description: brand && model ? `${brand} ${model}` : undefined,
       });
       // Reset form
@@ -183,20 +185,20 @@ export default function LubeDialog({
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/70 backdrop-blur-sm">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="h-5 w-5 animate-spin" />
-              Zapisuję...
+              {t("common.saving")}
             </div>
           </div>
         )}
         <DialogHeader>
-          <DialogTitle>Nasmaruj łańcuch</DialogTitle>
+          <DialogTitle>{t("services.lubeChain")}</DialogTitle>
           <DialogDescription>
-            Dodaj informacje o używanym smarze i oceń go
+            {t("services.lubeChainDescription")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="text-sm bg-muted p-3 rounded-md">
-            Aktualny przebieg:{" "}
+            {t("services.currentMileage")}:{" "}
             <span className="font-medium">{currentKm} km</span>
           </div>
 
@@ -247,10 +249,10 @@ export default function LubeDialog({
                   {/* Ocena gwiazdkowa */}
                   <div className="space-y-2">
                     <Label>
-                      Ocena (opcjonalnie)
+                      {t("services.ratingOptional")}
                       {isLoadingReview && (
                         <span className="ml-2 text-xs text-muted-foreground">
-                          Ładowanie...
+                          {t("common.loading")}
                         </span>
                       )}
                     </Label>
@@ -277,7 +279,7 @@ export default function LubeDialog({
                           onClick={() => setRating(0)}
                           className="ml-2 text-xs text-muted-foreground hover:text-foreground"
                         >
-                          Wyczyść
+                          {t("common.clear")}
                         </button>
                       )}
                     </div>
@@ -285,10 +287,10 @@ export default function LubeDialog({
 
                   {/* Opinia */}
                   <div className="space-y-2">
-                    <Label htmlFor="review">Opinia (opcjonalnie)</Label>
+                    <Label htmlFor="review">{t("services.reviewOptional")}</Label>
                     <Textarea
                       id="review"
-                      placeholder="Twoje wrażenia - jak się sprawdza, jak długo utrzymuje się na łańcuchu..."
+                      placeholder={t("services.reviewPlaceholderLube")}
                       value={reviewText}
                       onChange={(e) => setReviewText(e.target.value)}
                       rows={3}
@@ -302,11 +304,11 @@ export default function LubeDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Anuluj
+            {t("common.cancel")}
           </Button>
           <Button onClick={handleSubmit} disabled={isSubmitting}>
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isSubmitting ? "Zapisuję..." : "Nasmaruj"}
+            {isSubmitting ? t("common.saving") : t("services.lubricate")}
           </Button>
         </DialogFooter>
       </DialogContent>

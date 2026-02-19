@@ -43,8 +43,8 @@ export async function chainLubeRule(bikeId: string) {
   await ensureNotification({
     userId: bike.userId,
     type: NotificationType.SERVICE_DUE,
-    title: `Czas nasmarować łańcuch – ${bikeName}`,
-    message: `Od ostatniego smarowania minęło ${kmSince} km.`,
+    title: `Time to lube the chain – ${bikeName}`,
+    message: `It's been ${kmSince} km since the last lubrication.`,
     bikeId: bike.id,
     partId: chainPart.id, // ✅
   });

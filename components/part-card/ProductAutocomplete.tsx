@@ -4,7 +4,7 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { PartType } from "@/lib/generated/prisma";
-import { searchProducts } from "@/app/app/actions/search-products";
+import { searchProducts } from "@/app/actions/search-products";
 import { PartProduct } from "@/lib/types";
 import {
   Combobox,

@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { NotebookText, Link, Unlink, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BikeType, PartType } from "@/lib/generated/prisma";
@@ -26,8 +27,8 @@ import {
 import {
   deletePartReplacement,
   updatePartReplacement,
-} from "@/app/app/actions/replace-part";
-import { togglePartInstalled } from "@/app/app/actions/toggle-part-installed";
+} from "@/app/actions/replace-part";
+import { togglePartInstalled } from "@/app/actions/toggle-part-installed";
 import { PartReplacement, BikePartWithProduct } from "@/lib/types";
 import { useMultiDialog } from "@/lib/hooks/useDialog";
 
@@ -66,6 +67,7 @@ export default function PartCard({
   createdAt,
   bikeType,
 }: PartCardProps) {
+  const t = useTranslations();
   const { activeDialog, openDialog, closeDialog } = useMultiDialog<
     DialogType | "replace" | "history"
   >();
@@ -149,8 +151,8 @@ export default function PartCard({
                   ? `${currentBrand} ${currentModel}`
                   : currentBrand || currentModel
                 : isUnknownProduct
-                  ? <><Pencil className="w-3 h-3" />Uzupełnij markę i model</>
-                  : "Dodaj model"}
+                  ? <><Pencil className="w-3 h-3" />{t("parts.fillBrandAndModel")}</>
+                  : t("parts.addModel")}
             </button>
           </CardTitle>
           <CardAction className="flex items-center gap-2">
@@ -161,7 +163,7 @@ export default function PartCard({
                 variant={isInstalled ? "default" : "outline"}
                 onClick={() => handleToggleInstalled(!isInstalled)}
                 disabled={isPending}
-                title={isInstalled ? "Zdejmij z roweru" : "Zamontuj na rowerze"}
+                title={isInstalled ? t("parts.removeFromBike") : t("parts.mountOnBike")}
                 className="h-8 w-8 cursor-pointer"
               >
                 {isInstalled ? (
@@ -181,15 +183,15 @@ export default function PartCard({
             <span>
               {isTimeBased && timeBasedDate ? (
                 <>
-                  Wiek:{" "}
+                  {t("parts.age")}:{" "}
                   <span className="font-medium text-foreground">
                     {daysSinceInstall}
                   </span>
-                  {" dni "}/ {timeIntervalDays} dni
+                  {" "}{t("common.days")} / {timeIntervalDays} {t("common.days")}
                 </>
               ) : (
                 <>
-                  Zużycie:{" "}
+                  {t("parts.wear")}:{" "}
                   <span className="font-medium text-foreground">{wearKm}</span>
                   {" km "}/ {expectedKm} km
                 </>
@@ -204,7 +206,7 @@ export default function PartCard({
                   onClick={() => openDialog("replace")}
                   disabled={isPending}
                 >
-                  {isPending ? "Wymieniam..." : "🔄 Wymień"}
+                  {isPending ? t("parts.replacing") : t("parts.replace")}
                 </Button>
               )}
               {replacements.length > 0 && (

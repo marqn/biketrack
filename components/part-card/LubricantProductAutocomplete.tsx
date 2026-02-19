@@ -7,7 +7,7 @@ import { PartProduct } from "@/lib/types";
 import {
   searchLubricantBrands,
   searchLubricantModels,
-} from "@/app/app/actions/search-lubricants";
+} from "@/app/actions/search-lubricants";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 

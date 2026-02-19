@@ -7,7 +7,7 @@ import { BikeProduct } from "@/lib/types";
 import {
   searchBikeBrands,
   searchBikeModels,
-} from "@/app/app/actions/search-bikes";
+} from "@/app/actions/search-bikes";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 

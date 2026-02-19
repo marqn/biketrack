@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Flag, Lightbulb, HelpCircle, MessageSquare, Reply, Trash2 } from "lucide-react";
-import { deleteComment } from "@/app/app/actions/comments/delete-comment";
+import { deleteComment } from "@/app/actions/comments/delete-comment";
 import { CommentForm } from "./CommentForm";
 import { ReportCommentDialog } from "./ReportCommentDialog";
 import type { CommentData } from "./BikeCommentSection";

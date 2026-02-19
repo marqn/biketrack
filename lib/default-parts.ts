@@ -1,15 +1,15 @@
 import { BikeType, PartType } from "@/lib/generated/prisma";
 
-// Nazwy części zależne od typu roweru
+// Part name overrides by bike type
 const BIKE_TYPE_PART_NAMES: Partial<Record<BikeType, Partial<Record<PartType, string>>>> = {
   ROAD: {
-    [PartType.SHIFTERS]: "Klamkomanetki",
+    [PartType.SHIFTERS]: "Brifters",
   },
   GRAVEL: {
-    [PartType.SHIFTERS]: "Klamkomanetki",
+    [PartType.SHIFTERS]: "Brifters",
   },
   TRAINER: {
-    [PartType.FRAME]: "Trenażer",
+    [PartType.FRAME]: "Trainer",
   },
 };
 
@@ -244,77 +244,77 @@ export const DEFAULT_PARTS: Record<BikeType, DefaultPart[]> = {
   ],
 };
 
-// Pełne nazwy części (bez emoji)
+// Part names in English (base language) - use t(`parts.${partType}`) for localized names
 export const PART_NAMES: Record<PartType, string> = {
-  // Rama i widelec
-  [PartType.FRAME]: "Rama",
-  [PartType.FORK]: "Widelec",
-  [PartType.SUSPENSION_FORK]: "Widelec amortyzowany",
-  // Stery i suport
-  [PartType.HEADSET]: "Stery",
-  [PartType.BOTTOM_BRACKET]: "Suport",
-  // Napęd
-  [PartType.CRANKSET]: "Mechanizm korbowy",
-  [PartType.CHAIN]: "Łańcuch",
-  [PartType.CASSETTE]: "Kaseta",
-  [PartType.DERAILLEUR_FRONT]: "Przerzutka przód",
-  [PartType.DERAILLEUR_REAR]: "Przerzutka tył",
-  [PartType.SHIFTERS]: "Manetki",
-  [PartType.PEDALS]: "Pedały",
-  [PartType.CLEATS]: "Bloki SPD",
-  [PartType.SHIFT_CABLES]: "Linki przerzutki",
-  // Hamulce
-  [PartType.PADS_FRONT]: "Klocki przednie",
-  [PartType.PADS_REAR]: "Klocki tylne",
-  [PartType.DISC_FRONT]: "Tarcza przednia",
-  [PartType.DISC_REAR]: "Tarcza tylna",
-  [PartType.BRAKE_CALIPER_FRONT]: "Zacisk hamulca przód",
-  [PartType.BRAKE_CALIPER_REAR]: "Zacisk hamulca tył",
-  [PartType.BRAKE_CABLES]: "Linki hamulcowe",
-  [PartType.BRAKE_FLUID]: "Płyn hamulcowy",
-  // Koła
-  [PartType.HUBS]: "Piasty",
-  [PartType.RIMS]: "Obręcze",
-  [PartType.SPOKES]: "Szprychy",
-  [PartType.TIRE_FRONT]: "Opona przednia",
-  [PartType.TIRE_REAR]: "Opona tylna",
-  [PartType.INNER_TUBE_FRONT]: "Dętka przednia",
-  [PartType.INNER_TUBE_REAR]: "Dętka tylna",
-  [PartType.TUBELESS_SEALANT_FRONT]: "Mleko tubeless przód",
-  [PartType.TUBELESS_SEALANT_REAR]: "Mleko tubeless tył",
+  // Frame and fork
+  [PartType.FRAME]: "Frame",
+  [PartType.FORK]: "Fork",
+  [PartType.SUSPENSION_FORK]: "Suspension Fork",
+  // Headset and bottom bracket
+  [PartType.HEADSET]: "Headset",
+  [PartType.BOTTOM_BRACKET]: "Bottom Bracket",
+  // Drivetrain
+  [PartType.CRANKSET]: "Crankset",
+  [PartType.CHAIN]: "Chain",
+  [PartType.CASSETTE]: "Cassette",
+  [PartType.DERAILLEUR_FRONT]: "Front Derailleur",
+  [PartType.DERAILLEUR_REAR]: "Rear Derailleur",
+  [PartType.SHIFTERS]: "Shifters",
+  [PartType.PEDALS]: "Pedals",
+  [PartType.CLEATS]: "SPD Cleats",
+  [PartType.SHIFT_CABLES]: "Shift Cables",
+  // Brakes
+  [PartType.PADS_FRONT]: "Front Brake Pads",
+  [PartType.PADS_REAR]: "Rear Brake Pads",
+  [PartType.DISC_FRONT]: "Front Disc",
+  [PartType.DISC_REAR]: "Rear Disc",
+  [PartType.BRAKE_CALIPER_FRONT]: "Front Brake Caliper",
+  [PartType.BRAKE_CALIPER_REAR]: "Rear Brake Caliper",
+  [PartType.BRAKE_CABLES]: "Brake Cables",
+  [PartType.BRAKE_FLUID]: "Brake Fluid",
+  // Wheels
+  [PartType.HUBS]: "Hubs",
+  [PartType.RIMS]: "Rims",
+  [PartType.SPOKES]: "Spokes",
+  [PartType.TIRE_FRONT]: "Front Tire",
+  [PartType.TIRE_REAR]: "Rear Tire",
+  [PartType.INNER_TUBE_FRONT]: "Front Inner Tube",
+  [PartType.INNER_TUBE_REAR]: "Rear Inner Tube",
+  [PartType.TUBELESS_SEALANT_FRONT]: "Tubeless Sealant Front",
+  [PartType.TUBELESS_SEALANT_REAR]: "Tubeless Sealant Rear",
   // Cockpit
-  [PartType.STEM]: "Mostek",
-  [PartType.HANDLEBAR]: "Kierownica",
-  [PartType.HANDLEBAR_TAPE]: "Owijka kierownicy",
-  [PartType.GRIPS]: "Chwyty",
-  // Siodło
-  [PartType.SADDLE]: "Siodło",
-  [PartType.SEATPOST]: "Sztyca",
-  [PartType.SUSPENSION_SEATPOST]: "Sztyca amortyzowana",
-  [PartType.DROPPER_POST]: "Sztyca teleskopowa",
-  // Akcesoria
-  [PartType.FENDER_FRONT]: "Błotnik przedni",
-  [PartType.FENDER_REAR]: "Błotnik tylny",
-  [PartType.KICKSTAND]: "Stopka",
-  [PartType.RACK]: "Bagażnik",
-  [PartType.BAG_SADDLE]: "Torba podsiodłowa",
-  [PartType.BAG_FRAME]: "Torba na ramę",
-  [PartType.BOTTLE_CAGE]: "Koszyk na bidon",
-  [PartType.LIGHT_FRONT]: "Lampka przednia",
-  [PartType.LIGHT_REAR]: "Lampka tylna",
-  [PartType.BELL]: "Dzwonek",
-  [PartType.COMPUTER]: "Licznik",
-  // Inne
-  [PartType.LUBRICANT]: "Smar do łańcucha",
+  [PartType.STEM]: "Stem",
+  [PartType.HANDLEBAR]: "Handlebar",
+  [PartType.HANDLEBAR_TAPE]: "Bar Tape",
+  [PartType.GRIPS]: "Grips",
+  // Saddle
+  [PartType.SADDLE]: "Saddle",
+  [PartType.SEATPOST]: "Seatpost",
+  [PartType.SUSPENSION_SEATPOST]: "Suspension Seatpost",
+  [PartType.DROPPER_POST]: "Dropper Post",
+  // Accessories
+  [PartType.FENDER_FRONT]: "Front Fender",
+  [PartType.FENDER_REAR]: "Rear Fender",
+  [PartType.KICKSTAND]: "Kickstand",
+  [PartType.RACK]: "Rack",
+  [PartType.BAG_SADDLE]: "Saddle Bag",
+  [PartType.BAG_FRAME]: "Frame Bag",
+  [PartType.BOTTLE_CAGE]: "Bottle Cage",
+  [PartType.LIGHT_FRONT]: "Front Light",
+  [PartType.LIGHT_REAR]: "Rear Light",
+  [PartType.BELL]: "Bell",
+  [PartType.COMPUTER]: "Computer",
+  // Other
+  [PartType.LUBRICANT]: "Chain Lube",
   // E-bike
-  [PartType.MOTOR]: "Silnik",
-  [PartType.BATTERY]: "Akumulator",
-  [PartType.CONTROLLER]: "Sterownik",
-  // Przestarzałe
-  [PartType.TUBELESS_SEALANT]: "Mleko tubeless",
-  [PartType.CHAINRING_1X]: "Zębatka 1x",
-  [PartType.BRAKES]: "Hamulce",
-  [PartType.BRAKE_LEVERS]: "Klamki hamulcowe",
+  [PartType.MOTOR]: "Motor",
+  [PartType.BATTERY]: "Battery",
+  [PartType.CONTROLLER]: "Controller",
+  // Legacy
+  [PartType.TUBELESS_SEALANT]: "Tubeless Sealant",
+  [PartType.CHAINRING_1X]: "1x Chainring",
+  [PartType.BRAKES]: "Brakes",
+  [PartType.BRAKE_LEVERS]: "Brake Levers",
 };
 
 // Emoji dla każdego typu części
@@ -450,11 +450,11 @@ export type PartCategory = "frame" | "drivetrain" | "brakes" | "wheels" | "cockp
 
 export const PART_CATEGORIES: Record<PartCategory, { label: string; types: PartType[] }> = {
   frame: {
-    label: "Rama",
+    label: "Frame",
     types: [PartType.FRAME, PartType.FORK, PartType.SUSPENSION_FORK],
   },
   drivetrain: {
-    label: "Napęd",
+    label: "Drivetrain",
     types: [
       PartType.MOTOR,
       PartType.BATTERY,
@@ -472,7 +472,7 @@ export const PART_CATEGORIES: Record<PartCategory, { label: string; types: PartT
     ],
   },
   brakes: {
-    label: "Hamulce",
+    label: "Brakes",
     types: [
       PartType.PADS_FRONT,
       PartType.PADS_REAR,
@@ -485,7 +485,7 @@ export const PART_CATEGORIES: Record<PartCategory, { label: string; types: PartT
     ],
   },
   wheels: {
-    label: "Koła",
+    label: "Wheels",
     types: [
       PartType.HUBS,
       PartType.RIMS,
@@ -499,7 +499,7 @@ export const PART_CATEGORIES: Record<PartCategory, { label: string; types: PartT
     ],
   },
   cockpit: {
-    label: "Kokpit",
+    label: "Cockpit",
     types: [
       PartType.HEADSET,
       PartType.STEM,
@@ -513,7 +513,7 @@ export const PART_CATEGORIES: Record<PartCategory, { label: string; types: PartT
     ],
   },
   accessories: {
-    label: "Akcesoria",
+    label: "Accessories",
     types: [
       PartType.FENDER_FRONT,
       PartType.FENDER_REAR,

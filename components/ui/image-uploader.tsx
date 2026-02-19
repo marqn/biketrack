@@ -2,8 +2,8 @@
 
 import { useState, useRef } from "react";
 import { upload } from "@vercel/blob/client";
-import { deleteBlobImage } from "@/app/app/actions/delete-blob-image";
-import { saveBlobImage } from "@/app/app/actions/save-blob-image";
+import { deleteBlobImage } from "@/app/actions/delete-blob-image";
+import { saveBlobImage } from "@/app/actions/save-blob-image";
 import { Camera, X, Plus, Loader2 } from "lucide-react";
 import {
   compressImage,

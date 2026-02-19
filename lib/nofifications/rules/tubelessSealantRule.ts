@@ -13,8 +13,8 @@ export async function tubelessSealantRule(bikeId: string) {
 
   // Sprawdź oba koła
   const wheels: Array<{ type: ServiceType; label: string }> = [
-    { type: ServiceType.SEALANT_FRONT, label: "przednie" },
-    { type: ServiceType.SEALANT_REAR, label: "tylne" },
+    { type: ServiceType.SEALANT_FRONT, label: "front" },
+    { type: ServiceType.SEALANT_REAR, label: "rear" },
   ]
 
   for (const wheel of wheels) {
@@ -35,10 +35,10 @@ export async function tubelessSealantRule(bikeId: string) {
     await ensureNotification({
       userId: bike.userId,
       type: NotificationType.SERVICE_DUE,
-      title: `Wymień mleko tubeless (${wheel.label})`,
-      message: `Od ostatniej wymiany mleka minęło ${Math.floor(
+      title: `Replace tubeless sealant (${wheel.label})`,
+      message: `It's been ${Math.floor(
         daysSince
-      )} dni.`,
+      )} days since the last sealant change.`,
       bikeId,
     })
   }
