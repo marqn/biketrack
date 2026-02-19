@@ -193,7 +193,10 @@ export default function PartsAccordion({
   return (
     <div className="space-y-2">
       <div className="flex justify-end">
-        <PartsOrderDialog currentOrder={partsDisplayOrder ?? null} />
+        <PartsOrderDialog
+          currentOrder={partsDisplayOrder ?? null}
+          visibleParts={partsByCategory}
+        />
       </div>
       <Accordion
         type="multiple"

@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Sortable, SortableItem } from "@/components/ui/sortable";
+import { PartType } from "@/lib/generated/prisma";
 import {
   PART_CATEGORIES,
   PART_NAMES,
@@ -54,20 +55,14 @@ const DEFAULT_CATEGORY_ORDER: PartCategory[] = [
   "accessories",
 ];
 
-function getDefaultPartOrder(): Record<PartCategory, string[]> {
-  const result: Record<string, string[]> = {};
-  for (const [cat, data] of Object.entries(PART_CATEGORIES)) {
-    result[cat] = data.types.map((t) => t as string);
-  }
-  return result as Record<PartCategory, string[]>;
-}
-
 interface PartsOrderDialogProps {
   currentOrder: PartsDisplayOrder | null;
+  visibleParts: Record<PartCategory, Array<{ partType: PartType }>>;
 }
 
 export default function PartsOrderDialog({
   currentOrder,
+  visibleParts,
 }: PartsOrderDialogProps) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
@@ -95,14 +90,27 @@ export default function PartsOrderDialog({
         }))
       );
 
-      const defaultParts = getDefaultPartOrder();
       const parts: Record<
         string,
         { id: string; label: string; icon: string }[]
       > = {};
       for (const cat of DEFAULT_CATEGORY_ORDER) {
-        const partOrder = currentOrder?.parts?.[cat] ?? defaultParts[cat];
-        parts[cat] = partOrder.map((pt) => ({
+        // Tylko części widoczne dla aktualnego roweru
+        const visibleTypes = new Set(
+          (visibleParts[cat] ?? []).map((p) => p.partType as string)
+        );
+        const savedOrder = currentOrder?.parts?.[cat];
+        // Zacznij od zapisanej kolejności (filtrując do widocznych), potem dołóż brakujące
+        const ordered: string[] = [];
+        if (savedOrder) {
+          for (const pt of savedOrder) {
+            if (visibleTypes.has(pt)) ordered.push(pt);
+          }
+        }
+        for (const pt of visibleTypes) {
+          if (!ordered.includes(pt)) ordered.push(pt);
+        }
+        parts[cat] = ordered.map((pt) => ({
           id: pt,
           label: PART_NAMES[pt as keyof typeof PART_NAMES] ?? pt,
           icon: PART_ICONS[pt as keyof typeof PART_ICONS] ?? "",
