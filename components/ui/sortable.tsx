@@ -96,19 +96,14 @@ function SortableItem({ id, children, className }: SortableItemProps) {
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 text-sm",
+        "flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 text-sm cursor-grab touch-none active:cursor-grabbing",
         isDragging && "z-50 opacity-80 shadow-lg",
         className
       )}
+      {...attributes}
+      {...listeners}
     >
-      <button
-        type="button"
-        className="cursor-grab touch-none text-muted-foreground hover:text-foreground active:cursor-grabbing"
-        {...attributes}
-        {...listeners}
-      >
-        <GripVertical className="size-4" />
-      </button>
+      <GripVertical className="size-4 shrink-0 text-muted-foreground" />
       <div className="flex-1 min-w-0">{children}</div>
     </div>
   );
