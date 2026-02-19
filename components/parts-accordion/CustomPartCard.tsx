@@ -74,7 +74,7 @@ export default function CustomPartCard({
     <>
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2 flex-col items-start">
+          <CardTitle className="text-base flex gap-2 flex-col items-start">
             <div className="flex items-center gap-2">
               <Wrench className="w-5 h-5 shrink-0 text-muted-foreground" />
               {name}

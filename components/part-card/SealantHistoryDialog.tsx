@@ -67,7 +67,7 @@ export default function SealantHistoryDialog({
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-2xl max-h-[90vh]">
-          <DialogHeader className="flex-shrink-0">
+          <DialogHeader className="shrink-0">
             <DialogTitle>Historia wymiany mleka tubeless</DialogTitle>
           </DialogHeader>
 
