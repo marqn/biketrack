@@ -24,7 +24,8 @@
       "WebFetch(domain:docs.allauth.org)",
       "Bash(wc:*)",
       "Bash(node -e:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npx shadcn@latest add:*)"
     ]
   }
 }

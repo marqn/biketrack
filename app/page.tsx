@@ -51,9 +51,9 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <FeaturesSection />
         <CommunityStatsSection stats={landingStats} />
         <PopularBikeSection stats={landingStats} />
+        <FeaturesSection />
         <PopularPartSection stats={landingStats} />
         <TopProductsSection products={topProducts} />
         <Footer />

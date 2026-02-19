@@ -7,6 +7,7 @@ import SealantButton from "./sealant-button";
 import KmForm from "./km-form";
 import { ServiceType } from "@/lib/generated/prisma";
 import { DEFAULT_PARTS, EBIKE_PARTS, extractTubelessStatus } from "@/lib/default-parts";
+import { type PartsDisplayOrder } from "@/app/app/actions/parts-display-order";
 import { NotificationsList } from "@/components/notifications-list/NotificationsList";
 import { ensureEmailMissingNotification } from "@/lib/nofifications/emailMissing";
 import PartsAccordion from "@/components/parts-accordion/PartsAccordion";
@@ -90,10 +91,17 @@ export default async function AppPage() {
   if (!bike) redirect("/onboarding");
 
   // Sprawdź czy user ma konto Strava (do auto-sync dystansów)
-  const stravaAccount = await prisma.account.findFirst({
-    where: { userId: session.user.id, provider: "strava" },
-    select: { id: true },
-  });
+  const [stravaAccount, userData] = await Promise.all([
+    prisma.account.findFirst({
+      where: { userId: session.user.id, provider: "strava" },
+      select: { id: true },
+    }),
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { partsDisplayOrder: true },
+    }),
+  ]);
+  const partsDisplayOrder = (userData?.partsDisplayOrder as PartsDisplayOrder) ?? null;
 
   // Rozdziel service events wg typu
   const lubeEvents = bike.services.filter(
@@ -145,6 +153,7 @@ export default async function AppPage() {
         defaultParts={defaultParts}
         existingParts={existingParts}
         customParts={customParts}
+        partsDisplayOrder={partsDisplayOrder}
         chainChildren={
           <LubeButton
             bikeId={bike.id}

@@ -23,6 +23,8 @@ import {
   TOGGLEABLE_PARTS,
 } from "@/lib/default-parts";
 import { PartReplacement, BikePartWithProduct } from "@/lib/types";
+import type { PartsDisplayOrder } from "@/app/app/actions/parts-display-order";
+import PartsOrderDialog from "./PartsOrderDialog";
 
 type DefaultPart = {
   type: PartType;
@@ -63,6 +65,7 @@ interface PartsAccordionProps {
   chainChildren?: React.ReactNode;
   tireFrontChildren?: React.ReactNode;
   tireRearChildren?: React.ReactNode;
+  partsDisplayOrder?: PartsDisplayOrder | null;
 }
 
 export default function PartsAccordion({
@@ -74,6 +77,7 @@ export default function PartsAccordion({
   chainChildren,
   tireFrontChildren,
   tireRearChildren,
+  partsDisplayOrder,
 }: PartsAccordionProps) {
   // Grupuj części według kategorii (z filtrowaniem wg typu hamulców)
   const partsByCategory = React.useMemo(() => {
@@ -116,35 +120,51 @@ export default function PartsAccordion({
       }
     }
 
-    // Sortuj akcesoria: zamontowane najpierw, potem nieaktywne
-    categories.accessories.sort((a, b) => {
-      const aInstalled = a.existingPart?.isInstalled ?? false;
-      const bInstalled = b.existingPart?.isInstalled ?? false;
-      if (aInstalled === bInstalled) return 0;
-      return aInstalled ? -1 : 1;
-    });
+    // Sortuj części wg niestandardowej kolejności (jeśli ustawiona)
+    if (partsDisplayOrder?.parts) {
+      for (const cat of Object.keys(categories) as PartCategory[]) {
+        const customPartOrder = partsDisplayOrder.parts[cat];
+        if (customPartOrder) {
+          categories[cat].sort((a, b) => {
+            const aIdx = customPartOrder.indexOf(a.partType as string);
+            const bIdx = customPartOrder.indexOf(b.partType as string);
+            // Części spoza listy trafiają na koniec
+            return (aIdx === -1 ? 999 : aIdx) - (bIdx === -1 ? 999 : bIdx);
+          });
+        }
+      }
+    } else {
+      // Domyślne sortowanie gdy brak niestandardowej kolejności
+      // Sortuj akcesoria: zamontowane najpierw, potem nieaktywne
+      categories.accessories.sort((a, b) => {
+        const aInstalled = a.existingPart?.isInstalled ?? false;
+        const bInstalled = b.existingPart?.isInstalled ?? false;
+        if (aInstalled === bInstalled) return 0;
+        return aInstalled ? -1 : 1;
+      });
 
-    // Sortuj toggleable parts w pozostałych kategoriach (zamontowane najpierw)
-    for (const cat of Object.keys(categories) as PartCategory[]) {
-      if (cat === "accessories") continue;
-      const hasToggleable = categories[cat].some((p) => TOGGLEABLE_PARTS.has(p.partType));
-      if (hasToggleable) {
-        categories[cat].sort((a, b) => {
-          const aToggleable = TOGGLEABLE_PARTS.has(a.partType);
-          const bToggleable = TOGGLEABLE_PARTS.has(b.partType);
-          if (!aToggleable && !bToggleable) return 0;
-          if (!aToggleable) return -1;
-          if (!bToggleable) return 1;
-          const aInstalled = a.existingPart?.isInstalled ?? true;
-          const bInstalled = b.existingPart?.isInstalled ?? true;
-          if (aInstalled === bInstalled) return 0;
-          return aInstalled ? -1 : 1;
-        });
+      // Sortuj toggleable parts w pozostałych kategoriach (zamontowane najpierw)
+      for (const cat of Object.keys(categories) as PartCategory[]) {
+        if (cat === "accessories") continue;
+        const hasToggleable = categories[cat].some((p) => TOGGLEABLE_PARTS.has(p.partType));
+        if (hasToggleable) {
+          categories[cat].sort((a, b) => {
+            const aToggleable = TOGGLEABLE_PARTS.has(a.partType);
+            const bToggleable = TOGGLEABLE_PARTS.has(b.partType);
+            if (!aToggleable && !bToggleable) return 0;
+            if (!aToggleable) return -1;
+            if (!bToggleable) return 1;
+            const aInstalled = a.existingPart?.isInstalled ?? true;
+            const bInstalled = b.existingPart?.isInstalled ?? true;
+            if (aInstalled === bInstalled) return 0;
+            return aInstalled ? -1 : 1;
+          });
+        }
       }
     }
 
     return categories;
-  }, [defaultParts, existingParts, bikeType]);
+  }, [defaultParts, existingParts, bikeType, partsDisplayOrder]);
 
   // Grupuj custom parts wg kategorii
   const customPartsByCategory = React.useMemo(() => {
@@ -164,17 +184,22 @@ export default function PartsAccordion({
     return grouped;
   }, [customParts]);
 
-  // Filtruj puste kategorie (uwzględniając custom parts)
-  const nonEmptyCategories = (Object.keys(partsByCategory) as PartCategory[]).filter(
-    (cat) => partsByCategory[cat].length > 0 || customPartsByCategory[cat].length > 0
+  // Filtruj puste kategorie (uwzględniając custom parts) z zachowaniem kolejności
+  const allCategories = partsDisplayOrder?.categories ?? (Object.keys(partsByCategory) as PartCategory[]);
+  const nonEmptyCategories = allCategories.filter(
+    (cat) => (partsByCategory[cat]?.length ?? 0) > 0 || (customPartsByCategory[cat]?.length ?? 0) > 0
   );
 
   return (
-    <Accordion
-      type="multiple"
-      defaultValue={nonEmptyCategories}
-      className="space-y-2"
-    >
+    <div className="space-y-2">
+      <div className="flex justify-end">
+        <PartsOrderDialog currentOrder={partsDisplayOrder ?? null} />
+      </div>
+      <Accordion
+        type="multiple"
+        defaultValue={nonEmptyCategories}
+        className="space-y-2"
+      >
       {nonEmptyCategories.map((category) => {
         const parts = partsByCategory[category];
         const categoryCustomParts = customPartsByCategory[category];
@@ -235,6 +260,7 @@ export default function PartsAccordion({
           </AccordionItem>
         );
       })}
-    </Accordion>
+      </Accordion>
+    </div>
   );
 }
