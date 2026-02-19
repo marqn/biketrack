@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Bike as BikeIcon, Loader2, MapPin, MessageSquare } from "lucide-react";
 import { bikeTypeLabels } from "@/lib/types";
 import { BikeType } from "@/lib/generated/prisma";
+import { Watermark } from "@/components/ui/watermark";
 import Link from "next/link";
 
 interface BikeCardProps {
@@ -55,6 +56,7 @@ export function BikeCard({ bike }: BikeCardProps) {
               className={`w-full h-full object-cover group-hover:scale-105 transition-transform ${!imageLoaded ? "opacity-0" : "opacity-100"}`}
               onLoad={() => setImageLoaded(true)}
             />
+            {imageLoaded && <Watermark />}
           </>
         ) : (
           <BikeIcon className="h-12 w-12 text-muted-foreground/30" />

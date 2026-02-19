@@ -11,6 +11,7 @@ import {
   IMAGE_MAX_SIZE,
   type ImageEntityType,
 } from "@/lib/image-compression";
+import { Watermark } from "@/components/ui/watermark";
 
 interface ImageUploaderProps {
   images: string[];
@@ -168,6 +169,7 @@ export function ImageUploader({
               alt="Zdjęcie"
               className="w-full h-full object-cover"
             />
+            <Watermark />
             <button
               type="button"
               onClick={() => handleDelete(url)}

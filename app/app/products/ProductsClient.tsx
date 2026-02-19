@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Search, Package } from "lucide-react";
+import { Watermark } from "@/components/ui/watermark";
 import { PartType } from "@/lib/generated/prisma";
 import { getPartName, PART_NAMES } from "@/lib/default-parts";
 import { ProductSortBy, ProductListItem } from "@/app/app/actions/get-products";
@@ -216,12 +217,13 @@ function ProductCard({ product }: { product: ProductListItem }) {
     <Card className="hover:shadow-lg transition-shadow overflow-hidden">
       <Link href={`/app/products/${product.id}/reviews`}>
         {product.imageUrl ? (
-          <div className="w-full h-36 bg-muted">
+          <div className="relative w-full h-36 bg-muted">
             <img
               src={product.imageUrl}
               alt={`${product.brand} ${product.model}`}
               className="w-full h-full object-cover"
             />
+            <Watermark />
           </div>
         ) : (
           <div className="w-full h-36 bg-muted flex items-center justify-center">

@@ -21,6 +21,7 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { Star, Users, Route, Plus, ArrowLeft, Package, ImageIcon, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Watermark } from "@/components/ui/watermark";
 import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels } from "@/lib/types";
 import { getPartName } from "@/lib/default-parts";
@@ -105,11 +106,14 @@ export function ProductReviewsClient({
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-4">
               {(product.officialImageUrl || product.images?.[0] || communityImages[0]) ? (
-                <img
-                  src={(product.officialImageUrl || product.images?.[0] || communityImages[0])!}
-                  alt={`${product.brand} ${product.model}`}
-                  className="w-20 h-20 rounded-lg object-cover border bg-muted shrink-0"
-                />
+                <div className="relative w-20 h-20 shrink-0">
+                  <img
+                    src={(product.officialImageUrl || product.images?.[0] || communityImages[0])!}
+                    alt={`${product.brand} ${product.model}`}
+                    className="w-full h-full rounded-lg object-cover border bg-muted"
+                  />
+                  <Watermark />
+                </div>
               ) : (
                 <div className="w-20 h-20 rounded-lg border bg-muted flex items-center justify-center shrink-0">
                   <Package className="w-8 h-8 text-muted-foreground/30" />
@@ -168,13 +172,15 @@ export function ProductReviewsClient({
             </div>
             <div className="flex gap-2 overflow-x-auto">
               {communityImages.map((url, i) => (
-                <img
-                  key={i}
-                  src={url}
-                  alt={`Zdjęcie ${i + 1}`}
-                  className="w-24 h-24 rounded-lg object-cover border shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
-                  onClick={() => setLightboxIndex(i)}
-                />
+                <div key={i} className="relative shrink-0">
+                  <img
+                    src={url}
+                    alt={`Zdjęcie ${i + 1}`}
+                    className="w-24 h-24 rounded-lg object-cover border cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => setLightboxIndex(i)}
+                  />
+                  <Watermark />
+                </div>
               ))}
             </div>
           </CardContent>
@@ -215,12 +221,14 @@ export function ProductReviewsClient({
               </button>
             </>
           )}
-          <img
-            src={communityImages[lightboxIndex]}
-            alt={`Zdjęcie ${lightboxIndex + 1}`}
-            className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
-            onClick={(e) => e.stopPropagation()}
-          />
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={communityImages[lightboxIndex]}
+              alt={`Zdjęcie ${lightboxIndex + 1}`}
+              className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
+            />
+            <Watermark />
+          </div>
           <div className="absolute bottom-4 text-white/60 text-sm">
             {lightboxIndex + 1} / {communityImages.length}
           </div>

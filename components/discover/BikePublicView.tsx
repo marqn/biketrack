@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
 import { Bike as BikeIcon, MapPin, LogIn, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Watermark } from "@/components/ui/watermark";
 import { bikeTypeLabels } from "@/lib/types";
 import { BikeType, PartType } from "@/lib/generated/prisma";
 import { BikePublicParts } from "./BikePublicParts";
@@ -88,6 +89,7 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: Bik
               alt={bikeTitle}
               className="w-full h-full object-cover"
             />
+            <Watermark />
             {hasMultipleImages && (
               <>
                 <button
@@ -164,12 +166,14 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: Bik
                     </button>
                   </>
                 )}
-                <img
-                  src={allImages[currentImageIndex]}
-                  alt={bikeTitle}
-                  className="max-w-full max-h-[90vh] object-contain rounded-lg"
-                  onClick={(e) => e.stopPropagation()}
-                />
+                <div className="relative inline-flex" onClick={(e) => e.stopPropagation()}>
+                  <img
+                    src={allImages[currentImageIndex]}
+                    alt={bikeTitle}
+                    className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                  />
+                  <Watermark />
+                </div>
                 {hasMultipleImages && (
                   <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
                     {allImages.map((_, i) => (
