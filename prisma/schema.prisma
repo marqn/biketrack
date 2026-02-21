@@ -46,6 +46,7 @@ model User {
   partReviews    PartReview[]
   bikeComments   BikeComment[]
   commentReports CommentReport[]
+  bikeLikes      BikeLike[]
 
   createdAt DateTime @default(now())
 }
@@ -202,6 +203,7 @@ model Bike {
   services         ServiceEvent[]
   partReplacements PartReplacement[]
   comments         BikeComment[]
+  likes            BikeLike[]
 
   createdAt DateTime @default(now())
 
@@ -460,6 +462,23 @@ model Notification {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
+}
+
+// ========== Polubienia rowerów ==========
+
+model BikeLike {
+  id     String @id @default(cuid())
+  bikeId String
+  userId String
+
+  bike Bike @relation(fields: [bikeId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([bikeId, userId])
+  @@index([bikeId])
+  @@index([userId])
 }
 
 // ========== Funkcje społecznościowe ==========

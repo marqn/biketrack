@@ -40,7 +40,10 @@ export default async function AdminBikeDetailPage({
         },
       },
       _count: {
-        select: { comments: { where: { isHidden: false, parentId: null } } },
+        select: {
+          comments: { where: { isHidden: false, parentId: null } },
+          likes: true,
+        },
       },
     },
   });
@@ -62,6 +65,8 @@ export default async function AdminBikeDetailPage({
         isOwner={false}
         isLoggedIn={true}
         currentUserId={undefined}
+        likeCount={bike._count.likes}
+        isLiked={false}
       />
     </div>
   );

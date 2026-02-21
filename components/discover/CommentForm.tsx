@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { addComment } from "@/app/app/actions/comments/add-comment";
 import { Lightbulb, MessageSquare, HelpCircle } from "lucide-react";
 
@@ -14,7 +13,13 @@ const COMMENT_TYPES = [
 ] as const;
 
 interface CommentFormProps {
-  bikeId: string;
+  // Dla głównego formularza (BikeCommentSection kontroluje submit)
+  onSubmit?: (
+    content: string,
+    type: "GENERAL" | "SUGGESTION" | "QUESTION"
+  ) => Promise<{ success: boolean; error?: string }>;
+  // Dla odpowiedzi (CommentCard — submit wewnętrzny)
+  bikeId?: string;
   parentId?: string;
   onCommentAdded: () => void;
   onCancel?: () => void;
@@ -22,6 +27,7 @@ interface CommentFormProps {
 }
 
 export function CommentForm({
+  onSubmit,
   bikeId,
   parentId,
   onCommentAdded,
@@ -39,12 +45,20 @@ export function CommentForm({
     setIsSubmitting(true);
     setError(null);
 
-    const result = await addComment({
-      bikeId,
-      content: content.trim(),
-      type,
-      parentId,
-    });
+    let result: { success: boolean; error?: string };
+
+    if (onSubmit) {
+      // Główny formularz — rodzic zarządza transition + useOptimistic
+      result = await onSubmit(content.trim(), type);
+    } else {
+      // Formularz odpowiedzi — bezpośredni call
+      result = await addComment({
+        bikeId: bikeId!,
+        content: content.trim(),
+        type,
+        parentId,
+      });
+    }
 
     setIsSubmitting(false);
 
@@ -102,9 +116,7 @@ export function CommentForm({
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">
-          {content.length}/2000
-        </span>
+        <span className="text-xs text-muted-foreground">{content.length}/2000</span>
         <div className="flex gap-2">
           {onCancel && (
             <Button variant="ghost" size="sm" onClick={onCancel} disabled={isSubmitting}>

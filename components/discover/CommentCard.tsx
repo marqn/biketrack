@@ -22,6 +22,7 @@ interface CommentCardProps {
   currentUserId?: string;
   isLoggedIn: boolean;
   onCommentUpdated: () => void;
+  onReplyAdded?: () => void;
   isReply?: boolean;
 }
 
@@ -31,6 +32,7 @@ export function CommentCard({
   currentUserId,
   isLoggedIn,
   onCommentUpdated,
+  onReplyAdded,
   isReply = false,
 }: CommentCardProps) {
   const [showReplyForm, setShowReplyForm] = useState(false);
@@ -41,12 +43,13 @@ export function CommentCard({
   const config = TYPE_CONFIG[comment.type] || TYPE_CONFIG.GENERAL;
   const TypeIcon = config.icon;
 
-  const initials = comment.user.name
-    ?.split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase() ?? "?";
+  const initials =
+    comment.user.name
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() ?? "?";
 
   const timeAgo = formatTimeAgo(comment.createdAt);
 
@@ -59,8 +62,17 @@ export function CommentCard({
     setIsDeleting(false);
   };
 
+  const handleReplyAdded = () => {
+    setShowReplyForm(false);
+    (onReplyAdded ?? onCommentUpdated)();
+  };
+
   return (
-    <div className={`${isReply ? "ml-10 pl-4 border-l-2 border-muted" : ""}`}>
+    <div
+      className={`${isReply ? "ml-10 pl-4 border-l-2 border-muted" : ""} ${
+        comment.isOptimistic ? "opacity-60" : ""
+      }`}
+    >
       <div className="flex gap-3">
         <Avatar className="h-8 w-8 shrink-0">
           <AvatarImage src={comment.user.image ?? undefined} />
@@ -77,47 +89,52 @@ export function CommentCard({
               </Badge>
             )}
             <span className="text-xs text-muted-foreground">{timeAgo}</span>
-          </div>
-
-          <p className="text-sm mt-1 whitespace-pre-wrap break-words">{comment.content}</p>
-
-          {/* Akcje */}
-          <div className="flex items-center gap-1 mt-2">
-            {isLoggedIn && !isReply && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-xs text-muted-foreground"
-                onClick={() => setShowReplyForm(!showReplyForm)}
-              >
-                <Reply className="h-3 w-3 mr-1" />
-                Odpowiedz
-              </Button>
-            )}
-            {isLoggedIn && !isAuthor && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-xs text-muted-foreground"
-                onClick={() => setShowReportDialog(true)}
-              >
-                <Flag className="h-3 w-3 mr-1" />
-                Zgłoś
-              </Button>
-            )}
-            {isAuthor && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
-                onClick={handleDelete}
-                disabled={isDeleting}
-              >
-                <Trash2 className="h-3 w-3 mr-1" />
-                {isDeleting ? "Usuwanie..." : "Usuń"}
-              </Button>
+            {comment.isOptimistic && (
+              <span className="text-xs text-muted-foreground italic">wysyłanie...</span>
             )}
           </div>
+
+          <p className="text-sm mt-1 whitespace-pre-wrap wrap-break-word">{comment.content}</p>
+
+          {/* Akcje — ukryte dla optimistic */}
+          {!comment.isOptimistic && (
+            <div className="flex items-center gap-1 mt-2">
+              {isLoggedIn && !isReply && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-xs text-muted-foreground"
+                  onClick={() => setShowReplyForm(!showReplyForm)}
+                >
+                  <Reply className="h-3 w-3 mr-1" />
+                  Odpowiedz
+                </Button>
+              )}
+              {isLoggedIn && !isAuthor && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-xs text-muted-foreground"
+                  onClick={() => setShowReportDialog(true)}
+                >
+                  <Flag className="h-3 w-3 mr-1" />
+                  Zgłoś
+                </Button>
+              )}
+              {isAuthor && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                >
+                  <Trash2 className="h-3 w-3 mr-1" />
+                  {isDeleting ? "Usuwanie..." : "Usuń"}
+                </Button>
+              )}
+            </div>
+          )}
 
           {/* Formularz odpowiedzi */}
           {showReplyForm && (
@@ -126,10 +143,7 @@ export function CommentCard({
                 bikeId={bikeId}
                 parentId={comment.id}
                 compact
-                onCommentAdded={() => {
-                  setShowReplyForm(false);
-                  onCommentUpdated();
-                }}
+                onCommentAdded={handleReplyAdded}
                 onCancel={() => setShowReplyForm(false)}
               />
             </div>

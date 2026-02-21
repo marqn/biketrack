@@ -14,6 +14,7 @@ import { bikeTypeLabels } from "@/lib/types";
 import { BikeType, PartType } from "@/lib/generated/prisma";
 import { BikePublicParts } from "./BikePublicParts";
 import { BikeCommentSection } from "./BikeCommentSection";
+import { LikeButton } from "./LikeButton";
 import Link from "next/link";
 
 interface BikePublicViewProps {
@@ -51,14 +52,16 @@ interface BikePublicViewProps {
         totalReviews: number;
       } | null;
     }>;
-    _count: { comments: number };
+    _count: { comments: number; likes: number };
   };
   isOwner: boolean;
   isLoggedIn: boolean;
   currentUserId?: string;
+  likeCount: number;
+  isLiked: boolean;
 }
 
-export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: BikePublicViewProps) {
+export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId, likeCount, isLiked }: BikePublicViewProps) {
   const { data: session } = useSession();
   const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
   const [imageOpen, setImageOpen] = useState(false);
@@ -232,7 +235,7 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: Bik
             <p className="mt-4 text-muted-foreground">{bike.description}</p>
           )}
 
-          {/* Właściciel */}
+          {/* Właściciel + polubienie */}
           <div className="mt-4 pt-4 border-t flex items-center gap-3">
             {bike.user.profileSlug ? (
               <Link
@@ -254,9 +257,15 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: Bik
                 <span className="text-sm font-medium">{bike.user.name ?? "Użytkownik"}</span>
               </div>
             )}
-            {isOwner && (
-              <Badge variant="outline" className="ml-auto">Twój rower</Badge>
-            )}
+            <div className="ml-auto flex items-center gap-2">
+              <LikeButton
+                bikeId={bike.id}
+                initialLikeCount={likeCount}
+                initialIsLiked={isLiked}
+                isLoggedIn={isLoggedIn}
+              />
+              {isOwner && <Badge variant="outline">Twój rower</Badge>}
+            </div>
           </div>
         </div>
       </div>

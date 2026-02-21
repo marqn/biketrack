@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useOptimistic, useTransition } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
 import { CommentForm } from "./CommentForm";
 import { CommentCard } from "./CommentCard";
 import { getComments } from "@/app/app/actions/comments/get-comments";
+import { addComment } from "@/app/app/actions/comments/add-comment";
 
 interface BikeCommentSectionProps {
   bikeId: string;
@@ -19,6 +21,7 @@ export type CommentData = {
   content: string;
   type: "GENERAL" | "SUGGESTION" | "QUESTION";
   createdAt: string;
+  isOptimistic?: boolean;
   user: {
     id: string;
     name: string | null;
@@ -44,14 +47,30 @@ export function BikeCommentSection({
   currentUserId,
   commentCount: initialCount,
 }: BikeCommentSectionProps) {
+  const { data: session } = useSession();
   const [comments, setComments] = useState<CommentData[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [totalComments, setTotalComments] = useState(initialCount);
 
+  const [isPending, startTransition] = useTransition();
+  const [optimisticComments, dispatchOptimistic] = useOptimistic(
+    comments,
+    (
+      state,
+      action:
+        | { type: "add"; comment: CommentData }
+        | { type: "remove"; id: string }
+    ) => {
+      if (action.type === "add") return [action.comment, ...state];
+      if (action.type === "remove") return state.filter((c) => c.id !== action.id);
+      return state;
+    }
+  );
+
   const loadComments = async (pageNum: number) => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const result = await getComments({ bikeId, page: pageNum, pageSize: 10 });
       if (result.success && result.comments) {
@@ -66,7 +85,7 @@ export function BikeCommentSection({
     } catch (error) {
       console.error("Error loading comments:", error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -74,9 +93,60 @@ export function BikeCommentSection({
     loadComments(1);
   }, [bikeId]);
 
-  const handleCommentAdded = () => {
+  // Optimistic submit dla głównych komentarzy
+  const handleSubmitComment = (
+    content: string,
+    type: "GENERAL" | "SUGGESTION" | "QUESTION"
+  ): Promise<{ success: boolean; error?: string }> => {
+    return new Promise((resolve) => {
+      startTransition(async () => {
+        const tempComment: CommentData = {
+          id: `opt-${Date.now()}`,
+          content,
+          type,
+          createdAt: new Date().toISOString(),
+          isOptimistic: true,
+          user: {
+            id: currentUserId ?? "",
+            name: session?.user?.name ?? "Ty",
+            image: session?.user?.image ?? null,
+          },
+          replies: [],
+          _count: { reports: 0 },
+        };
+
+        dispatchOptimistic({ type: "add", comment: tempComment });
+
+        const result = await addComment({ bikeId, content, type });
+
+        if (result.success) {
+          setTotalComments((prev) => prev + 1);
+          // Reload żeby zastąpić optimistic real danymi
+          const reloaded = await getComments({ bikeId, page: 1, pageSize: 10 });
+          if (reloaded.success && reloaded.comments) {
+            setComments(reloaded.comments);
+            setPage(1);
+            setHasMore(1 < (reloaded.totalPages ?? 1));
+            setTotalComments(reloaded.totalCount ?? totalComments + 1);
+          }
+        }
+
+        resolve(result);
+      });
+    });
+  };
+
+  // Po dodaniu odpowiedzi — przeładuj
+  const handleReplyAdded = () => {
     setPage(1);
     loadComments(1);
+  };
+
+  // Po usunięciu komentarza — przeładuj
+  const handleCommentUpdated = () => {
+    setPage(1);
+    loadComments(1);
+    setTotalComments((prev) => Math.max(0, prev - 1));
   };
 
   const handleLoadMore = () => {
@@ -96,7 +166,10 @@ export function BikeCommentSection({
 
       {/* Formularz dodawania komentarza */}
       {isLoggedIn ? (
-        <CommentForm bikeId={bikeId} onCommentAdded={handleCommentAdded} />
+        <CommentForm
+          onSubmit={handleSubmitComment}
+          onCommentAdded={() => {}}
+        />
       ) : (
         <div className="text-center py-4 text-sm text-muted-foreground border rounded-lg mb-4">
           <a href="/login" className="text-primary hover:underline">
@@ -106,21 +179,22 @@ export function BikeCommentSection({
         </div>
       )}
 
-      {/* Lista komentarzy */}
+      {/* Lista komentarzy (optimistic) */}
       <div className="space-y-4 mt-4">
-        {comments.map((comment) => (
+        {optimisticComments.map((comment) => (
           <CommentCard
             key={comment.id}
             comment={comment}
             bikeId={bikeId}
             currentUserId={currentUserId}
             isLoggedIn={isLoggedIn}
-            onCommentUpdated={handleCommentAdded}
+            onCommentUpdated={comment.isOptimistic ? () => {} : handleCommentUpdated}
+            onReplyAdded={handleReplyAdded}
           />
         ))}
       </div>
 
-      {comments.length === 0 && !loading && (
+      {optimisticComments.length === 0 && !isLoading && !isPending && (
         <p className="text-center text-sm text-muted-foreground py-8">
           Brak komentarzy. Bądź pierwszy - dodaj komentarz!
         </p>
@@ -128,8 +202,8 @@ export function BikeCommentSection({
 
       {hasMore && comments.length > 0 && (
         <div className="text-center mt-4">
-          <Button variant="outline" onClick={handleLoadMore} disabled={loading}>
-            {loading ? "Ładowanie..." : "Pokaż więcej"}
+          <Button variant="outline" onClick={handleLoadMore} disabled={isLoading}>
+            {isLoading ? "Ładowanie..." : "Pokaż więcej"}
           </Button>
         </div>
       )}

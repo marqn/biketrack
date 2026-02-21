@@ -35,7 +35,10 @@ const getBikePublicData = unstable_cache(
           },
         },
         _count: {
-          select: { comments: { where: { isHidden: false, parentId: null } } },
+          select: {
+            comments: { where: { isHidden: false, parentId: null } },
+            likes: true,
+          },
         },
       },
     });
@@ -61,6 +64,16 @@ export default async function BikePublicPage({ params }: BikePublicPageProps) {
   const isOwner = session?.user?.id === bike.userId;
   const isLoggedIn = !!session?.user?.id;
 
+  // Sprawdź czy zalogowany user polubił ten rower
+  const isLiked = session?.user?.id
+    ? !!(await prisma.bikeLike.findUnique({
+        where: {
+          bikeId_userId: { bikeId: bike.id, userId: session.user.id },
+        },
+        select: { id: true },
+      }))
+    : false;
+
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-4xl mx-auto">
@@ -69,6 +82,8 @@ export default async function BikePublicPage({ params }: BikePublicPageProps) {
           isOwner={isOwner}
           isLoggedIn={isLoggedIn}
           currentUserId={session?.user?.id}
+          likeCount={bike._count.likes}
+          isLiked={isLiked}
         />
       </div>
     </div>
