@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "@/components/ui/sonner";
 import { JetBrains_Mono } from "next/font/google";
+import { NavigationViewTransition } from "@/components/navigation-view-transition";
 
 const font = JetBrains_Mono({
   subsets: ["latin"],
@@ -26,8 +27,10 @@ export default function RootLayout({
     <html lang="pl" className={font.variable}>
       <body className="antialiased">
         <Providers>
-          {children}
-          <Toaster />
+          <NavigationViewTransition>
+            {children}
+            <Toaster />
+          </NavigationViewTransition>
         </Providers>
       </body>
     </html>

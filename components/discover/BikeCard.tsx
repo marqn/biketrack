@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Bike as BikeIcon, Loader2, MapPin, MessageSquare } from "lucide-react";
 import { bikeTypeLabels } from "@/lib/types";
@@ -34,6 +35,11 @@ export function BikeCard({ bike }: BikeCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const { data: session } = useSession();
   const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
+  const router = useRouter();
+
+  const handleMouseEnter = useCallback(() => {
+    if (bike.slug) router.prefetch(`/app/discover/bike/${bike.slug}`);
+  }, [bike.slug, router]);
 
   if (!bike.slug) return null;
 
@@ -47,9 +53,13 @@ export function BikeCard({ bike }: BikeCardProps) {
     <Link
       href={`/app/discover/bike/${bike.slug}`}
       className="group block bg-card rounded-xl border overflow-hidden hover:shadow-md transition-shadow"
+      onMouseEnter={handleMouseEnter}
     >
       {/* Miniatura */}
-      <div className="relative w-full h-36 bg-muted flex items-center justify-center overflow-hidden">
+      <div
+        className="relative w-full h-36 bg-muted flex items-center justify-center overflow-hidden"
+        style={{ viewTransitionName: `bike-image-${bike.slug}` }}
+      >
         {displayImage ? (
           <>
             {!imageLoaded && (
@@ -70,7 +80,12 @@ export function BikeCard({ bike }: BikeCardProps) {
 
       {/* Info */}
       <div className="p-4">
-        <h3 className="font-semibold truncate">{bikeTitle}</h3>
+        <h3
+          className="font-semibold truncate"
+          style={{ viewTransitionName: `bike-title-${bike.slug}` }}
+        >
+          {bikeTitle}
+        </h3>
         <div className="flex items-center gap-2 mt-1.5 flex-wrap">
           <Badge variant="secondary" className="text-xs">
             {bikeTypeLabels[bike.type]}

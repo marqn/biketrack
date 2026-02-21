@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { BikeType } from "@/lib/generated/prisma";
+import { unstable_cache } from "next/cache";
 
 interface GetPublicBikesParams {
   page?: number;
@@ -11,21 +12,13 @@ interface GetPublicBikesParams {
   sortBy?: "newest" | "mostKm" | "mostComments";
 }
 
-export async function getPublicBikes({
-  page = 1,
-  pageSize = 12,
-  type = null,
-  search = "",
-  sortBy = "newest",
-}: GetPublicBikesParams) {
-  try {
+const fetchPublicBikes = unstable_cache(
+  async (page: number, pageSize: number, type: string, search: string, sortBy: string) => {
     const skip = (page - 1) * pageSize;
 
-    const where: Record<string, unknown> = {
-      isPublic: true,
-    };
+    const where: Record<string, unknown> = { isPublic: true };
 
-    if (type) {
+    if (type && type !== "null") {
       where.type = type;
     }
 
@@ -78,6 +71,28 @@ export async function getPublicBikes({
       }),
       prisma.bike.count({ where }),
     ]);
+
+    return { bikes, totalCount };
+  },
+  ["public-bikes-list"],
+  { revalidate: 30, tags: ["public-bikes-list"] }
+);
+
+export async function getPublicBikes({
+  page = 1,
+  pageSize = 12,
+  type = null,
+  search = "",
+  sortBy = "newest",
+}: GetPublicBikesParams) {
+  try {
+    const { bikes, totalCount } = await fetchPublicBikes(
+      page,
+      pageSize,
+      String(type),
+      search,
+      sortBy
+    );
 
     return {
       success: true,

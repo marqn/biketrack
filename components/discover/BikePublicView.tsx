@@ -87,6 +87,7 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: Bik
         {hasImages ? (
           <div
             className="relative w-full h-64 bg-muted cursor-pointer group"
+            style={{ viewTransitionName: `bike-image-${bike.slug}` }}
             onClick={() => setImageOpen(true)}
           >
             <img
@@ -128,7 +129,10 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: Bik
             )}
           </div>
         ) : (
-          <div className="w-full h-40 bg-muted flex items-center justify-center">
+          <div
+            className="w-full h-40 bg-muted flex items-center justify-center"
+            style={{ viewTransitionName: `bike-image-${bike.slug}` }}
+          >
             <BikeIcon className="h-16 w-16 text-muted-foreground/30" />
           </div>
         )}
@@ -198,7 +202,12 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: Bik
         <div className="p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold">{bikeTitle}</h1>
+              <h1
+                className="text-2xl font-bold"
+                style={{ viewTransitionName: `bike-title-${bike.slug}` }}
+              >
+                {bikeTitle}
+              </h1>
               <div className="flex items-center gap-2 mt-2 flex-wrap">
                 <Badge variant="secondary">{bikeTypeLabels[bike.type]}</Badge>
                 {bike.year && <Badge variant="outline">{bike.year}</Badge>}

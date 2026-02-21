@@ -99,6 +99,19 @@ export function BikeHeader({
 }: BikeHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
+
+  const navigate = (href: string) => {
+    if (!("startViewTransition" in document)) {
+      router.push(href);
+      return;
+    }
+    (document as any).startViewTransition(() => router.push(href));
+  };
+
+  // Nadaje view-transition-name aktywnej ikonie nawigacyjnej,
+  // dzięki czemu "pill" ślizga się między przyciskami podczas nawigacji.
+  const pill = (isActive: boolean): React.CSSProperties | undefined =>
+    isActive ? { viewTransitionName: "nav-pill" } : undefined;
   const { data: session } = useSession();
   const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
   const { activeDialog, openDialog, closeDialog } =
@@ -432,7 +445,8 @@ export function BikeHeader({
                 <Button
                   variant={pathname === "/app" ? "default" : "outline"}
                   size="icon"
-                  onClick={() => router.push("/app")}
+                  style={pill(pathname === "/app")}
+                  onClick={() => navigate("/app")}
                 >
                   <Home className="h-4 w-4" />
                 </Button>
@@ -451,7 +465,8 @@ export function BikeHeader({
                     pathname?.startsWith("/app/history") ? "default" : "outline"
                   }
                   size="icon"
-                  onClick={() => router.push("/app/history")}
+                  style={pill(!!pathname?.startsWith("/app/history"))}
+                  onClick={() => navigate("/app/history")}
                 >
                   <History className="h-4 w-4" />
                 </Button>
@@ -472,7 +487,8 @@ export function BikeHeader({
                       : "outline"
                   }
                   size="icon"
-                  onClick={() => router.push("/app/products")}
+                  style={pill(!!pathname?.startsWith("/app/products"))}
+                  onClick={() => navigate("/app/products")}
                 >
                   <Package className="h-4 w-4" />
                 </Button>
@@ -493,7 +509,8 @@ export function BikeHeader({
                       : "outline"
                   }
                   size="icon"
-                  onClick={() => router.push("/app/discover")}
+                  style={pill(!!pathname?.startsWith("/app/discover"))}
+                  onClick={() => navigate("/app/discover")}
                 >
                   <Compass className="h-4 w-4" />
                 </Button>
@@ -514,8 +531,9 @@ export function BikeHeader({
                       : "outline"
                   }
                   size="icon"
+                  style={pill(!!pathname?.startsWith("/app/messages"))}
                   className="relative"
-                  onClick={() => router.push("/app/messages")}
+                  onClick={() => navigate("/app/messages")}
                 >
                   <Mail className="h-4 w-4" />
                   {unreadCount > 0 && (

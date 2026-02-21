@@ -272,7 +272,7 @@ const BikePartsHistory: React.FC = () => {
     return (
       <div key={item.id} className="relative pl-20">
         {/* Timeline icon with km */}
-        <div className="absolute left-0 top-6 flex flex-col items-center px-2">
+        <div className="absolute left-0 top-6 flex flex-col items-center">
           <div className="p-2.5 bg-blue-600 rounded-full shadow-md ">
             {getCategoryIcon(part.partType || "")}
           </div>

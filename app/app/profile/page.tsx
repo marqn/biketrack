@@ -17,6 +17,7 @@ import NumberStepper from "@/components/ui/number-stepper";
 import { ImageUploader } from "@/components/ui/image-uploader";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 import type { UnitPreference } from "@/lib/units";
 import {
   displayKg,
@@ -264,8 +265,7 @@ export default function ProfilePage() {
             weight: displayKg(user.weight!, unit).toString(),
           }));
         }
-        setSuccessMessage("Jednostki zaktualizowane!");
-        setTimeout(() => setSuccessMessage(""), 3000);
+        toast.success("Jednostki zaktualizowane!");
         // Odśwież sesję żeby unitPreference było aktualne
         await updateSession();
         router.refresh();
