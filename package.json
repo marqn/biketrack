@@ -90,7 +90,8 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "tw-animate-css": "1.3.3",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wrangler": "^4.67.0"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

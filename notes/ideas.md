@@ -7,6 +7,13 @@ Select the portion of the photo that you'd like to use.
 
 
 fixy:
-    -   w BrandModelFields jeśli pojawią się podpowiedzi marki lub modelu pojawia się scroll ale wygląd jego jest nieprawidłowy. Popraw na taki jaki jest na wszystkich dialogach (ten ciemny)
-
+    -   
     - 
+
+*** -   PLAN    -   ***
+
+    ✅      Domena mbike.cc
+    -       terms and conditions
+    -       cloudflare
+    -       paddle
+    -   

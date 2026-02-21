@@ -24,7 +24,7 @@ export async function ensureEmailMissingNotification(userId: string) {
       type: "EMAIL_MISSING",
       title: "Dodaj adres e-mail",
       message:
-        "Dodaj adres e-mail, aby otrzymywać powiadomienia o serwisie i synchronizacji. Możesz to zrobić w ustawieniach konta .",
+        "Dodaj adres e-mail, aby otrzymywać powiadomienia o serwisie i synchronizacji. Możesz to zrobić w ustawieniach profilu.",
     },
   })
 }

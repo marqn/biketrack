@@ -9,7 +9,7 @@ import { ServiceType } from "@/lib/generated/prisma";
 import { DEFAULT_PARTS, EBIKE_PARTS, extractTubelessStatus } from "@/lib/default-parts";
 import { type PartsDisplayOrder } from "@/app/app/actions/parts-display-order";
 import { NotificationsList } from "@/components/notifications-list/NotificationsList";
-import { ensureEmailMissingNotification } from "@/lib/nofifications/emailMissing";
+import { ensureEmailMissingNotification } from "@/lib/nofifications/rules/emailMissing";
 import PartsAccordion from "@/components/parts-accordion/PartsAccordion";
 import { StravaSyncTrigger } from "@/components/strava-sync-trigger";
 import { cookies } from "next/headers";

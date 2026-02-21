@@ -128,7 +128,7 @@ export default function PartCard({
     <>
       <Card className={isAccessory && !isInstalled ? "opacity-50" : ""}>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2 flex-col items-start">
+          <CardTitle className="text-base flex gap-2 flex-col items-start">
             <div className="flex items-center gap-2">
               <PartIcon type={partType} className="w-5 h-5 shrink-0" />
               {partName}

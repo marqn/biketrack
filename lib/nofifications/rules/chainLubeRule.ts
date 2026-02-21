@@ -46,6 +46,6 @@ export async function chainLubeRule(bikeId: string) {
     title: `Czas nasmarować łańcuch – ${bikeName}`,
     message: `Od ostatniego smarowania minęło ${kmSince} km.`,
     bikeId: bike.id,
-    partId: chainPart.id, // ✅
+    partId: chainPart.id,
   });
 }
