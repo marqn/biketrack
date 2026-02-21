@@ -17,6 +17,8 @@ import {
   Package,
   Pencil,
   Trash2,
+  FileDown,
+  Crown,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import EditLubeDialog from "@/components/part-card/EditLubeDialog";
@@ -40,8 +42,10 @@ import { getPartName } from "@/lib/default-parts";
 import { formatDate } from "@/lib/utils";
 import { getCategoryIcon, SERVICE_ICON } from "@/lib/part-icons";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { formatDistance } from "@/lib/units";
 import type { UnitPreference } from "@/lib/units";
+import { exportHistoryToPdf } from "@/lib/history-pdf";
 
 type FilterType = "all" | "replacement" | "service";
 
@@ -52,12 +56,18 @@ const BikePartsHistory: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterType>("all");
   const { data: session } = useSession();
+  const router = useRouter();
   const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
+  const isPremium =
+    session?.user?.plan === "PREMIUM" &&
+    session?.user?.planExpiresAt &&
+    new Date(session.user.planExpiresAt) > new Date();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteType, setDeleteType] = useState<
     "replacement" | "service" | null
   >(null);
   const [editItem, setEditItem] = useState<TimelineItem | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -454,6 +464,36 @@ const BikePartsHistory: React.FC = () => {
                 </div>
                 <div className="text-sm ">Łączny przebieg</div>
               </div>
+            )}
+          </div>
+
+          {/* Export PDF */}
+          <div className="flex justify-center mt-6">
+            {isPremium ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 border-blue-600 text-blue-600 hover:bg-blue-500"
+                onClick={async () => {
+                  setIsExporting(true);
+                  await exportHistoryToPdf(timeline, bike, unitPref);
+                  setIsExporting(false);
+                }}
+                disabled={timeline.length === 0 || isExporting}
+              >
+                <FileDown className="w-4 h-4" />
+                {isExporting ? "Generowanie..." : "Eksportuj do PDF"}
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 border-amber-500 text-amber-600 hover:bg-amber-300"
+                onClick={() => router.push("/app/upgrade")}
+              >
+                <Crown className="w-4 h-4" />
+                Eksportuj do PDF
+              </Button>
             )}
           </div>
 

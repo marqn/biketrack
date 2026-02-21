@@ -28,7 +28,9 @@
       "Bash(npx shadcn@latest add:*)",
       "WebFetch(domain:developers.cloudflare.com)",
       "WebFetch(domain:www.cloudflare.com)",
-      "WebFetch(domain:next-intl.dev)"
+      "WebFetch(domain:next-intl.dev)",
+      "Bash(curl:*)",
+      "Bash(xxd:*)"
     ]
   }
 }

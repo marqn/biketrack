@@ -285,7 +285,7 @@ export function BikeHeader({
   }
 
   return (
-    <header className="fixed top-0 left-0 z-50 w-screen border-b bg-card">
+    <header className="fixed top-0 left-0 z-50 w-screen border-b bg-card" style={{ viewTransitionName: "nav-header" }}>
       <div className="container mx-auto px-8 py-3 flex items-center justify-between">
           {/* BIKE SWITCHER */}
           <div className="min-w-35">
