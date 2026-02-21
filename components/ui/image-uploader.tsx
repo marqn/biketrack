@@ -22,6 +22,17 @@ interface ImageUploaderProps {
   onImagesChange: (urls: string[]) => void;
   variant?: "grid" | "avatar";
   className?: string;
+  fallbackName?: string;
+}
+
+function getInitials(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/)
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 }
 
 export function ImageUploader({
@@ -32,6 +43,7 @@ export function ImageUploader({
   onImagesChange,
   variant = "grid",
   className = "",
+  fallbackName,
 }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -144,6 +156,10 @@ export function ImageUploader({
                 alt="Avatar"
                 className="w-full h-full object-cover"
               />
+            ) : fallbackName && fallbackName.trim() ? (
+              <span className="text-2xl font-semibold text-muted-foreground select-none">
+                {getInitials(fallbackName)}
+              </span>
             ) : (
               <Camera className="h-8 w-8 text-muted-foreground" />
             )}

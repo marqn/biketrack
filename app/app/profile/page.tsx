@@ -392,6 +392,7 @@ export default function ProfilePage() {
             maxImages={1}
             entityType="avatar"
             entityId={user.id}
+            fallbackName={user.name ?? user.email ?? ""}
             onImagesChange={(urls) => {
               const newImage = urls[0] ?? null;
               setUser({ ...user, image: newImage });
