@@ -40,6 +40,7 @@ model User {
   partReviews    PartReview[]
   bikeComments   BikeComment[]
   commentReports CommentReport[]
+  stravaCache    StravaCache?
 
   createdAt DateTime @default(now())
 }
@@ -515,4 +516,17 @@ model CommentReport {
 
   @@unique([commentId, userId]) // Jedno zgłoszenie per użytkownik per komentarz
   @@index([status])
+}
+
+// Cache odpowiedzi Strava API (per-user, TTL 10 minut)
+// Chroni przed nadmiernym wywoływaniem API przy wielokrotnym sync
+model StravaCache {
+  id       String   @id @default(cuid())
+  userId   String   @unique
+  data     Json     // Array: [{ id: string, distance: number }]
+  cachedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, cachedAt])
 }
