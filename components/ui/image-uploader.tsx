@@ -12,6 +12,7 @@ import {
   type ImageEntityType,
 } from "@/lib/image-compression";
 import { Watermark } from "@/components/ui/watermark";
+import { AvatarCropModal } from "@/components/ui/avatar-crop-modal";
 
 interface ImageUploaderProps {
   images: string[];
@@ -35,9 +36,38 @@ export function ImageUploader({
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const canAddMore = images.length < maxImages;
+
+  const uploadBlob = async (file: File) => {
+    setError(null);
+    setUploading(true);
+    try {
+      const compressedFile = await compressImage(file, entityType);
+
+      const blob = await upload(compressedFile.name, compressedFile, {
+        access: "public",
+        handleUploadUrl: "/api/upload",
+        clientPayload: JSON.stringify({ type: entityType, entityId }),
+      });
+
+      const result = await saveBlobImage(entityType, entityId, blob.url);
+      if (!result.success) {
+        setError(result.error || "Błąd podczas zapisywania");
+        return;
+      }
+
+      onImagesChange(maxImages === 1 ? [blob.url] : [...images, blob.url]);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Błąd podczas uploadu";
+      setError(message);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -57,32 +87,24 @@ export function ImageUploader({
     }
 
     setError(null);
-    setUploading(true);
 
-    try {
-      const compressedFile = await compressImage(file, entityType);
-
-      const blob = await upload(compressedFile.name, compressedFile, {
-        access: "public",
-        handleUploadUrl: "/api/upload",
-        clientPayload: JSON.stringify({ type: entityType, entityId }),
-      });
-
-      // Zapisz URL do bazy danych przez server action
-      const result = await saveBlobImage(entityType, entityId, blob.url);
-      if (!result.success) {
-        setError(result.error || "Błąd podczas zapisywania");
-        return;
-      }
-
-      onImagesChange(maxImages === 1 ? [blob.url] : [...images, blob.url]);
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Błąd podczas uploadu";
-      setError(message);
-    } finally {
-      setUploading(false);
+    if (variant === "avatar") {
+      // Dla avatara otwórz modal kadrowania
+      const reader = new FileReader();
+      reader.onload = () => {
+        setCropImageSrc(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      return;
     }
+
+    await uploadBlob(file);
+  };
+
+  const handleCropComplete = async (croppedBlob: Blob) => {
+    setCropImageSrc(null);
+    const file = new File([croppedBlob], "avatar.webp", { type: "image/webp" });
+    await uploadBlob(file);
   };
 
   const handleDelete = async (url: string) => {
@@ -107,6 +129,13 @@ export function ImageUploader({
     const currentImage = images[0] || null;
     return (
       <div className={`flex flex-col items-center gap-2 ${className}`}>
+        {cropImageSrc && (
+          <AvatarCropModal
+            imageSrc={cropImageSrc}
+            onCropComplete={handleCropComplete}
+            onCancel={() => setCropImageSrc(null)}
+          />
+        )}
         <div className="relative">
           <div className="w-24 h-24 rounded-full border-2 border-dashed border-muted-foreground/25 flex items-center justify-center overflow-hidden bg-muted/50">
             {currentImage ? (
