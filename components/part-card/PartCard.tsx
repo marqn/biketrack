@@ -155,7 +155,9 @@ export default function PartCard({
                   : currentBrand || currentModel
                 : isUnknownProduct
                   ? <><Pencil className="w-3 h-3" />Uzupełnij markę i model</>
-                  : "Dodaj model"}
+                  : progressPercent > 50
+                    ? "Aby wymienić dodaj aktualny model"
+                    : "Dodaj model"}
             </button>
           </CardTitle>
           <CardAction className="flex items-center gap-2">
