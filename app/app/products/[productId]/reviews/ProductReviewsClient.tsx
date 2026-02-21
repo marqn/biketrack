@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useSession } from "next-auth/react";
+import { formatDistance } from "@/lib/units";
+import type { UnitPreference } from "@/lib/units";
 import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -71,6 +74,8 @@ export function ProductReviewsClient({
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const { data: session } = useSession();
+  const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
 
   function updateParams(updates: Record<string, string | undefined>) {
     const params = new URLSearchParams();
@@ -153,7 +158,7 @@ export function ProductReviewsClient({
               label="Śr. żywotność"
               value={
                 product.averageKmLifespan
-                  ? `${product.averageKmLifespan.toLocaleString("pl-PL")} km`
+                  ? formatDistance(product.averageKmLifespan, unitPref)
                   : "–"
               }
               icon={<Route className="w-5 h-5 text-muted-foreground" />}

@@ -25,6 +25,9 @@ import ColoredProgress from "@/components/ui/colored-progress";
 import { replaceCustomPart, deleteCustomPart } from "@/app/app/actions/custom-part";
 import { useMultiDialog } from "@/lib/hooks/useDialog";
 import CustomPartDetailsDialog from "./CustomPartDetailsDialog";
+import { useSession } from "next-auth/react";
+import { formatDistance } from "@/lib/units";
+import type { UnitPreference } from "@/lib/units";
 
 interface CustomPartCardProps {
   id: string;
@@ -48,6 +51,8 @@ export default function CustomPartCard({
   const { activeDialog, openDialog, closeDialog } = useMultiDialog<"details" | "confirm-delete">();
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const { data: session } = useSession();
+  const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
 
   const hasLimit = expectedKm > 0;
   const progressPercent = hasLimit
@@ -118,14 +123,13 @@ export default function CustomPartCard({
               {hasLimit ? (
                 <>
                   Zużycie:{" "}
-                  <span className="font-medium text-foreground">{wearKm}</span>
-                  {" km "}/ {expectedKm} km
+                  <span className="font-medium text-foreground">{formatDistance(wearKm, unitPref)}</span>
+                  {" / "}{formatDistance(expectedKm, unitPref)}
                 </>
               ) : (
                 <>
                   Przebieg:{" "}
-                  <span className="font-medium text-foreground">{wearKm}</span>
-                  {" km"}
+                  <span className="font-medium text-foreground">{formatDistance(wearKm, unitPref)}</span>
                 </>
               )}
             </span>

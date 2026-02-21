@@ -24,6 +24,7 @@ export async function GET() {
         password: true, // Sprawdzamy czy ma hasło
         bio: true,
         profileSlug: true,
+        unitPreference: true,
       }
     });
 
@@ -42,6 +43,7 @@ export async function GET() {
         password: !!user.password, // true/false
         bio: user.bio,
         profileSlug: user.profileSlug,
+        unitPreference: user.unitPreference,
       }
     });
   } catch (error) {
@@ -59,7 +61,7 @@ export async function PATCH(request: Request) {
     }
 
     const body = await request.json();
-    const { name, email, image, weight, currentPassword, newPassword, bio, profileSlug } = body;
+    const { name, email, image, weight, currentPassword, newPassword, bio, profileSlug, unitPreference } = body;
 
     const updateData: any = {};
 
@@ -90,6 +92,11 @@ export async function PATCH(request: Request) {
     // Aktualizacja wagi
     if (weight !== undefined) {
       updateData.weight = weight;
+    }
+
+    // Aktualizacja preferencji jednostek
+    if (unitPreference !== undefined && (unitPreference === "METRIC" || unitPreference === "IMPERIAL")) {
+      updateData.unitPreference = unitPreference;
     }
 
     // Aktualizacja bio

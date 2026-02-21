@@ -6,6 +6,9 @@ import { Progress } from "@/components/ui/progress";
 import { BikeType, PartType } from "@/lib/generated/prisma";
 import { PART_CATEGORIES, type PartCategory, getPartNameForBike, getHiddenPartsByBrakeType, extractBrakeType, getHiddenPartsByTubelessStatus, extractTubelessStatus } from "@/lib/default-parts";
 import { PartIcon } from "@/lib/part-icons";
+import { useSession } from "next-auth/react";
+import { formatDistance } from "@/lib/units";
+import type { UnitPreference } from "@/lib/units";
 
 interface BikePublicPartsProps {
   bikeType?: BikeType;
@@ -28,6 +31,9 @@ interface BikePublicPartsProps {
 }
 
 export function BikePublicParts({ parts, bikeType }: BikePublicPartsProps) {
+  const { data: session } = useSession();
+  const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
+
   if (parts.length === 0) return null;
 
   // Filtruj części wg typu hamulców i tubeless
@@ -114,7 +120,7 @@ export function BikePublicParts({ parts, bikeType }: BikePublicPartsProps) {
                     </div>
 
                     <div className="text-xs text-muted-foreground shrink-0">
-                      {part.wearKm.toLocaleString("pl-PL")} km
+                      {formatDistance(part.wearKm, unitPref)}
                     </div>
                   </div>
                 );

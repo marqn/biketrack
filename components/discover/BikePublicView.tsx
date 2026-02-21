@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { displayKm, distanceUnit } from "@/lib/units";
+import type { UnitPreference } from "@/lib/units";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -56,6 +59,8 @@ interface BikePublicViewProps {
 }
 
 export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: BikePublicViewProps) {
+  const { data: session } = useSession();
+  const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
   const [imageOpen, setImageOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -206,9 +211,9 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId }: Bik
                 <div className="flex items-center gap-1 text-muted-foreground">
                   <MapPin className="h-4 w-4" />
                   <span className="text-xl font-semibold text-foreground">
-                    {bike.totalKm.toLocaleString("pl-PL")}
+                    {displayKm(bike.totalKm, unitPref).toLocaleString("pl-PL")}
                   </span>
-                  <span className="text-sm">km</span>
+                  <span className="text-sm">{distanceUnit(unitPref)}</span>
                 </div>
               </div>
             )}

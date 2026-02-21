@@ -15,6 +15,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import NumberStepper from "@/components/ui/number-stepper";
 import { createCustomPart } from "@/app/app/actions/custom-part";
+import { useSession } from "next-auth/react";
+import { inputToKm, distanceUnit } from "@/lib/units";
+import type { UnitPreference } from "@/lib/units";
 
 interface AddCustomPartDialogProps {
   open: boolean;
@@ -33,14 +36,17 @@ export default function AddCustomPartDialog({
   const [expectedKm, setExpectedKm] = useState(0);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const { data: session } = useSession();
+  const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
 
   function handleSave() {
     if (!name.trim()) return;
 
     startTransition(async () => {
       try {
-        const km = expectedKm > 0 ? expectedKm : undefined;
-        await createCustomPart(bikeId, name.trim(), category, km);
+        // Konwertuj do km jeśli user wpisuje w milach
+        const kmMetric = expectedKm > 0 ? inputToKm(expectedKm, unitPref) : undefined;
+        await createCustomPart(bikeId, name.trim(), category, kmMetric);
         setName("");
         setExpectedKm(0);
         onOpenChange(false);
@@ -77,14 +83,14 @@ export default function AddCustomPartDialog({
 
           <div className="space-y-2">
             <Label htmlFor="custom-part-km">
-              Limit km <span className="text-muted-foreground font-normal">(opcjonalnie)</span>
+              Limit {distanceUnit(unitPref)} <span className="text-muted-foreground font-normal">(opcjonalnie)</span>
             </Label>
             <NumberStepper
               value={expectedKm}
               onChange={setExpectedKm}
               steps={[10,100]}
               min={0}
-              placeholder="np. 5000"
+              placeholder={unitPref === "IMPERIAL" ? "np. 3000" : "np. 5000"}
               onKeyDown={(e) => e.key === "Enter" && handleSave()}
             />
             <p className="text-xs text-muted-foreground">

@@ -27,6 +27,9 @@ import { PartType } from "@/lib/generated/prisma";
 import { getPartName, PART_NAMES } from "@/lib/default-parts";
 import { ProductSortBy, ProductListItem } from "@/app/app/actions/get-products";
 import { useState, useTransition } from "react";
+import { useSession } from "next-auth/react";
+import { formatDistance } from "@/lib/units";
+import type { UnitPreference } from "@/lib/units";
 
 interface ProductsClientProps {
   products: ProductListItem[];
@@ -213,6 +216,9 @@ export function ProductsClient({
 }
 
 function ProductCard({ product }: { product: ProductListItem }) {
+  const { data: session } = useSession();
+  const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
+
   return (
     <Card className="hover:shadow-lg transition-shadow overflow-hidden">
       <Link href={`/app/products/${product.id}/reviews`}>
@@ -256,7 +262,7 @@ function ProductCard({ product }: { product: ProductListItem }) {
           <div className="flex gap-4 text-sm text-muted-foreground">
             <span>{product.totalInstallations} instalacji</span>
             {product.averageKmLifespan && product.averageKmLifespan > 0 && (
-              <span>~{product.averageKmLifespan.toLocaleString("pl-PL")} km</span>
+              <span>~{formatDistance(product.averageKmLifespan, unitPref)}</span>
             )}
           </div>
         </CardContent>

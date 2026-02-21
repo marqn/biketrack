@@ -30,6 +30,9 @@ import {
 import { togglePartInstalled } from "@/app/app/actions/toggle-part-installed";
 import { PartReplacement, BikePartWithProduct } from "@/lib/types";
 import { useMultiDialog } from "@/lib/hooks/useDialog";
+import { useSession } from "next-auth/react";
+import { formatDistance } from "@/lib/units";
+import type { UnitPreference } from "@/lib/units";
 
 interface PartCardProps {
   partName: string;
@@ -71,6 +74,8 @@ export default function PartCard({
   >();
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const { data: session } = useSession();
+  const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
 
   const isTimeBased =
     partType === PartType.TUBELESS_SEALANT_FRONT || partType === PartType.TUBELESS_SEALANT_REAR || partType === PartType.BRAKE_FLUID;
@@ -190,8 +195,8 @@ export default function PartCard({
               ) : (
                 <>
                   Zużycie:{" "}
-                  <span className="font-medium text-foreground">{wearKm}</span>
-                  {" km "}/ {expectedKm} km
+                  <span className="font-medium text-foreground">{formatDistance(wearKm, unitPref)}</span>
+                  {" / "}{formatDistance(expectedKm, unitPref)}
                 </>
               )}
             </span>

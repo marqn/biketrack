@@ -7,6 +7,9 @@ import { bikeTypeLabels } from "@/lib/types";
 import { BikeType } from "@/lib/generated/prisma";
 import { Watermark } from "@/components/ui/watermark";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { formatDistance } from "@/lib/units";
+import type { UnitPreference } from "@/lib/units";
 
 interface BikeCardProps {
   bike: {
@@ -29,6 +32,8 @@ interface BikeCardProps {
 
 export function BikeCard({ bike }: BikeCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const { data: session } = useSession();
+  const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
 
   if (!bike.slug) return null;
 
@@ -81,7 +86,7 @@ export function BikeCard({ bike }: BikeCardProps) {
         <div className="flex items-center justify-between mt-3 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <MapPin className="h-3.5 w-3.5" />
-            <span>{bike.totalKm.toLocaleString("pl-PL")} km</span>
+            <span>{formatDistance(bike.totalKm, unitPref)}</span>
           </div>
           {bike._count && bike._count.comments > 0 && (
             <div className="flex items-center gap-1">

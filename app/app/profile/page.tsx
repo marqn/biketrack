@@ -11,10 +11,19 @@ import {
   EyeOff,
   Scale,
   Info,
+  Ruler,
 } from "lucide-react";
 import NumberStepper from "@/components/ui/number-stepper";
 import { ImageUploader } from "@/components/ui/image-uploader";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import type { UnitPreference } from "@/lib/units";
+import {
+  displayKg,
+  inputToKg,
+  weightUnit,
+  weightRange,
+} from "@/lib/units";
 
 interface UserData {
   id: string;
@@ -24,6 +33,7 @@ interface UserData {
   weight: number | null;
   bio: string | null;
   profileSlug: string | null;
+  unitPreference: UnitPreference;
 }
 
 interface FormData {
@@ -61,9 +71,12 @@ interface Errors {
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { update: updateSession } = useSession();
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasPassword, setHasPassword] = useState(false);
+  const [unitPreference, setUnitPreference] = useState<UnitPreference>("METRIC");
+  const [unitSaving, setUnitSaving] = useState(false);
 
   const [isEditing, setIsEditing] = useState<IsEditing>({
     name: false,
@@ -102,11 +115,16 @@ export default function ProfilePage() {
         if (data.user) {
           setUser(data.user);
           setHasPassword(!!data.user.password);
+          const pref: UnitPreference = data.user.unitPreference ?? "METRIC";
+          setUnitPreference(pref);
           setFormData((prev) => ({
             ...prev,
             name: data.user.name || "",
             email: data.user.email || "",
-            weight: data.user.weight?.toString() || "75",
+            // Wyświetl wagę w jednostkach użytkownika
+            weight: data.user.weight
+              ? displayKg(data.user.weight, pref).toString()
+              : "",
             bio: data.user.bio || "",
           }));
         }
@@ -190,27 +208,31 @@ export default function ProfilePage() {
   };
 
   const handleSaveWeight = async () => {
-    const weightValue = parseInt(formData.weight);
+    const displayValue = parseInt(formData.weight);
+    const range = weightRange(unitPreference);
 
     if (
       formData.weight &&
-      (isNaN(weightValue) || weightValue < 20 || weightValue > 300)
+      (isNaN(displayValue) || displayValue < range.min || displayValue > range.max)
     ) {
-      setErrors({ weight: "Podaj wagę w zakresie 20-300 kg" });
+      setErrors({ weight: `Podaj wagę w zakresie ${range.min}-${range.max} ${weightUnit(unitPreference)}` });
       return;
     }
+
+    // Konwertuj z jednostek użytkownika do kg przed zapisem
+    const weightInKg = formData.weight ? inputToKg(displayValue, unitPreference) : null;
 
     try {
       const response = await fetch("/api/user/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ weight: formData.weight ? weightValue : null }),
+        body: JSON.stringify({ weight: weightInKg }),
       });
 
       const data = await response.json();
 
       if (data.success && user) {
-        setUser({ ...user, weight: formData.weight ? weightValue : null });
+        setUser({ ...user, weight: weightInKg });
         setIsEditing({ ...isEditing, weight: false });
         setErrors({});
         setSuccessMessage("Waga zaktualizowana!");
@@ -221,6 +243,37 @@ export default function ProfilePage() {
     } catch (error) {
       console.error("Błąd aktualizacji wagi:", error);
       setErrors({ weight: "Wystąpił błąd podczas zapisywania" });
+    }
+  };
+
+  const handleSaveUnitPreference = async (unit: UnitPreference) => {
+    setUnitSaving(true);
+    try {
+      const response = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ unitPreference: unit }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setUnitPreference(unit);
+        // Przelicz wagę w formularzu na nowe jednostki
+        if (user?.weight) {
+          setFormData((prev) => ({
+            ...prev,
+            weight: displayKg(user.weight!, unit).toString(),
+          }));
+        }
+        setSuccessMessage("Jednostki zaktualizowane!");
+        setTimeout(() => setSuccessMessage(""), 3000);
+        // Odśwież sesję żeby unitPreference było aktualne
+        await updateSession();
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("Błąd aktualizacji jednostek:", error);
+    } finally {
+      setUnitSaving(false);
     }
   };
 
@@ -282,7 +335,7 @@ export default function ProfilePage() {
       ...formData,
       name: user?.name || "",
       email: user?.email || "",
-      weight: user?.weight?.toString() || "75",
+      weight: user?.weight ? displayKg(user.weight, unitPreference).toString() : "",
       bio: user?.bio || "",
       currentPassword: "",
       newPassword: "",
@@ -456,6 +509,43 @@ export default function ProfilePage() {
           )}
         </div>
 
+        {/* Units Section */}
+        <div className="bg-card rounded-xl border p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Ruler className="w-5 h-5 text-muted-foreground" />
+            <h2 className="text-lg font-semibold">Jednostki</h2>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Wybierz system jednostek stosowany w całej aplikacji — dystanse, waga i odległości serwisowe.
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => handleSaveUnitPreference("METRIC")}
+              disabled={unitSaving}
+              className={`flex-1 py-3 px-4 rounded-lg border-2 transition-colors font-medium text-sm ${
+                unitPreference === "METRIC"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border hover:border-primary/50"
+              }`}
+            >
+              <div className="text-base font-bold">km / kg</div>
+              <div className="text-xs text-muted-foreground font-normal mt-0.5">Metryczny</div>
+            </button>
+            <button
+              onClick={() => handleSaveUnitPreference("IMPERIAL")}
+              disabled={unitSaving}
+              className={`flex-1 py-3 px-4 rounded-lg border-2 transition-colors font-medium text-sm ${
+                unitPreference === "IMPERIAL"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border hover:border-primary/50"
+              }`}
+            >
+              <div className="text-base font-bold">mi / lbs</div>
+              <div className="text-xs text-muted-foreground font-normal mt-0.5">Imperialny</div>
+            </button>
+          </div>
+        </div>
+
         {/* Weight Section */}
         <div className="bg-card rounded-xl border p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
@@ -484,13 +574,13 @@ export default function ProfilePage() {
             <div>
               <div className="flex items-center gap-2">
                 <NumberStepper
-                  value={formData.weight ? parseInt(formData.weight, 10) : 75}
+                  value={formData.weight ? parseInt(formData.weight, 10) : weightRange(unitPreference).min + 35}
                   onChange={(v) => setFormData({ ...formData, weight: v.toString() })}
                   steps={[1]}
-                  min={20}
-                  max={300}
+                  min={weightRange(unitPreference).min}
+                  max={weightRange(unitPreference).max}
                 />
-                <span className="text-muted-foreground">kg</span>
+                <span className="text-muted-foreground">{weightUnit(unitPreference)}</span>
               </div>
               {errors.weight && (
                 <p className="text-destructive text-sm mt-1">{errors.weight}</p>
@@ -515,7 +605,11 @@ export default function ProfilePage() {
           ) : (
             <div className="flex items-center gap-3">
               <Scale className="w-5 h-5 text-muted-foreground" />
-              <span>{user.weight ? `${user.weight} kg` : "Nie ustawiono"}</span>
+              <span>
+                {user.weight
+                  ? `${displayKg(user.weight, unitPreference)} ${weightUnit(unitPreference)}`
+                  : "Nie ustawiono"}
+              </span>
             </div>
           )}
         </div>

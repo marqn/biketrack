@@ -11,6 +11,7 @@ declare module "next-auth" {
       provider?: "google" | "strava" | "credentials" | string;
       plan?: "FREE" | "PREMIUM";
       planExpiresAt?: string | null;
+      unitPreference?: "METRIC" | "IMPERIAL";
     };
   }
 
@@ -25,5 +26,6 @@ declare module "next-auth/jwt" {
     provider?: string;
     plan?: "FREE" | "PREMIUM";
     planExpiresAt?: string | null;
+    unitPreference?: "METRIC" | "IMPERIAL";
   }
 }

@@ -14,6 +14,9 @@ import {
   updateLubeEvent,
 } from "@/app/app/actions/lube-service";
 import { LubeEvent } from "@/lib/types";
+import { useSession } from "next-auth/react";
+import { formatDistance } from "@/lib/units";
+import type { UnitPreference } from "@/lib/units";
 
 interface LubeButtonProps {
   bikeId: string;
@@ -33,6 +36,8 @@ export default function LubeButton({
   );
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const { data: session } = useSession();
+  const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
 
   const [lastLubeKm, setLastLubeKm] = useOptimistic(
     lastLubeKmInitial ?? null,
@@ -94,7 +99,7 @@ export default function LubeButton({
     <>
       <div className="flex flex-col gap-2">
         <div className="flex justify-between items-center">
-          <span>{kmSinceLube} km od ostatniego smarowania</span>
+          <span>{formatDistance(kmSinceLube, unitPref)} od ostatniego smarowania</span>
           {kmSinceLube > 0 && (
             <div className="flex items-center gap-2">
               <Button

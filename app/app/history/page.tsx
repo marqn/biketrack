@@ -38,6 +38,9 @@ import {
 import { getPartName } from "@/lib/default-parts";
 import { formatDate } from "@/lib/utils";
 import { getCategoryIcon, SERVICE_ICON } from "@/lib/part-icons";
+import { useSession } from "next-auth/react";
+import { formatDistance } from "@/lib/units";
+import type { UnitPreference } from "@/lib/units";
 
 type FilterType = "all" | "replacement" | "service";
 
@@ -47,6 +50,8 @@ const BikePartsHistory: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterType>("all");
+  const { data: session } = useSession();
+  const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteType, setDeleteType] = useState<
     "replacement" | "service" | null
@@ -184,7 +189,7 @@ const BikePartsHistory: React.FC = () => {
             </div>
             <span className="text-xs font-semibold text-cyan-600 mt-1">
               <Badge className="bg-cyan-600">
-                {service.kmAtTime.toLocaleString("pl-PL")} km
+                {formatDistance(service.kmAtTime, unitPref)}
               </Badge>
             </span>
           </div>
@@ -273,7 +278,7 @@ const BikePartsHistory: React.FC = () => {
           </div>
           <span className="text-xs font-semibold text-blue-600 mt-1">
             <Badge className="bg-blue-600">
-              {part.kmAtReplacement.toLocaleString("pl-PL")} km
+              {formatDistance(part.kmAtReplacement, unitPref)}
             </Badge>
           </span>
         </div>
@@ -331,7 +336,7 @@ const BikePartsHistory: React.FC = () => {
                 <Wrench className="w-4 h-4 " />
                 <span className="text-sm font-medium">Zużycie części:</span>
                 <span className="text-sm font-semibold text-orange-600">
-                  {part.kmUsed.toLocaleString("pl-PL")} km
+                  {formatDistance(part.kmUsed, unitPref)}
                 </span>
               </div>
               {part.notes && (
@@ -408,7 +413,7 @@ const BikePartsHistory: React.FC = () => {
             {bike && (
               <div className=" rounded-lg px-6 py-4 shadow-sm">
                 <div className="text-2xl font-bold text-green-600">
-                  {bike.totalKm.toLocaleString("pl-PL")} km
+                  {formatDistance(bike.totalKm, unitPref)}
                 </div>
                 <div className="text-sm ">Łączny przebieg</div>
               </div>

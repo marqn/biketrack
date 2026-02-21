@@ -1,8 +1,9 @@
 // app/onboarding/_components/SimpleOnboardingFlow.tsx
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { createBike } from "../_actions/createBike";
+import { updateUnitPreference } from "@/app/app/actions/update-unit-preference";
 import BikeBrandModelFields from "@/components/bike/BikeBrandModelFields";
 import {
   Card,
@@ -19,9 +20,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels, BikeProduct } from "@/lib/types";
 import { ArrowLeft } from "lucide-react";
+import type { UnitPreference } from "@/lib/units";
+import { detectUnitFromLocale } from "@/lib/units";
+
+type Step = 1 | 2 | 3 | "units";
 
 export default function SimpleOnboardingFlow() {
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<Step>(1);
+  const [unitPreference, setUnitPreference] = useState<UnitPreference>("METRIC");
   const [selectedType, setSelectedType] = useState<BikeType | null>(null);
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
@@ -30,6 +36,11 @@ export default function SimpleOnboardingFlow() {
   const [isElectric, setIsElectric] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [termsAccepted, setTermsAccepted] = useState(false);
+
+  // Auto-detekcja locale przy starcie
+  useEffect(() => {
+    setUnitPreference(detectUnitFromLocale(navigator.language));
+  }, []);
 
   function handleTypeSelect(type: BikeType) {
     setSelectedType(type);
@@ -57,10 +68,16 @@ export default function SimpleOnboardingFlow() {
     setStep(2);
   }
 
+  function handleTermsNext() {
+    if (!termsAccepted) return;
+    setStep("units");
+  }
+
   function handleSubmit() {
-    if (!selectedType || !termsAccepted) return;
+    if (!selectedType) return;
 
     startTransition(async () => {
+      await updateUnitPreference(unitPreference);
       await createBike({
         type: selectedType,
         brand: brand || null,
@@ -77,18 +94,21 @@ export default function SimpleOnboardingFlow() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">
-            {step === 1 && "Witaj!"}
+            {step === 1 && "Wybierz typ roweru"}
             {step === 2 && "Szczegóły roweru"}
             {step === 3 && "Regulamin"}
+            {step === "units" && "Jednostki"}
           </CardTitle>
           <CardDescription className="text-base">
-            {step === 1 && "Wybierz typ swojego roweru"}
+            {step === 1 && "Jaki typ roweru chcesz śledzić?"}
             {step === 2 && "Podaj markę i model (opcjonalnie)"}
             {step === 3 && "Zapoznaj się z regulaminem serwisu"}
+            {step === "units" && "Wybierz preferowany system jednostek"}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
+
           {step === 1 && (
             <div className="flex justify-center">
               <ToggleGroup
@@ -211,12 +231,60 @@ export default function SimpleOnboardingFlow() {
               </div>
 
               <Button
-                onClick={handleSubmit}
-                disabled={!termsAccepted || isPending}
+                onClick={handleTermsNext}
+                disabled={!termsAccepted}
                 className="w-full"
                 size="lg"
               >
-                {isPending ? "Tworzenie..." : "Dalej"}
+                Dalej
+              </Button>
+            </>
+          )}
+
+          {step === "units" && (
+            <>
+              <button
+                onClick={() => setStep(3)}
+                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Wróć
+              </button>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setUnitPreference("METRIC")}
+                  className={`flex-1 py-4 px-4 rounded-xl border-2 transition-colors ${
+                    unitPreference === "METRIC"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <div className="text-xl font-bold">km / kg</div>
+                  <div className="text-sm text-muted-foreground mt-1">Metryczny</div>
+                </button>
+                <button
+                  onClick={() => setUnitPreference("IMPERIAL")}
+                  className={`flex-1 py-4 px-4 rounded-xl border-2 transition-colors ${
+                    unitPreference === "IMPERIAL"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <div className="text-xl font-bold">mi / lbs</div>
+                  <div className="text-sm text-muted-foreground mt-1">Imperialny</div>
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                Możesz to zmienić później w ustawieniach profilu
+              </p>
+              <Button
+                onClick={handleSubmit}
+                disabled={isPending}
+                className="w-full"
+                size="lg"
+              >
+                {isPending ? "Tworzenie..." : "Zacznij korzystać"}
               </Button>
             </>
           )}

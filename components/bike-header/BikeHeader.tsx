@@ -48,8 +48,10 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { Bike, BikeType } from "@/lib/generated/prisma";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useNotifications } from "@/app/hooks/useNotifications";
+import { formatDistance } from "@/lib/units";
+import type { UnitPreference } from "@/lib/units";
 import { syncStravaDistances } from "@/app/app/actions/sync-strava-distances";
 import { toast } from "sonner";
 import { deleteAccount } from "./actions/delete-account";
@@ -97,6 +99,8 @@ export function BikeHeader({
 }: BikeHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
   const { activeDialog, openDialog, closeDialog } =
     useMultiDialog<DialogType>();
   const [bikeToDelete, setBikeToDelete] = useState<string | null>(null);
@@ -144,8 +148,8 @@ export function BikeHeader({
       if (result.synced > 0) {
         router.refresh();
         for (const update of result.updates) {
-          toast.success(`${update.bikeName}: +${update.diffKm} km`, {
-            description: `Przebieg: ${update.oldKm.toLocaleString("pl-PL")} → ${update.newKm.toLocaleString("pl-PL")} km`,
+          toast.success(`${update.bikeName}: +${formatDistance(update.diffKm, unitPref)}`, {
+            description: `Przebieg: ${formatDistance(update.oldKm, unitPref)} → ${formatDistance(update.newKm, unitPref)}`,
           });
         }
       }
@@ -281,7 +285,7 @@ export function BikeHeader({
                       <ChevronDown className="h-3 w-3 text-muted-foreground" />
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {bike.type} {bike.totalKm.toLocaleString("pl-PL")} km
+                      {bike.type} {formatDistance(bike.totalKm, unitPref)}
                     </p>
                   </div>
                 </Button>
@@ -302,7 +306,7 @@ export function BikeHeader({
                         {getBikeLabel(b)}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {b.type} · {b.totalKm.toLocaleString("pl-PL")} km
+                        {b.type} · {formatDistance(b.totalKm, unitPref)}
                       </p>
                     </div>
                     <div className="flex items-center gap-1 ml-2">

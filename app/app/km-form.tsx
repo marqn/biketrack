@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import NumberStepper from "@/components/ui/number-stepper";
+import { useSession } from "next-auth/react";
+import { displayKm, inputToKm, distanceUnit, distanceRange } from "@/lib/units";
+import type { UnitPreference } from "@/lib/units";
 
 type Props = {
   bikeId: string;
@@ -14,36 +17,47 @@ type Props = {
 
 export default function KmForm({ bikeId, initialKm }: Props) {
   const [isPending, startTransition] = useTransition();
+  const { data: session } = useSession();
+  const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
 
+  // optimisticKm i inputKm zawsze w METRYCZNYCH (km) — konwersja tylko do wyświetlania
   const [optimisticKm, setOptimisticKm] = useOptimistic(
     initialKm,
     (_, newKm: number) => newKm,
   );
 
-  const [inputKm, setInputKm] = useState(optimisticKm);
+  const [inputKm, setInputKm] = useState(displayKm(optimisticKm, unitPref));
 
-  // Synchronizuj inputKm gdy zmieni się rower (nowe initialKm)
+  // Synchronizuj inputKm gdy zmieni się rower lub jednostki
   useEffect(() => {
-    setInputKm(initialKm);
-  }, [initialKm]);
+    setInputKm(displayKm(initialKm, unitPref));
+  }, [initialKm, unitPref]);
 
   async function action(formData: FormData) {
-    const newKm = Number(formData.get("newKm"));
+    // Wartość z formularza jest w jednostkach użytkownika — konwertuj do km
+    const displayValue = Number(formData.get("newKm"));
+    const newKmMetric = inputToKm(displayValue, unitPref);
+    formData.set("newKm", newKmMetric.toString());
+
     const prevKm = optimisticKm;
 
     startTransition(() => {
-      setOptimisticKm(newKm);
+      setOptimisticKm(newKmMetric);
     });
 
     await updateBikeKm(formData);
 
-    toast.success(`Zapisano przebieg: ${newKm.toLocaleString("pl-PL")} km`, {
+    const unit = distanceUnit(unitPref);
+    toast.success(`Zapisano przebieg: ${displayKm(newKmMetric, unitPref).toLocaleString("pl-PL")} ${unit}`, {
       description:
-        prevKm !== newKm
-          ? `Zmiana: ${prevKm.toLocaleString("pl-PL")} km → ${newKm.toLocaleString("pl-PL")} km`
+        prevKm !== newKmMetric
+          ? `Zmiana: ${displayKm(prevKm, unitPref).toLocaleString("pl-PL")} → ${displayKm(newKmMetric, unitPref).toLocaleString("pl-PL")} ${unit}`
           : undefined,
     });
   }
+
+  const unit = distanceUnit(unitPref);
+  const range = distanceRange(unitPref);
 
   return (
     <Card className="mt-4 mx-auto max-w-md">
@@ -62,14 +76,15 @@ export default function KmForm({ bikeId, initialKm }: Props) {
             value={inputKm}
             onChange={setInputKm}
             steps={[1, 10]}
-            min={0}
+            min={range.min}
+            max={range.max}
             disabled={isPending}
           />
           <Button disabled={isPending} variant="outline">
-            {isPending ? "Zapisuję..." : "💾 Zapisz km"}
+            {isPending ? "Zapisuję..." : "💾 Zapisz"}
           </Button>
           <span className="text-center">
-            Aktualnie zapisane: {optimisticKm} km
+            Aktualnie zapisane: {displayKm(optimisticKm, unitPref).toLocaleString("pl-PL")} {unit}
           </span>
         </form>
       </CardContent>

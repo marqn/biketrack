@@ -23,25 +23,34 @@ import {
   getAvailableStravaBikes,
   StravaBikeForImport,
 } from "../actions/get-strava-bikes";
+import { updateUnitPreference } from "@/app/app/actions/update-unit-preference";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import type { UnitPreference } from "@/lib/units";
+import { detectUnitFromLocale } from "@/lib/units";
 
 interface AddBikeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onBikeAdded?: (bikeId: string) => void;
+  /** Czy to dodawanie pierwszego roweru przez istniejącego usera bez ustawionej preferencji */
+  showUnitsStep?: boolean;
 }
 
-type Step = "loading" | "strava" | "type" | "details";
+type Step = "units" | "loading" | "strava" | "type" | "details";
 
 export function AddBikeDialog({
   open,
   onOpenChange,
   onBikeAdded,
+  showUnitsStep = false,
 }: AddBikeDialogProps) {
   const router = useRouter();
+  const { data: session, update: updateSession } = useSession();
   const [step, setStep] = useState<Step>("loading");
+  const [unitPreference, setUnitPreference] = useState<UnitPreference>("METRIC");
   const [stravaBikes, setStravaBikes] = useState<StravaBikeForImport[]>([]);
   const [selectedStravaBike, setSelectedStravaBike] =
     useState<StravaBikeForImport | null>(null);
@@ -59,7 +68,13 @@ export function AddBikeDialog({
   // Pobierz rowery ze Stravy gdy dialog się otworzy
   useEffect(() => {
     if (open) {
-      loadStravaBikes();
+      // Jeśli showUnitsStep - pokaż krok jednostek jako pierwszy
+      if (showUnitsStep) {
+        setUnitPreference(detectUnitFromLocale(navigator.language));
+        setStep("units");
+      } else {
+        loadStravaBikes();
+      }
     }
   }, [open]);
 
@@ -79,6 +94,12 @@ export function AddBikeDialog({
       setStravaBikes([]);
       setStep("type");
     }
+  }
+
+  async function handleUnitsNext() {
+    await updateUnitPreference(unitPreference);
+    await updateSession();
+    loadStravaBikes();
   }
 
   function resetForm() {
@@ -196,6 +217,8 @@ export function AddBikeDialog({
 
   function getTitle() {
     switch (step) {
+      case "units":
+        return "Jednostki";
       case "loading":
         return "Dodaj nowy rower";
       case "strava":
@@ -209,6 +232,8 @@ export function AddBikeDialog({
 
   function getDescription() {
     switch (step) {
+      case "units":
+        return "Wybierz preferowany system jednostek";
       case "loading":
         return "Sprawdzanie dostępnych rowerów...";
       case "strava":
@@ -231,6 +256,42 @@ export function AddBikeDialog({
 
         <div className="space-y-4 py-2 ">
           {error && <p className="text-sm text-destructive">{error}</p>}
+
+          {/* Krok wyboru jednostek */}
+          {step === "units" && (
+            <div className="space-y-4">
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setUnitPreference("METRIC")}
+                  className={`flex-1 py-4 px-4 rounded-xl border-2 transition-colors ${
+                    unitPreference === "METRIC"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <div className="text-xl font-bold">km / kg</div>
+                  <div className="text-sm text-muted-foreground mt-1">Metryczny</div>
+                </button>
+                <button
+                  onClick={() => setUnitPreference("IMPERIAL")}
+                  className={`flex-1 py-4 px-4 rounded-xl border-2 transition-colors ${
+                    unitPreference === "IMPERIAL"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <div className="text-xl font-bold">mi / lbs</div>
+                  <div className="text-sm text-muted-foreground mt-1">Imperialny</div>
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                Możesz to zmienić później w ustawieniach profilu
+              </p>
+              <Button onClick={handleUnitsNext} className="w-full">
+                Dalej
+              </Button>
+            </div>
+          )}
 
           {/* Loading */}
           {step === "loading" && (

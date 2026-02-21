@@ -105,7 +105,7 @@ export const authOptions: AuthOptions = {
         // NIE ufaj user.image z OAuth providera
         const dbUser = await prisma.user.findUnique({
           where: { id: user.id },
-          select: { image: true, plan: true, planExpiresAt: true }
+          select: { image: true, plan: true, planExpiresAt: true, unitPreference: true }
         });
 
         token.picture = dbUser?.image && dbUser.image.length > 200
@@ -116,10 +116,11 @@ export const authOptions: AuthOptions = {
         const isPremiumActive = dbUser?.plan === "PREMIUM" && dbUser.planExpiresAt && dbUser.planExpiresAt > new Date();
         token.plan = isPremiumActive ? "PREMIUM" : "FREE";
         token.planExpiresAt = dbUser?.planExpiresAt?.toISOString() ?? null;
+        token.unitPreference = dbUser?.unitPreference ?? "METRIC";
       }
 
       // Aktualizacja sesji (np. po zmianie avatara w profilu)
-      if (trigger === "update" && session) {
+      if (trigger === "update") {
         const updatedUser = await prisma.user.findUnique({
           where: { id: token.id as string },
           select: {
@@ -129,6 +130,7 @@ export const authOptions: AuthOptions = {
             image: true,
             plan: true,
             planExpiresAt: true,
+            unitPreference: true,
           }
         });
 
@@ -142,6 +144,7 @@ export const authOptions: AuthOptions = {
           const isPremiumActive = updatedUser.plan === "PREMIUM" && updatedUser.planExpiresAt && updatedUser.planExpiresAt > new Date();
           token.plan = isPremiumActive ? "PREMIUM" : "FREE";
           token.planExpiresAt = updatedUser.planExpiresAt?.toISOString() ?? null;
+          token.unitPreference = updatedUser.unitPreference ?? "METRIC";
         }
       }
       
@@ -157,6 +160,7 @@ export const authOptions: AuthOptions = {
         session.user.provider = token.provider as string;
         session.user.plan = (token.plan as "FREE" | "PREMIUM") ?? "FREE";
         session.user.planExpiresAt = (token.planExpiresAt as string | null) ?? null;
+        session.user.unitPreference = (token.unitPreference as "METRIC" | "IMPERIAL") ?? "METRIC";
       }
 
       return session;

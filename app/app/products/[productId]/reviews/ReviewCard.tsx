@@ -6,6 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Crown, ThumbsUp, ThumbsDown } from "lucide-react";
 import { bikeTypeLabels } from "@/lib/types";
 import { ReviewWithUser } from "@/app/app/actions/get-product-reviews";
+import { useSession } from "next-auth/react";
+import { formatDistance } from "@/lib/units";
+import type { UnitPreference } from "@/lib/units";
 
 interface ReviewCardProps {
   review: ReviewWithUser;
@@ -13,6 +16,8 @@ interface ReviewCardProps {
 }
 
 export function ReviewCard({ review, isCurrentUser }: ReviewCardProps) {
+  const { data: session } = useSession();
+  const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
   const isPremium = review.user.plan === "PREMIUM" && review.user.planExpiresAt && new Date(review.user.planExpiresAt) > new Date();
 
   const initials =
@@ -63,7 +68,7 @@ export function ReviewCard({ review, isCurrentUser }: ReviewCardProps) {
               <div className="text-sm text-muted-foreground">
                 {formattedDate} · {bikeTypeLabels[review.bikeType]}
                 {review.kmUsed > 0 &&
-                  ` · ${review.kmUsed.toLocaleString("pl-PL")} km`}
+                  ` · ${formatDistance(review.kmUsed, unitPref)}`}
               </div>
             </div>
           </div>
