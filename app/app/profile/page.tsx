@@ -14,6 +14,7 @@ import {
   Ruler,
 } from "lucide-react";
 import NumberStepper from "@/components/ui/number-stepper";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ImageUploader } from "@/components/ui/image-uploader";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -346,10 +347,42 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen py-8 px-4 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Ładowanie profilu...</p>
+      <div className="min-h-screen py-8 px-4">
+        <div className="max-w-3xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <Skeleton className="h-8 w-56 mb-2" />
+            <Skeleton className="h-4 w-72" />
+          </div>
+          {/* Avatar card */}
+          <div className="bg-card rounded-xl border p-6 mb-6">
+            <Skeleton className="h-5 w-36 mb-4" />
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-20 w-20 rounded-full shrink-0" />
+              <Skeleton className="h-9 w-28 rounded-lg" />
+            </div>
+          </div>
+          {/* Name card */}
+          <div className="bg-card rounded-xl border p-6 mb-6 space-y-3">
+            <div className="flex justify-between">
+              <Skeleton className="h-5 w-40" />
+              <Skeleton className="h-4 w-12" />
+            </div>
+            <Skeleton className="h-4 w-48" />
+          </div>
+          {/* Email card */}
+          <div className="bg-card rounded-xl border p-6 mb-6 space-y-3">
+            <div className="flex justify-between">
+              <Skeleton className="h-5 w-40" />
+              <Skeleton className="h-4 w-12" />
+            </div>
+            <Skeleton className="h-4 w-56" />
+          </div>
+          {/* Password card */}
+          <div className="bg-card rounded-xl border p-6 mb-6 space-y-3">
+            <Skeleton className="h-5 w-36" />
+            <Skeleton className="h-4 w-44" />
+          </div>
         </div>
       </div>
     );

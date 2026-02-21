@@ -15,6 +15,7 @@ import { bikeTypeLabels } from "@/lib/types";
 import { BikeType } from "@/lib/generated/prisma";
 import { BikeCard } from "@/components/discover/BikeCard";
 import { getPublicBikes } from "@/app/app/actions/discover/get-public-bikes";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type BikeData = {
   slug: string | null;
@@ -125,14 +126,11 @@ export function DiscoverClient() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              className="bg-card rounded-xl border overflow-hidden animate-pulse"
-            >
-              <div className="w-full h-36 bg-muted" />
+            <div key={i} className="bg-card rounded-xl border overflow-hidden">
+              <Skeleton className="w-full h-36 rounded-none" />
               <div className="p-4 space-y-2">
-                <div className="h-5 bg-muted rounded w-3/4" />
-                <div className="h-4 bg-muted rounded w-1/2" />
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
               </div>
             </div>
           ))}

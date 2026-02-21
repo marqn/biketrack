@@ -18,6 +18,7 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import EditLubeDialog from "@/components/part-card/EditLubeDialog";
 import PartDetailsDialog from "@/components/part-card/PartDetailsDialog";
 import { ConfirmDeleteDialog } from "@/components/bike-header/dialogs";
@@ -357,10 +358,46 @@ const BikePartsHistory: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br  p-4 md:p-8 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="">Ładowanie historii...</p>
+      <div className="min-h-screen p-4 md:p-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <Skeleton className="w-20 h-20 rounded-full mx-auto mb-4" />
+            <Skeleton className="h-9 w-56 mx-auto mb-2" />
+            <Skeleton className="h-5 w-36 mx-auto" />
+            {/* Stats */}
+            <div className="flex flex-wrap justify-center gap-6 mt-8">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="rounded-lg px-6 py-4 space-y-2">
+                  <Skeleton className="h-7 w-10 mx-auto" />
+                  <Skeleton className="h-4 w-16 mx-auto" />
+                </div>
+              ))}
+            </div>
+            {/* Filter buttons */}
+            <div className="flex flex-wrap justify-center gap-3 mt-8">
+              {[...Array(3)].map((_, i) => (
+                <Skeleton key={i} className="h-8 w-28 rounded-md" />
+              ))}
+            </div>
+          </div>
+          {/* Timeline items */}
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="border rounded-xl bg-card p-4 space-y-3">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-8 w-8 rounded-md shrink-0" />
+                  <div className="space-y-1.5 flex-1">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                </div>
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-2/3" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
