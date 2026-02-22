@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Package } from "lucide-react";
 import { Watermark } from "@/components/ui/watermark";
 import { PartType } from "@/lib/generated/prisma";
-import { getPartName, PART_NAMES } from "@/lib/default-parts";
+import { getPartName, PART_CATEGORIES, PartCategory } from "@/lib/default-parts";
 import { ProductSortBy, ProductListItem } from "@/app/app/actions/get-products";
 import { useState, useTransition } from "react";
 import { useSession } from "next-auth/react";
@@ -38,6 +38,7 @@ interface ProductsClientProps {
   currentPage: number;
   sortBy: ProductSortBy;
   typeFilter?: PartType;
+  category?: PartCategory;
   search?: string;
 }
 
@@ -48,6 +49,7 @@ export function ProductsClient({
   currentPage,
   sortBy,
   typeFilter,
+  category,
   search,
 }: ProductsClientProps) {
   const router = useRouter();
@@ -58,6 +60,7 @@ export function ProductsClient({
     const params = new URLSearchParams();
 
     if (sortBy && !updates.sort) params.set("sort", sortBy);
+    if (category && !updates.category) params.set("category", category);
     if (typeFilter && !updates.type) params.set("type", typeFilter);
     if (search && !updates.search) params.set("search", search);
 
@@ -76,9 +79,7 @@ export function ProductsClient({
     updateParams({ search: searchInput || undefined, page: "1" });
   }
 
-  const partTypes = Object.keys(PART_NAMES).filter(
-    (t) => t !== "LUBRICANT",
-  ) as PartType[];
+  const categoryTypes = category ? PART_CATEGORIES[category].types : null;
 
   return (
     <div className="space-y-6 lg:px-24 text-center">
@@ -87,6 +88,29 @@ export function ProductsClient({
         <p className="text-muted-foreground">
           Przeglądaj i oceniaj części rowerowe
         </p>
+      </div>
+
+      {/* Category chips */}
+      <div className="flex flex-wrap gap-2 justify-center">
+        <Button
+          variant={!category ? "default" : "outline"}
+          size="sm"
+          disabled={isPending}
+          onClick={() => updateParams({ category: undefined, type: undefined, page: "1" })}
+        >
+          Wszystkie
+        </Button>
+        {(Object.entries(PART_CATEGORIES) as [PartCategory, typeof PART_CATEGORIES[PartCategory]][]).map(([key, cat]) => (
+          <Button
+            key={key}
+            variant={category === key ? "default" : "outline"}
+            size="sm"
+            disabled={isPending}
+            onClick={() => updateParams({ category: key, type: undefined, page: "1" })}
+          >
+            {cat.label}
+          </Button>
+        ))}
       </div>
 
       {/* Filters */}
@@ -106,24 +130,26 @@ export function ProductsClient({
           </Button>
         </form>
 
-        <Select
-          value={typeFilter || "all"}
-          onValueChange={(v) =>
-            updateParams({ type: v === "all" ? undefined : v, page: "1" })
-          }
-        >
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Typ czesci" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Wszystkie typy</SelectItem>
-            {partTypes.map((type) => (
-              <SelectItem key={type} value={type}>
-                {getPartName(type)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {categoryTypes && (
+          <Select
+            value={typeFilter || "all"}
+            onValueChange={(v) =>
+              updateParams({ type: v === "all" ? undefined : v, page: "1" })
+            }
+          >
+            <SelectTrigger className="w-52">
+              <SelectValue placeholder="Typ części" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Wszystkie w kategorii</SelectItem>
+              {categoryTypes.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {getPartName(type)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
 
         <Select
           value={sortBy}
@@ -143,7 +169,7 @@ export function ProductsClient({
         </Select>
 
         <span className="text-sm text-muted-foreground ml-auto">
-          {totalCount} {totalCount === 1 ? "produkt" : "produktow"}
+          {totalCount} {totalCount === 1 ? "produkt" : "produktów"}
         </span>
       </div>
 

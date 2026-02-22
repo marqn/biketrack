@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getProducts, ProductSortBy } from "@/app/app/actions/get-products";
 import { PartType } from "@/lib/generated/prisma";
+import { PART_CATEGORIES, PartCategory } from "@/lib/default-parts";
 import { ProductsClient } from "./ProductsClient";
 
 interface PageProps {
@@ -10,6 +11,7 @@ interface PageProps {
     page?: string;
     sort?: ProductSortBy;
     type?: PartType;
+    category?: string;
     search?: string;
   }>;
 }
@@ -24,12 +26,19 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   const page = parseInt(params.page || "1", 10);
   const sortBy = params.sort || "installations";
   const typeFilter = params.type;
+  const categoryParam = params.category;
   const search = params.search;
+
+  const category = categoryParam && categoryParam in PART_CATEGORIES
+    ? categoryParam as PartCategory
+    : undefined;
+  const categoryTypes = category ? PART_CATEGORIES[category].types : undefined;
 
   const result = await getProducts({
     page,
     sortBy,
     type: typeFilter,
+    types: !typeFilter ? categoryTypes : undefined,
     search,
   });
 
@@ -42,6 +51,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
         currentPage={result.currentPage}
         sortBy={sortBy}
         typeFilter={typeFilter}
+        category={category}
         search={search}
       />
     </div>

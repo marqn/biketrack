@@ -9,6 +9,7 @@ export interface GetProductsParams {
   page?: number;
   pageSize?: number;
   type?: PartType;
+  types?: PartType[];
   sortBy?: ProductSortBy;
   search?: string;
 }
@@ -37,6 +38,7 @@ export async function getProducts({
   page = 1,
   pageSize = 12,
   type,
+  types,
   sortBy = "installations",
   search,
 }: GetProductsParams = {}): Promise<GetProductsResult> {
@@ -48,7 +50,7 @@ export async function getProducts({
   }[sortBy] as Prisma.PartProductOrderByWithRelationInput;
 
   const where: Prisma.PartProductWhereInput = {
-    ...(type && { type }),
+    ...(type ? { type } : types?.length ? { type: { in: types } } : {}),
     ...(search && {
       OR: [
         { brand: { contains: search, mode: "insensitive" } },
