@@ -119,6 +119,7 @@ export function BikeHeader({
   const { activeDialog, openDialog, closeDialog } =
     useMultiDialog<DialogType>();
   const [bikeToDelete, setBikeToDelete] = useState<string | null>(null);
+  const [bikeToEdit, setBikeToEdit] = useState<Bike | null>(null);
   const { notifications: unreadNotifications } = useNotifications();
   const unreadCount = unreadNotifications.length;
   const [isSyncing, startSync] = useTransition();
@@ -192,7 +193,7 @@ export function BikeHeader({
     isElectric: boolean;
     description: string;
   }) => {
-    return await updateBike(bike.id, user.id, data);
+    return await updateBike((bikeToEdit ?? bike).id, user.id, data);
   };
 
   const handleSwitchBike = (bikeId: string) => {
@@ -321,8 +322,11 @@ export function BikeHeader({
                   <DropdownMenuItem
                     key={b.id}
                     onClick={() => handleSwitchBike(b.id)}
-                    className="flex items-center justify-between"
+                    className={`flex items-center justify-between relative pl-3 ${b.id === bike.id ? "bg-primary/10" : ""}`}
                   >
+                    {b.id === bike.id && (
+                      <span className="absolute left-0 top-1 bottom-1 w-1 rounded-full bg-primary" />
+                    )}
                     <div className="h-8 w-8 rounded-md overflow-hidden shrink-0 border bg-muted flex items-center justify-center mr-2">
                       {(b.images[0] || b.imageUrl) ? (
                         <img
@@ -331,12 +335,12 @@ export function BikeHeader({
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        <BikeIcon className="h-4 w-4 text-muted-foreground" />
+                        <BikeIcon className={`h-4 w-4 ${b.id === bike.id ? "text-primary" : "text-muted-foreground"}`} />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p
-                        className={`text-sm truncate ${b.id === bike.id ? "font-semibold" : ""}`}
+                        className={`text-sm truncate ${b.id === bike.id ? "font-semibold text-primary" : ""}`}
                       >
                         {getBikeLabel(b)}
                       </p>
@@ -345,9 +349,16 @@ export function BikeHeader({
                       </p>
                     </div>
                     <div className="flex items-center gap-1 ml-2">
-                      {b.id === bike.id && (
-                        <Check className="h-4 w-4 text-primary shrink-0" />
-                      )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setBikeToEdit(b);
+                          openDialog("rename-bike");
+                        }}
+                        className="p-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-500! transition-colors"
+                      >
+                        <Pencil className="h-3 w-3" />
+                      </button>
                       {hasMultipleBikes && (
                         <button
                           onClick={(e) => {
@@ -355,7 +366,7 @@ export function BikeHeader({
                             setBikeToDelete(b.id);
                             openDialog("delete-bike");
                           }}
-                          className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                          className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive! transition-colors"
                         >
                           <Trash2 className="h-3 w-3" />
                         </button>
@@ -365,12 +376,6 @@ export function BikeHeader({
                 ))}
 
                 <DropdownMenuSeparator />
-
-                {/* Edytuj aktywny rower */}
-                <DropdownMenuItem onClick={() => openDialog("rename-bike")}>
-                  <Pencil className="mr-2 h-4 w-4" />
-                  Edytuj rower
-                </DropdownMenuItem>
 
                 {/* Dodaj rower - premium lub upgrade CTA */}
                 {isPremium ? (
@@ -654,10 +659,10 @@ export function BikeHeader({
 
       {/* DIALOGS */}
       <RenameBikeDialog
-        key={bike.id}
+        key={(bikeToEdit ?? bike).id}
         open={activeDialog === "rename-bike"}
-        onOpenChange={(open) => !open && closeDialog()}
-        bike={bike}
+        onOpenChange={(open) => { if (!open) { setBikeToEdit(null); closeDialog(); } }}
+        bike={bikeToEdit ?? bike}
         onSave={handleUpdateBike}
       />
 
