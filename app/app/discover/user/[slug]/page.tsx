@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { UserPublicProfile } from "@/components/discover/UserPublicProfile";
+import { BackButton } from "@/components/discover/BackButton";
 
 interface UserPublicPageProps {
   params: Promise<{ slug: string }>;
@@ -43,6 +44,7 @@ export default async function UserPublicPage({ params }: UserPublicPageProps) {
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-4xl mx-auto">
+        <BackButton />
         <UserPublicProfile user={user} bikes={user.bikes} />
       </div>
     </div>
