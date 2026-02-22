@@ -21,6 +21,7 @@ import {
   RefreshCw,
   X,
   Warehouse,
+  Bike as BikeIcon,
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
@@ -292,7 +293,16 @@ export function BikeHeader({
           <div className="min-w-35">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="p-0 h-auto">
+                <Button variant="ghost" className="p-0 h-auto gap-2">
+                  {(bike.images[0] || bike.imageUrl) && (
+                    <div className="h-9 w-9 rounded-md overflow-hidden shrink-0 border">
+                      <img
+                        src={bike.images[0] || bike.imageUrl!}
+                        alt={bikeTitle}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  )}
                   <div className="text-left">
                     <div className="flex items-center gap-2">
                       <h1 className="text-lg">{bikeTitle}</h1>
@@ -313,6 +323,17 @@ export function BikeHeader({
                     onClick={() => handleSwitchBike(b.id)}
                     className="flex items-center justify-between"
                   >
+                    <div className="h-8 w-8 rounded-md overflow-hidden shrink-0 border bg-muted flex items-center justify-center mr-2">
+                      {(b.images[0] || b.imageUrl) ? (
+                        <img
+                          src={b.images[0] || b.imageUrl!}
+                          alt={getBikeLabel(b)}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <BikeIcon className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <p
                         className={`text-sm truncate ${b.id === bike.id ? "font-semibold" : ""}`}

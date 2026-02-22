@@ -4,7 +4,8 @@ import { useState, useRef } from "react";
 import { upload } from "@vercel/blob/client";
 import { deleteBlobImage } from "@/app/app/actions/delete-blob-image";
 import { saveBlobImage } from "@/app/app/actions/save-blob-image";
-import { Camera, X, Plus, Loader2 } from "lucide-react";
+import { Camera, X, Plus, Loader2, Star } from "lucide-react";
+import { setBikeThumbnail } from "@/app/app/actions/set-bike-thumbnail";
 import {
   compressImage,
   IMAGE_ALLOWED_TYPES,
@@ -47,9 +48,30 @@ export function ImageUploader({
 }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [settingThumbnail, setSettingThumbnail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleSetThumbnail = async (url: string) => {
+    if (url === images[0]) return;
+    setSettingThumbnail(url);
+    setError(null);
+    try {
+      const result = await setBikeThumbnail(entityId, url);
+      if (result.success) {
+        onImagesChange([url, ...images.filter((u) => u !== url)]);
+      } else {
+        setError(result.error || "Błąd podczas ustawiania miniaturki");
+      }
+    } catch {
+      setError("Błąd podczas ustawiania miniaturki");
+    } finally {
+      setSettingThumbnail(null);
+    }
+  };
+
+  const showThumbnailSelect = entityType === "bike" && images.length > 1;
 
   const canAddMore = images.length < maxImages;
 
@@ -204,31 +226,56 @@ export function ImageUploader({
   return (
     <div className={`space-y-2 ${className}`}>
       <div className="flex flex-wrap gap-2">
-        {images.map((url) => (
-          <div
-            key={url}
-            className="relative w-24 h-24 rounded-lg border overflow-hidden bg-muted/50 group"
-          >
-            <img
-              src={url}
-              alt="Zdjęcie"
-              className="w-full h-full object-cover"
-            />
-            <Watermark />
-            <button
-              type="button"
-              onClick={() => handleDelete(url)}
-              disabled={deleting === url}
-              className="absolute top-1 right-1 p-0.5 rounded-full bg-background/80 hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors opacity-0 group-hover:opacity-100"
+        {images.map((url, index) => {
+          const isThumbnail = index === 0;
+          return (
+            <div
+              key={url}
+              className="relative w-24 h-24 rounded-lg border overflow-hidden bg-muted/50 group"
             >
-              {deleting === url ? (
-                <Loader2 className="h-3 w-3 animate-spin" />
-              ) : (
-                <X className="h-3 w-3" />
+              <img
+                src={url}
+                alt="Zdjęcie"
+                className="w-full h-full object-cover"
+              />
+              <Watermark />
+              <button
+                type="button"
+                onClick={() => handleDelete(url)}
+                disabled={deleting === url}
+                className="absolute top-1 right-1 p-0.5 rounded-full bg-background/80 hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors opacity-0 group-hover:opacity-100"
+              >
+                {deleting === url ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <X className="h-3 w-3" />
+                )}
+              </button>
+              {showThumbnailSelect && (
+                <button
+                  type="button"
+                  title={isThumbnail ? "Miniaturka" : "Ustaw jako miniaturkę"}
+                  onClick={() => handleSetThumbnail(url)}
+                  disabled={isThumbnail || settingThumbnail !== null}
+                  className={`absolute bottom-1 left-1 p-0.5 rounded-full bg-background/80 transition-colors ${
+                    isThumbnail
+                      ? "text-yellow-500 opacity-100"
+                      : "text-muted-foreground hover:text-yellow-500 opacity-0 group-hover:opacity-100"
+                  }`}
+                >
+                  {settingThumbnail === url ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Star
+                      className="h-3 w-3"
+                      fill={isThumbnail ? "currentColor" : "none"}
+                    />
+                  )}
+                </button>
               )}
-            </button>
-          </div>
-        ))}
+            </div>
+          );
+        })}
 
         {canAddMore && (
           <label className="w-24 h-24 rounded-lg border-2 border-dashed border-muted-foreground/25 flex flex-col items-center justify-center gap-1 cursor-pointer text-muted-foreground hover:text-foreground hover:border-foreground/25 transition-colors bg-muted/50">
