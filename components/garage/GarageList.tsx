@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2, Wrench, PackageOpen, Pencil } from "lucide-react";
+import Link from "next/link";
+import { Trash2, Wrench, PackageOpen, Pencil, Star } from "lucide-react";
 import { PartType } from "@/lib/generated/prisma";
 import { PartIcon } from "@/lib/part-icons";
 import { getPartName } from "@/lib/default-parts";
@@ -50,6 +51,9 @@ export interface StoredPartData {
   removedAt: Date | string | null;
   fromBikeName: string | null;
   productImageUrl: string | null;
+  productId: string | null;
+  averageRating: number | null;
+  totalReviews: number;
 }
 
 export interface BikeOption {
@@ -202,12 +206,40 @@ export default function GarageList({ parts, bikes, unitPref }: GarageListProps) 
               </CardHeader>
 
               <CardContent className="space-y-3">
-                {part.productImageUrl && (
-                  <img
-                    src={part.productImageUrl}
-                    alt={`${part.brand} ${part.model}`}
-                    className="h-16 w-16 object-contain rounded"
-                  />
+                {(part.productImageUrl || part.productId) && (
+                  <div className="flex items-start gap-3">
+                    {part.productImageUrl && (
+                      <img
+                        src={part.productImageUrl}
+                        alt={`${part.brand} ${part.model}`}
+                        className="h-16 w-16 object-contain rounded shrink-0"
+                      />
+                    )}
+                    {part.productId && (
+                      <Link
+                        href={`/app/products/${part.productId}/reviews`}
+                        className="flex flex-col gap-1 hover:opacity-80 transition-opacity"
+                      >
+                        {part.averageRating !== null && (
+                          <div className="flex items-center gap-1">
+                            {[1, 2, 3, 4, 5].map((s) => (
+                              <Star
+                                key={s}
+                                className={`h-3.5 w-3.5 ${
+                                  s <= Math.round(part.averageRating!)
+                                    ? "fill-yellow-400 text-yellow-400"
+                                    : "text-muted-foreground"
+                                }`}
+                              />
+                            ))}
+                            <span className="text-xs text-muted-foreground ml-1">
+                              ({part.totalReviews})
+                            </span>
+                          </div>
+                        )}
+                      </Link>
+                    )}
+                  </div>
                 )}
 
                 <div className="space-y-1 text-sm">
@@ -323,7 +355,7 @@ export default function GarageList({ parts, bikes, unitPref }: GarageListProps) 
             <Textarea
               value={editNotes}
               onChange={(e) => setEditNotes(e.target.value)}
-              placeholder="Stan techniczny, uwagi, powód zdjęcia..."
+              placeholder="Stan techniczny, uwagi..."
               rows={4}
             />
           </div>

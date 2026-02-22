@@ -20,7 +20,16 @@ export default async function GaragePage() {
   const [storedParts, user] = await Promise.all([
     prisma.storedPart.findMany({
       where: { userId },
-      include: { product: { select: { officialImageUrl: true } } },
+      include: {
+        product: {
+          select: {
+            id: true,
+            officialImageUrl: true,
+            averageRating: true,
+            totalReviews: true,
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
     }),
     prisma.user.findUnique({
@@ -68,6 +77,9 @@ export default async function GaragePage() {
     removedAt: p.removedAt,
     fromBikeName: p.fromBikeId ? (bikeMap.get(p.fromBikeId) ?? null) : null,
     productImageUrl: p.product?.officialImageUrl ?? null,
+    productId: p.product?.id ?? null,
+    averageRating: p.product?.averageRating ?? null,
+    totalReviews: p.product?.totalReviews ?? 0,
   }));
 
   const unitPref = user.unitPreference ?? "METRIC";

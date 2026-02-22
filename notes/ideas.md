@@ -1,6 +1,6 @@
 # Pomysły
 
-    -
+    -   miniaturka roweru jak dodane zdjęcie
     -
 
 

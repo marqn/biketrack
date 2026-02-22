@@ -74,7 +74,7 @@ export async function installPart(data: InstallPartInput) {
   if (!part) throw new Error("Part not found");
 
   // Opcjonalnie: zachowaj starą część w garażu przed wymianą
-  if (mode === "replace" && data.saveToGarage && (part.productId || part.wearKm > 0)) {
+  if (mode === "replace" && data.saveToGarage && (part.productId || part.wearKm > 0 || part.installedAt)) {
     const session = await getServerSession(authOptions);
     if (session?.user?.id) {
       await prisma.storedPart.create({

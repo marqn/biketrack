@@ -226,7 +226,7 @@ export default function PartDetailsDialog({
         setReviewText("");
       }
       setHoveredRating(0);
-      setSaveToGarage(false);
+      setSaveToGarage(mode === "replace");
     }
 
     if (open) {
@@ -511,17 +511,25 @@ export default function PartDetailsDialog({
           style={{ maxHeight: "calc(90vh - 200px)" }}
         >
           {/* === Zachowaj starą część === */}
-          {mode === "replace" && (currentPart?.productId || (currentPart?.wearKm ?? 0) > 0) && (
-            <div className="rounded-md border p-3 bg-muted/30 flex items-start space-x-3">
+          {mode === "replace" && (
+            <div
+              className="rounded-md border p-3 bg-muted/30 flex items-start space-x-3 cursor-pointer"
+              onClick={() => setSaveToGarage((v) => !v)}
+            >
               <Checkbox
                 id="save-to-garage"
                 checked={saveToGarage}
                 onCheckedChange={(checked) => setSaveToGarage(checked === true)}
-                className="mt-0.5"
+                className="mt-0.5 pointer-events-none"
               />
               <div>
                 <Label htmlFor="save-to-garage" className="text-sm font-medium cursor-pointer">
-                  Zachowaj starą część w garażu
+                  Zachowaj{" "}
+                  {currentPart?.product
+                    ? <span className="font-semibold">{currentPart.product.brand} {currentPart.product.model}</span>
+                    : <span className="font-semibold">{partName}</span>
+                  }{" "}
+                  w garażu
                 </Label>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   Możesz ją później ponownie założyć na rower
