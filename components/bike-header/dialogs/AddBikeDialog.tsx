@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { ElectricBikeCheckbox } from "@/components/bike/ElectricBikeCheckbox";
 import NumberStepper from "@/components/ui/number-stepper";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { BikeType } from "@/lib/generated/prisma";
@@ -423,17 +423,12 @@ export function AddBikeDialog({
               )}
 
               {selectedType !== BikeType.TRAINER && (
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="new-bike-electric"
-                    checked={isElectric}
-                    onCheckedChange={(checked) => setIsElectric(checked === true)}
-                    disabled={isPending}
-                  />
-                  <Label htmlFor="new-bike-electric" className="cursor-pointer">
-                    Rower elektryczny (e-bike)
-                  </Label>
-                </div>
+                <ElectricBikeCheckbox
+                  id="new-bike-electric"
+                  checked={isElectric}
+                  onCheckedChange={setIsElectric}
+                  disabled={isPending}
+                />
               )}
 
               <DialogFooter className="flex-col gap-2 sm:flex-col">

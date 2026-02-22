@@ -8,8 +8,11 @@ import { CheckIcon } from "lucide-react"
 
 function Checkbox({
   className,
+  icon,
   ...props
-}: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
+}: React.ComponentProps<typeof CheckboxPrimitive.Root> & {
+  icon?: React.ReactNode
+}) {
   return (
     <CheckboxPrimitive.Root
       data-slot="checkbox"
@@ -23,8 +26,7 @@ function Checkbox({
         data-slot="checkbox-indicator"
         className="[&>svg]:size-3.5 grid place-content-center text-current transition-none"
       >
-        <CheckIcon
-        />
+        {icon ?? <CheckIcon />}
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   )

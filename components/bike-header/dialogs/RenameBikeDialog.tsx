@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
+import { ElectricBikeCheckbox } from "@/components/bike/ElectricBikeCheckbox";
 import NumberStepper from "@/components/ui/number-stepper";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -198,19 +198,12 @@ export function RenameBikeDialog({
             </div>
 
             {type !== BikeType.TRAINER && (
-              <div className="flex items-center space-x-2 pb-2">
-                <Checkbox
-                  id="is-electric"
+              <div className="pb-2">
+                <ElectricBikeCheckbox
                   checked={isElectric}
-                  onCheckedChange={(checked) => setIsElectric(checked === true)}
+                  onCheckedChange={setIsElectric}
                   disabled={isLoading}
                 />
-                <Label
-                  htmlFor="is-electric"
-                  className="cursor-pointer whitespace-nowrap"
-                >
-                  E-bike
-                </Label>
               </div>
             )}
           </div>

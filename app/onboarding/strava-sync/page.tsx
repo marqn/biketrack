@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ElectricBikeCheckbox } from "@/components/bike/ElectricBikeCheckbox";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels, BikeProduct } from "@/lib/types";
@@ -270,16 +271,10 @@ export default function StravaOnboardingPage() {
                 </div>
               )}
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="is-electric"
-                  checked={isElectric}
-                  onCheckedChange={(checked) => setIsElectric(checked === true)}
-                />
-                <Label htmlFor="is-electric" className="cursor-pointer">
-                  Rower elektryczny (e-bike)
-                </Label>
-              </div>
+              <ElectricBikeCheckbox
+                checked={isElectric}
+                onCheckedChange={setIsElectric}
+              />
 
               <div className="space-y-3 pt-2">
                 <Button
