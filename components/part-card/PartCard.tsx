@@ -232,14 +232,14 @@ export default function PartCard({
         )}
       </Card>
 
-      {/* Dialog dla edycji istniejącej części */}
+      {/* Dialog dla podglądu/edycji istniejącej części */}
       <PartDetailsDialog
         open={activeDialog === "bike-details"}
         onOpenChange={(open) => !open && closeDialog()}
         partType={partType}
         partName={partName}
         partId={partId || ""}
-        mode={canReplace ? "edit" : "create"}
+        mode={hasCurrentPart ? "view" : canReplace ? "edit" : "create"}
         currentPart={currentPart}
         bikeType={bikeType}
       />

@@ -2,7 +2,9 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { PartType } from "@/lib/generated/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { PartType, Prisma } from "@/lib/generated/prisma";
 
 // Pomocnicza funkcja do normalizacji typu części do "kanonicznego" typu
 // Używamy jej aby opony, klocki i tarcze współdzieliły produkty
@@ -51,6 +53,9 @@ export interface InstallPartInput {
   // Użytkownik nie zna marki i modelu
   unknownProduct?: boolean;
 
+  // Zachowaj starą część w garażu przy wymianie
+  saveToGarage?: boolean;
+
   // @deprecated - użyj mode: "replace" zamiast tego
   isReplacement?: boolean;
 }
@@ -67,6 +72,27 @@ export async function installPart(data: InstallPartInput) {
   });
 
   if (!part) throw new Error("Part not found");
+
+  // Opcjonalnie: zachowaj starą część w garażu przed wymianą
+  if (mode === "replace" && data.saveToGarage && (part.productId || part.wearKm > 0 || part.installedAt)) {
+    const session = await getServerSession(authOptions);
+    if (session?.user?.id) {
+      await prisma.storedPart.create({
+        data: {
+          userId: session.user.id,
+          partType: part.type,
+          brand: part.product?.brand || null,
+          model: part.product?.model || null,
+          wearKm: part.wearKm,
+          expectedKm: part.expectedKm,
+          productId: part.productId,
+          partSpecificData: part.partSpecificData ?? Prisma.JsonNull,
+          fromBikeId: part.bikeId,
+          removedAt: new Date(),
+        },
+      });
+    }
+  }
 
   // Obsługa wymiany części - zaktualizuj istniejący rekord lub utwórz nowy
   if (mode === "replace") {

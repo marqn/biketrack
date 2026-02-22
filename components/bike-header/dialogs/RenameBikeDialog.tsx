@@ -314,7 +314,7 @@ export function RenameBikeDialog({
                 </button>
               </p>
             )}
-            {!isPublic && !visibilityLoading && visibilitySlug && (
+            {!isPublic && !visibilityLoading && (
               <p className="text-xs text-yellow-400">
                 Rower jest niewidoczny dla innych.
               </p>
