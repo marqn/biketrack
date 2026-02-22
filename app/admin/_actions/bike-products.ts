@@ -23,6 +23,7 @@ export async function getBikeProducts(params: {
   page?: number;
   search?: string;
   bikeType?: BikeType;
+  all?: boolean;
 }) {
   const pageSize = 20;
   const page = params.page || 1;
@@ -36,6 +37,19 @@ export async function getBikeProducts(params: {
       ],
     }),
   };
+
+  if (params.all) {
+    const products = await prisma.bikeProduct.findMany({
+      where,
+      include: {
+        defaultParts: {
+          include: { partProduct: true },
+        },
+      },
+      orderBy: [{ brand: "asc" }, { model: "asc" }],
+    });
+    return { products, total: products.length, totalPages: 1 };
+  }
 
   const [products, total] = await Promise.all([
     prisma.bikeProduct.findMany({
