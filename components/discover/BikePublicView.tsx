@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
-import { Bike as BikeIcon, MapPin, LogIn, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Bike as BikeIcon, MapPin, LogIn, X, ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Watermark } from "@/components/ui/watermark";
 import { bikeTypeLabels } from "@/lib/types";
 import { BikeType, PartType } from "@/lib/generated/prisma";
@@ -63,6 +64,7 @@ interface BikePublicViewProps {
 
 export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId, likeCount, isLiked }: BikePublicViewProps) {
   const { data: session } = useSession();
+  const router = useRouter();
   const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
   const [imageOpen, setImageOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -84,6 +86,10 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId, likeC
 
   return (
     <div className="space-y-6">
+      <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-1.5 -ml-2">
+        <ArrowLeft className="h-4 w-4" />
+        Wstecz
+      </Button>
       {/* Header z informacjami o rowerze */}
       <div className="bg-card rounded-xl border overflow-hidden">
         {/* Zdjęcia roweru */}

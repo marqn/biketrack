@@ -49,13 +49,17 @@ export async function getProducts({
     newest: { createdAt: "desc" },
   }[sortBy] as Prisma.PartProductOrderByWithRelationInput;
 
+  const searchTerms = search ? search.trim().split(/\s+/).filter(Boolean) : [];
+
   const where: Prisma.PartProductWhereInput = {
     ...(type ? { type } : types?.length ? { type: { in: types } } : {}),
-    ...(search && {
-      OR: [
-        { brand: { contains: search, mode: "insensitive" } },
-        { model: { contains: search, mode: "insensitive" } },
-      ],
+    ...(searchTerms.length > 0 && {
+      AND: searchTerms.map((term) => ({
+        OR: [
+          { brand: { contains: term, mode: "insensitive" } },
+          { model: { contains: term, mode: "insensitive" } },
+        ],
+      })),
     }),
   };
 
