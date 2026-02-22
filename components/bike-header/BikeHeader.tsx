@@ -20,6 +20,7 @@ import {
   Compass,
   RefreshCw,
   X,
+  Warehouse,
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
@@ -473,6 +474,26 @@ export function BikeHeader({
               </TooltipTrigger>
               <TooltipContent>
                 <p>Historia</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={
+                    pathname?.startsWith("/app/garage") ? "default" : "outline"
+                  }
+                  size="icon"
+                  style={pill(!!pathname?.startsWith("/app/garage"))}
+                  onClick={() => navigate("/app/garage")}
+                >
+                  <Warehouse className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Garaż</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

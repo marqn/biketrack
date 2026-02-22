@@ -47,6 +47,7 @@ model User {
   bikeComments   BikeComment[]
   commentReports CommentReport[]
   bikeLikes      BikeLike[]
+  storedParts    StoredPart[]
 
   createdAt DateTime @default(now())
 }
@@ -285,6 +286,31 @@ model PartReplacement {
   @@index([productId])
 }
 
+// Części przechowywane w garażu użytkownika (zdjęte z roweru, ale zachowane)
+model StoredPart {
+  id               String    @id @default(cuid())
+  userId           String
+  partType         PartType
+  brand            String?
+  model            String?
+  wearKm           Int       @default(0)
+  expectedKm       Int       @default(0)
+  productId        String?
+  partSpecificData Json?
+  notes            String?
+  fromBikeId       String?   // Informacyjnie: skąd pochodzi część
+  removedAt        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product PartProduct? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([productId])
+}
+
 // Globalna baza produktów (community-driven)
 model PartProduct {
   id   String   @id @default(cuid())
@@ -312,6 +338,7 @@ model PartProduct {
   reviews             PartReview[]
   serviceEvents       ServiceEvent[]
   partReplacements    PartReplacement[]
+  storedParts         StoredPart[]
   bikeProductDefaults BikeProductDefaultPart[]
 
   createdAt DateTime @default(now())

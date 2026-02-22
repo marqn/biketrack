@@ -130,6 +130,7 @@ export default function PartDetailsDialog({
     Record<string, unknown>
   >(getDefaultSpecificData(partType) as Record<string, unknown>);
   const [unknownProduct, setUnknownProduct] = useState(false);
+  const [saveToGarage, setSaveToGarage] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isLoadingReview, setIsLoadingReview] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -225,6 +226,7 @@ export default function PartDetailsDialog({
         setReviewText("");
       }
       setHoveredRating(0);
+      setSaveToGarage(false);
     }
 
     if (open) {
@@ -269,6 +271,7 @@ export default function PartDetailsDialog({
             reviewText: reviewText.trim() || undefined,
             mode,
             unknownProduct,
+            saveToGarage: mode === "replace" ? saveToGarage : undefined,
           });
         }
         onOpenChange(false);
@@ -507,6 +510,26 @@ export default function PartDetailsDialog({
           className="custom-scrollbar space-y-6 overflow-y-auto -mx-6 pl-6 pr-8"
           style={{ maxHeight: "calc(90vh - 200px)" }}
         >
+          {/* === Zachowaj starą część === */}
+          {mode === "replace" && (currentPart?.productId || (currentPart?.wearKm ?? 0) > 0) && (
+            <div className="rounded-md border p-3 bg-muted/30 flex items-start space-x-3">
+              <Checkbox
+                id="save-to-garage"
+                checked={saveToGarage}
+                onCheckedChange={(checked) => setSaveToGarage(checked === true)}
+                className="mt-0.5"
+              />
+              <div>
+                <Label htmlFor="save-to-garage" className="text-sm font-medium cursor-pointer">
+                  Zachowaj starą część w garażu
+                </Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Możesz ją później ponownie założyć na rower
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* === Podstawowe informacje === */}
           <div className="space-y-4">
             <h3 className="text-base font-semibold">Podstawowe informacje</h3>

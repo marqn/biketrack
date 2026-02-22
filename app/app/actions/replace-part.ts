@@ -1,6 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { PartType, Prisma, ServiceType } from "@/lib/generated/prisma";
 
@@ -10,6 +12,7 @@ export async function replacePart(formData: FormData) {
   const brand = formData.get("brand") as string | null;
   const model = formData.get("model") as string | null;
   const notes = formData.get("notes") as string | null;
+  const saveToGarage = formData.get("saveToGarage") === "true";
 
   if (!bikeId || !partType) {
     throw new Error("Brak wymaganych danych");
@@ -46,6 +49,27 @@ export async function replacePart(formData: FormData) {
       kmUsed: part.wearKm,
     },
   });
+
+  // Opcjonalnie: zachowaj starą część w garażu
+  if (saveToGarage && (part.productId || part.wearKm > 0)) {
+    const session = await getServerSession(authOptions);
+    if (session?.user?.id) {
+      await prisma.storedPart.create({
+        data: {
+          userId: session.user.id,
+          partType,
+          brand: part.product?.brand || null,
+          model: part.product?.model || null,
+          wearKm: part.wearKm,
+          expectedKm: part.expectedKm,
+          productId: part.productId,
+          partSpecificData: part.partSpecificData ?? Prisma.JsonNull,
+          fromBikeId: bikeId,
+          removedAt: new Date(),
+        },
+      });
+    }
+  }
 
   // Reset BikePart (nowa część = czyste dane)
   await prisma.bikePart.update({
