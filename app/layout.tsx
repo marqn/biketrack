@@ -5,6 +5,7 @@ import { Providers } from "./providers";
 import { Toaster } from "@/components/ui/sonner";
 import { JetBrains_Mono } from "next/font/google";
 import { NavigationViewTransition } from "@/components/navigation-view-transition";
+import { CookieBanner } from "@/components/cookie-banner";
 
 const font = JetBrains_Mono({
   subsets: ["latin"],
@@ -30,6 +31,7 @@ export default function RootLayout({
           <NavigationViewTransition>
             {children}
             <Toaster />
+            <CookieBanner />
           </NavigationViewTransition>
         </Providers>
       </body>
