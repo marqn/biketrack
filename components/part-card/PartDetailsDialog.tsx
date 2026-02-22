@@ -33,6 +33,7 @@ import { cn } from "@/lib/utils";
 import { BikeType, PartType } from "@/lib/generated/prisma";
 import { PartProduct, BikePartWithProduct } from "@/lib/types";
 import { installPart } from "@/app/app/actions/install-part";
+import { savePartReview } from "@/app/app/actions/save-part-review";
 import { getUserPartReview } from "@/app/app/actions/get-user-part-review";
 import { ImageUploader } from "@/components/ui/image-uploader";
 import BrandModelFields from "./BrandModelFields";
@@ -89,7 +90,7 @@ interface PartDetailsDialogProps {
   partType: PartType;
   partName: string;
   partId: string;
-  mode: "create" | "edit" | "replace";
+  mode: "create" | "edit" | "replace" | "view";
   currentPart?: Partial<BikePartWithProduct> | null;
   bikeType?: BikeType;
   // Opcjonalne - dla edycji PartReplacement z historii
@@ -130,7 +131,6 @@ export default function PartDetailsDialog({
     Record<string, unknown>
   >(getDefaultSpecificData(partType) as Record<string, unknown>);
   const [unknownProduct, setUnknownProduct] = useState(false);
-  const [saveToGarage, setSaveToGarage] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isLoadingReview, setIsLoadingReview] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -141,7 +141,41 @@ export default function PartDetailsDialog({
 
   useEffect(() => {
     async function initDialog() {
-      if (mode === "edit" && currentPart?.product) {
+      if (mode === "view" && currentPart?.product) {
+        // Tryb podglądu - tylko do odczytu, edycja tylko opinii i zdjęcia
+        setSelectedProduct(currentPart.product as PartProduct);
+        setBrand(currentPart.product.brand);
+        setModel(currentPart.product.model);
+        setUnknownProduct(false);
+        if (currentPart.installedAt) {
+          setInstalledAt(format(new Date(currentPart.installedAt), "yyyy-MM-dd"));
+        } else {
+          setInstalledAt("");
+        }
+        if (currentPart.partSpecificData) {
+          setPartSpecificData(currentPart.partSpecificData as Record<string, unknown>);
+        } else {
+          setPartSpecificData(getDefaultSpecificData(partType) as Record<string, unknown>);
+        }
+        if (currentPart.product.id) {
+          setIsLoadingReview(true);
+          try {
+            const review = await getUserPartReview(currentPart.product.id);
+            if (review) {
+              setRating(review.rating);
+              setReviewText(review.reviewText || "");
+            } else {
+              setRating(0);
+              setReviewText("");
+            }
+          } finally {
+            setIsLoadingReview(false);
+          }
+        } else {
+          setRating(0);
+          setReviewText("");
+        }
+      } else if (mode === "edit" && currentPart?.product) {
         // Tryb edycji - załaduj dane z currentPart
         setSelectedProduct(currentPart.product as PartProduct);
         setBrand(currentPart.product.brand);
@@ -226,7 +260,6 @@ export default function PartDetailsDialog({
         setReviewText("");
       }
       setHoveredRating(0);
-      setSaveToGarage(mode === "replace");
     }
 
     if (open) {
@@ -243,6 +276,27 @@ export default function PartDetailsDialog({
   ]);
 
   async function handleSave() {
+    if (mode === "view") {
+      startTransition(async () => {
+        try {
+          if (rating > 0 && selectedProduct?.id) {
+            await savePartReview({
+              partId,
+              productId: selectedProduct.id,
+              rating,
+              reviewText: reviewText.trim() || undefined,
+            });
+          }
+          onOpenChange(false);
+          router.refresh();
+        } catch (error) {
+          console.error("Error saving review:", error);
+          alert("Wystąpił błąd podczas zapisywania opinii");
+        }
+      });
+      return;
+    }
+
     if (!unknownProduct && (!brand.trim() || !model.trim())) {
       alert("Proszę podać markę i model");
       return;
@@ -271,7 +325,7 @@ export default function PartDetailsDialog({
             reviewText: reviewText.trim() || undefined,
             mode,
             unknownProduct,
-            saveToGarage: mode === "replace" ? saveToGarage : undefined,
+            saveToGarage: mode === "replace" ? true : undefined,
           });
         }
         onOpenChange(false);
@@ -492,17 +546,21 @@ export default function PartDetailsDialog({
       <DialogContent className="max-w-2xl max-h-[90vh]">
         <DialogHeader className="shrink-0">
           <DialogTitle className="py-2">
-            {mode === "edit"
-              ? "Edytuj szczegóły"
-              : mode === "replace"
-                ? "Wymień"
-                : "Dodaj szczegóły"}
+            {mode === "view"
+              ? "Szczegóły"
+              : mode === "edit"
+                ? "Edytuj szczegóły"
+                : mode === "replace"
+                  ? "Wymień"
+                  : "Dodaj szczegóły"}
             : {partName}
           </DialogTitle>
           <DialogDescription>
-            {mode === "replace"
-              ? "Podaj szczegóły nowej części"
-              : "Określ model części oraz jej parametry użytkowe"}
+            {mode === "view"
+              ? "Zdjęcie i opinia (marka i model tylko do odczytu)"
+              : mode === "replace"
+                ? "Podaj szczegóły nowej części"
+                : "Określ model części oraz jej parametry użytkowe"}
           </DialogDescription>
         </DialogHeader>
 
@@ -510,79 +568,70 @@ export default function PartDetailsDialog({
           className="custom-scrollbar space-y-6 overflow-y-auto -mx-6 pl-6 pr-8"
           style={{ maxHeight: "calc(90vh - 200px)" }}
         >
-          {/* === Zachowaj starą część === */}
-          {mode === "replace" && (
-            <div
-              className="rounded-md border p-3 bg-muted/30 flex items-start space-x-3 cursor-pointer"
-              onClick={() => setSaveToGarage((v) => !v)}
-            >
-              <Checkbox
-                id="save-to-garage"
-                checked={saveToGarage}
-                onCheckedChange={(checked) => setSaveToGarage(checked === true)}
-                className="mt-0.5 pointer-events-none"
-              />
-              <div>
-                <Label htmlFor="save-to-garage" className="text-sm font-medium cursor-pointer">
-                  Zachowaj{" "}
-                  {currentPart?.product
-                    ? <span className="font-semibold">{currentPart.product.brand} {currentPart.product.model}</span>
-                    : <span className="font-semibold">{partName}</span>
-                  }{" "}
-                  w garażu
-                </Label>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Możesz ją później ponownie założyć na rower
-                </p>
+
+          {/* === Tryb podglądu: marka/model/data tylko do odczytu === */}
+          {mode === "view" && (
+            <div className="space-y-2">
+              <h3 className="text-base font-semibold">Zainstalowana część</h3>
+              <div className="rounded-md border p-3 bg-muted/30">
+                <p className="font-medium">{brand} {model}</p>
+                {installedAt && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Zainstalowano:{" "}
+                    {format(new Date(installedAt), "d MMMM yyyy", { locale: pl })}
+                  </p>
+                )}
               </div>
             </div>
           )}
 
           {/* === Podstawowe informacje === */}
-          <div className="space-y-4">
-            <h3 className="text-base font-semibold">Podstawowe informacje</h3>
+          {mode !== "view" && (
+            <div className="space-y-4">
+              <h3 className="text-base font-semibold">Podstawowe informacje</h3>
 
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="unknown-product"
-                checked={unknownProduct}
-                onCheckedChange={(checked) => {
-                  setUnknownProduct(checked === true);
-                  if (checked) {
-                    setBrand("");
-                    setModel("");
-                    setSelectedProduct(null);
-                    setRating(0);
-                    setReviewText("");
-                  }
-                }}
-              />
-              <Label
-                htmlFor="unknown-product"
-                className="text-sm font-normal cursor-pointer"
-              >
-                Nie znam marki i modelu
-              </Label>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="unknown-product"
+                  checked={unknownProduct}
+                  onCheckedChange={(checked) => {
+                    setUnknownProduct(checked === true);
+                    if (checked) {
+                      setBrand("");
+                      setModel("");
+                      setSelectedProduct(null);
+                      setRating(0);
+                      setReviewText("");
+                    }
+                  }}
+                />
+                <Label
+                  htmlFor="unknown-product"
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  Nie znam marki i modelu
+                </Label>
+              </div>
+
+              {!unknownProduct && (
+                <BrandModelFields
+                  partType={partType}
+                  brand={brand}
+                  model={model}
+                  onBrandChange={(newBrand) => { setBrand(newBrand); setSelectedProduct(null); }}
+                  onModelChange={(newModel) => { setModel(newModel); setSelectedProduct(null); }}
+                  onProductSelect={(product) => {
+                    setSelectedProduct(product);
+                    if (product && product.specifications) {
+                      setPartSpecificData(
+                        product.specifications as Record<string, unknown>,
+                      );
+                    }
+                  }}
+                />
+              )}
             </div>
-
-            {!unknownProduct && (
-              <BrandModelFields
-                partType={partType}
-                brand={brand}
-                model={model}
-                onBrandChange={(newBrand) => { setBrand(newBrand); setSelectedProduct(null); }}
-                onModelChange={(newModel) => { setModel(newModel); setSelectedProduct(null); }}
-                onProductSelect={(product) => {
-                  setSelectedProduct(product);
-                  if (product && product.specifications) {
-                    setPartSpecificData(
-                      product.specifications as Record<string, unknown>,
-                    );
-                  }
-                }}
-              />
-            )}
-          </div>
+          )}
 
           {/* === Zdjęcie części === */}
           {!unknownProduct && selectedProduct && (
@@ -641,7 +690,7 @@ export default function PartDetailsDialog({
           )}
 
           {/* === Data montażu === */}
-          <div className="space-y-4">
+          {mode !== "view" && <div className="space-y-4">
             <h3 className="text-base font-semibold">Data montażu</h3>
             <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
               <PopoverTrigger asChild>
@@ -675,10 +724,10 @@ export default function PartDetailsDialog({
                 />
               </PopoverContent>
             </Popover>
-          </div>
+          </div>}
 
           {/* === Specyficzne pola dla typu części === */}
-          {(() => {
+          {mode !== "view" && (() => {
             const fields = renderSpecificFields();
             if (!fields) return null;
             return (
@@ -746,7 +795,7 @@ export default function PartDetailsDialog({
             Anuluj
           </Button>
           <Button onClick={handleSave} disabled={isPending}>
-            {isPending ? "Zapisuję..." : "Zapisz"}
+            {isPending ? "Zapisuję..." : mode === "view" ? "Zapisz opinię" : "Zapisz"}
           </Button>
         </DialogFooter>
       </DialogContent>
