@@ -244,6 +244,7 @@ export default function UsersPage() {
                       id={user.id}
                       onDelete={deleteUser}
                       confirmMessage="Czy na pewno chcesz usunąć tego użytkownika? Wszystkie jego dane (rowery, komentarze, opinie) zostaną usunięte."
+                      onSuccess={() => loadUsers(search)}
                     />
                   </div>
                 </TableCell>

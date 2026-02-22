@@ -9,16 +9,21 @@ interface DeleteButtonProps {
   id: string;
   onDelete: (id: string) => Promise<void>;
   confirmMessage?: string;
+  onSuccess?: () => void;
 }
 
-export function DeleteButton({ id, onDelete, confirmMessage = "Czy na pewno chcesz usunac?" }: DeleteButtonProps) {
+export function DeleteButton({ id, onDelete, onSuccess }: DeleteButtonProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   function handleDelete() {
     startTransition(async () => {
       await onDelete(id);
-      router.refresh();
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.refresh();
+      }
     });
   }
 
