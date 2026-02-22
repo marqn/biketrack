@@ -17,7 +17,7 @@ export default async function EditBikePage({
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <BikeProductForm initialData={product} />
+      <BikeProductForm key={product.updatedAt.toString()} initialData={product} />
       <DefaultPartsManager
         bikeProductId={product.id}
         bikeType={product.bikeType}

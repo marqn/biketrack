@@ -3,8 +3,9 @@
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { BikeType } from "@/lib/generated/prisma";
-import { DEFAULT_PARTS, EBIKE_PARTS, getDefaultIsInstalled } from "@/lib/default-parts";
+import { BikeType, PartType } from "@/lib/generated/prisma";
+import { DEFAULT_PARTS, EBIKE_PARTS, getDefaultIsInstalled, type BrakeType } from "@/lib/default-parts";
+import { getDefaultSpecificData } from "@/lib/part-specific-data";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 // Normalizacja tekstu do Title Case (np. "trek" -> "Trek", "CANNONDALE" -> "Cannondale")
@@ -22,9 +23,20 @@ interface CreateBikeParams {
   year?: number | null;
   bikeProductId?: string | null;
   isElectric?: boolean;
+  brakeType?: BrakeType;
+  hasSuspensionFork?: boolean;
+  tubelessFront?: boolean;
+  tubelessRear?: boolean;
 }
 
-export async function createBike({ type, brand, model, year, bikeProductId, isElectric = false }: CreateBikeParams) {
+export async function createBike({
+  type, brand, model, year, bikeProductId,
+  isElectric = false,
+  brakeType = "disc",
+  hasSuspensionFork = false,
+  tubelessFront = false,
+  tubelessRear = false,
+}: CreateBikeParams) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
 
@@ -79,7 +91,7 @@ export async function createBike({ type, brand, model, year, bikeProductId, isEl
   }
 
   // Zacznij od domyślnych części dla typu roweru
-  const partsMap = new Map<string, { type: typeof DEFAULT_PARTS[BikeType][number]["type"]; expectedKm: number; productId?: string }>();
+  const partsMap = new Map<string, { type: typeof DEFAULT_PARTS[BikeType][number]["type"]; expectedKm: number; productId?: string; partSpecificData?: unknown }>();
 
   for (const p of DEFAULT_PARTS[type]) {
     partsMap.set(p.type, {
@@ -120,6 +132,30 @@ export async function createBike({ type, brand, model, year, bikeProductId, isEl
     }
   }
 
+  // Ustaw partSpecificData na podstawie konfiguracji roweru
+  const framePart = partsMap.get("FRAME");
+  if (framePart) {
+    framePart.partSpecificData = {
+      ...getDefaultSpecificData(PartType.FRAME),
+      brakeType,
+      forkType: hasSuspensionFork ? "suspension" : "rigid",
+    };
+  }
+  const tireFront = partsMap.get("TIRE_FRONT");
+  if (tireFront) {
+    tireFront.partSpecificData = {
+      ...getDefaultSpecificData(PartType.TIRE_FRONT),
+      tubelessReady: tubelessFront,
+    };
+  }
+  const tireRear = partsMap.get("TIRE_REAR");
+  if (tireRear) {
+    tireRear.partSpecificData = {
+      ...getDefaultSpecificData(PartType.TIRE_REAR),
+      tubelessReady: tubelessRear,
+    };
+  }
+
   const partsToCreate = Array.from(partsMap.values());
 
   await prisma.bike.create({
@@ -137,6 +173,7 @@ export async function createBike({ type, brand, model, year, bikeProductId, isEl
           productId: p.productId || undefined,
           installedAt: p.productId ? new Date() : undefined,
           isInstalled: getDefaultIsInstalled(p.type, type),
+          partSpecificData: p.partSpecificData ?? undefined,
         })),
       },
     },

@@ -5,8 +5,10 @@ import { prisma } from "@/lib/prisma";
 import LubeButton from "./lube-button";
 import SealantButton from "./sealant-button";
 import KmForm from "./km-form";
-import { ServiceType } from "@/lib/generated/prisma";
+import BikeSetupPanel from "./bike-setup-panel";
+import { ServiceType, PartType } from "@/lib/generated/prisma";
 import { DEFAULT_PARTS, EBIKE_PARTS, extractTubelessStatus } from "@/lib/default-parts";
+import type { BrakeType, ForkType } from "@/lib/default-parts";
 import { type PartsDisplayOrder } from "@/app/app/actions/parts-display-order";
 import { NotificationsList } from "@/components/notifications-list/NotificationsList";
 import { ensureEmailMissingNotification } from "@/lib/nofifications/rules/emailMissing";
@@ -115,6 +117,16 @@ export default async function AppPage() {
   );
   const lastLube = lubeEvents[0];
 
+  // Wyciągnij konfigurację roweru z partSpecificData
+  const framePart = bike.parts.find((p) => p.type === PartType.FRAME);
+  const tireFrontPart = bike.parts.find((p) => p.type === PartType.TIRE_FRONT);
+  const tireRearPart = bike.parts.find((p) => p.type === PartType.TIRE_REAR);
+  const frameData = (framePart?.partSpecificData as Record<string, unknown>) ?? {};
+  const initialBrakeType = (frameData.brakeType as BrakeType) ?? "disc";
+  const initialForkType = (frameData.forkType as ForkType) ?? "rigid";
+  const initialTubelessFront = !!(tireFrontPart?.partSpecificData as Record<string, unknown>)?.tubelessReady;
+  const initialTubelessRear = !!(tireRearPart?.partSpecificData as Record<string, unknown>)?.tubelessReady;
+
   // Przygotuj dane dla PartsAccordion
   const defaultParts = [...DEFAULT_PARTS[bike.type], ...(bike.isElectric ? EBIKE_PARTS : [])];
   const existingParts = bike.parts.map((p) => ({
@@ -146,6 +158,14 @@ export default async function AppPage() {
       {stravaAccount && <StravaSyncTrigger />}
 
       <KmForm bikeId={bike.id} initialKm={bike.totalKm} />
+
+      <BikeSetupPanel
+        bikeId={bike.id}
+        initialBrakeType={initialBrakeType}
+        initialForkType={initialForkType}
+        initialTubelessFront={initialTubelessFront}
+        initialTubelessRear={initialTubelessRear}
+      />
 
       <PartsAccordion
         bikeId={bike.id}

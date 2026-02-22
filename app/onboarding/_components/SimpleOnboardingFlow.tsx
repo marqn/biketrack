@@ -17,14 +17,15 @@ import { Label } from "@/components/ui/label";
 import NumberStepper from "@/components/ui/number-stepper";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ElectricBikeCheckbox } from "@/components/bike/ElectricBikeCheckbox";
 import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels, BikeProduct } from "@/lib/types";
 import { ArrowLeft } from "lucide-react";
+import type { BrakeType } from "@/lib/default-parts";
+import BikeConfigStep from "./BikeConfigStep";
 import type { UnitPreference } from "@/lib/units";
 import { detectUnitFromLocale } from "@/lib/units";
 
-type Step = 1 | 2 | 3 | "units";
+type Step = 1 | 2 | "config" | 3 | "units";
 
 export default function SimpleOnboardingFlow() {
   const [step, setStep] = useState<Step>(1);
@@ -35,6 +36,10 @@ export default function SimpleOnboardingFlow() {
   const [year, setYear] = useState(new Date().getFullYear().toString());
   const [selectedProduct, setSelectedProduct] = useState<BikeProduct | null>(null);
   const [isElectric, setIsElectric] = useState(false);
+  const [brakeType, setBrakeType] = useState<BrakeType>("disc");
+  const [hasSuspensionFork, setHasSuspensionFork] = useState(false);
+  const [tubelessFront, setTubelessFront] = useState(false);
+  const [tubelessRear, setTubelessRear] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -54,7 +59,7 @@ export default function SimpleOnboardingFlow() {
   }
 
   function handleDetailsNext() {
-    setStep(3);
+    setStep("config");
   }
 
   function handleDetailsSkip() {
@@ -62,11 +67,11 @@ export default function SimpleOnboardingFlow() {
     setModel("");
     setYear(new Date().getFullYear().toString());
     setSelectedProduct(null);
-    setStep(3);
+    setStep("config");
   }
 
   function handleBackToDetails() {
-    setStep(2);
+    setStep("config");
   }
 
   function handleTermsNext() {
@@ -86,6 +91,10 @@ export default function SimpleOnboardingFlow() {
         year: year ? parseInt(year, 10) : null,
         bikeProductId: selectedProduct?.id || null,
         isElectric,
+        brakeType,
+        hasSuspensionFork,
+        tubelessFront,
+        tubelessRear,
       });
     });
   }
@@ -97,12 +106,14 @@ export default function SimpleOnboardingFlow() {
           <CardTitle className="text-2xl">
             {step === 1 && "Wybierz typ roweru"}
             {step === 2 && "Szczegóły roweru"}
+            {step === "config" && "Konfiguracja"}
             {step === 3 && "Regulamin"}
             {step === "units" && "Jednostki"}
           </CardTitle>
           <CardDescription className="text-base">
             {step === 1 && "Jaki typ roweru chcesz śledzić?"}
             {step === 2 && "Podaj markę i model (opcjonalnie)"}
+            {step === "config" && "Dostosuj ustawienia roweru (opcjonalnie)"}
             {step === 3 && "Zapoznaj się z regulaminem serwisu"}
             {step === "units" && "Wybierz preferowany system jednostek"}
           </CardDescription>
@@ -164,11 +175,6 @@ export default function SimpleOnboardingFlow() {
                 />
               </div>
 
-              <ElectricBikeCheckbox
-                checked={isElectric}
-                onCheckedChange={setIsElectric}
-              />
-
               <div className="space-y-3 pt-2">
                 <Button
                   onClick={handleDetailsNext}
@@ -188,6 +194,24 @@ export default function SimpleOnboardingFlow() {
                 </Button>
               </div>
             </>
+          )}
+
+          {step === "config" && (
+            <BikeConfigStep
+              brakeType={brakeType}
+              hasSuspensionFork={hasSuspensionFork}
+              tubelessFront={tubelessFront}
+              tubelessRear={tubelessRear}
+              isElectric={isElectric}
+              onBrakeTypeChange={setBrakeType}
+              onSuspensionForkChange={setHasSuspensionFork}
+              onTubelessFrontChange={setTubelessFront}
+              onTubelessRearChange={setTubelessRear}
+              onIsElectricChange={setIsElectric}
+              onNext={() => setStep(3)}
+              onSkip={() => setStep(3)}
+              onBack={() => setStep(2)}
+            />
           )}
 
           {step === 3 && (

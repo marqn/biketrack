@@ -424,6 +424,8 @@ model BikeProduct {
   description      String? @db.Text
   officialImageUrl String?
   year             Int? // rok modelowy
+  isElectric       Boolean @default(false)
+  isPublic         Boolean @default(true) // Widoczny w katalogu publicznym
 
   defaultParts BikeProductDefaultPart[]
 

@@ -599,6 +599,27 @@ export function extractTubelessStatus(
   };
 }
 
+export type ForkType = "rigid" | "suspension";
+
+export function extractForkType(
+  parts: Array<{ type: PartType; partSpecificData?: unknown }>
+): ForkType | undefined {
+  const framePart = parts.find((p) => p.type === PartType.FRAME);
+  if (!framePart?.partSpecificData) return undefined;
+  const data = framePart.partSpecificData as Record<string, unknown>;
+  return data.forkType as ForkType | undefined;
+}
+
+export function getHiddenPartsByForkType(forkType: ForkType | undefined): Set<PartType> {
+  const hidden = new Set<PartType>();
+  if (forkType === "suspension") {
+    hidden.add(PartType.FORK);
+  } else {
+    hidden.add(PartType.SUSPENSION_FORK);
+  }
+  return hidden;
+}
+
 export function getHiddenPartsByTubelessStatus(
   tubeless: { front: boolean; rear: boolean }
 ): Set<PartType> {

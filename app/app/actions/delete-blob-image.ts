@@ -7,7 +7,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { revalidatePath } from "next/cache";
 
 export async function deleteBlobImage(
-  entityType: "bike" | "part" | "avatar" | "review" | "product",
+  entityType: "bike" | "part" | "avatar" | "review" | "product" | "bikeproduct",
   entityId: string,
   imageUrl: string
 ) {
@@ -115,6 +115,29 @@ export async function deleteBlobImage(
           images: review.images.filter((url) => url !== imageUrl),
         },
       });
+    } else if (entityType === "bikeproduct") {
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { role: true },
+      });
+      if (user?.role !== "ADMIN") {
+        return { success: false, error: "Brak uprawnień" };
+      }
+      const product = await prisma.bikeProduct.findUnique({
+        where: { id: entityId },
+        select: { officialImageUrl: true },
+      });
+      if (!product) {
+        return { success: false, error: "Produkt nie istnieje" };
+      }
+      if (imageUrl.includes(".public.blob.vercel-storage.com")) {
+        await del(imageUrl);
+      }
+      await prisma.bikeProduct.update({
+        where: { id: entityId },
+        data: { officialImageUrl: null },
+      });
+      revalidatePath("/admin/bikes");
     }
 
     revalidatePath("/app", "layout");

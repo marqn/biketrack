@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 export async function saveBlobImage(
-  entityType: "bike" | "part" | "avatar" | "review" | "product",
+  entityType: "bike" | "part" | "avatar" | "review" | "product" | "bikeproduct",
   entityId: string,
   blobUrl: string
 ) {
@@ -115,6 +115,28 @@ export async function saveBlobImage(
         data: {
           images: { push: blobUrl },
         },
+      });
+    } else if (entityType === "bikeproduct") {
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { role: true },
+      });
+      if (user?.role !== "ADMIN") {
+        return { success: false, error: "Brak uprawnień" };
+      }
+      const product = await prisma.bikeProduct.findUnique({
+        where: { id: entityId },
+        select: { officialImageUrl: true },
+      });
+      if (!product) {
+        return { success: false, error: "Produkt nie istnieje" };
+      }
+      if (product.officialImageUrl) {
+        return { success: false, error: "Produkt ma już zdjęcie" };
+      }
+      await prisma.bikeProduct.update({
+        where: { id: entityId },
+        data: { officialImageUrl: blobUrl },
       });
     }
 

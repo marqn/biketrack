@@ -20,6 +20,8 @@ import {
   extractBrakeType,
   getHiddenPartsByTubelessStatus,
   extractTubelessStatus,
+  extractForkType,
+  getHiddenPartsByForkType,
   TOGGLEABLE_PARTS,
 } from "@/lib/default-parts";
 import { PartReplacement, BikePartWithProduct } from "@/lib/types";
@@ -85,7 +87,9 @@ export default function PartsAccordion({
     const hiddenByBrake = getHiddenPartsByBrakeType(brakeType);
     const tubelessStatus = extractTubelessStatus(existingParts);
     const hiddenByTubeless = getHiddenPartsByTubelessStatus(tubelessStatus);
-    const hiddenParts = new Set([...hiddenByBrake, ...hiddenByTubeless]);
+    const forkType = extractForkType(existingParts);
+    const hiddenByFork = getHiddenPartsByForkType(forkType);
+    const hiddenParts = new Set([...hiddenByBrake, ...hiddenByTubeless, ...hiddenByFork]);
 
     const categories: Record<
       PartCategory,

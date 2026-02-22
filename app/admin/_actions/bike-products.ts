@@ -87,6 +87,8 @@ export async function createBikeProduct(data: {
   year?: number | null;
   description?: string | null;
   officialImageUrl?: string | null;
+  isElectric?: boolean;
+  isPublic?: boolean;
 }) {
   await requireAdmin();
 
@@ -98,6 +100,8 @@ export async function createBikeProduct(data: {
       year: data.year || undefined,
       description: data.description || undefined,
       officialImageUrl: data.officialImageUrl || undefined,
+      isElectric: data.isElectric ?? false,
+      isPublic: data.isPublic ?? true,
     },
   });
 
@@ -114,6 +118,8 @@ export async function updateBikeProduct(
     year?: number | null;
     description?: string | null;
     officialImageUrl?: string | null;
+    isElectric?: boolean;
+    isPublic?: boolean;
   }
 ) {
   await requireAdmin();

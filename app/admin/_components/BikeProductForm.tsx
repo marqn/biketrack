@@ -15,12 +15,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import {
   createBikeProduct,
   updateBikeProduct,
   deleteBikeProduct,
 } from "../_actions/bike-products";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ImageUploader } from "@/components/ui/image-uploader";
 
 const bikeTypeLabels: Record<BikeType, string> = {
   ROAD: "Szosowy",
@@ -39,6 +41,8 @@ interface BikeProductFormProps {
     year?: number | null;
     description?: string | null;
     officialImageUrl?: string | null;
+    isElectric?: boolean;
+    isPublic?: boolean;
   };
 }
 
@@ -55,7 +59,11 @@ export function BikeProductForm({ initialData }: BikeProductFormProps) {
   const [description, setDescription] = useState(
     initialData?.description || ""
   );
-  const [imageUrl, setImageUrl] = useState(initialData?.officialImageUrl || "");
+  const [isElectric, setIsElectric] = useState(initialData?.isElectric ?? false);
+  const [isPublic, setIsPublic] = useState(initialData?.isPublic ?? true);
+  const [officialImageUrl, setOfficialImageUrl] = useState<string | null>(
+    initialData?.officialImageUrl || null
+  );
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -67,7 +75,8 @@ export function BikeProductForm({ initialData }: BikeProductFormProps) {
         model,
         year: year ? parseInt(year, 10) : null,
         description: description || null,
-        officialImageUrl: imageUrl || null,
+        isElectric,
+        isPublic,
       };
 
       if (initialData) {
@@ -163,17 +172,26 @@ export function BikeProductForm({ initialData }: BikeProductFormProps) {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="imageUrl">URL obrazka</Label>
-            <Input
-              id="imageUrl"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://..."
-            />
+          <div className="flex gap-6">
+            <div className="flex items-center gap-2">
+              <Switch
+                id="isElectric"
+                checked={isElectric}
+                onCheckedChange={setIsElectric}
+              />
+              <Label htmlFor="isElectric">E-bike (elektryczny)</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                id="isPublic"
+                checked={isPublic}
+                onCheckedChange={setIsPublic}
+              />
+              <Label htmlFor="isPublic">Widoczny w katalogu</Label>
+            </div>
           </div>
 
-          <div className="flex gap-2 pt-4">
+          <div className="flex gap-2 pt-2">
             <Button type="submit" disabled={isPending}>
               {isPending ? "Zapisywanie..." : "Zapisz"}
             </Button>
@@ -189,6 +207,19 @@ export function BikeProductForm({ initialData }: BikeProductFormProps) {
             )}
           </div>
         </form>
+
+        {initialData && (
+          <div className="mt-6 space-y-2">
+            <Label>Zdjęcie roweru</Label>
+            <ImageUploader
+              images={officialImageUrl ? [officialImageUrl] : []}
+              maxImages={1}
+              entityType="bikeproduct"
+              entityId={initialData.id}
+              onImagesChange={(urls) => setOfficialImageUrl(urls[0] || null)}
+            />
+          </div>
+        )}
       </CardContent>
     </Card>
   );

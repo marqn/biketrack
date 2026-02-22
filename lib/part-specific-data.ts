@@ -62,6 +62,7 @@ export type HubsSpecificData = {
 export type FrameSpecificData = {
   material: "aluminum" | "carbon" | "titanium" | "steel";
   brakeType: "rim" | "disc" | "disc-hydraulic" | "v-brake";
+  forkType?: "rigid" | "suspension";
   wheelSize: "24" | "26" | "27.5" | "28" | "29";
   frameSize: "xs" | "s" | "m" | "l" | "xl" | "xxl" | "one-size";
   gender: "women" | "men" | "unisex";

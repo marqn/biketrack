@@ -13,7 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DeleteButton } from "../_components/DeleteButton";
-import { ArrowUp, ArrowDown, ArrowUpDown, Pencil } from "lucide-react";
+import { ArrowUp, ArrowDown, ArrowUpDown, Pencil, ImageOff } from "lucide-react";
 import { bikeTypeLabels } from "@/lib/types";
 
 type SortKey = "brand" | "model" | "bikeType" | "year";
@@ -25,6 +25,7 @@ interface Product {
   model: string;
   bikeType: string;
   year: number | null;
+  officialImageUrl?: string | null;
   defaultParts: unknown[];
 }
 
@@ -75,6 +76,7 @@ export function BikesTable({ products, onDelete }: BikesTableProps) {
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHead className="w-14">Foto</TableHead>
           <TableHead className={headerClass} onClick={() => handleSort("brand")}>
             <span className="inline-flex items-center">Marka <SortIcon column="brand" /></span>
           </TableHead>
@@ -94,6 +96,19 @@ export function BikesTable({ products, onDelete }: BikesTableProps) {
       <TableBody>
         {sorted.map((product) => (
           <TableRow key={product.id}>
+            <TableCell>
+              {product.officialImageUrl ? (
+                <img
+                  src={product.officialImageUrl}
+                  alt={`${product.brand} ${product.model}`}
+                  className="w-10 h-10 object-cover rounded border"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded border bg-muted flex items-center justify-center">
+                  <ImageOff className="h-4 w-4 text-muted-foreground" />
+                </div>
+              )}
+            </TableCell>
             <TableCell className="font-medium">{product.brand}</TableCell>
             <TableCell>{product.model}</TableCell>
             <TableCell>
@@ -127,7 +142,7 @@ export function BikesTable({ products, onDelete }: BikesTableProps) {
         ))}
         {sorted.length === 0 && (
           <TableRow>
-            <TableCell colSpan={6} className="text-center text-muted-foreground">
+            <TableCell colSpan={7} className="text-center text-muted-foreground">
               Brak rowerów w bazie
             </TableCell>
           </TableRow>

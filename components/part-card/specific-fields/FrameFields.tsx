@@ -33,6 +33,11 @@ const BRAKE_TYPES = [
   { value: "v-brake", label: "V-Brake" },
 ];
 
+const FORK_TYPES = [
+  { value: "rigid", label: "Sztywny" },
+  { value: "suspension", label: "Amortyzowany" },
+];
+
 const WHEEL_SIZES = [
   { value: "24", label: '24"' },
   { value: "26", label: '26"' },
@@ -216,6 +221,27 @@ export default function FrameFields({ data, onChange, bikeType }: FrameFieldsPro
               </SelectTrigger>
               <SelectContent>
                 {BRAKE_TYPES.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="frame-fork-type">Widelec</Label>
+            <Select
+              value={data.forkType || ""}
+              onValueChange={(value) =>
+                onChange({ ...data, forkType: value as FrameSpecificData["forkType"] })
+              }
+            >
+              <SelectTrigger id="frame-fork-type">
+                <SelectValue placeholder="Wybierz typ widelca" />
+              </SelectTrigger>
+              <SelectContent>
+                {FORK_TYPES.map((item) => (
                   <SelectItem key={item.value} value={item.value}>
                     {item.label}
                   </SelectItem>

@@ -23,7 +23,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
         const payload = JSON.parse(clientPayload || "{}");
         const { type, entityId } = payload as {
-          type: "bike" | "part" | "avatar" | "review" | "product";
+          type: "bike" | "part" | "avatar" | "review" | "product" | "bikeproduct";
           entityId: string;
         };
 
@@ -77,6 +77,24 @@ export async function POST(request: Request): Promise<NextResponse> {
           });
           if (!product) {
             throw new Error("Produkt nie istnieje");
+          }
+        } else if (type === "bikeproduct") {
+          const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { role: true },
+          });
+          if (user?.role !== "ADMIN") {
+            throw new Error("Brak uprawnień");
+          }
+          const bikeProduct = await prisma.bikeProduct.findUnique({
+            where: { id: entityId },
+            select: { officialImageUrl: true },
+          });
+          if (!bikeProduct) {
+            throw new Error("Produkt nie istnieje");
+          }
+          if (bikeProduct.officialImageUrl) {
+            throw new Error("Produkt ma już zdjęcie");
           }
         }
 
