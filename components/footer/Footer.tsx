@@ -28,6 +28,12 @@ export function Footer() {
               >
                 Kontakt
               </Link>
+              <Link
+                href="/terms"
+                className="font-semibold text-foreground hover:underline"
+              >
+                Regulamin
+              </Link>
               <p>© {yearDisplay} MBike. Wszelkie prawa zastrzeżone.</p>
             </div>
             <div className="flex flex-col gap-1">

@@ -225,16 +225,56 @@ export default function SimpleOnboardingFlow() {
               </button>
 
               <div className="h-60 custom-scrollbar overflow-y-auto rounded-md border p-4">
-                <div className="text-sm text-muted-foreground space-y-3">
+                <div className="text-sm text-muted-foreground space-y-4">
                   <p className="font-semibold text-foreground">Regulamin korzystania z serwisu MBike</p>
-                  <p>1. Serwis MBike służy do zarządzania rowerami, śledzenia przebiegu oraz planowania serwisowania części rowerowych.</p>
-                  <p>2. Użytkownik zobowiązuje się do podawania prawdziwych informacji dotyczących swoich rowerów i ich stanu technicznego.</p>
-                  <p>3. Dane użytkownika są przechowywane zgodnie z polityką prywatności i nie są udostępniane osobom trzecim bez zgody użytkownika.</p>
-                  <p>4. Użytkownik ponosi pełną odpowiedzialność za stan techniczny swojego roweru. Informacje o serwisowaniu mają charakter wyłącznie pomocniczy.</p>
-                  <p>5. Zabrania się wykorzystywania serwisu w sposób niezgodny z jego przeznaczeniem, w tym publikowania treści obraźliwych lub niezgodnych z prawem.</p>
-                  <p>6. Administracja zastrzega sobie prawo do usunięcia konta użytkownika w przypadku naruszenia regulaminu.</p>
-                  <p>7. Serwis jest udostępniany w stanie &quot;tak jak jest&quot; (as is). Administracja nie ponosi odpowiedzialności za ewentualne przerwy w działaniu serwisu.</p>
-                  <p>8. Regulamin może ulec zmianie. O istotnych zmianach użytkownicy zostaną poinformowani za pośrednictwem serwisu.</p>
+
+                  <div className="space-y-1">
+                    <p className="font-medium text-foreground">§1. Postanowienia ogólne</p>
+                    <p>Serwis MBike (dalej: &quot;Serwis&quot;) to platforma do zarządzania rowerami, śledzenia przebiegu, serwisowania części oraz budowania społeczności rowerzystów. Właścicielem i operatorem Serwisu jest Marqn. Korzystanie z Serwisu oznacza akceptację niniejszego Regulaminu.</p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="font-medium text-foreground">§2. Konto użytkownika</p>
+                    <p>Rejestracja jest dobrowolna. Użytkownik zobowiązuje się do podania prawdziwych danych oraz ochrony hasła. Niedozwolone jest tworzenie kont fałszywych, wielokrotnych lub w celach niezgodnych z przeznaczeniem Serwisu.</p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="font-medium text-foreground">§3. Dane i treści użytkownika</p>
+                    <p>Użytkownik wyraża zgodę na wykorzystanie przez Właściciela wszystkich danych podanych w Serwisie — w tym danych profilu, rowerów, przebiegów, komponentów, komentarzy i ocen produktów — do celów analizy statystycznej oraz wyświetlania innym użytkownikom Serwisu. Treści publiczne (rowery z włączoną widocznością, profile publiczne, komentarze, recenzje) są widoczne dla innych użytkowników. Dane wrażliwe (hasło, adres e-mail) nie są udostępniane innym użytkownikom.</p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="font-medium text-foreground">§4. Zasady społeczności</p>
+                    <p>Zabrania się publikowania treści obraźliwych, niezgodnych z prawem, spamu lub reklam. Właściciel może moderować treści i usuwać konta naruszające zasady bez wcześniejszego ostrzeżenia. Komentarz zgłoszony trzykrotnie zostaje automatycznie ukryty.</p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="font-medium text-foreground">§5. Plany płatne i dostępność Serwisu</p>
+                    <p>Właściciel zastrzega sobie prawo do wyłączenia Serwisu lub dowolnej jego funkcji w dowolnym momencie, bez podania przyczyny. Opłaty za plan Premium są bezzwrotne. W przypadku zaprzestania działania Serwisu nie przysługuje zwrot za niewykorzystany okres subskrypcji. Subskrypcja obowiązuje do końca opłaconego okresu po anulowaniu.</p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="font-medium text-foreground">§6. Odpowiedzialność</p>
+                    <p>Serwis jest udostępniany w stanie &quot;tak jak jest&quot; (as is). Informacje o serwisowaniu roweru mają charakter wyłącznie pomocniczy i nie zastępują konsultacji z profesjonalnym mechanikiem rowerowym. Właściciel nie odpowiada za przerwy w dostępności, utratę danych ani szkody wynikające z korzystania z Serwisu.</p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="font-medium text-foreground">§7. Zmiany Regulaminu</p>
+                    <p>Właściciel może zmieniać Regulamin. O istotnych zmianach użytkownicy zostaną poinformowani przez Serwis. Dalsze korzystanie z Serwisu po opublikowaniu zmian oznacza ich akceptację.</p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="font-medium text-foreground">§8. Prawo właściwe</p>
+                    <p>W sprawach nieuregulowanych niniejszym Regulaminem stosuje się prawo polskie. Spory rozstrzygane będą przez sąd właściwy dla siedziby Właściciela.</p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => window.open('/terms', '_blank')}
+                    className="text-primary hover:underline text-left"
+                  >
+                    Pełna wersja regulaminu →
+                  </button>
                 </div>
               </div>
 
