@@ -189,6 +189,42 @@ export default function PartsAccordion({
     return grouped;
   }, [customParts]);
 
+  // Scal standardowe i custom parts w jedną posortowaną listę per kategoria
+  type MergedItem =
+    | { kind: "standard"; partType: PartType; expectedKm: number; existingPart?: ExistingPart }
+    | { kind: "custom"; part: CustomPartData };
+
+  const mergedPartsByCategory = React.useMemo(() => {
+    const result = {} as Record<PartCategory, MergedItem[]>;
+    for (const cat of Object.keys(partsByCategory) as PartCategory[]) {
+      const standard: MergedItem[] = partsByCategory[cat].map((p) => ({
+        kind: "standard",
+        partType: p.partType,
+        expectedKm: p.expectedKm,
+        existingPart: p.existingPart,
+      }));
+      const custom: MergedItem[] = (customPartsByCategory[cat] ?? []).map((cp) => ({
+        kind: "custom",
+        part: cp,
+      }));
+      const savedOrder = partsDisplayOrder?.parts?.[cat];
+      if (savedOrder) {
+        const all = [...standard, ...custom];
+        all.sort((a, b) => {
+          const aId = a.kind === "standard" ? (a.partType as string) : a.part.id;
+          const bId = b.kind === "standard" ? (b.partType as string) : b.part.id;
+          const aIdx = savedOrder.indexOf(aId);
+          const bIdx = savedOrder.indexOf(bId);
+          return (aIdx === -1 ? 999 : aIdx) - (bIdx === -1 ? 999 : bIdx);
+        });
+        result[cat] = all;
+      } else {
+        result[cat] = [...standard, ...custom];
+      }
+    }
+    return result;
+  }, [partsByCategory, customPartsByCategory, partsDisplayOrder]);
+
   // Filtruj puste kategorie (uwzględniając custom parts) z zachowaniem kolejności
   const allCategories = partsDisplayOrder?.categories ?? (Object.keys(partsByCategory) as PartCategory[]);
   const nonEmptyCategories = allCategories.filter(
@@ -215,12 +251,42 @@ export default function PartsAccordion({
     });
   }, [nonEmptyCategories]);
 
+  // Animacja reorderingu części wewnątrz kategorii
+  const partItemRefs = React.useRef<Map<string, Map<string, HTMLDivElement>>>(new Map());
+  const prevPartOrderRef = React.useRef<Map<string, string>>(new Map());
+
+  React.useEffect(() => {
+    for (const cat of Object.keys(mergedPartsByCategory) as PartCategory[]) {
+      const items = mergedPartsByCategory[cat];
+      const currentOrder = items.map((i) => i.kind === "standard" ? (i.partType as string) : i.part.id).join(",");
+      const prevOrder = prevPartOrderRef.current.get(cat);
+
+      if (prevOrder === undefined) {
+        // Pierwsze renderowanie – tylko inicjalizacja, bez animacji
+        prevPartOrderRef.current.set(cat, currentOrder);
+        continue;
+      }
+      if (currentOrder === prevOrder) continue;
+      prevPartOrderRef.current.set(cat, currentOrder);
+
+      items.forEach((item, index) => {
+        const id = item.kind === "standard" ? (item.partType as string) : item.part.id;
+        const el = partItemRefs.current.get(cat)?.get(id);
+        if (!el) return;
+        el.style.animation = "none";
+        void el.offsetHeight;
+        el.style.animation = `reorder-appear 0.3s ease-out ${index * 30}ms both`;
+      });
+    }
+  }, [mergedPartsByCategory]);
+
   return (
     <div className="space-y-2">
       <div className="flex justify-end">
         <PartsOrderDialog
           currentOrder={partsDisplayOrder ?? null}
           visibleParts={partsByCategory}
+          customParts={customPartsByCategory}
         />
       </div>
       <Accordion
@@ -228,8 +294,7 @@ export default function PartsAccordion({
         defaultValue={nonEmptyCategories}
       >
       {nonEmptyCategories.map((category) => {
-        const parts = partsByCategory[category];
-        const categoryCustomParts = customPartsByCategory[category];
+        const mergedParts = mergedPartsByCategory[category];
 
         return (
           <div
@@ -246,48 +311,61 @@ export default function PartsAccordion({
               </AccordionTrigger>
               <AccordionContent>
                 <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-                  {parts.map(({ partType, expectedKm, existingPart }) => (
-                    <PartCard
-                      key={partType}
-                      partId={existingPart?.id || ""}
-                      partName={getPartNameForBike(partType, bikeType, existingPart?.partSpecificData)}
-                      expectedKm={expectedKm}
-                      wearKm={existingPart?.wearKm || 0}
-                      bikeId={bikeId}
-                      partType={partType}
-                      replacements={existingPart?.replacements || []}
-                      currentBrand={
-                        existingPart?.product?.brand ||
-                        existingPart?.replacements?.[0]?.brand
-                      }
-                      currentModel={
-                        existingPart?.product?.model ||
-                        existingPart?.replacements?.[0]?.model
-                      }
-                      currentPart={existingPart as BikePartWithProduct | undefined}
-                      isAccessory={category === "accessories" || TOGGLEABLE_PARTS.has(partType)}
-                      isInstalled={existingPart?.isInstalled ?? (category !== "accessories")}
-                      createdAt={existingPart?.createdAt}
-                      bikeType={bikeType}
-                    >
-                      {partType === PartType.CHAIN ? chainChildren :
-                       partType === PartType.TIRE_FRONT ? tireFrontChildren :
-                       partType === PartType.TIRE_REAR ? tireRearChildren : null}
-                    </PartCard>
-                  ))}
-
-                  {categoryCustomParts.map((cp) => (
-                    <CustomPartCard
-                      key={cp.id}
-                      id={cp.id}
-                      name={cp.name}
-                      wearKm={cp.wearKm}
-                      expectedKm={cp.expectedKm}
-                      brand={cp.brand}
-                      model={cp.model}
-                      installedAt={cp.installedAt}
-                    />
-                  ))}
+                  {mergedParts.map((item) => {
+                    const partId = item.kind === "standard" ? (item.partType as string) : item.part.id;
+                    return (
+                      <div
+                        key={partId}
+                        ref={(el) => {
+                          if (!partItemRefs.current.has(category)) {
+                            partItemRefs.current.set(category, new Map());
+                          }
+                          const catMap = partItemRefs.current.get(category)!;
+                          if (el) catMap.set(partId, el);
+                          else catMap.delete(partId);
+                        }}
+                      >
+                        {item.kind === "standard" ? (
+                          <PartCard
+                            partId={item.existingPart?.id || ""}
+                            partName={getPartNameForBike(item.partType, bikeType, item.existingPart?.partSpecificData)}
+                            expectedKm={item.expectedKm}
+                            wearKm={item.existingPart?.wearKm || 0}
+                            bikeId={bikeId}
+                            partType={item.partType}
+                            replacements={item.existingPart?.replacements || []}
+                            currentBrand={
+                              item.existingPart?.product?.brand ||
+                              item.existingPart?.replacements?.[0]?.brand
+                            }
+                            currentModel={
+                              item.existingPart?.product?.model ||
+                              item.existingPart?.replacements?.[0]?.model
+                            }
+                            currentPart={item.existingPart as BikePartWithProduct | undefined}
+                            isAccessory={category === "accessories" || TOGGLEABLE_PARTS.has(item.partType)}
+                            isInstalled={item.existingPart?.isInstalled ?? (category !== "accessories")}
+                            createdAt={item.existingPart?.createdAt}
+                            bikeType={bikeType}
+                          >
+                            {item.partType === PartType.CHAIN ? chainChildren :
+                             item.partType === PartType.TIRE_FRONT ? tireFrontChildren :
+                             item.partType === PartType.TIRE_REAR ? tireRearChildren : null}
+                          </PartCard>
+                        ) : (
+                          <CustomPartCard
+                            id={item.part.id}
+                            name={item.part.name}
+                            wearKm={item.part.wearKm}
+                            expectedKm={item.part.expectedKm}
+                            brand={item.part.brand}
+                            model={item.part.model}
+                            installedAt={item.part.installedAt}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
 
                   <AddCustomPartCard bikeId={bikeId} category={category} />
                 </div>

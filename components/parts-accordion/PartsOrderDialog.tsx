@@ -58,11 +58,13 @@ const DEFAULT_CATEGORY_ORDER: PartCategory[] = [
 interface PartsOrderDialogProps {
   currentOrder: PartsDisplayOrder | null;
   visibleParts: Record<PartCategory, Array<{ partType: PartType }>>;
+  customParts?: Record<PartCategory, Array<{ id: string; name: string }>>;
 }
 
 export default function PartsOrderDialog({
   currentOrder,
   visibleParts,
+  customParts = {} as Record<PartCategory, Array<{ id: string; name: string }>>,
 }: PartsOrderDialogProps) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
@@ -96,24 +98,31 @@ export default function PartsOrderDialog({
       > = {};
       for (const cat of DEFAULT_CATEGORY_ORDER) {
         // Tylko części widoczne dla aktualnego roweru
-        const visibleTypes = new Set(
+        const visibleStandard = new Set(
           (visibleParts[cat] ?? []).map((p) => p.partType as string)
         );
+        const catCustomParts = customParts[cat as PartCategory] ?? [];
+        const customPartsMap = new Map(catCustomParts.map((cp) => [cp.id, cp.name]));
+        const visibleCustomIds = new Set(catCustomParts.map((cp) => cp.id));
+
         const savedOrder = currentOrder?.parts?.[cat];
         // Zacznij od zapisanej kolejności (filtrując do widocznych), potem dołóż brakujące
         const ordered: string[] = [];
         if (savedOrder) {
           for (const pt of savedOrder) {
-            if (visibleTypes.has(pt)) ordered.push(pt);
+            if (visibleStandard.has(pt) || visibleCustomIds.has(pt)) ordered.push(pt);
           }
         }
-        for (const pt of visibleTypes) {
+        for (const pt of visibleStandard) {
           if (!ordered.includes(pt)) ordered.push(pt);
+        }
+        for (const id of visibleCustomIds) {
+          if (!ordered.includes(id)) ordered.push(id);
         }
         parts[cat] = ordered.map((pt) => ({
           id: pt,
-          label: PART_NAMES[pt as keyof typeof PART_NAMES] ?? pt,
-          icon: PART_ICONS[pt as keyof typeof PART_ICONS] ?? "",
+          label: PART_NAMES[pt as keyof typeof PART_NAMES] ?? customPartsMap.get(pt) ?? pt,
+          icon: PART_ICONS[pt as keyof typeof PART_ICONS] ?? "🔧",
         }));
       }
       setPartsOrder(parts);

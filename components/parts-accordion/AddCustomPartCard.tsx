@@ -19,10 +19,10 @@ export default function AddCustomPartCard({ bikeId, category }: AddCustomPartCar
         className="flex flex-col items-center justify-center gap-2 p-6 cursor-pointer border-dashed hover:border-primary hover:bg-muted/50 transition-colors min-h-[120px]"
         onClick={() => setDialogOpen(true)}
       >
-        <Plus className="h-8 w-8 text-muted-foreground" />
         <span className="text-sm text-muted-foreground text-center">
-          Dodaj swoją część
+          Nie znalazłeś swojej części? Możesz dodać ją ręcznie!
         </span>
+        <Plus className="h-8 w-8 text-muted-foreground" />
       </Card>
 
       <AddCustomPartDialog
