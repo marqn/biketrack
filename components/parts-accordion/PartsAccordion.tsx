@@ -231,6 +231,33 @@ export default function PartsAccordion({
     (cat) => (partsByCategory[cat]?.length ?? 0) > 0 || (customPartsByCategory[cat]?.length ?? 0) > 0
   );
 
+  // Zapamiętaj stan otwarcia/zamknięcia kategorii w sessionStorage per rower.
+  // sessionStorage czyści się przy zamknięciu przeglądarki/karty → domyślnie wszystko otwarte.
+  const storageKey = `accordion-open-${bikeId}`;
+
+  const [openCategories, setOpenCategories] = React.useState<string[]>(() => {
+    if (typeof window === "undefined") return nonEmptyCategories;
+    try {
+      const saved = sessionStorage.getItem(storageKey);
+      // Brak zapisu = pierwsza wizyta w sesji → wszystkie kategorie otwarte
+      if (saved === null) return nonEmptyCategories;
+      const parsed: string[] = JSON.parse(saved);
+      // Zachowaj tylko kategorie które nadal istnieją (mogły zniknąć po zmianie roweru)
+      return parsed.filter((cat) => (nonEmptyCategories as string[]).includes(cat));
+    } catch {
+      return nonEmptyCategories;
+    }
+  });
+
+  function handleAccordionChange(values: string[]) {
+    setOpenCategories(values);
+    try {
+      sessionStorage.setItem(storageKey, JSON.stringify(values));
+    } catch {
+      // sessionStorage niedostępny (prywatna karta, pełny storage itp.)
+    }
+  }
+
   // Animacja reorderingu kategorii: bezpośrednia manipulacja DOM przez ref,
   // żeby uniknąć konfliktu framer-motion layout z CSS animacją akordeonu.
   const categoryWrapperRefs = React.useRef<Map<string, HTMLDivElement>>(new Map());
@@ -291,7 +318,8 @@ export default function PartsAccordion({
       </div>
       <Accordion
         type="multiple"
-        defaultValue={nonEmptyCategories}
+        value={openCategories}
+        onValueChange={handleAccordionChange}
       >
       {nonEmptyCategories.map((category) => {
         const mergedParts = mergedPartsByCategory[category];
