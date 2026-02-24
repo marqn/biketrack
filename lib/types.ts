@@ -156,10 +156,22 @@ export interface BikeInfo {
   totalKm: number;
 }
 
+export interface CustomPartReplacement {
+  id: string;
+  name: string;
+  category: string;
+  brand: string | null;
+  model: string | null;
+  wearKm: number;
+  expectedKm: number;
+  removedAt: Date | string | null;
+  createdAt?: Date | string;
+}
+
 export interface TimelineItem {
   id: string;
-  type: "replacement" | "service";
-  data: PartReplacement | ServiceEvent;
+  type: "replacement" | "service" | "custom-replacement";
+  data: PartReplacement | ServiceEvent | CustomPartReplacement;
   createdAt: string;
 }
 

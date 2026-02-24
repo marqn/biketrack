@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Wrench, Pencil, Trash2 } from "lucide-react";
+import { Wrench, Pencil, Trash2, NotebookText } from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -22,9 +22,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import ColoredProgress from "@/components/ui/colored-progress";
-import { replaceCustomPart, deleteCustomPart } from "@/app/app/actions/custom-part";
+import { deleteCustomPart } from "@/app/app/actions/custom-part";
 import { useMultiDialog } from "@/lib/hooks/useDialog";
 import CustomPartDetailsDialog from "./CustomPartDetailsDialog";
+import CustomPartHistoryDialog from "./CustomPartHistoryDialog";
 import { useSession } from "next-auth/react";
 import { formatDistance } from "@/lib/units";
 import type { UnitPreference } from "@/lib/units";
@@ -48,7 +49,7 @@ export default function CustomPartCard({
   model,
   installedAt,
 }: CustomPartCardProps) {
-  const { activeDialog, openDialog, closeDialog } = useMultiDialog<"details" | "confirm-delete">();
+  const { activeDialog, openDialog, closeDialog } = useMultiDialog<"details" | "replace" | "history" | "confirm-delete">();
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const { data: session } = useSession();
@@ -60,13 +61,6 @@ export default function CustomPartCard({
     : 0;
 
   const hasBrandModel = !!(brand || model);
-
-  function handleReplace() {
-    startTransition(async () => {
-      await replaceCustomPart(id);
-      router.refresh();
-    });
-  }
 
   function handleDelete() {
     startTransition(async () => {
@@ -134,16 +128,26 @@ export default function CustomPartCard({
               )}
             </span>
 
-            {hasBrandModel && (
+            <span className="flex items-center gap-2">
+              {hasBrandModel && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => openDialog("replace")}
+                  disabled={isPending}
+                >
+                  🔄 Wymień
+                </Button>
+              )}
               <Button
                 size="sm"
                 variant="outline"
-                onClick={handleReplace}
-                disabled={isPending}
+                onClick={() => openDialog("history")}
+                title="Historia wymian"
               >
-                {isPending ? "Wymieniam..." : "🔄 Wymień"}
+                <NotebookText className="h-4 w-4" />
               </Button>
-            )}
+            </span>
           </div>
         </CardContent>
       </Card>
@@ -156,6 +160,22 @@ export default function CustomPartCard({
         currentBrand={brand}
         currentModel={model}
         currentInstalledAt={installedAt}
+      />
+
+      <CustomPartDetailsDialog
+        open={activeDialog === "replace"}
+        onOpenChange={(open) => !open && closeDialog()}
+        partId={id}
+        partName={name}
+        mode="replace"
+      />
+
+      <CustomPartHistoryDialog
+        open={activeDialog === "history"}
+        onOpenChange={(open) => !open && closeDialog()}
+        partId={id}
+        partName={name}
+        unitPref={unitPref}
       />
 
       <AlertDialog

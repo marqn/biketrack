@@ -38,6 +38,7 @@ import { ConfirmDeleteDialog } from "@/components/bike-header/dialogs";
 import { installGaragePart } from "@/app/app/actions/garage/install-garage-part";
 import { deleteStoredPart } from "@/app/app/actions/garage/delete-stored-part";
 import { updateStoredPart } from "@/app/app/actions/garage/update-stored-part";
+import { deleteCustomStoredPart, installCustomGaragePart, updateCustomStoredPart } from "@/app/app/actions/custom-part";
 import { toast } from "sonner";
 
 export interface StoredPartData {
@@ -56,6 +57,19 @@ export interface StoredPartData {
   totalReviews: number;
 }
 
+export interface CustomStoredPartData {
+  id: string;
+  name: string;
+  category: string;
+  brand: string | null;
+  model: string | null;
+  wearKm: number;
+  expectedKm: number;
+  notes: string | null;
+  removedAt: Date | string | null;
+  fromBikeName: string | null;
+}
+
 export interface BikeOption {
   id: string;
   label: string;
@@ -65,6 +79,15 @@ interface InstallDialogState {
   open: boolean;
   partId: string;
   partName: string;
+}
+
+interface CustomInstallDialogState {
+  open: boolean;
+  partId: string;
+  partName: string;
+  brand: string | null;
+  model: string | null;
+  wearKm: number;
 }
 
 interface EditNotesDialogState {
@@ -80,11 +103,12 @@ interface DeleteDialogState {
 
 interface GarageListProps {
   parts: StoredPartData[];
+  customParts: CustomStoredPartData[];
   bikes: BikeOption[];
   unitPref: "METRIC" | "IMPERIAL";
 }
 
-export default function GarageList({ parts, bikes, unitPref }: GarageListProps) {
+export default function GarageList({ parts, customParts, bikes, unitPref }: GarageListProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [installDialog, setInstallDialog] = useState<InstallDialogState>({
@@ -103,8 +127,27 @@ export default function GarageList({ parts, bikes, unitPref }: GarageListProps) 
     open: false,
     partId: "",
   });
+  const [customDeleteDialog, setCustomDeleteDialog] = useState<DeleteDialogState>({
+    open: false,
+    partId: "",
+  });
+  const [customEditDialog, setCustomEditDialog] = useState<EditNotesDialogState>({
+    open: false,
+    partId: "",
+    currentNotes: "",
+  });
+  const [customEditNotes, setCustomEditNotes] = useState("");
+  const [customInstallDialog, setCustomInstallDialog] = useState<CustomInstallDialogState>({
+    open: false,
+    partId: "",
+    partName: "",
+    brand: null,
+    model: null,
+    wearKm: 0,
+  });
+  const [customInstallBikeId, setCustomInstallBikeId] = useState<string>("");
 
-  if (parts.length === 0) {
+  if (parts.length === 0 && customParts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center gap-4">
         <PackageOpen className="h-12 w-12 text-muted-foreground" />
@@ -163,6 +206,61 @@ export default function GarageList({ parts, bikes, unitPref }: GarageListProps) 
         router.refresh();
       } catch {
         toast.error("Nie udało się usunąć części");
+      }
+    });
+  }
+
+  function handleCustomDeleteClick(partId: string) {
+    setCustomDeleteDialog({ open: true, partId });
+  }
+
+  function handleCustomDeleteConfirm() {
+    startTransition(async () => {
+      try {
+        await deleteCustomStoredPart(customDeleteDialog.partId);
+        setCustomDeleteDialog({ open: false, partId: "" });
+        toast.success("Część usunięta z garażu");
+        router.refresh();
+      } catch {
+        toast.error("Nie udało się usunąć części");
+      }
+    });
+  }
+
+  function handleCustomEditClick(part: CustomStoredPartData) {
+    setCustomEditNotes(part.notes ?? "");
+    setCustomEditDialog({ open: true, partId: part.id, currentNotes: part.notes ?? "" });
+  }
+
+  function handleCustomEditSave() {
+    startTransition(async () => {
+      try {
+        await updateCustomStoredPart(customEditDialog.partId, { notes: customEditNotes });
+        setCustomEditDialog({ open: false, partId: "", currentNotes: "" });
+        router.refresh();
+      } catch {
+        toast.error("Nie udało się zapisać notatek");
+      }
+    });
+  }
+
+  const emptyCustomInstall: CustomInstallDialogState = { open: false, partId: "", partName: "", brand: null, model: null, wearKm: 0 };
+
+  function handleCustomInstallClick(part: CustomStoredPartData) {
+    setCustomInstallBikeId(bikes[0]?.id ?? "");
+    setCustomInstallDialog({ open: true, partId: part.id, partName: part.name, brand: part.brand, model: part.model, wearKm: part.wearKm });
+  }
+
+  function handleCustomInstall() {
+    if (!customInstallBikeId) return;
+    startTransition(async () => {
+      try {
+        await installCustomGaragePart(customInstallDialog.partId, customInstallBikeId);
+        setCustomInstallDialog(emptyCustomInstall);
+        toast.success("Część zainstalowana na rowerze");
+        router.refresh();
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Błąd instalacji");
       }
     });
   }
@@ -299,6 +397,104 @@ export default function GarageList({ parts, bikes, unitPref }: GarageListProps) 
         })}
       </div>
 
+      {customParts.length > 0 && (
+        <>
+          {parts.length > 0 && (
+            <h2 className="text-lg font-semibold mt-2">Twoje części</h2>
+          )}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {customParts.map((part) => {
+              const wearPercent = part.expectedKm > 0
+                ? Math.round((part.wearKm / part.expectedKm) * 100)
+                : null;
+
+              return (
+                <Card key={part.id}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Wrench className="w-5 h-5 shrink-0 text-muted-foreground" />
+                      {part.name}
+                    </CardTitle>
+                    <CardAction className="flex gap-1">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7"
+                        onClick={() => handleCustomEditClick(part)}
+                        title="Edytuj notatki"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-destructive hover:text-destructive"
+                        onClick={() => handleCustomDeleteClick(part.id)}
+                        title="Usuń z garażu"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </CardAction>
+                  </CardHeader>
+
+                  <CardContent className="space-y-2 text-sm">
+                    {part.brand || part.model ? (
+                      <p className="font-medium">
+                        {[part.brand, part.model].filter(Boolean).join(" ")}
+                      </p>
+                    ) : (
+                      <p className="text-muted-foreground italic">Nieznana marka/model</p>
+                    )}
+
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <span>
+                        Zużycie: {formatDistance(part.wearKm, unitPref)}
+                        {part.expectedKm > 0 && (
+                          <> / {formatDistance(part.expectedKm, unitPref)}</>
+                        )}
+                      </span>
+                      {wearPercent !== null && (
+                        <Badge variant={wearPercent >= 100 ? "destructive" : "secondary"}>
+                          {wearPercent}%
+                        </Badge>
+                      )}
+                    </div>
+
+                    {part.removedAt && (
+                      <p className="text-muted-foreground">
+                        Zdjęta: {formatDate(new Date(part.removedAt))}
+                      </p>
+                    )}
+
+                    {part.fromBikeName && (
+                      <p className="text-muted-foreground text-xs">
+                        z roweru: {part.fromBikeName}
+                      </p>
+                    )}
+
+                    {part.notes && (
+                      <p className="text-xs text-muted-foreground border-l-2 pl-2 mt-1">
+                        {part.notes}
+                      </p>
+                    )}
+
+                  <Button
+                    size="sm"
+                    className="w-full"
+                    onClick={() => handleCustomInstallClick(part)}
+                    disabled={isPending || bikes.length === 0}
+                  >
+                    <Wrench className="h-4 w-4 mr-1" />
+                    Zainstaluj na rower
+                  </Button>
+                </CardContent>
+              </Card>
+              );
+            })}
+          </div>
+        </>
+      )}
+
       {/* Dialog instalacji */}
       <Dialog
         open={installDialog.open}
@@ -381,6 +577,108 @@ export default function GarageList({ parts, bikes, unitPref }: GarageListProps) 
         title="Usunąć część z garażu?"
         description="Część zostanie trwale usunięta. Tej operacji nie można cofnąć."
       />
+
+      <ConfirmDeleteDialog
+        open={customDeleteDialog.open}
+        onOpenChange={(open) => !open && setCustomDeleteDialog({ open: false, partId: "" })}
+        onConfirm={handleCustomDeleteConfirm}
+        title="Usunąć część z garażu?"
+        description="Część zostanie trwale usunięta. Tej operacji nie można cofnąć."
+      />
+
+      {/* Dialog edycji notatek własnej części */}
+      <Dialog
+        open={customEditDialog.open}
+        onOpenChange={(open) => !open && setCustomEditDialog({ open: false, partId: "", currentNotes: "" })}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edytuj notatki</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Textarea
+              value={customEditNotes}
+              onChange={(e) => setCustomEditNotes(e.target.value)}
+              placeholder="Stan techniczny, uwagi..."
+              rows={4}
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setCustomEditDialog({ open: false, partId: "", currentNotes: "" })}
+            >
+              Anuluj
+            </Button>
+            <Button onClick={handleCustomEditSave} disabled={isPending}>
+              {isPending ? "Zapisuję..." : "Zapisz"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog instalacji własnej części */}
+      <Dialog
+        open={customInstallDialog.open}
+        onOpenChange={(open) => !open && setCustomInstallDialog(emptyCustomInstall)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Zainstaluj: {customInstallDialog.partName}</DialogTitle>
+            <DialogDescription asChild>
+              <div className="space-y-1 text-sm text-muted-foreground">
+                {(customInstallDialog.brand || customInstallDialog.model) && (
+                  <p>
+                    <span className="font-medium text-foreground">
+                      {[customInstallDialog.brand, customInstallDialog.model].filter(Boolean).join(" ")}
+                    </span>
+                  </p>
+                )}
+                <p>
+                  Przebieg części:{" "}
+                  <span className="font-medium text-foreground">
+                    {formatDistance(customInstallDialog.wearKm, unitPref)}
+                  </span>
+                </p>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-4">
+            {bikes.length === 1 ? (
+              <p className="text-sm">
+                Zainstalujesz na rower:{" "}
+                <span className="font-medium">{bikes[0].label}</span>
+              </p>
+            ) : (
+              <Select value={customInstallBikeId} onValueChange={setCustomInstallBikeId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Wybierz rower" />
+                </SelectTrigger>
+                <SelectContent>
+                  {bikes.map((b) => (
+                    <SelectItem key={b.id} value={b.id}>
+                      {b.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setCustomInstallDialog(emptyCustomInstall)}
+            >
+              Anuluj
+            </Button>
+            <Button onClick={handleCustomInstall} disabled={isPending || !customInstallBikeId}>
+              {isPending ? "Instaluję..." : "Zainstaluj"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

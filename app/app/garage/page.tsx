@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { Warehouse } from "lucide-react";
 import GarageList, {
   StoredPartData,
+  CustomStoredPartData,
   BikeOption,
 } from "@/components/garage/GarageList";
 
@@ -17,7 +18,7 @@ export default async function GaragePage() {
 
   const userId = session.user.id;
 
-  const [storedParts, user] = await Promise.all([
+  const [storedParts, customStoredParts, user] = await Promise.all([
     prisma.storedPart.findMany({
       where: { userId },
       include: {
@@ -30,6 +31,10 @@ export default async function GaragePage() {
           },
         },
       },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.customStoredPart.findMany({
+      where: { userId, inGarage: true },
       orderBy: { createdAt: "desc" },
     }),
     prisma.user.findUnique({
@@ -82,7 +87,21 @@ export default async function GaragePage() {
     totalReviews: p.product?.totalReviews ?? 0,
   }));
 
+  const customParts: CustomStoredPartData[] = customStoredParts.map((p) => ({
+    id: p.id,
+    name: p.name,
+    category: p.category,
+    brand: p.brand,
+    model: p.model,
+    wearKm: p.wearKm,
+    expectedKm: p.expectedKm,
+    notes: p.notes,
+    removedAt: p.removedAt,
+    fromBikeName: p.fromBikeId ? (bikeMap.get(p.fromBikeId) ?? null) : null,
+  }));
+
   const unitPref = user.unitPreference ?? "METRIC";
+  const totalParts = parts.length + customParts.length;
 
   return (
     <div className="space-y-6">
@@ -92,13 +111,13 @@ export default async function GaragePage() {
         </div>
         <h1 className="text-4xl font-bold mb-2">Garaż</h1>
         <p className="text-lg">
-          {parts.length > 0
-            ? `${parts.length} ${parts.length === 1 ? "część" : parts.length < 5 ? "części" : "części"} na przechowaniu`
+          {totalParts > 0
+            ? `${totalParts} ${totalParts === 1 ? "część" : totalParts < 5 ? "części" : "części"} na przechowaniu`
             : "Przechowuj zdjęte części i instaluj je ponownie"}
         </p>
       </div>
 
-      <GarageList parts={parts} bikes={sortedBikes} unitPref={unitPref} />
+      <GarageList parts={parts} customParts={customParts} bikes={sortedBikes} unitPref={unitPref} />
     </div>
   );
 }

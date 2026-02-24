@@ -19,6 +19,11 @@ export async function GET(request: NextRequest) {
     let bike;
     let replacements;
     let services;
+    let customReplacements: Array<{
+      id: string; name: string; category: string; brand: string | null;
+      model: string | null; wearKm: number; expectedKm: number;
+      removedAt: Date | null; createdAt: Date;
+    }> = [];
 
     if (bikeId) {
       // Pobierz konkretny rower
@@ -80,6 +85,23 @@ export async function GET(request: NextRequest) {
           kmAtTime: true,
           lubricantBrand: true,
           notes: true,
+          createdAt: true,
+        },
+      });
+
+      // Pobierz wymiany customowych części
+      customReplacements = await prisma.customStoredPart.findMany({
+        where: { fromBikeId: bikeId },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          name: true,
+          category: true,
+          brand: true,
+          model: true,
+          wearKm: true,
+          expectedKm: true,
+          removedAt: true,
           createdAt: true,
         },
       });
@@ -151,9 +173,26 @@ export async function GET(request: NextRequest) {
           lubricantProduct: true,
         },
       });
+
+      // Pobierz wymiany customowych części
+      customReplacements = await prisma.customStoredPart.findMany({
+        where: { fromBikeId: bike.id },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          name: true,
+          category: true,
+          brand: true,
+          model: true,
+          wearKm: true,
+          expectedKm: true,
+          removedAt: true,
+          createdAt: true,
+        },
+      });
     }
 
-    // Połącz wymiany i serwisy w jeden timeline
+    // Połącz wymiany, serwisy i wymiany customowych części w jeden timeline
     const timeline = [
       ...replacements.map((r) => ({
         id: r.id,
@@ -166,6 +205,12 @@ export async function GET(request: NextRequest) {
         type: "service" as const,
         data: s,
         createdAt: s.createdAt,
+      })),
+      ...customReplacements.map((c) => ({
+        id: c.id,
+        type: "custom-replacement" as const,
+        data: c,
+        createdAt: c.createdAt,
       })),
     ].sort(
       (a, b) =>

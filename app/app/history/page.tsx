@@ -33,8 +33,14 @@ import {
   updatePartReplacement,
 } from "@/app/app/actions/replace-part";
 import {
+  deleteCustomStoredPart,
+  updateCustomStoredPart,
+} from "@/app/app/actions/custom-part";
+import CustomPartDetailsDialog from "@/components/parts-accordion/CustomPartDetailsDialog";
+import {
   PartReplacement,
   ServiceEvent,
+  CustomPartReplacement,
   TimelineItem,
   BikeInfo,
 } from "@/lib/types";
@@ -64,7 +70,7 @@ const BikePartsHistory: React.FC = () => {
     new Date(session.user.planExpiresAt) > new Date();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteType, setDeleteType] = useState<
-    "replacement" | "service" | null
+    "replacement" | "service" | "custom-replacement" | null
   >(null);
   const [editItem, setEditItem] = useState<TimelineItem | null>(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -129,6 +135,8 @@ const BikePartsHistory: React.FC = () => {
     try {
       if (deleteType === "replacement") {
         await deletePartReplacement(deleteId);
+      } else if (deleteType === "custom-replacement") {
+        await deleteCustomStoredPart(deleteId);
       } else {
         await deleteLubeEvent(deleteId);
       }
@@ -177,7 +185,7 @@ const BikePartsHistory: React.FC = () => {
   };
 
   const replacementsCount = timeline.filter(
-    (item) => item.type === "replacement",
+    (item) => item.type === "replacement" || item.type === "custom-replacement",
   ).length;
   const servicesCount = timeline.filter(
     (item) => item.type === "service",
@@ -185,6 +193,7 @@ const BikePartsHistory: React.FC = () => {
 
   const filteredTimeline = timeline.filter((item) => {
     if (filter === "all") return true;
+    if (filter === "replacement") return item.type === "replacement" || item.type === "custom-replacement";
     return item.type === filter;
   });
 
@@ -278,6 +287,78 @@ const BikePartsHistory: React.FC = () => {
       );
     }
 
+    // Wymiana customowej części
+    if (item.type === "custom-replacement") {
+      const custom = item.data as CustomPartReplacement;
+      return (
+        <div key={item.id} className="relative pl-20">
+          <div className="absolute left-0 top-6 flex flex-col items-center">
+            <div className="p-2.5 bg-green-600 rounded-full shadow-md">
+              <Wrench className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-xs font-semibold text-green-600 mt-1">
+              <Badge className="bg-green-600">
+                {formatDistance(custom.wearKm, unitPref)}
+              </Badge>
+            </span>
+          </div>
+
+          <Card className="hover:shadow-lg transition-shadow duration-300 border-l-4 border-l-green-500">
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div>
+                  <CardTitle className="text-xl mb-1">
+                    {custom.brand && custom.model
+                      ? `${custom.brand} ${custom.model}`
+                      : custom.name}
+                  </CardTitle>
+                  <CardDescription className="text-base">
+                    {custom.name} — Twoja część
+                  </CardDescription>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => handleEdit(item)}
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onClick={() => handleDelete(item)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  <span className="text-sm font-medium">Data wymiany:</span>
+                  <span className="text-sm">
+                    {formatDate(custom.removedAt ?? custom.createdAt ?? "")}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Wrench className="w-4 h-4" />
+                  <span className="text-sm font-medium">Zużycie części:</span>
+                  <span className="text-sm font-semibold text-orange-600">
+                    {formatDistance(custom.wearKm, unitPref)}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
     // Wymiana części
     const part = item.data as PartReplacement;
     return (
@@ -309,10 +390,10 @@ const BikePartsHistory: React.FC = () => {
                   <CardTitle className="text-xl mb-1">
                     {part.brand && part.model
                       ? `${part.brand} ${part.model}`
-                      : getPartName(part.partType)}
+                      : getPartName(part.partType ?? "")}
                   </CardTitle>
                   <CardDescription className="text-base">
-                    {getPartName(part.partType)}
+                    {getPartName(part.partType ?? "")}
                   </CardDescription>
                 </div>
               </div>
@@ -341,7 +422,7 @@ const BikePartsHistory: React.FC = () => {
               <div className="flex items-center gap-2 ">
                 <Calendar className="w-4 h-4 " />
                 <span className="text-sm font-medium">Data wymiany:</span>
-                <span className="text-sm">{formatDate(part.createdAt)}</span>
+                <span className="text-sm">{formatDate(part.createdAt ?? "")}</span>
               </div>
               <div className="flex items-center gap-2 ">
                 <Wrench className="w-4 h-4 " />
@@ -439,7 +520,7 @@ const BikePartsHistory: React.FC = () => {
             <p className=" text-lg">
               {bike.brand || bike.model
                 ? `${bike.brand ?? ""} ${bike.model ?? ""}`.trim()
-                : bike.type}
+                : bike.name ?? ""}
             </p>
           )}
 
@@ -580,8 +661,6 @@ const BikePartsHistory: React.FC = () => {
       {/* Delete Confirmation Dialog */}
       <ConfirmDeleteDialog
         open={!!deleteId}
-        deleteId={deleteId}
-        deleteType={deleteType}
         onOpenChange={(open: boolean) => {
           if (!open) {
             setDeleteId(null);
@@ -593,13 +672,14 @@ const BikePartsHistory: React.FC = () => {
       />
 
       {/* Edit Dialogs */}
-      {editItem && editItem.type === "replacement" && (
+      {editItem && editItem.type === "replacement" && (editItem.data as PartReplacement).partType && (
         <PartDetailsDialog
           open={true}
           onOpenChange={() => setEditItem(null)}
-          partType={(editItem.data as PartReplacement).partType}
-          partName={getPartName((editItem.data as PartReplacement).partType)}
-          partId={(editItem.data as PartReplacement).partId}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          partType={(editItem.data as PartReplacement).partType as any}
+          partName={getPartName((editItem.data as PartReplacement).partType ?? "")}
+          partId={editItem.id}
           mode="edit"
           initialBrand={(editItem.data as PartReplacement).brand || ""}
           initialModel={(editItem.data as PartReplacement).model || ""}
@@ -614,6 +694,22 @@ const BikePartsHistory: React.FC = () => {
           onOpenChange={() => setEditItem(null)}
           lubeEvent={editItem.data as ServiceEvent}
           onSave={handleEditService}
+        />
+      )}
+
+      {editItem && editItem.type === "custom-replacement" && (
+        <CustomPartDetailsDialog
+          open={true}
+          onOpenChange={() => setEditItem(null)}
+          partId={editItem.id}
+          partName={(editItem.data as CustomPartReplacement).name}
+          currentBrand={(editItem.data as CustomPartReplacement).brand}
+          currentModel={(editItem.data as CustomPartReplacement).model}
+          onSave={async (data) => {
+            await updateCustomStoredPart(editItem.id, data);
+            await fetchData();
+            setEditItem(null);
+          }}
         />
       )}
     </div>

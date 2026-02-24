@@ -8,6 +8,7 @@ import {
   TimelineItem,
   PartReplacement,
   ServiceEvent,
+  CustomPartReplacement,
   BikeInfo,
 } from "@/lib/types";
 import { formatDistance, UnitPreference } from "@/lib/units";
@@ -112,7 +113,7 @@ async function buildPdf(
 
   // ── Statystyki ────────────────────────────────────────────
   const replacementsCount = timeline.filter(
-    (i) => i.type === "replacement"
+    (i) => i.type === "replacement" || i.type === "custom-replacement"
   ).length;
   const servicesCount = timeline.filter((i) => i.type === "service").length;
 
@@ -176,6 +177,17 @@ async function buildPdf(
         formatDistance(s.kmAtTime, unitPref),
         "—",
         s.notes || "—",
+      ];
+    } else if (item.type === "custom-replacement") {
+      const c = item.data as CustomPartReplacement;
+      const desc = c.brand && c.model ? `${c.brand} ${c.model}` : c.name;
+      return [
+        formatDate(c.removedAt ?? c.createdAt ?? ""),
+        c.name,
+        desc,
+        "—",
+        formatDistance(c.wearKm, unitPref),
+        "—",
       ];
     } else {
       const p = item.data as PartReplacement;
@@ -241,10 +253,14 @@ async function buildPdf(
 
       let color = rgb(0, 0, 0);
       if (colIdx === 1) {
-        color =
-          cell === "Smarowanie"
-            ? rgb(0, 130 / 255, 130 / 255)
-            : rgb(37 / 255, 99 / 255, 235 / 255);
+        const itemType = timeline[rowIdx]?.type;
+        if (itemType === "service") {
+          color = rgb(0, 130 / 255, 130 / 255);
+        } else if (itemType === "custom-replacement") {
+          color = rgb(22 / 255, 163 / 255, 74 / 255);
+        } else {
+          color = rgb(37 / 255, 99 / 255, 235 / 255);
+        }
       }
 
       page.drawText(displayText, {

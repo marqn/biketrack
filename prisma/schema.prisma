@@ -47,7 +47,8 @@ model User {
   bikeComments   BikeComment[]
   commentReports CommentReport[]
   bikeLikes      BikeLike[]
-  storedParts    StoredPart[]
+  storedParts       StoredPart[]
+  customStoredParts CustomStoredPart[]
 
   createdAt DateTime @default(now())
 }
@@ -309,6 +310,31 @@ model StoredPart {
 
   @@index([userId])
   @@index([productId])
+}
+
+// Części customowe przechowywane w garażu (zdjęte przy wymianie)
+model CustomStoredPart {
+  id          String    @id @default(cuid())
+  userId      String
+  name        String    // Nazwa zdefiniowana przez użytkownika
+  category    String    // Klucz kategorii: "frame", "drivetrain", etc.
+  brand       String?
+  model       String?
+  wearKm      Int       @default(0)
+  expectedKm  Int       @default(0)
+  installedAt DateTime?
+  notes            String?
+  inGarage         Boolean   @default(true)
+  fromBikeId       String?
+  fromCustomPartId String?  // Link do oryginalnej CustomPart (dla historii)
+  removedAt        DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([fromCustomPartId])
 }
 
 // Globalna baza produktów (community-driven)

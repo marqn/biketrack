@@ -23,7 +23,7 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { updateCustomPart } from "@/app/app/actions/custom-part";
+import { updateCustomPart, replaceCustomPart } from "@/app/app/actions/custom-part";
 
 interface CustomPartDetailsDialogProps {
   open: boolean;
@@ -33,6 +33,8 @@ interface CustomPartDetailsDialogProps {
   currentBrand?: string | null;
   currentModel?: string | null;
   currentInstalledAt?: Date | string | null;
+  mode?: "edit" | "replace";
+  onSave?: (data: { brand?: string; model?: string; installedAt?: Date }) => Promise<void>;
 }
 
 export default function CustomPartDetailsDialog({
@@ -43,6 +45,8 @@ export default function CustomPartDetailsDialog({
   currentBrand,
   currentModel,
   currentInstalledAt,
+  mode = "edit",
+  onSave,
 }: CustomPartDetailsDialogProps) {
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
@@ -53,25 +57,39 @@ export default function CustomPartDetailsDialog({
 
   useEffect(() => {
     if (open) {
-      setBrand(currentBrand || "");
-      setModel(currentModel || "");
-      if (currentInstalledAt) {
-        const date = new Date(currentInstalledAt);
-        setInstalledAt(format(date, "yyyy-MM-dd"));
-      } else {
+      if (mode === "replace") {
+        // W trybie wymiany zaczynamy z pustymi polami dla nowej części
+        setBrand("");
+        setModel("");
         setInstalledAt(format(new Date(), "yyyy-MM-dd"));
+      } else {
+        setBrand(currentBrand || "");
+        setModel(currentModel || "");
+        if (currentInstalledAt) {
+          const date = new Date(currentInstalledAt);
+          setInstalledAt(format(date, "yyyy-MM-dd"));
+        } else {
+          setInstalledAt(format(new Date(), "yyyy-MM-dd"));
+        }
       }
     }
-  }, [open, currentBrand, currentModel, currentInstalledAt]);
+  }, [open, currentBrand, currentModel, currentInstalledAt, mode]);
 
   function handleSave() {
     startTransition(async () => {
       try {
-        await updateCustomPart(partId, {
+        const payload = {
           brand: brand.trim() || undefined,
           model: model.trim() || undefined,
           installedAt: installedAt ? new Date(installedAt) : undefined,
-        });
+        };
+        if (onSave) {
+          await onSave(payload);
+        } else if (mode === "replace") {
+          await replaceCustomPart(partId, payload);
+        } else {
+          await updateCustomPart(partId, payload);
+        }
         onOpenChange(false);
         router.refresh();
       } catch (error) {
@@ -81,13 +99,19 @@ export default function CustomPartDetailsDialog({
     });
   }
 
+  const isReplace = mode === "replace";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Szczegóły: {partName}</DialogTitle>
+          <DialogTitle>
+            {isReplace ? `Wymień: ${partName}` : `Szczegóły: ${partName}`}
+          </DialogTitle>
           <DialogDescription>
-            Marka i model są opcjonalne
+            {isReplace
+              ? "Stara część zostanie zapisana w garażu. Podaj dane nowej części."
+              : "Marka i model są opcjonalne"}
           </DialogDescription>
         </DialogHeader>
 
@@ -152,7 +176,9 @@ export default function CustomPartDetailsDialog({
             Anuluj
           </Button>
           <Button onClick={handleSave} disabled={isPending}>
-            {isPending ? "Zapisuję..." : "Zapisz"}
+            {isPending
+              ? isReplace ? "Wymieniam..." : "Zapisuję..."
+              : isReplace ? "Wymień" : "Zapisz"}
           </Button>
         </DialogFooter>
       </DialogContent>
