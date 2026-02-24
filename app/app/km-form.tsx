@@ -37,6 +37,9 @@ export default function KmForm({ bikeId, initialKm }: Props) {
     // Wartość z formularza jest w jednostkach użytkownika — konwertuj do km
     const displayValue = Number(formData.get("newKm"));
     const newKmMetric = inputToKm(displayValue, unitPref);
+
+    if (newKmMetric === optimisticKm) return;
+
     formData.set("newKm", newKmMetric.toString());
 
     const prevKm = optimisticKm;
@@ -58,6 +61,7 @@ export default function KmForm({ bikeId, initialKm }: Props) {
 
   const unit = distanceUnit(unitPref);
   const range = distanceRange(unitPref);
+  const hasChanged = inputToKm(inputKm, unitPref) !== optimisticKm;
 
   return (
     <Card className="mt-4 mx-auto max-w-md">
@@ -80,7 +84,7 @@ export default function KmForm({ bikeId, initialKm }: Props) {
             max={range.max}
             disabled={isPending}
           />
-          <Button disabled={isPending} variant="outline">
+          <Button disabled={isPending || !hasChanged} variant={hasChanged ? "default" : "outline"}>
             {isPending ? "Zapisuję..." : "💾 Zapisz"}
           </Button>
           <span className="text-center">
