@@ -6,6 +6,7 @@ import LubeButton from "./lube-button";
 import SealantButton from "./sealant-button";
 import KmForm from "./km-form";
 import BikeSetupPanel from "./bike-setup-panel";
+import MaintenancePanel from "@/components/maintenance-panel/MaintenancePanel";
 import { ServiceType, PartType } from "@/lib/generated/prisma";
 import { DEFAULT_PARTS, EBIKE_PARTS, extractTubelessStatus } from "@/lib/default-parts";
 import type { BrakeType, ForkType } from "@/lib/default-parts";
@@ -93,7 +94,7 @@ export default async function AppPage() {
   if (!bike) redirect("/onboarding");
 
   // Sprawdź czy user ma konto Strava (do auto-sync dystansów)
-  const [stravaAccount, userData] = await Promise.all([
+  const [stravaAccount, userData, maintenanceLogs] = await Promise.all([
     prisma.account.findFirst({
       where: { userId: session.user.id, provider: "strava" },
       select: { id: true },
@@ -102,7 +103,22 @@ export default async function AppPage() {
       where: { id: session.user.id },
       select: { partsDisplayOrder: true },
     }),
+    prisma.maintenanceLog.findMany({
+      where: { bikeId: bike.id },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
+
+  // Jeden wpis per typ (najnowszy)
+  const lastMaintenanceLogs = Object.values(
+    maintenanceLogs.reduce<Record<string, (typeof maintenanceLogs)[0]>>(
+      (acc, log) => {
+        if (!acc[log.type]) acc[log.type] = log;
+        return acc;
+      },
+      {}
+    )
+  );
   const partsDisplayOrder = (userData?.partsDisplayOrder as PartsDisplayOrder) ?? null;
 
   // Rozdziel service events wg typu
@@ -158,6 +174,13 @@ export default async function AppPage() {
       {stravaAccount && <StravaSyncTrigger />}
 
       <KmForm bikeId={bike.id} initialKm={bike.totalKm} />
+
+      <MaintenancePanel
+        bikeId={bike.id}
+        currentKm={bike.totalKm}
+        lastLogs={lastMaintenanceLogs}
+        hiddenItems={bike.hiddenMaintenanceItems}
+      />
 
       <BikeSetupPanel
         bikeId={bike.id}

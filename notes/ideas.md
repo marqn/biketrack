@@ -1,6 +1,6 @@
 # Pomysły
 
-    -   mini panel/komponent w formie jak części czy dodawanie km które wyświetlałoby info sprawdz ciśnieni w oponach, umyj bidon, ostatnie umycie roweru. Możesz jeszcze coś zaproponować
+    -  dodaj mini panel/komponent w formie jak części czy dodawanie km które wyświetlałoby info sprawdz ciśnieni w oponach, umyj bidon, ostatnie umycie roweru. Możesz jeszcze coś zaproponować
     -
 
 

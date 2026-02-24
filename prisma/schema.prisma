@@ -183,6 +183,31 @@ enum ServiceType {
   SEALANT_REAR
 }
 
+enum MaintenanceType {
+  TIRE_PRESSURE
+  BIDON_WASH
+  BIKE_WASH
+  DRIVETRAIN_CLEAN
+  CABLE_CHECK
+  SPOKE_CHECK
+  BOLT_CHECK
+  TIRE_CONDITION
+}
+
+model MaintenanceLog {
+  id        String          @id @default(cuid())
+  bikeId    String
+  type      MaintenanceType
+  kmAtTime  Int
+  notes     String?
+
+  bike      Bike            @relation(fields: [bikeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime        @default(now())
+
+  @@index([bikeId, type, createdAt])
+}
+
 model Bike {
   id           String   @id @default(cuid())
   userId       String
@@ -198,6 +223,7 @@ model Bike {
   slug         String?  @unique          // URL-friendly identyfikator dla strony publicznej
   images       String[] @default([])      // Vercel Blob URLs (do 3 zdjęć)
   imageUrl     String?  @db.Text         // TYMCZASOWO - stare base64, usunąć po migracji
+  hiddenMaintenanceItems String[] @default([]) // wartości MaintenanceType ukryte per rower
 
   user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   parts            BikePart[]
@@ -206,6 +232,7 @@ model Bike {
   partReplacements PartReplacement[]
   comments         BikeComment[]
   likes            BikeLike[]
+  maintenanceLogs  MaintenanceLog[]
 
   createdAt DateTime @default(now())
 

@@ -3,6 +3,7 @@ import { partWearRule } from "./rules/partWearRule";
 import { chainLubeRule } from "./rules/chainLubeRule";
 import { tubelessSealantRule } from "./rules/tubelessSealantRule";
 import { brakeFluidRule } from "./rules/brakeFluidRule";
+import { maintenanceRule } from "./rules/maintenanceRule";
 
 export async function checkBikeNotifications(bikeId: string) {
   const parts = await prisma.bikePart.findMany({
@@ -25,4 +26,5 @@ export async function checkBikeNotifications(bikeId: string) {
   await chainLubeRule(bikeId);
   await tubelessSealantRule(bikeId);
   await brakeFluidRule(bikeId);
+  await maintenanceRule(bikeId);
 }
