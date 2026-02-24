@@ -235,19 +235,23 @@ export default function PartsAccordion({
   // sessionStorage czyści się przy zamknięciu przeglądarki/karty → domyślnie wszystko otwarte.
   const storageKey = `accordion-open-${bikeId}`;
 
-  const [openCategories, setOpenCategories] = React.useState<string[]>(() => {
-    if (typeof window === "undefined") return nonEmptyCategories;
+  // Inicjalizacja musi być identyczna na serwerze i kliencie (wszystko otwarte),
+  // żeby uniknąć hydration mismatch. sessionStorage czytamy dopiero po hydration w useEffect.
+  const [openCategories, setOpenCategories] = React.useState<string[]>(nonEmptyCategories);
+
+  React.useEffect(() => {
     try {
       const saved = sessionStorage.getItem(storageKey);
-      // Brak zapisu = pierwsza wizyta w sesji → wszystkie kategorie otwarte
-      if (saved === null) return nonEmptyCategories;
+      if (saved === null) return; // brak zapisu = zostaw domyślny stan (wszystko otwarte)
       const parsed: string[] = JSON.parse(saved);
-      // Zachowaj tylko kategorie które nadal istnieją (mogły zniknąć po zmianie roweru)
-      return parsed.filter((cat) => (nonEmptyCategories as string[]).includes(cat));
+      const restored = parsed.filter((cat) => (nonEmptyCategories as string[]).includes(cat));
+      setOpenCategories(restored);
     } catch {
-      return nonEmptyCategories;
+      // sessionStorage niedostępny — zostaw stan domyślny
     }
-  });
+  // Celowo tylko przy montowaniu — nie reaguj na zmiany nonEmptyCategories
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey]);
 
   function handleAccordionChange(values: string[]) {
     setOpenCategories(values);
