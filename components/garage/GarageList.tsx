@@ -38,7 +38,11 @@ import { ConfirmDeleteDialog } from "@/components/bike-header/dialogs";
 import { installGaragePart } from "@/app/app/actions/garage/install-garage-part";
 import { deleteStoredPart } from "@/app/app/actions/garage/delete-stored-part";
 import { updateStoredPart } from "@/app/app/actions/garage/update-stored-part";
-import { deleteCustomStoredPart, installCustomGaragePart, updateCustomStoredPart } from "@/app/app/actions/custom-part";
+import {
+  deleteCustomStoredPart,
+  installCustomGaragePart,
+  updateCustomStoredPart,
+} from "@/app/app/actions/custom-part";
 import { toast } from "sonner";
 
 export interface StoredPartData {
@@ -108,7 +112,12 @@ interface GarageListProps {
   unitPref: "METRIC" | "IMPERIAL";
 }
 
-export default function GarageList({ parts, customParts, bikes, unitPref }: GarageListProps) {
+export default function GarageList({
+  parts,
+  customParts,
+  bikes,
+  unitPref,
+}: GarageListProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [installDialog, setInstallDialog] = useState<InstallDialogState>({
@@ -127,24 +136,27 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
     open: false,
     partId: "",
   });
-  const [customDeleteDialog, setCustomDeleteDialog] = useState<DeleteDialogState>({
-    open: false,
-    partId: "",
-  });
-  const [customEditDialog, setCustomEditDialog] = useState<EditNotesDialogState>({
-    open: false,
-    partId: "",
-    currentNotes: "",
-  });
+  const [customDeleteDialog, setCustomDeleteDialog] =
+    useState<DeleteDialogState>({
+      open: false,
+      partId: "",
+    });
+  const [customEditDialog, setCustomEditDialog] =
+    useState<EditNotesDialogState>({
+      open: false,
+      partId: "",
+      currentNotes: "",
+    });
   const [customEditNotes, setCustomEditNotes] = useState("");
-  const [customInstallDialog, setCustomInstallDialog] = useState<CustomInstallDialogState>({
-    open: false,
-    partId: "",
-    partName: "",
-    brand: null,
-    model: null,
-    wearKm: 0,
-  });
+  const [customInstallDialog, setCustomInstallDialog] =
+    useState<CustomInstallDialogState>({
+      open: false,
+      partId: "",
+      partName: "",
+      brand: null,
+      model: null,
+      wearKm: 0,
+    });
   const [customInstallBikeId, setCustomInstallBikeId] = useState<string>("");
 
   if (parts.length === 0 && customParts.length === 0) {
@@ -154,7 +166,8 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
         <div>
           <p className="text-lg font-medium">Garaż jest pusty</p>
           <p className="text-sm text-muted-foreground mt-1">
-            Przy wymianie części zaznacz opcję &quot;Zachowaj starą część w garażu&quot;
+            Przy wymianie części zaznacz opcję &quot;Zachowaj starą część w
+            garażu&quot;
           </p>
         </div>
       </div>
@@ -163,7 +176,11 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
 
   function handleInstallClick(part: StoredPartData) {
     setSelectedBikeId(bikes[0]?.id ?? "");
-    setInstallDialog({ open: true, partId: part.id, partName: getPartName(part.partType) });
+    setInstallDialog({
+      open: true,
+      partId: part.id,
+      partName: getPartName(part.partType),
+    });
   }
 
   function handleInstall() {
@@ -182,7 +199,11 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
 
   function handleEditClick(part: StoredPartData) {
     setEditNotes(part.notes ?? "");
-    setEditDialog({ open: true, partId: part.id, currentNotes: part.notes ?? "" });
+    setEditDialog({
+      open: true,
+      partId: part.id,
+      currentNotes: part.notes ?? "",
+    });
   }
 
   function handleEditSave() {
@@ -229,13 +250,19 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
 
   function handleCustomEditClick(part: CustomStoredPartData) {
     setCustomEditNotes(part.notes ?? "");
-    setCustomEditDialog({ open: true, partId: part.id, currentNotes: part.notes ?? "" });
+    setCustomEditDialog({
+      open: true,
+      partId: part.id,
+      currentNotes: part.notes ?? "",
+    });
   }
 
   function handleCustomEditSave() {
     startTransition(async () => {
       try {
-        await updateCustomStoredPart(customEditDialog.partId, { notes: customEditNotes });
+        await updateCustomStoredPart(customEditDialog.partId, {
+          notes: customEditNotes,
+        });
         setCustomEditDialog({ open: false, partId: "", currentNotes: "" });
         router.refresh();
       } catch {
@@ -244,18 +271,35 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
     });
   }
 
-  const emptyCustomInstall: CustomInstallDialogState = { open: false, partId: "", partName: "", brand: null, model: null, wearKm: 0 };
+  const emptyCustomInstall: CustomInstallDialogState = {
+    open: false,
+    partId: "",
+    partName: "",
+    brand: null,
+    model: null,
+    wearKm: 0,
+  };
 
   function handleCustomInstallClick(part: CustomStoredPartData) {
     setCustomInstallBikeId(bikes[0]?.id ?? "");
-    setCustomInstallDialog({ open: true, partId: part.id, partName: part.name, brand: part.brand, model: part.model, wearKm: part.wearKm });
+    setCustomInstallDialog({
+      open: true,
+      partId: part.id,
+      partName: part.name,
+      brand: part.brand,
+      model: part.model,
+      wearKm: part.wearKm,
+    });
   }
 
   function handleCustomInstall() {
     if (!customInstallBikeId) return;
     startTransition(async () => {
       try {
-        await installCustomGaragePart(customInstallDialog.partId, customInstallBikeId);
+        await installCustomGaragePart(
+          customInstallDialog.partId,
+          customInstallBikeId,
+        );
         setCustomInstallDialog(emptyCustomInstall);
         toast.success("Część zainstalowana na rowerze");
         router.refresh();
@@ -267,12 +311,14 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
 
   return (
     <>
+      <h2 className="text-lg font-semibold mt-2">Lista części:</h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {parts.map((part) => {
           const partName = getPartName(part.partType);
-          const wearPercent = part.expectedKm > 0
-            ? Math.round((part.wearKm / part.expectedKm) * 100)
-            : null;
+          const wearPercent =
+            part.expectedKm > 0
+              ? Math.round((part.wearKm / part.expectedKm) * 100)
+              : null;
 
           return (
             <Card key={part.id}>
@@ -295,7 +341,9 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
                     size="icon"
                     variant="ghost"
                     className="h-7 w-7 text-destructive hover:text-destructive"
-                    onClick={() => setDeleteDialog({ open: true, partId: part.id })}
+                    onClick={() =>
+                      setDeleteDialog({ open: true, partId: part.id })
+                    }
                     title="Usuń z garażu"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -346,7 +394,9 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
                       {[part.brand, part.model].filter(Boolean).join(" ")}
                     </p>
                   ) : (
-                    <p className="text-muted-foreground italic">Nieznana marka/model</p>
+                    <p className="text-muted-foreground italic">
+                      Nieznana marka/model
+                    </p>
                   )}
 
                   <div className="flex items-center gap-2 text-muted-foreground">
@@ -357,7 +407,11 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
                       )}
                     </span>
                     {wearPercent !== null && (
-                      <Badge variant={wearPercent >= 100 ? "destructive" : "secondary"}>
+                      <Badge
+                        variant={
+                          wearPercent >= 100 ? "destructive" : "secondary"
+                        }
+                      >
                         {wearPercent}%
                       </Badge>
                     )}
@@ -400,13 +454,16 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
       {customParts.length > 0 && (
         <>
           {parts.length > 0 && (
-            <h2 className="text-lg font-semibold mt-2">Twoje części</h2>
+            <h2 className="text-lg font-semibold mt-2">
+              Twoje dodatkowe części:
+            </h2>
           )}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {customParts.map((part) => {
-              const wearPercent = part.expectedKm > 0
-                ? Math.round((part.wearKm / part.expectedKm) * 100)
-                : null;
+              const wearPercent =
+                part.expectedKm > 0
+                  ? Math.round((part.wearKm / part.expectedKm) * 100)
+                  : null;
 
               return (
                 <Card key={part.id}>
@@ -443,7 +500,9 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
                         {[part.brand, part.model].filter(Boolean).join(" ")}
                       </p>
                     ) : (
-                      <p className="text-muted-foreground italic">Nieznana marka/model</p>
+                      <p className="text-muted-foreground italic">
+                        Nieznana marka/model
+                      </p>
                     )}
 
                     <div className="flex items-center gap-2 text-muted-foreground">
@@ -454,7 +513,11 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
                         )}
                       </span>
                       {wearPercent !== null && (
-                        <Badge variant={wearPercent >= 100 ? "destructive" : "secondary"}>
+                        <Badge
+                          variant={
+                            wearPercent >= 100 ? "destructive" : "secondary"
+                          }
+                        >
                           {wearPercent}%
                         </Badge>
                       )}
@@ -478,17 +541,17 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
                       </p>
                     )}
 
-                  <Button
-                    size="sm"
-                    className="w-full"
-                    onClick={() => handleCustomInstallClick(part)}
-                    disabled={isPending || bikes.length === 0}
-                  >
-                    <Wrench className="h-4 w-4 mr-1" />
-                    Zainstaluj na rower
-                  </Button>
-                </CardContent>
-              </Card>
+                    <Button
+                      size="sm"
+                      className="w-full"
+                      onClick={() => handleCustomInstallClick(part)}
+                      disabled={isPending || bikes.length === 0}
+                    >
+                      <Wrench className="h-4 w-4 mr-1" />
+                      Zainstaluj na rower
+                    </Button>
+                  </CardContent>
+                </Card>
               );
             })}
           </div>
@@ -498,7 +561,9 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
       {/* Dialog instalacji */}
       <Dialog
         open={installDialog.open}
-        onOpenChange={(open) => !open && setInstallDialog({ open: false, partId: "", partName: "" })}
+        onOpenChange={(open) =>
+          !open && setInstallDialog({ open: false, partId: "", partName: "" })
+        }
       >
         <DialogContent>
           <DialogHeader>
@@ -527,11 +592,16 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setInstallDialog({ open: false, partId: "", partName: "" })}
+              onClick={() =>
+                setInstallDialog({ open: false, partId: "", partName: "" })
+              }
             >
               Anuluj
             </Button>
-            <Button onClick={handleInstall} disabled={isPending || !selectedBikeId}>
+            <Button
+              onClick={handleInstall}
+              disabled={isPending || !selectedBikeId}
+            >
               {isPending ? "Instaluję..." : "Zainstaluj"}
             </Button>
           </DialogFooter>
@@ -541,7 +611,9 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
       {/* Dialog edycji notatek */}
       <Dialog
         open={editDialog.open}
-        onOpenChange={(open) => !open && setEditDialog({ open: false, partId: "", currentNotes: "" })}
+        onOpenChange={(open) =>
+          !open && setEditDialog({ open: false, partId: "", currentNotes: "" })
+        }
       >
         <DialogContent>
           <DialogHeader>
@@ -558,7 +630,9 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setEditDialog({ open: false, partId: "", currentNotes: "" })}
+              onClick={() =>
+                setEditDialog({ open: false, partId: "", currentNotes: "" })
+              }
             >
               Anuluj
             </Button>
@@ -572,7 +646,9 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
       {/* Dialog potwierdzenia usunięcia */}
       <ConfirmDeleteDialog
         open={deleteDialog.open}
-        onOpenChange={(open) => !open && setDeleteDialog({ open: false, partId: "" })}
+        onOpenChange={(open) =>
+          !open && setDeleteDialog({ open: false, partId: "" })
+        }
         onConfirm={handleDeleteConfirm}
         title="Usunąć część z garażu?"
         description="Część zostanie trwale usunięta. Tej operacji nie można cofnąć."
@@ -580,7 +656,9 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
 
       <ConfirmDeleteDialog
         open={customDeleteDialog.open}
-        onOpenChange={(open) => !open && setCustomDeleteDialog({ open: false, partId: "" })}
+        onOpenChange={(open) =>
+          !open && setCustomDeleteDialog({ open: false, partId: "" })
+        }
         onConfirm={handleCustomDeleteConfirm}
         title="Usunąć część z garażu?"
         description="Część zostanie trwale usunięta. Tej operacji nie można cofnąć."
@@ -589,7 +667,10 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
       {/* Dialog edycji notatek własnej części */}
       <Dialog
         open={customEditDialog.open}
-        onOpenChange={(open) => !open && setCustomEditDialog({ open: false, partId: "", currentNotes: "" })}
+        onOpenChange={(open) =>
+          !open &&
+          setCustomEditDialog({ open: false, partId: "", currentNotes: "" })
+        }
       >
         <DialogContent>
           <DialogHeader>
@@ -606,7 +687,13 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setCustomEditDialog({ open: false, partId: "", currentNotes: "" })}
+              onClick={() =>
+                setCustomEditDialog({
+                  open: false,
+                  partId: "",
+                  currentNotes: "",
+                })
+              }
             >
               Anuluj
             </Button>
@@ -620,17 +707,23 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
       {/* Dialog instalacji własnej części */}
       <Dialog
         open={customInstallDialog.open}
-        onOpenChange={(open) => !open && setCustomInstallDialog(emptyCustomInstall)}
+        onOpenChange={(open) =>
+          !open && setCustomInstallDialog(emptyCustomInstall)
+        }
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Zainstaluj: {customInstallDialog.partName}</DialogTitle>
+            <DialogTitle>
+              Zainstaluj: {customInstallDialog.partName}
+            </DialogTitle>
             <DialogDescription asChild>
               <div className="space-y-1 text-sm text-muted-foreground">
                 {(customInstallDialog.brand || customInstallDialog.model) && (
                   <p>
                     <span className="font-medium text-foreground">
-                      {[customInstallDialog.brand, customInstallDialog.model].filter(Boolean).join(" ")}
+                      {[customInstallDialog.brand, customInstallDialog.model]
+                        .filter(Boolean)
+                        .join(" ")}
                     </span>
                   </p>
                 )}
@@ -651,7 +744,10 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
                 <span className="font-medium">{bikes[0].label}</span>
               </p>
             ) : (
-              <Select value={customInstallBikeId} onValueChange={setCustomInstallBikeId}>
+              <Select
+                value={customInstallBikeId}
+                onValueChange={setCustomInstallBikeId}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Wybierz rower" />
                 </SelectTrigger>
@@ -673,7 +769,10 @@ export default function GarageList({ parts, customParts, bikes, unitPref }: Gara
             >
               Anuluj
             </Button>
-            <Button onClick={handleCustomInstall} disabled={isPending || !customInstallBikeId}>
+            <Button
+              onClick={handleCustomInstall}
+              disabled={isPending || !customInstallBikeId}
+            >
               {isPending ? "Instaluję..." : "Zainstaluj"}
             </Button>
           </DialogFooter>

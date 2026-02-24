@@ -104,20 +104,22 @@ export default async function GaragePage() {
   const totalParts = parts.length + customParts.length;
 
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-600 rounded-full mb-4">
-          <Warehouse className="w-10 h-10" />
+    <div className="container mx-auto px-4 py-8 pt-4">
+      <div className="space-y-6 lg:px-24">
+        <div className="text-center mb-2">
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-blue-600 rounded-full mb-3">
+            <Warehouse className="w-7 h-7" />
+          </div>
+          <h1 className="text-3xl font-bold mb-1">Garaż</h1>
+          <p className="text-muted-foreground">
+            {totalParts > 0
+              ? `${totalParts} ${totalParts === 1 ? "część" : "części"} na przechowaniu`
+              : "Przechowuj zdjęte części i instaluj je ponownie"}
+          </p>
         </div>
-        <h1 className="text-4xl font-bold mb-2">Garaż</h1>
-        <p className="text-lg">
-          {totalParts > 0
-            ? `${totalParts} ${totalParts === 1 ? "część" : totalParts < 5 ? "części" : "części"} na przechowaniu`
-            : "Przechowuj zdjęte części i instaluj je ponownie"}
-        </p>
-      </div>
 
-      <GarageList parts={parts} customParts={customParts} bikes={sortedBikes} unitPref={unitPref} />
+        <GarageList parts={parts} customParts={customParts} bikes={sortedBikes} unitPref={unitPref} />
+      </div>
     </div>
   );
 }
