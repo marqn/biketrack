@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+
 import { BikeType, PartType } from "@/lib/generated/prisma";
 import {
   Accordion,
@@ -194,6 +195,26 @@ export default function PartsAccordion({
     (cat) => (partsByCategory[cat]?.length ?? 0) > 0 || (customPartsByCategory[cat]?.length ?? 0) > 0
   );
 
+  // Animacja reorderingu kategorii: bezpośrednia manipulacja DOM przez ref,
+  // żeby uniknąć konfliktu framer-motion layout z CSS animacją akordeonu.
+  const categoryWrapperRefs = React.useRef<Map<string, HTMLDivElement>>(new Map());
+  const prevOrderRef = React.useRef(nonEmptyCategories.join(","));
+
+  React.useEffect(() => {
+    const currentOrder = nonEmptyCategories.join(",");
+    if (currentOrder === prevOrderRef.current) return;
+    prevOrderRef.current = currentOrder;
+
+    nonEmptyCategories.forEach((cat, index) => {
+      const el = categoryWrapperRefs.current.get(cat);
+      if (!el) return;
+      // Restart animacji: usuń, wymuś reflow, dodaj ponownie
+      el.style.animation = "none";
+      void el.offsetHeight;
+      el.style.animation = `reorder-appear 0.35s ease-out ${index * 45}ms both`;
+    });
+  }, [nonEmptyCategories]);
+
   return (
     <div className="space-y-2">
       <div className="flex justify-end">
@@ -205,66 +226,74 @@ export default function PartsAccordion({
       <Accordion
         type="multiple"
         defaultValue={nonEmptyCategories}
-        className="space-y-2"
       >
       {nonEmptyCategories.map((category) => {
         const parts = partsByCategory[category];
         const categoryCustomParts = customPartsByCategory[category];
 
         return (
-          <AccordionItem key={category} value={category} className="border rounded-lg px-4">
-            <AccordionTrigger className="text-lg font-semibold">
-              {PART_CATEGORIES[category].label}
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-                {parts.map(({ partType, expectedKm, existingPart }) => (
-                  <PartCard
-                    key={partType}
-                    partId={existingPart?.id || ""}
-                    partName={getPartNameForBike(partType, bikeType, existingPart?.partSpecificData)}
-                    expectedKm={expectedKm}
-                    wearKm={existingPart?.wearKm || 0}
-                    bikeId={bikeId}
-                    partType={partType}
-                    replacements={existingPart?.replacements || []}
-                    currentBrand={
-                      existingPart?.product?.brand ||
-                      existingPart?.replacements?.[0]?.brand
-                    }
-                    currentModel={
-                      existingPart?.product?.model ||
-                      existingPart?.replacements?.[0]?.model
-                    }
-                    currentPart={existingPart as BikePartWithProduct | undefined}
-                    isAccessory={category === "accessories" || TOGGLEABLE_PARTS.has(partType)}
-                    isInstalled={existingPart?.isInstalled ?? (category !== "accessories")}
-                    createdAt={existingPart?.createdAt}
-                    bikeType={bikeType}
-                  >
-                    {partType === PartType.CHAIN ? chainChildren :
-                     partType === PartType.TIRE_FRONT ? tireFrontChildren :
-                     partType === PartType.TIRE_REAR ? tireRearChildren : null}
-                  </PartCard>
-                ))}
+          <div
+            key={category}
+            className="mb-2"
+            ref={(el) => {
+              if (el) categoryWrapperRefs.current.set(category, el);
+              else categoryWrapperRefs.current.delete(category);
+            }}
+          >
+            <AccordionItem value={category} className="border rounded-lg px-4">
+              <AccordionTrigger className="text-lg font-semibold">
+                {PART_CATEGORIES[category].label}
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+                  {parts.map(({ partType, expectedKm, existingPart }) => (
+                    <PartCard
+                      key={partType}
+                      partId={existingPart?.id || ""}
+                      partName={getPartNameForBike(partType, bikeType, existingPart?.partSpecificData)}
+                      expectedKm={expectedKm}
+                      wearKm={existingPart?.wearKm || 0}
+                      bikeId={bikeId}
+                      partType={partType}
+                      replacements={existingPart?.replacements || []}
+                      currentBrand={
+                        existingPart?.product?.brand ||
+                        existingPart?.replacements?.[0]?.brand
+                      }
+                      currentModel={
+                        existingPart?.product?.model ||
+                        existingPart?.replacements?.[0]?.model
+                      }
+                      currentPart={existingPart as BikePartWithProduct | undefined}
+                      isAccessory={category === "accessories" || TOGGLEABLE_PARTS.has(partType)}
+                      isInstalled={existingPart?.isInstalled ?? (category !== "accessories")}
+                      createdAt={existingPart?.createdAt}
+                      bikeType={bikeType}
+                    >
+                      {partType === PartType.CHAIN ? chainChildren :
+                       partType === PartType.TIRE_FRONT ? tireFrontChildren :
+                       partType === PartType.TIRE_REAR ? tireRearChildren : null}
+                    </PartCard>
+                  ))}
 
-                {categoryCustomParts.map((cp) => (
-                  <CustomPartCard
-                    key={cp.id}
-                    id={cp.id}
-                    name={cp.name}
-                    wearKm={cp.wearKm}
-                    expectedKm={cp.expectedKm}
-                    brand={cp.brand}
-                    model={cp.model}
-                    installedAt={cp.installedAt}
-                  />
-                ))}
+                  {categoryCustomParts.map((cp) => (
+                    <CustomPartCard
+                      key={cp.id}
+                      id={cp.id}
+                      name={cp.name}
+                      wearKm={cp.wearKm}
+                      expectedKm={cp.expectedKm}
+                      brand={cp.brand}
+                      model={cp.model}
+                      installedAt={cp.installedAt}
+                    />
+                  ))}
 
-                <AddCustomPartCard bikeId={bikeId} category={category} />
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+                  <AddCustomPartCard bikeId={bikeId} category={category} />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </div>
         );
       })}
       </Accordion>
