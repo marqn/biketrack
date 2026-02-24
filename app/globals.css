@@ -94,6 +94,10 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+  img {
+    image-rendering: auto;
+    -ms-interpolation-mode: bicubic;
+  }
 }
 
 @layer utilities {

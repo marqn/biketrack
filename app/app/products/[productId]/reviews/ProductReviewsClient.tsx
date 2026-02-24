@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useTransition } from "react";
 import { useSession } from "next-auth/react";
 import { formatDistance } from "@/lib/units";
@@ -111,11 +112,13 @@ export function ProductReviewsClient({
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-4">
               {(product.officialImageUrl || product.images?.[0] || communityImages[0]) ? (
-                <div className="relative w-20 h-20 shrink-0">
-                  <img
+                <div className="relative w-20 h-20 shrink-0 rounded-lg overflow-hidden border bg-muted">
+                  <Image
                     src={(product.officialImageUrl || product.images?.[0] || communityImages[0])!}
                     alt={`${product.brand} ${product.model}`}
-                    className="w-full h-full rounded-lg object-cover border bg-muted"
+                    fill
+                    sizes="80px"
+                    className="object-cover"
                   />
                   <Watermark />
                 </div>
@@ -177,11 +180,13 @@ export function ProductReviewsClient({
             </div>
             <div className="flex gap-2 overflow-x-auto">
               {communityImages.map((url, i) => (
-                <div key={i} className="relative shrink-0">
-                  <img
+                <div key={i} className="relative w-24 h-24 shrink-0 rounded-lg overflow-hidden border">
+                  <Image
                     src={url}
                     alt={`Zdjęcie ${i + 1}`}
-                    className="w-24 h-24 rounded-lg object-cover border cursor-pointer hover:opacity-80 transition-opacity"
+                    fill
+                    sizes="96px"
+                    className="object-cover cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => setLightboxIndex(i)}
                   />
                   <Watermark />

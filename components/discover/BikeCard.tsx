@@ -7,6 +7,7 @@ import { Bike as BikeIcon, Loader2, MapPin, MessageSquare } from "lucide-react";
 import { bikeTypeLabels } from "@/lib/types";
 import { BikeType } from "@/lib/generated/prisma";
 import { Watermark } from "@/components/ui/watermark";
+import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { formatDistance } from "@/lib/units";
@@ -65,10 +66,12 @@ export function BikeCard({ bike }: BikeCardProps) {
             {!imageLoaded && (
               <Loader2 className="h-8 w-8 text-muted-foreground/40 animate-spin absolute" />
             )}
-            <img
+            <Image
               src={displayImage}
               alt={bikeTitle}
-              className={`w-full h-full object-cover group-hover:scale-105 transition-transform ${!imageLoaded ? "opacity-0" : "opacity-100"}`}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className={`object-cover group-hover:scale-105 transition-transform ${!imageLoaded ? "opacity-0" : "opacity-100"}`}
               onLoad={() => setImageLoaded(true)}
             />
             {imageLoaded && <Watermark />}

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { Trash2, Wrench, PackageOpen, Pencil, Star } from "lucide-react";
 import { PartType } from "@/lib/generated/prisma";
@@ -355,11 +356,15 @@ export default function GarageList({
                 {(part.productImageUrl || part.productId) && (
                   <div className="flex items-start gap-3">
                     {part.productImageUrl && (
-                      <img
-                        src={part.productImageUrl}
-                        alt={`${part.brand} ${part.model}`}
-                        className="h-16 w-16 object-contain rounded shrink-0"
-                      />
+                      <div className="relative h-16 w-16 shrink-0 rounded overflow-hidden">
+                        <Image
+                          src={part.productImageUrl}
+                          alt={`${part.brand} ${part.model}`}
+                          fill
+                          sizes="64px"
+                          className="object-contain"
+                        />
+                      </div>
                     )}
                     {part.productId && (
                       <Link

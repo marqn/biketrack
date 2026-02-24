@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { displayKm, distanceUnit } from "@/lib/units";
@@ -99,11 +100,17 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId, likeC
             style={{ viewTransitionName: `bike-image-${bike.slug}` }}
             onClick={() => setImageOpen(true)}
           >
-            <img
-              src={allImages[currentImageIndex]}
-              alt={bikeTitle}
-              className="w-full h-full object-cover"
-            />
+            {allImages[currentImageIndex].startsWith("data:") ? (
+              <img src={allImages[currentImageIndex]} alt={bikeTitle} className="w-full h-full object-cover" />
+            ) : (
+              <Image
+                src={allImages[currentImageIndex]}
+                alt={bikeTitle}
+                fill
+                sizes="(max-width: 768px) 100vw, 768px"
+                className="object-cover"
+              />
+            )}
             <Watermark />
             {hasMultipleImages && (
               <>

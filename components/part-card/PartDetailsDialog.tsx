@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -642,13 +643,15 @@ export default function PartDetailsDialog({
                   <button
                     type="button"
                     onClick={() => setLightboxOpen(true)}
-                    className="w-24 h-24 rounded-lg border overflow-hidden bg-muted/50 cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+                    className="relative w-24 h-24 rounded-lg border overflow-hidden bg-muted/50 cursor-pointer hover:ring-2 hover:ring-primary transition-all"
                   >
-                    <img
+                    <Image
                       key={displayImage}
                       src={displayImage}
                       alt="Zdjęcie części"
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="96px"
+                      className="object-cover"
                     />
                   </button>
                   {lightboxOpen && (

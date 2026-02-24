@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useTransition, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -182,10 +183,12 @@ export function AddReviewDialog({
                   key={url}
                   className="relative w-20 h-20 rounded-lg border overflow-hidden bg-muted/50 group"
                 >
-                  <img
+                  <Image
                     src={url}
                     alt="Zdjęcie recenzji"
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="80px"
+                    className="object-cover"
                   />
                   <button
                     type="button"

@@ -23,6 +23,7 @@ import {
   Warehouse,
   Bike as BikeIcon,
 } from "lucide-react";
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 
@@ -295,15 +296,18 @@ export function BikeHeader({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="p-0 h-auto gap-2">
-                  {(bike.images[0] || bike.imageUrl) && (
-                    <div className="h-9 w-9 rounded-md overflow-hidden shrink-0 border">
-                      <img
-                        src={bike.images[0] || bike.imageUrl!}
-                        alt={bikeTitle}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                  )}
+                  {(bike.images[0] || bike.imageUrl) && (() => {
+                    const src = bike.images[0] || bike.imageUrl!;
+                    return (
+                      <div className="relative h-9 w-9 rounded-md overflow-hidden shrink-0 border">
+                        {src.startsWith("data:") ? (
+                          <img src={src} alt={bikeTitle} className="h-full w-full object-cover" />
+                        ) : (
+                          <Image src={src} alt={bikeTitle} fill sizes="36px" className="object-cover" />
+                        )}
+                      </div>
+                    );
+                  })()}
                   <div className="text-left">
                     <div className="flex items-center gap-2">
                       <h1 className="text-lg">{bikeTitle}</h1>
@@ -327,13 +331,16 @@ export function BikeHeader({
                     {b.id === bike.id && (
                       <span className="absolute left-0 top-1 bottom-1 w-1 rounded-full bg-primary" />
                     )}
-                    <div className="h-8 w-8 rounded-md overflow-hidden shrink-0 border bg-muted flex items-center justify-center mr-2">
+                    <div className="relative h-8 w-8 rounded-md overflow-hidden shrink-0 border bg-muted flex items-center justify-center mr-2">
                       {(b.images[0] || b.imageUrl) ? (
-                        <img
-                          src={b.images[0] || b.imageUrl!}
-                          alt={getBikeLabel(b)}
-                          className="h-full w-full object-cover"
-                        />
+                        (() => {
+                          const src = b.images[0] || b.imageUrl!;
+                          return src.startsWith("data:") ? (
+                            <img src={src} alt={getBikeLabel(b)} className="h-full w-full object-cover" />
+                          ) : (
+                            <Image src={src} alt={getBikeLabel(b)} fill sizes="32px" className="object-cover" />
+                          );
+                        })()
                       ) : (
                         <BikeIcon className={`h-4 w-4 ${b.id === bike.id ? "text-primary" : "text-muted-foreground"}`} />
                       )}

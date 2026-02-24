@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useRef } from "react";
 import { upload } from "@vercel/blob/client";
 import { deleteBlobImage } from "@/app/app/actions/delete-blob-image";
@@ -173,11 +174,13 @@ export function ImageUploader({
         <div className="relative">
           <div className="w-24 h-24 rounded-full border-2 border-dashed border-muted-foreground/25 flex items-center justify-center overflow-hidden bg-muted/50">
             {currentImage ? (
-              <img
-                src={currentImage}
-                alt="Avatar"
-                className="w-full h-full object-cover"
-              />
+              currentImage.startsWith("data:") ? (
+                <img src={currentImage} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <div className="relative w-full h-full">
+                  <Image src={currentImage} alt="Avatar" fill sizes="96px" className="object-cover" />
+                </div>
+              )
             ) : fallbackName && fallbackName.trim() ? (
               <span className="text-2xl font-semibold text-muted-foreground select-none">
                 {getInitials(fallbackName)}
@@ -233,10 +236,12 @@ export function ImageUploader({
               key={url}
               className="relative w-24 h-24 rounded-lg border overflow-hidden bg-muted/50 group"
             >
-              <img
+              <Image
                 src={url}
                 alt="Zdjęcie"
-                className="w-full h-full object-cover"
+                fill
+                sizes="96px"
+                className="object-cover"
               />
               <Watermark />
               <button

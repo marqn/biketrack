@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, JSX } from "react";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -380,11 +381,15 @@ const BikePartsHistory: React.FC = () => {
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 {part.product?.officialImageUrl && (
-                  <img
-                    src={part.product.officialImageUrl}
-                    alt={`${part.brand} ${part.model}`}
-                    className="w-12 h-12 rounded-lg object-cover border shrink-0"
-                  />
+                  <div className="relative w-12 h-12 shrink-0 rounded-lg overflow-hidden border">
+                    <Image
+                      src={part.product.officialImageUrl}
+                      alt={`${part.brand} ${part.model}`}
+                      fill
+                      sizes="48px"
+                      className="object-cover"
+                    />
+                  </div>
                 )}
                 <div>
                   <CardTitle className="text-xl mb-1">

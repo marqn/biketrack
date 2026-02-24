@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
@@ -98,11 +99,15 @@ export function BikesTable({ products, onDelete }: BikesTableProps) {
           <TableRow key={product.id}>
             <TableCell>
               {product.officialImageUrl ? (
-                <img
-                  src={product.officialImageUrl}
-                  alt={`${product.brand} ${product.model}`}
-                  className="w-10 h-10 object-cover rounded border"
-                />
+                <div className="relative w-10 h-10 rounded overflow-hidden border">
+                  <Image
+                    src={product.officialImageUrl}
+                    alt={`${product.brand} ${product.model}`}
+                    fill
+                    sizes="40px"
+                    className="object-cover"
+                  />
+                </div>
               ) : (
                 <div className="w-10 h-10 rounded border bg-muted flex items-center justify-center">
                   <ImageOff className="h-4 w-4 text-muted-foreground" />

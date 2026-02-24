@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -250,10 +251,12 @@ function ProductCard({ product }: { product: ProductListItem }) {
       <Link href={`/app/products/${product.id}/reviews`}>
         {product.imageUrl ? (
           <div className="relative w-full h-36 bg-muted">
-            <img
+            <Image
               src={product.imageUrl}
               alt={`${product.brand} ${product.model}`}
-              className="w-full h-full object-cover"
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover"
             />
             <Watermark />
           </div>
