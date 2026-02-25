@@ -37,7 +37,6 @@ CREATE UNIQUE INDEX "User_profileSlug_key" ON "User"("profileSlug");
 
 -- AlterTable: Bike – add missing columns
 ALTER TABLE "Bike"
-ADD COLUMN "model"                  TEXT,
 ADD COLUMN "description"            TEXT,
 ADD COLUMN "stravaGearId"           TEXT,
 ADD COLUMN "isPublic"               BOOLEAN   NOT NULL DEFAULT false,
