@@ -13,6 +13,11 @@ export async function sendContactMessage(formData: { name: string; message: stri
     return { success: false, error: "Wiadomość jest za długa (max 2000 znaków)." };
   }
 
+  if (!process.env.EMAIL_SERVER) {
+    console.error("Błąd wysyłania maila");
+    return { success: false, error: "Nie udało się wysłać wiadomości. Spróbuj ponownie później." };
+  }
+
   try {
     const transporter = nodemailer.createTransport(process.env.EMAIL_SERVER);
 

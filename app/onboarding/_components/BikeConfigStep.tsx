@@ -66,7 +66,7 @@ export default function BikeConfigStep({
             <ToggleGroupItem
               key={opt.value}
               value={opt.value}
-              className="h-14 text-sm rounded-xl text-center px-2"
+              className="h-14 text-sm rounded-xl text-center px-2 border border-border data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary"
             >
               {opt.label}
             </ToggleGroupItem>
@@ -81,8 +81,8 @@ export default function BikeConfigStep({
         >
           <Label className="text-sm pointer-events-none">Widelec amortyzowany</Label>
           <ToggleGroup type="single" value={hasSuspensionFork ? "yes" : "no"} className="gap-1 pointer-events-none">
-            <ToggleGroupItem value="no" className="h-8 px-3 text-xs rounded-lg">Nie</ToggleGroupItem>
-            <ToggleGroupItem value="yes" className="h-8 px-3 text-xs rounded-lg">Tak</ToggleGroupItem>
+            <ToggleGroupItem value="no" className="h-8 px-3 text-xs rounded-lg data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">Nie</ToggleGroupItem>
+            <ToggleGroupItem value="yes" className="h-8 px-3 text-xs rounded-lg data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">Tak</ToggleGroupItem>
           </ToggleGroup>
         </div>
 
@@ -92,8 +92,8 @@ export default function BikeConfigStep({
         >
           <Label className="text-sm pointer-events-none">Opona tubeless — przód</Label>
           <ToggleGroup type="single" value={tubelessFront ? "yes" : "no"} className="gap-1 pointer-events-none">
-            <ToggleGroupItem value="no" className="h-8 px-3 text-xs rounded-lg">Nie</ToggleGroupItem>
-            <ToggleGroupItem value="yes" className="h-8 px-3 text-xs rounded-lg">Tak</ToggleGroupItem>
+            <ToggleGroupItem value="no" className="h-8 px-3 text-xs rounded-lg data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">Nie</ToggleGroupItem>
+            <ToggleGroupItem value="yes" className="h-8 px-3 text-xs rounded-lg data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">Tak</ToggleGroupItem>
           </ToggleGroup>
         </div>
 
@@ -103,8 +103,8 @@ export default function BikeConfigStep({
         >
           <Label className="text-sm pointer-events-none">Opona tubeless — tył</Label>
           <ToggleGroup type="single" value={tubelessRear ? "yes" : "no"} className="gap-1 pointer-events-none">
-            <ToggleGroupItem value="no" className="h-8 px-3 text-xs rounded-lg">Nie</ToggleGroupItem>
-            <ToggleGroupItem value="yes" className="h-8 px-3 text-xs rounded-lg">Tak</ToggleGroupItem>
+            <ToggleGroupItem value="no" className="h-8 px-3 text-xs rounded-lg data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">Nie</ToggleGroupItem>
+            <ToggleGroupItem value="yes" className="h-8 px-3 text-xs rounded-lg data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">Tak</ToggleGroupItem>
           </ToggleGroup>
         </div>
 
@@ -117,8 +117,8 @@ export default function BikeConfigStep({
             Rower elektryczny (e-bike)
           </Label>
           <ToggleGroup type="single" value={isElectric ? "yes" : "no"} className="gap-1 pointer-events-none">
-            <ToggleGroupItem value="no" className="h-8 px-3 text-xs rounded-lg">Nie</ToggleGroupItem>
-            <ToggleGroupItem value="yes" className="h-8 px-3 text-xs rounded-lg">Tak</ToggleGroupItem>
+            <ToggleGroupItem value="no" className="h-8 px-3 text-xs rounded-lg data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">Nie</ToggleGroupItem>
+            <ToggleGroupItem value="yes" className="h-8 px-3 text-xs rounded-lg data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">Tak</ToggleGroupItem>
           </ToggleGroup>
         </div>
       </div>
