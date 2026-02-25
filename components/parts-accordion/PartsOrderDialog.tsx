@@ -94,8 +94,8 @@ export default function PartsOrderDialog({
   React.useEffect(() => {
     if (open) {
       const defaultOrder: DisplayCategory[] = [
-        ...DEFAULT_CATEGORY_ORDER,
         ...(hasMaintenance ? (["maintenance"] as const) : []),
+        ...DEFAULT_CATEGORY_ORDER,
       ];
       const catOrder: DisplayCategory[] = currentOrder?.categories
         ? [

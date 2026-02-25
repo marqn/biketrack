@@ -233,8 +233,8 @@ export default function PartsAccordion({
 
   // Filtruj puste kategorie (uwzględniając custom parts i maintenance) z zachowaniem kolejności
   const defaultCategoryList = [
-    ...(Object.keys(partsByCategory) as PartCategory[]),
     ...(maintenanceData ? (["maintenance"] as const) : []),
+    ...(Object.keys(partsByCategory) as PartCategory[]),
   ];
   const allCategories = partsDisplayOrder?.categories ?? defaultCategoryList;
   const nonEmptyCategories = allCategories.filter((cat) => {
