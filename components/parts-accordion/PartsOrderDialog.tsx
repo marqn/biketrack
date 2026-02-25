@@ -33,17 +33,20 @@ import {
   savePartsDisplayOrder,
   resetPartsDisplayOrder,
   type PartsDisplayOrder,
+  type DisplayCategory,
 } from "@/app/app/actions/parts-display-order";
+import { MAINTENANCE_ITEMS } from "@/lib/maintenance-config";
 import { toast } from "sonner";
 
 // Ikony kategorii
-const CATEGORY_ICONS: Record<PartCategory, string> = {
+const CATEGORY_ICONS: Record<DisplayCategory, string> = {
   frame: "🖼️",
   drivetrain: "⚙️",
   brakes: "🛑",
   wheels: "⭕",
   cockpit: "🎛️",
   accessories: "🎒",
+  maintenance: "🔧",
 };
 
 const DEFAULT_CATEGORY_ORDER: PartCategory[] = [
@@ -57,12 +60,19 @@ const DEFAULT_CATEGORY_ORDER: PartCategory[] = [
 
 interface PartsOrderDialogProps {
   currentOrder: PartsDisplayOrder | null;
+  hasMaintenance?: boolean;
   visibleParts: Record<PartCategory, Array<{ partType: PartType }>>;
   customParts?: Record<PartCategory, Array<{ id: string; name: string }>>;
 }
 
+function getCategoryLabel(cat: string): string {
+  if (cat === "maintenance") return "Konserwacja roweru";
+  return PART_CATEGORIES[cat as PartCategory]?.label ?? cat;
+}
+
 export default function PartsOrderDialog({
   currentOrder,
+  hasMaintenance = false,
   visibleParts,
   customParts = {} as Record<PartCategory, Array<{ id: string; name: string }>>,
 }: PartsOrderDialogProps) {
@@ -78,17 +88,32 @@ export default function PartsOrderDialog({
     Record<string, { id: string; label: string; icon: string }[]>
   >({});
   const [selectedCategory, setSelectedCategory] =
-    React.useState<PartCategory>("frame");
+    React.useState<DisplayCategory>("frame");
 
   // Inicjalizacja z currentOrder lub domyślnych wartości
   React.useEffect(() => {
     if (open) {
-      const catOrder = currentOrder?.categories ?? DEFAULT_CATEGORY_ORDER;
+      const defaultOrder: DisplayCategory[] = [
+        ...DEFAULT_CATEGORY_ORDER,
+        ...(hasMaintenance ? (["maintenance"] as const) : []),
+      ];
+      const catOrder: DisplayCategory[] = currentOrder?.categories
+        ? [
+            // Zachowaj zapisaną kolejność, dołóż brakujące (np. nowo dodane)
+            ...currentOrder.categories.filter(
+              (c) => c !== "maintenance" || hasMaintenance
+            ),
+            ...(hasMaintenance && !currentOrder.categories.includes("maintenance")
+              ? (["maintenance"] as const)
+              : []),
+          ]
+        : defaultOrder;
+
       setCategoryOrder(
         catOrder.map((cat) => ({
           id: cat,
-          label: PART_CATEGORIES[cat].label,
-          icon: CATEGORY_ICONS[cat],
+          label: getCategoryLabel(cat),
+          icon: CATEGORY_ICONS[cat as DisplayCategory] ?? "🔧",
         }))
       );
 
@@ -96,8 +121,9 @@ export default function PartsOrderDialog({
         string,
         { id: string; label: string; icon: string }[]
       > = {};
+
+      // Standardowe kategorie części
       for (const cat of DEFAULT_CATEGORY_ORDER) {
-        // Tylko części widoczne dla aktualnego roweru
         const visibleStandard = new Set(
           (visibleParts[cat] ?? []).map((p) => p.partType as string)
         );
@@ -106,7 +132,6 @@ export default function PartsOrderDialog({
         const visibleCustomIds = new Set(catCustomParts.map((cp) => cp.id));
 
         const savedOrder = currentOrder?.parts?.[cat];
-        // Zacznij od zapisanej kolejności (filtrując do widocznych), potem dołóż brakujące
         const ordered: string[] = [];
         if (savedOrder) {
           for (const pt of savedOrder) {
@@ -125,16 +150,31 @@ export default function PartsOrderDialog({
           icon: PART_ICONS[pt as keyof typeof PART_ICONS] ?? "🔧",
         }));
       }
+
+      // Kategoria konserwacji
+      if (hasMaintenance) {
+        const savedMaintenanceOrder = currentOrder?.parts?.["maintenance"] ?? [];
+        const allTypes = MAINTENANCE_ITEMS.map((i) => i.type);
+        const ordered = [
+          ...savedMaintenanceOrder.filter((t) => allTypes.includes(t as typeof allTypes[number])),
+          ...allTypes.filter((t) => !savedMaintenanceOrder.includes(t)),
+        ];
+        parts["maintenance"] = ordered.map((t) => {
+          const item = MAINTENANCE_ITEMS.find((i) => i.type === t)!;
+          return { id: t, label: item.label, icon: "🔧" };
+        });
+      }
+
       setPartsOrder(parts);
       setSelectedCategory(catOrder[0] ?? "frame");
     }
-  }, [open, currentOrder]);
+  }, [open, currentOrder, hasMaintenance]);
 
   async function handleSave() {
     setSaving(true);
     try {
       const order: PartsDisplayOrder = {
-        categories: categoryOrder.map((c) => c.id as PartCategory),
+        categories: categoryOrder.map((c) => c.id as DisplayCategory),
         parts: Object.fromEntries(
           Object.entries(partsOrder).map(([cat, items]) => [
             cat,
@@ -215,7 +255,7 @@ export default function PartsOrderDialog({
           <TabsContent value="parts" className="mt-4 space-y-3">
             <Select
               value={selectedCategory}
-              onValueChange={(v) => setSelectedCategory(v as PartCategory)}
+              onValueChange={(v) => setSelectedCategory(v as DisplayCategory)}
             >
               <SelectTrigger>
                 <SelectValue />

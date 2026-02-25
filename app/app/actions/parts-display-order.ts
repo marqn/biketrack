@@ -6,8 +6,10 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { PartCategory } from "@/lib/default-parts";
 
+export type DisplayCategory = PartCategory | "maintenance";
+
 export type PartsDisplayOrder = {
-  categories: PartCategory[];
+  categories: DisplayCategory[];
   parts: Record<string, string[]>;
 };
 

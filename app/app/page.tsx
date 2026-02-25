@@ -6,7 +6,6 @@ import LubeButton from "./lube-button";
 import SealantButton from "./sealant-button";
 import KmForm from "./km-form";
 import BikeSetupPanel from "./bike-setup-panel";
-import MaintenancePanel from "@/components/maintenance-panel/MaintenancePanel";
 import { ServiceType, PartType } from "@/lib/generated/prisma";
 import { DEFAULT_PARTS, EBIKE_PARTS, extractTubelessStatus } from "@/lib/default-parts";
 import type { BrakeType, ForkType } from "@/lib/default-parts";
@@ -175,13 +174,6 @@ export default async function AppPage() {
 
       <KmForm bikeId={bike.id} initialKm={bike.totalKm} />
 
-      <MaintenancePanel
-        bikeId={bike.id}
-        currentKm={bike.totalKm}
-        lastLogs={lastMaintenanceLogs}
-        hiddenItems={bike.hiddenMaintenanceItems}
-      />
-
       <BikeSetupPanel
         bikeId={bike.id}
         initialBrakeType={initialBrakeType}
@@ -197,6 +189,12 @@ export default async function AppPage() {
         existingParts={existingParts}
         customParts={customParts}
         partsDisplayOrder={partsDisplayOrder}
+        maintenanceData={{
+          bikeId: bike.id,
+          currentKm: bike.totalKm,
+          lastLogs: lastMaintenanceLogs,
+          hiddenItems: bike.hiddenMaintenanceItems,
+        }}
         chainChildren={
           <LubeButton
             bikeId={bike.id}
