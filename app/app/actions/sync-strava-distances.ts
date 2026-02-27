@@ -83,6 +83,11 @@ export async function syncStravaDistances(force = false): Promise<{
 
     let syncedCount = 0;
     const updates: StravaSyncUpdate[] = [];
+    const updatedBikeIds: string[] = [];
+
+    // Zbierz wszystkie operacje i uruchom w jednej transakcji (1 połączenie zamiast N)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const dbOps: any[] = [];
 
     for (const bike of userBikes) {
       const stravaKm = stravaDistanceMap.get(bike.stravaGearId!);
@@ -91,39 +96,37 @@ export async function syncStravaDistances(force = false): Promise<{
       const diffKm = stravaKm - bike.totalKm;
       if (diffKm <= 0) continue;
 
-      // Ta sama logika co updateBikeKm: bike.totalKm + parts.wearKm
-      await prisma.$transaction([
+      dbOps.push(
         prisma.bike.update({
           where: { id: bike.id },
           data: { totalKm: stravaKm },
         }),
         prisma.bikePart.updateMany({
           where: { bikeId: bike.id, isInstalled: true },
-          data: {
-            wearKm: { increment: diffKm },
-          },
+          data: { wearKm: { increment: diffKm } },
         }),
         prisma.customPart.updateMany({
           where: { bikeId: bike.id },
-          data: {
-            wearKm: { increment: diffKm },
-          },
+          data: { wearKm: { increment: diffKm } },
         }),
-      ]);
+      );
 
       const bikeName = (bike.brand || bike.model)
         ? `${bike.brand ?? ""} ${bike.model ?? ""}`.trim()
         : bike.type;
 
-      updates.push({
-        bikeName,
-        oldKm: bike.totalKm,
-        newKm: stravaKm,
-        diffKm,
-      });
-
-      await checkBikeNotifications(bike.id);
+      updates.push({ bikeName, oldKm: bike.totalKm, newKm: stravaKm, diffKm });
+      updatedBikeIds.push(bike.id);
       syncedCount++;
+    }
+
+    if (dbOps.length > 0) {
+      await prisma.$transaction(dbOps);
+    }
+
+    // Powiadomienia po transakcji — sekwencyjnie, poza transakcją
+    for (const bikeId of updatedBikeIds) {
+      await checkBikeNotifications(bikeId);
     }
 
     // Aktualizuj timestamp ostatniego sync
