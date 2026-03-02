@@ -16,7 +16,7 @@ export async function syncStravaBikes() {
   const accessToken = await getStravaAccessToken(session.user.id);
 
   if (!accessToken) {
-    throw new Error("Brak połączenia ze Strava. Zaloguj się przez Strava.");
+    return [];
   }
 
   try {

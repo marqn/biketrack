@@ -29,6 +29,7 @@ import { bikeTypeLabels, BikeProduct } from "@/lib/types";
 import { syncStravaBikes } from "./sync-strava-bikes";
 import { createBike } from "./actions";
 import BikeBrandModelFields from "@/components/bike/BikeBrandModelFields";
+import SimpleOnboardingFlow from "../_components/SimpleOnboardingFlow";
 
 interface StravaBike {
   id: string;
@@ -44,6 +45,7 @@ interface StravaBike {
 export default function StravaOnboardingPage() {
   const [loading, setLoading] = useState(true);
   const [stravaBikes, setStravaBikes] = useState<StravaBike[]>([]);
+  const [manualMode, setManualMode] = useState(false);
   const [selectedBikeId, setSelectedBikeId] = useState<string>("");
   const [selectedBike, setSelectedBike] = useState<StravaBike | null>(null);
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -129,6 +131,10 @@ export default function StravaOnboardingPage() {
     });
   }
 
+  if (manualMode) {
+    return <SimpleOnboardingFlow />;
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center px-4">
@@ -193,6 +199,14 @@ export default function StravaOnboardingPage() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+          )}
+
+          {step === 1 && stravaBikes.length === 0 && (
+            <div className="space-y-4">
+              <Button onClick={() => setManualMode(true)} className="w-full" size="lg">
+                Dodaj rower ręcznie
+              </Button>
             </div>
           )}
 
