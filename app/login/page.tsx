@@ -19,8 +19,8 @@ export default function Page() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("marqn@wp.pl");
-  const [password, setPassword] = useState("zaq!2wsx");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);

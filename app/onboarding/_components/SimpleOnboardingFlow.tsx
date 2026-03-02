@@ -36,7 +36,7 @@ export default function SimpleOnboardingFlow() {
   const [year, setYear] = useState(new Date().getFullYear().toString());
   const [selectedProduct, setSelectedProduct] = useState<BikeProduct | null>(null);
   const [isElectric, setIsElectric] = useState(false);
-  const [brakeType, setBrakeType] = useState<BrakeType>("disc");
+  const [brakeType, setBrakeType] = useState<BrakeType>("disc-hydraulic");
   const [hasSuspensionFork, setHasSuspensionFork] = useState(false);
   const [tubelessFront, setTubelessFront] = useState(false);
   const [tubelessRear, setTubelessRear] = useState(false);
