@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { updateBikeSetup } from "./actions/update-bike-setup";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,9 +34,13 @@ export default function BikeSetupPanel({
   initialTubelessFront,
   initialTubelessRear,
 }: Props) {
-  const [visible, setVisible] = useState(
-    () => typeof window !== "undefined" && localStorage.getItem(LS_KEY) !== "true"
-  );
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem(LS_KEY) !== "true") {
+      setVisible(true);
+    }
+  }, []);
   const [isBrakePending, startBrakeTransition] = useTransition();
   const [isWheelPending, startWheelTransition] = useTransition();
   const isSaving = isBrakePending || isWheelPending;

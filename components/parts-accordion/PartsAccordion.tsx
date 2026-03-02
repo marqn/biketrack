@@ -249,14 +249,14 @@ export default function PartsAccordion({
   // sessionStorage czyści się przy zamknięciu przeglądarki/karty → domyślnie wszystko otwarte.
   const storageKey = `accordion-open-${bikeId}`;
 
-  // Inicjalizacja musi być identyczna na serwerze i kliencie (wszystko otwarte),
+  // Inicjalizacja musi być identyczna na serwerze i kliencie (wszystko zwinięte),
   // żeby uniknąć hydration mismatch. sessionStorage czytamy dopiero po hydration w useEffect.
-  const [openCategories, setOpenCategories] = React.useState<string[]>(nonEmptyCategories);
+  const [openCategories, setOpenCategories] = React.useState<string[]>([]);
 
   React.useEffect(() => {
     try {
       const saved = sessionStorage.getItem(storageKey);
-      if (saved === null) return; // brak zapisu = zostaw domyślny stan (wszystko otwarte)
+      if (saved === null) return; // brak zapisu = zostaw domyślny stan (wszystko zwinięte)
       const parsed: string[] = JSON.parse(saved);
       const restored = parsed.filter((cat) => (nonEmptyCategories as string[]).includes(cat));
       setOpenCategories(restored);
