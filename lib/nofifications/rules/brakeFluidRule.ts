@@ -1,39 +1,25 @@
-import { prisma } from "@/lib/prisma"
 import { NotificationType, PartType } from '@/lib/generated/prisma';
-import { ensureNotification } from "../utils/ensureNotification"
 import { BRAKE_FLUID_INTERVAL_DAYS } from "@/lib/default-parts";
+import type { BikeWithSyncData, NotifInput } from '../checkBikeNotifications';
 
-export async function brakeFluidRule(bikeId: string) {
-  const part = await prisma.bikePart.findFirst({
-    where: {
-      bikeId,
-      type: PartType.BRAKE_FLUID,
-    },
-    include: {
-      bike: {
-        select: {
-          userId: true,
-        },
-      },
-    },
-  })
+export function brakeFluidRule(bike: BikeWithSyncData, existingNotifs: Set<string>): NotifInput[] {
+  const part = bike.parts.find(p => p.type === PartType.BRAKE_FLUID);
+  if (!part) return [];
 
-  if (!part) return
+  const referenceDate = part.installedAt || part.createdAt;
+  const daysSince = (Date.now() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
+  if (daysSince < BRAKE_FLUID_INTERVAL_DAYS) return [];
 
-  const referenceDate = part.installedAt || part.createdAt
-  const daysSince =
-    (Date.now() - referenceDate.getTime()) / (1000 * 60 * 60 * 24)
+  const key = `${NotificationType.SERVICE_DUE}-${bike.id}-${part.id}`;
+  if (existingNotifs.has(key)) return [];
 
-  if (daysSince < BRAKE_FLUID_INTERVAL_DAYS) return
-
-  await ensureNotification({
-    userId: part.bike.userId,
+  existingNotifs.add(key);
+  return [{
+    userId: bike.userId,
     type: NotificationType.SERVICE_DUE,
     title: "Wymień płyn hamulcowy",
-    message: `Od ostatniej wymiany płynu hamulcowego minęło ${Math.floor(
-      daysSince
-    )} dni.`,
-    bikeId,
+    message: `Od ostatniej wymiany płynu hamulcowego minęło ${Math.floor(daysSince)} dni.`,
+    bikeId: bike.id,
     partId: part.id,
-  })
+  }];
 }

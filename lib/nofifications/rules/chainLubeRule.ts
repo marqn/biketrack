@@ -1,51 +1,30 @@
-import { prisma } from "@/lib/prisma";
-import {
-  NotificationType,
-  ServiceType,
-  PartType,
-} from "@/lib/generated/prisma";
-import { ensureNotification } from "../utils/ensureNotification";
+import { NotificationType, ServiceType, PartType } from "@/lib/generated/prisma";
 import { CHAIN_LUBE_INTERVAL_KM } from "@/lib/default-parts";
+import type { BikeWithSyncData, NotifInput } from '../checkBikeNotifications';
 
-export async function chainLubeRule(bikeId: string) {
-  const bike = await prisma.bike.findUnique({
-    where: { id: bikeId },
-    include: {
-      services: {
-        where: { type: ServiceType.CHAIN_LUBE },
-        orderBy: { kmAtTime: "desc" },
-        take: 1,
-      },
-      user: true,
-    },
-  });
+export function chainLubeRule(bike: BikeWithSyncData, existingNotifs: Set<string>): NotifInput[] {
+  const chainPart = bike.parts.find(p => p.type === PartType.CHAIN);
+  if (!chainPart) return [];
 
-  if (!bike) return;
+  const lastLube = bike.services.find(s => s.type === ServiceType.CHAIN_LUBE);
+  const kmSince = bike.totalKm - (lastLube?.kmAtTime ?? 0);
 
-  const lastLube = bike.services[0] ?? { kmAtTime: 0 };
-  const kmSince = bike.totalKm - lastLube.kmAtTime;
+  if (kmSince < CHAIN_LUBE_INTERVAL_KM) return [];
 
-  if (kmSince < CHAIN_LUBE_INTERVAL_KM) return;
-
-  const chainPart = await prisma.bikePart.findFirst({
-    where: {
-      bikeId,
-      type: PartType.CHAIN,
-    },
-  });
-
-  if (!chainPart) return; // brak łańcucha = brak alertu
+  const key = `${NotificationType.SERVICE_DUE}-${bike.id}-${chainPart.id}`;
+  if (existingNotifs.has(key)) return [];
 
   const bikeName = bike.brand || bike.model
     ? `${bike.brand ?? ""} ${bike.model ?? ""}`.trim()
     : bike.type;
 
-  await ensureNotification({
+  existingNotifs.add(key);
+  return [{
     userId: bike.userId,
     type: NotificationType.SERVICE_DUE,
     title: `Czas nasmarować łańcuch – ${bikeName}`,
     message: `Od ostatniego smarowania minęło ${kmSince} km.`,
     bikeId: bike.id,
     partId: chainPart.id,
-  });
+  }];
 }
