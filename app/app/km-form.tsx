@@ -51,10 +51,10 @@ export default function KmForm({ bikeId, initialKm }: Props) {
     await updateBikeKm(formData);
 
     const unit = distanceUnit(unitPref);
-    toast.success(`Zapisano przebieg: ${displayKm(newKmMetric, unitPref).toLocaleString("pl-PL")} ${unit}`, {
+    toast.success(`Zapisano przebieg: ${displayKm(newKmMetric, unitPref)} ${unit}`, {
       description:
         prevKm !== newKmMetric
-          ? `Zmiana: ${displayKm(prevKm, unitPref).toLocaleString("pl-PL")} → ${displayKm(newKmMetric, unitPref).toLocaleString("pl-PL")} ${unit}`
+          ? `Zmiana: ${displayKm(prevKm, unitPref)} → ${displayKm(newKmMetric, unitPref)} ${unit}`
           : undefined,
     });
   }
@@ -88,7 +88,7 @@ export default function KmForm({ bikeId, initialKm }: Props) {
             {isPending ? "Zapisuję..." : "💾 Zapisz"}
           </Button>
           <span className="text-center">
-            Aktualnie zapisane: {displayKm(optimisticKm, unitPref).toLocaleString("pl-PL")} {unit}
+            Aktualnie zapisane: {displayKm(optimisticKm, unitPref)} {unit}
           </span>
         </form>
       </CardContent>

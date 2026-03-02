@@ -31,7 +31,7 @@ export function inputToKg(value: number, unit: UnitPreference): number {
 export function formatDistance(km: number, unit: UnitPreference): string {
   const value = displayKm(km, unit)
   const label = distanceUnit(unit)
-  return `${value.toLocaleString("pl-PL")} ${label}`
+  return `${value} ${label}`
 }
 
 export function formatWeight(kg: number, unit: UnitPreference): string {
