@@ -6,7 +6,8 @@ export async function ensureEmailMissingNotification(userId: string) {
     select: { email: true },
   })
 
-  if (user?.email) return
+  if (!user) return
+  if (user.email) return
 
   const exists = await prisma.notification.findFirst({
     where: {
