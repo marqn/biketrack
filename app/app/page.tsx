@@ -160,7 +160,7 @@ export default async function AppPage() {
     <div className="space-y-6 lg:px-24 lg:space-6">
       {stravaAccount && <StravaSyncTrigger />}
 
-      <KmForm bikeId={bike.id} initialKm={bike.totalKm} />
+      <KmForm key={bike.id} bikeId={bike.id} initialKm={bike.totalKm} />
 
       <PartsAccordion
         bikeId={bike.id}
