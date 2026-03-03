@@ -126,7 +126,7 @@ export default async function RootLayout({
   return (
     <div className="flex flex-col min-h-screen">
       {headerProps && <BikeHeader {...headerProps} />}
-      <main className="flex-1 container mx-auto px-2 pt-24 pb-8">{children}</main>
+      <main className="flex-1 container mx-auto px-2 pt-28 md:pt-24 pb-8">{children}</main>
       <Footer />
     </div>
   );

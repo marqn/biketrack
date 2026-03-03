@@ -15,7 +15,7 @@ export function Footer() {
         {/* Bottom Section - Copyright */}
         <div className="mt-8 pt-6 border-t">
           <div className="flex flex-col md:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 items-center md:items-start">
               <Link
                 href="/app/blog"
                 className="font-semibold text-foreground hover:underline"
@@ -34,7 +34,7 @@ export function Footer() {
               >
                 Regulamin
               </Link>
-              <p>© {yearDisplay} MBike. Wszelkie prawa zastrzeżone.</p>
+              <p className="text-center md:text-left">© {yearDisplay} MBike. Wszelkie prawa zastrzeżone.</p>
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-1">

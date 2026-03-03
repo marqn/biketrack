@@ -272,16 +272,18 @@ export function BikeHeader({
   if (!mounted) {
     return (
       <header className="fixed top-0 left-0 z-50 w-screen border-b bg-card">
-        <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-2">
-          <div className="min-w-0 flex-1 space-y-2">
+        <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-3 flex flex-wrap md:flex-nowrap items-center gap-x-2 gap-y-1">
+          <div className="order-1 flex-1 min-w-0 space-y-2">
             <Skeleton className="h-5 w-32" />
             <Skeleton className="h-4 w-24" />
           </div>
-          <div className="flex items-center gap-1 sm:gap-2 md:gap-4 shrink-0">
+          <div className="order-2 md:order-last shrink-0">
+            <Skeleton className="h-9 w-9 rounded-full" />
+          </div>
+          <div className="order-3 md:order-2 w-full md:w-auto flex items-center justify-center md:justify-normal gap-1 sm:gap-2 md:gap-4 shrink-0">
             {[...Array(6)].map((_, i) => (
               <Skeleton key={i} className="h-9 w-9 rounded-md" />
             ))}
-            <Skeleton className="h-9 w-9 rounded-full" />
           </div>
         </div>
       </header>
@@ -290,9 +292,9 @@ export function BikeHeader({
 
   return (
     <header className="fixed top-0 left-0 z-50 w-screen border-b bg-card" style={{ viewTransitionName: "nav-header" }}>
-      <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-2">
-          {/* BIKE SWITCHER */}
-          <div className="min-w-0 flex-1 overflow-hidden">
+      <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-3 flex flex-wrap md:flex-nowrap items-center gap-x-2 gap-y-1">
+          {/* BIKE SWITCHER - wiersz 1 lewa */}
+          <div className="order-1 flex-1 min-w-0 overflow-hidden">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="p-0 h-auto gap-2 max-w-full overflow-hidden">
@@ -406,8 +408,70 @@ export function BikeHeader({
             </DropdownMenu>
           </div>
 
-        {/* RIGHT SIDE */}
-        <div className="flex items-center gap-1 sm:gap-2 md:gap-4 shrink-0">
+        {/* AVATAR - wiersz 1 prawa na mobile, ostatni na desktop */}
+        <div className="order-2 md:order-last shrink-0">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="p-0">
+                <Avatar
+                  className={`h-9 w-9 ${user.plan === "PREMIUM" ? "ring-2 ring-blue-500" : ""}`}
+                >
+                  <AvatarImage src={user.image ?? undefined} />
+                  <AvatarFallback>{initials}</AvatarFallback>
+                  {user.plan === "PREMIUM" && (
+                    <AvatarBadge className="bg-blue-500 text-white ring-background">
+                      <Crown className="size-2!" />
+                    </AvatarBadge>
+                  )}
+                </Avatar>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-56">
+              <div className="p-2">
+                <p className="text-sm font-medium">
+                  {user.name}{" "}
+                  <Badge
+                    className="mt-1"
+                    variant={user.plan === "PREMIUM" ? "default" : "secondary"}
+                  >
+                    {user.plan === "PREMIUM" ? "PREMIUM" : "FREE"}
+                  </Badge>
+                </p>
+                <p className="text-xs text-muted-foreground">{user.email}</p>
+              </div>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem onClick={() => router.push("/app/profile")}>
+                <UserIcon className="mr-2 h-4 w-4" />
+                Profil
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={() => router.push("/app/upgrade")}>
+                <CreditCard className="mr-2 h-4 w-4" />
+                Premium
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem
+                onClick={() => signOut({ callbackUrl: "/login" })}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Wyloguj
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => openDialog("delete-account")}>
+                <Delete className="mr-2 h-4 w-4" />
+                Usuń konto
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* NAV BUTTONS - wiersz 2 wyśrodkowane na mobile, środek na desktop */}
+        <div className="order-3 md:order-2 w-full md:w-auto flex items-center justify-center md:justify-normal gap-1 sm:gap-2 md:gap-4 shrink-0">
           {hasStrava && (
             <TooltipProvider>
               <Tooltip>
@@ -603,64 +667,6 @@ export function BikeHeader({
             </Tooltip>
           </TooltipProvider>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="p-0">
-                <Avatar
-                  className={`h-9 w-9 ${user.plan === "PREMIUM" ? "ring-2 ring-blue-500" : ""}`}
-                >
-                  <AvatarImage src={user.image ?? undefined} />
-                  <AvatarFallback>{initials}</AvatarFallback>
-                  {user.plan === "PREMIUM" && (
-                    <AvatarBadge className="bg-blue-500 text-white ring-background">
-                      <Crown className="size-2!" />
-                    </AvatarBadge>
-                  )}
-                </Avatar>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="end" className="w-56">
-              <div className="p-2">
-                <p className="text-sm font-medium">
-                  {user.name}{" "}
-                  <Badge
-                    className="mt-1"
-                    variant={user.plan === "PREMIUM" ? "default" : "secondary"}
-                  >
-                    {user.plan === "PREMIUM" ? "PREMIUM" : "FREE"}
-                  </Badge>
-                </p>
-                <p className="text-xs text-muted-foreground">{user.email}</p>
-              </div>
-
-              <DropdownMenuSeparator />
-
-              <DropdownMenuItem onClick={() => router.push("/app/profile")}>
-                <UserIcon className="mr-2 h-4 w-4" />
-                Profil
-              </DropdownMenuItem>
-
-              <DropdownMenuItem onClick={() => router.push("/app/upgrade")}>
-                <CreditCard className="mr-2 h-4 w-4" />
-                Premium
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator />
-
-              <DropdownMenuItem
-                onClick={() => signOut({ callbackUrl: "/login" })}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Wyloguj
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => openDialog("delete-account")}>
-                <Delete className="mr-2 h-4 w-4" />
-                Usuń konto
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
 
