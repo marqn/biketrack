@@ -32,7 +32,7 @@ export default function Page() {
       window.history.replaceState(
         null,
         "",
-        window.location.pathname + window.location.search
+        window.location.pathname + window.location.search,
       );
     }
   }, []);
@@ -109,9 +109,10 @@ export default function Page() {
           {status === "authenticated" && session && (
             <Alert className="mb-4">
               <AlertDescription>
-                Jesteś zalogowany jako {session.user?.email} przez {session.user?.provider}.
-                <Button 
-                  variant="link" 
+                Jesteś zalogowany jako {session.user?.email} przez{" "}
+                {session.user?.provider}.
+                <Button
+                  variant="link"
                   className="ml-2 p-0 h-auto text-primary"
                   onClick={() => signOut({ callbackUrl: "/login" })}
                 >
@@ -152,7 +153,7 @@ export default function Page() {
               <Input
                 id="email"
                 type="email"
-                placeholder="twoj@email.pl"
+                placeholder=""
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -164,7 +165,7 @@ export default function Page() {
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder=""
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -181,9 +182,24 @@ export default function Page() {
               {isLoading
                 ? "Proszę czekać..."
                 : isLogin
-                ? "Zaloguj się"
-                : "Utwórz konto"}
+                  ? "Zaloguj się"
+                  : "Utwórz konto"}
             </Button>
+            <div className="text-center mt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setError("");
+                  setSuccess("");
+                }}
+                className="text-sm text-primary hover:underline"
+              >
+                {isLogin
+                  ? "Nie masz konta? Zarejestruj się"
+                  : "Masz już konto? Zaloguj się"}
+              </button>
+            </div>
 
             <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
@@ -234,12 +250,8 @@ export default function Page() {
               className="w-full bg-blue-600 hover:bg-blue-700"
               type="button"
             >
-              <svg 
-                className="w-5 h-5 mr-2" 
-                fill="white" 
-                viewBox="0 0 24 24"
-              >
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              <svg className="w-5 h-5 mr-2" fill="white" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
               {isLogin ? "Zaloguj" : "Zarejestruj się"} przez Facebook
             </Button>
@@ -266,22 +278,6 @@ export default function Page() {
               </svg>
               {isLogin ? "Zaloguj" : "Zarejestruj się"} przez Strava
             </Button>
-
-            <div className="text-center mt-4">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setError("");
-                  setSuccess("");
-                }}
-                className="text-sm text-primary hover:underline"
-              >
-                {isLogin
-                  ? "Nie masz konta? Zarejestruj się"
-                  : "Masz już konto? Zaloguj się"}
-              </button>
-            </div>
           </form>
         </CardContent>
       </Card>
