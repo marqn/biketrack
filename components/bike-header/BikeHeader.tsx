@@ -272,12 +272,12 @@ export function BikeHeader({
   if (!mounted) {
     return (
       <header className="fixed top-0 left-0 z-50 w-screen border-b bg-card">
-        <div className="container mx-auto px-8 py-3 flex items-center justify-between">
-          <div className="min-w-35 space-y-2">
+        <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-2">
+          <div className="min-w-0 flex-1 space-y-2">
             <Skeleton className="h-5 w-32" />
             <Skeleton className="h-4 w-24" />
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-4 shrink-0">
             {[...Array(6)].map((_, i) => (
               <Skeleton key={i} className="h-9 w-9 rounded-md" />
             ))}
@@ -290,12 +290,12 @@ export function BikeHeader({
 
   return (
     <header className="fixed top-0 left-0 z-50 w-screen border-b bg-card" style={{ viewTransitionName: "nav-header" }}>
-      <div className="container mx-auto px-8 py-3 flex items-center justify-between">
+      <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-2">
           {/* BIKE SWITCHER */}
-          <div className="min-w-35">
+          <div className="min-w-0 flex-1 overflow-hidden">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="p-0 h-auto gap-2">
+                <Button variant="ghost" className="p-0 h-auto gap-2 max-w-full overflow-hidden">
                   {(bike.images[0] || bike.imageUrl) && (() => {
                     const src = bike.images[0] || bike.imageUrl!;
                     return (
@@ -308,9 +308,9 @@ export function BikeHeader({
                       </div>
                     );
                   })()}
-                  <div className="text-left">
+                  <div className="text-left min-w-0 overflow-hidden">
                     <div className="flex items-center gap-2">
-                      <h1 className="text-lg">{bikeTitle}</h1>
+                      <h1 className="text-lg truncate">{bikeTitle}</h1>
                       <ChevronDown className="h-3 w-3 text-muted-foreground" />
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -407,7 +407,7 @@ export function BikeHeader({
           </div>
 
         {/* RIGHT SIDE */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1 sm:gap-2 md:gap-4 shrink-0">
           {hasStrava && (
             <TooltipProvider>
               <Tooltip>
