@@ -2,7 +2,18 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { ArrowUpDown, RotateCcw } from "lucide-react";
+import {
+  ArrowUpDown,
+  RotateCcw,
+  Gauge,
+  FlaskConical,
+  Droplets,
+  Settings2,
+  Cable,
+  CircleDot,
+  Wrench,
+  CircleAlert,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -38,6 +49,18 @@ import {
 import { MAINTENANCE_ITEMS } from "@/lib/maintenance-config";
 import { toast } from "sonner";
 
+// Mapa ikon Lucide dla sekcji konserwacji (spójna z MaintenancePanel)
+const MAINTENANCE_ICON_MAP: Record<string, React.ElementType> = {
+  Gauge,
+  FlaskConical,
+  Droplets,
+  Settings2,
+  Cable,
+  CircleDot,
+  Wrench,
+  CircleAlert,
+};
+
 // Ikony kategorii
 const CATEGORY_ICONS: Record<DisplayCategory, string> = {
   frame: "🖼️",
@@ -61,6 +84,7 @@ const DEFAULT_CATEGORY_ORDER: PartCategory[] = [
 interface PartsOrderDialogProps {
   currentOrder: PartsDisplayOrder | null;
   hasMaintenance?: boolean;
+  hasChainLube?: boolean;
   visibleParts: Record<PartCategory, Array<{ partType: PartType }>>;
   customParts?: Record<PartCategory, Array<{ id: string; name: string }>>;
 }
@@ -73,6 +97,7 @@ function getCategoryLabel(cat: string): string {
 export default function PartsOrderDialog({
   currentOrder,
   hasMaintenance = false,
+  hasChainLube = false,
   visibleParts,
   customParts = {} as Record<PartCategory, Array<{ id: string; name: string }>>,
 }: PartsOrderDialogProps) {
@@ -154,14 +179,21 @@ export default function PartsOrderDialog({
       // Kategoria konserwacji
       if (hasMaintenance) {
         const savedMaintenanceOrder = currentOrder?.parts?.["maintenance"] ?? [];
-        const allTypes = MAINTENANCE_ITEMS.map((i) => i.type);
+        const maintenanceTypes = MAINTENANCE_ITEMS.map((i) => i.type);
+        const allIds = [
+          ...(hasChainLube ? ["CHAIN_LUBE"] : []),
+          ...maintenanceTypes,
+        ];
         const ordered = [
-          ...savedMaintenanceOrder.filter((t) => allTypes.includes(t as typeof allTypes[number])),
-          ...allTypes.filter((t) => !savedMaintenanceOrder.includes(t)),
+          ...savedMaintenanceOrder.filter((t) => allIds.includes(t)),
+          ...allIds.filter((t) => !savedMaintenanceOrder.includes(t)),
         ];
         parts["maintenance"] = ordered.map((t) => {
+          if (t === "CHAIN_LUBE") {
+            return { id: "CHAIN_LUBE", label: "Smarowanie łańcucha", icon: "Droplets" };
+          }
           const item = MAINTENANCE_ITEMS.find((i) => i.type === t)!;
-          return { id: t, label: item.label, icon: "🔧" };
+          return { id: t, label: item.label, icon: item.icon };
         });
       }
 
@@ -282,13 +314,21 @@ export default function PartsOrderDialog({
                   }))
                 }
               >
-                {currentParts.map((part) => (
-                  <SortableItem key={part.id} id={part.id}>
-                    <span>
-                      {part.icon} {part.label}
-                    </span>
-                  </SortableItem>
-                ))}
+                {currentParts.map((part) => {
+                  const MaintenanceIcon = MAINTENANCE_ICON_MAP[part.icon];
+                  return (
+                    <SortableItem key={part.id} id={part.id}>
+                      <span className="flex items-center gap-1.5">
+                        {MaintenanceIcon ? (
+                          <MaintenanceIcon className="h-4 w-4 shrink-0" />
+                        ) : (
+                          <span className="shrink-0">{part.icon}</span>
+                        )}
+                        {part.label}
+                      </span>
+                    </SortableItem>
+                  );
+                })}
               </Sortable>
             </div>
           </TabsContent>

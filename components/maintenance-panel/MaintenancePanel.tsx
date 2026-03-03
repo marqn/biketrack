@@ -34,6 +34,9 @@ import {
 import { markMaintenanceDone } from "@/app/app/actions/maintenance/mark-maintenance-done";
 import { toggleMaintenanceVisibility } from "@/app/app/actions/maintenance/toggle-maintenance-visibility";
 import { MaintenanceType as PrismaMaintenanceType } from "@/lib/generated/prisma";
+import LubeButton from "@/app/app/lube-button";
+import { CHAIN_LUBE_INTERVAL_KM } from "@/lib/default-parts";
+import { LubeEvent } from "@/lib/types";
 
 const ICON_MAP: Record<string, React.ElementType> = {
   Gauge,
@@ -82,6 +85,11 @@ export interface MaintenancePanelProps {
   hiddenItems: string[];
   /** Opcjonalna kolejność pozycji (z partsDisplayOrder.parts.maintenance) */
   itemOrder?: string[];
+  /** Dane do sekcji smarowania łańcucha */
+  chainLubeData?: {
+    lastLubeKmInitial?: number | null;
+    lubeEvents?: LubeEvent[];
+  };
 }
 
 function formatStatusLabel(
@@ -109,6 +117,7 @@ export default function MaintenancePanelContent({
   lastLogs,
   hiddenItems,
   itemOrder,
+  chainLubeData,
 }: MaintenancePanelProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -143,26 +152,88 @@ export default function MaintenancePanelContent({
     });
   }
 
-  // Zastosuj opcjonalną kolejność z partsDisplayOrder
-  const orderedItems = React.useMemo(() => {
-    if (!itemOrder?.length) return MAINTENANCE_ITEMS;
-    return [...MAINTENANCE_ITEMS].sort((a, b) => {
-      const ai = itemOrder.indexOf(a.type);
-      const bi = itemOrder.indexOf(b.type);
-      return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
-    });
-  }, [itemOrder]);
+  type VisibleEntry =
+    | { kind: "chain_lube" }
+    | { kind: "maintenance"; config: (typeof MAINTENANCE_ITEMS)[number] };
 
-  const visibleItems = orderedItems.filter(
-    (item) => !optimisticHidden.includes(item.type)
-  );
-  const hiddenItemConfigs = orderedItems.filter((item) =>
-    optimisticHidden.includes(item.type)
-  );
+  // Zunifikowana lista widocznych pozycji (konserwacja + smarowanie) z respektowaniem itemOrder
+  const allVisibleEntries = React.useMemo((): VisibleEntry[] => {
+    const maintByType = new Map(MAINTENANCE_ITEMS.map((i) => [i.type, i]));
+
+    if (!itemOrder?.length) {
+      const result: VisibleEntry[] = [];
+      if (chainLubeData) result.push({ kind: "chain_lube" });
+      for (const config of MAINTENANCE_ITEMS) {
+        if (!optimisticHidden.includes(config.type))
+          result.push({ kind: "maintenance", config });
+      }
+      return result;
+    }
+
+    const result: VisibleEntry[] = [];
+    const usedTypes = new Set<string>();
+
+    for (const id of itemOrder) {
+      if (id === "CHAIN_LUBE") {
+        if (chainLubeData) result.push({ kind: "chain_lube" });
+      } else {
+        const config = maintByType.get(id as MaintenanceType);
+        if (config && !optimisticHidden.includes(config.type)) {
+          result.push({ kind: "maintenance", config });
+          usedTypes.add(config.type);
+        }
+      }
+    }
+    // Dołącz pozycje konserwacji spoza itemOrder
+    for (const config of MAINTENANCE_ITEMS) {
+      if (!usedTypes.has(config.type) && !optimisticHidden.includes(config.type)) {
+        result.push({ kind: "maintenance", config });
+      }
+    }
+    // Jeśli CHAIN_LUBE nie ma w itemOrder, dodaj na początku
+    if (chainLubeData && !itemOrder.includes("CHAIN_LUBE")) {
+      result.unshift({ kind: "chain_lube" });
+    }
+    return result;
+  }, [itemOrder, chainLubeData, optimisticHidden]);
+
+  const hiddenItemConfigs = React.useMemo(() => {
+    const sorted = itemOrder?.length
+      ? [...MAINTENANCE_ITEMS].sort((a, b) => {
+          const ai = itemOrder.indexOf(a.type);
+          const bi = itemOrder.indexOf(b.type);
+          return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+        })
+      : MAINTENANCE_ITEMS;
+    return sorted.filter((item) => optimisticHidden.includes(item.type));
+  }, [itemOrder, optimisticHidden]);
 
   return (
     <div className="space-y-3 py-1">
-      {visibleItems.map((config) => {
+      {allVisibleEntries.map((entry) => {
+        if (entry.kind === "chain_lube") {
+          return (
+            <div key="CHAIN_LUBE" className="space-y-1.5 pb-3 border-b">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Droplets className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="text-sm font-medium">Smarowanie łańcucha</span>
+                </div>
+                <span className="text-xs text-muted-foreground shrink-0">
+                  co {CHAIN_LUBE_INTERVAL_KM} km
+                </span>
+              </div>
+              <LubeButton
+                bikeId={bikeId}
+                currentKm={currentKm}
+                lastLubeKmInitial={chainLubeData!.lastLubeKmInitial}
+                lubeEvents={chainLubeData!.lubeEvents}
+              />
+            </div>
+          );
+        }
+
+        const { config } = entry;
         const lastLog = optimisticLogs.find((l) => l.type === config.type) ?? null;
         const itemStatus = computeMaintenanceStatus(config, lastLog, currentKm);
         const Icon = ICON_MAP[config.icon] ?? Wrench;
@@ -224,7 +295,7 @@ export default function MaintenancePanelContent({
               )}
             </div>
 
-            <ColoredProgress value={itemStatus.progressPercent} showPercentage={false} />
+            <ColoredProgress value={itemStatus.progressPercent} />
           </div>
         );
       })}

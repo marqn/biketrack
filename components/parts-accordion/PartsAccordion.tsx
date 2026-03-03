@@ -31,7 +31,25 @@ import PartsOrderDialog from "./PartsOrderDialog";
 import MaintenancePanelContent, {
   type MaintenancePanelProps,
 } from "@/components/maintenance-panel/MaintenancePanel";
-import { Wrench } from "lucide-react";
+import {
+  Wrench,
+  Frame,
+  Cog,
+  StopCircle,
+  Circle,
+  Sliders,
+  Package,
+} from "lucide-react";
+
+const CATEGORY_ICON_MAP: Record<string, React.ElementType> = {
+  frame: Frame,
+  drivetrain: Cog,
+  brakes: StopCircle,
+  wheels: Circle,
+  cockpit: Sliders,
+  accessories: Package,
+  maintenance: Wrench,
+};
 
 type DefaultPart = {
   type: PartType;
@@ -333,6 +351,7 @@ export default function PartsAccordion({
           visibleParts={partsByCategory}
           customParts={customPartsByCategory}
           hasMaintenance={!!maintenanceData}
+          hasChainLube={!!maintenanceData?.chainLubeData}
         />
       </div>
       <Accordion
@@ -368,7 +387,10 @@ export default function PartsAccordion({
             ) : category !== "maintenance" ? (
               <AccordionItem value={category} className="border rounded-lg px-4">
                 <AccordionTrigger className="text-lg font-semibold">
-                  {PART_CATEGORIES[category as PartCategory].label}
+                  <div className="flex items-center gap-2">
+                    {React.createElement(CATEGORY_ICON_MAP[category] ?? Package, { className: "h-5 w-5 text-muted-foreground" })}
+                    {PART_CATEGORIES[category as PartCategory].label}
+                  </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-4 grid-cols-1 md:grid-cols-2">

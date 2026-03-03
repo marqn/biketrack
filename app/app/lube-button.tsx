@@ -98,7 +98,7 @@ export default function LubeButton({
   return (
     <>
       <div className="flex flex-col gap-2">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center text-xs text-muted-foreground">
           <span>{formatDistance(kmSinceLube, unitPref)} od ostatniego smarowania</span>
           {kmSinceLube > 0 && (
             <div className="flex items-center gap-2">

@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
-import LubeButton from "./lube-button";
 import SealantButton from "./sealant-button";
 import KmForm from "./km-form";
 import { ServiceType, PartType } from "@/lib/generated/prisma";
@@ -174,15 +173,11 @@ export default async function AppPage() {
           currentKm: bike.totalKm,
           lastLogs: lastMaintenanceLogs,
           hiddenItems: bike.hiddenMaintenanceItems,
+          chainLubeData: {
+            lastLubeKmInitial: lastLube?.kmAtTime,
+            lubeEvents,
+          },
         }}
-        chainChildren={
-          <LubeButton
-            bikeId={bike.id}
-            currentKm={bike.totalKm}
-            lastLubeKmInitial={lastLube?.kmAtTime}
-            lubeEvents={lubeEvents}
-          />
-        }
         tireFrontChildren={
           extractTubelessStatus(existingParts).front ? (
             <SealantButton

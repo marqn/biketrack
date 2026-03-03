@@ -1,6 +1,4 @@
 # Pomysły
-
-    -  dodaj mini panel/komponent w formie jak części czy dodawanie km które wyświetlałoby info sprawdz ciśnieni w oponach, umyj bidon, ostatnie umycie roweru. Możesz jeszcze coś zaproponować
     -
     - pytanie na początek: 
         - ile masz przerzutek tył przód
@@ -14,7 +12,7 @@
 *** -   PLAN    -   ***
 
     ✅      Domena mbike.cc
-    -       terms and conditions
+    ✅      terms and conditions
     -       cloudflare
     -       paddle
     
