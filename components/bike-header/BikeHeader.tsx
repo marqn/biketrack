@@ -22,6 +22,8 @@ import {
   X,
   Warehouse,
   Bike as BikeIcon,
+  Sun,
+  Moon,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
@@ -57,6 +59,7 @@ import { formatDistance } from "@/lib/units";
 import type { UnitPreference } from "@/lib/units";
 import { syncStravaDistances } from "@/app/app/actions/sync-strava-distances";
 import { toast } from "sonner";
+import { useTheme } from "next-themes";
 import { deleteAccount } from "./actions/delete-account";
 import { deleteBike } from "./actions/delete-bike";
 import { updateBike } from "./actions/update-bike";
@@ -116,6 +119,7 @@ export function BikeHeader({
   const pill = (isActive: boolean): React.CSSProperties | undefined =>
     isActive ? { viewTransitionName: "nav-pill" } : undefined;
   const { data: session } = useSession();
+  const { theme, setTheme } = useTheme();
   const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
   const { activeDialog, openDialog, closeDialog } =
     useMultiDialog<DialogType>();
@@ -245,7 +249,7 @@ export function BikeHeader({
     try {
       await deleteAccount();
       await signOut({
-        callbackUrl: "/login",
+        callbackUrl: "/",
         redirect: true,
       });
     } catch (error) {
@@ -272,7 +276,7 @@ export function BikeHeader({
   if (!mounted) {
     return (
       <header className="fixed top-0 left-0 z-50 w-screen border-b bg-card">
-        <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-3 flex flex-wrap md:flex-nowrap items-center gap-x-2 gap-y-1">
+        <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-3 flex flex-wrap md:flex-nowrap items-center gap-x-4 gap-y-1">
           <div className="order-1 flex-1 min-w-0 space-y-2">
             <Skeleton className="h-5 w-32" />
             <Skeleton className="h-4 w-24" />
@@ -292,7 +296,7 @@ export function BikeHeader({
 
   return (
     <header className="fixed top-0 left-0 z-50 w-screen border-b bg-card" style={{ viewTransitionName: "nav-header" }}>
-      <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-3 flex flex-wrap md:flex-nowrap items-center gap-x-2 gap-y-1">
+      <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-3 flex flex-wrap md:flex-nowrap items-center gap-x-4 gap-y-1">
           {/* BIKE SWITCHER - wiersz 1 lewa */}
           <div className="order-1 flex-1 min-w-0 overflow-hidden">
             <DropdownMenu>
@@ -454,10 +458,21 @@ export function BikeHeader({
                 Premium
               </DropdownMenuItem>
 
+              <DropdownMenuItem
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              >
+                {theme === "dark" ? (
+                  <Sun className="mr-2 h-4 w-4" />
+                ) : (
+                  <Moon className="mr-2 h-4 w-4" />
+                )}
+                {theme === "dark" ? "Tryb jasny" : "Tryb ciemny"}
+              </DropdownMenuItem>
+
               <DropdownMenuSeparator />
 
               <DropdownMenuItem
-                onClick={() => signOut({ callbackUrl: "/login" })}
+                onClick={() => signOut({ callbackUrl: "/" })}
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 Wyloguj

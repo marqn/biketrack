@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pl" className={font.variable}>
+    <html lang="pl" className={font.variable} suppressHydrationWarning>
       <body className="antialiased">
         <Providers>
           <NavigationViewTransition>

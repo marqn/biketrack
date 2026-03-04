@@ -12,6 +12,7 @@ import { CommunityStatsSection } from "@/components/landing/CommunityStatsSectio
 import { PopularBikeSection } from "@/components/landing/PopularBikeSection";
 import { PopularPartSection } from "@/components/landing/PopularPartSection";
 import { Footer } from "@/components/footer/Footer";
+import { ThemeToggle } from "@/components/landing/ThemeToggle";
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
@@ -25,6 +26,9 @@ export default async function HomePage() {
 
     return (
       <div className="min-h-screen bg-linear-to-b from-background to-secondary/20">
+        <div className="flex justify-end px-4 pt-4">
+          <ThemeToggle />
+        </div>
         <div className="flex items-center justify-center px-4 py-4">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <div className="flex justify-center">
@@ -33,7 +37,7 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <h1 className="text-5xl font-bold tracking-tight">MBike</h1>
+            <h1 className="text-5xl font-bold tracking-tight">MBike.cc</h1>
 
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Zarządzaj serwisem swoich rowerów w jednym miejscu.
