@@ -82,11 +82,10 @@ export default function NumberStepper({
   const sorted = [...steps].sort((a, b) => a - b);
 
   const holdProps = (amount: number) => ({
-    onMouseDown: () => startHold(amount),
-    onMouseUp: stopHold,
-    onMouseLeave: stopHold,
-    onTouchStart: () => startHold(amount),
-    onTouchEnd: stopHold,
+    onPointerDown: (e: React.PointerEvent) => { e.preventDefault(); startHold(amount); },
+    onPointerUp: stopHold,
+    onPointerLeave: stopHold,
+    onPointerCancel: stopHold,
   });
 
   const stepLabel = (step: number, positive: boolean) => {
