@@ -371,7 +371,7 @@ export default function PartsAccordion({
           >
             {category === "maintenance" && maintenanceData ? (
               <AccordionItem value="maintenance" className="border rounded-lg px-4">
-                <AccordionTrigger className="text-lg font-semibold">
+                <AccordionTrigger className="text-lg font-semibold hover:bg-muted/50 hover:no-underline">
                   <div className="flex items-center gap-2">
                     <Wrench className="h-5 w-5 text-muted-foreground" />
                     Konserwacja roweru
@@ -386,7 +386,7 @@ export default function PartsAccordion({
               </AccordionItem>
             ) : category !== "maintenance" ? (
               <AccordionItem value={category} className="border rounded-lg px-4">
-                <AccordionTrigger className="text-lg font-semibold">
+                <AccordionTrigger className="text-lg font-semibold hover:bg-muted/50 hover:no-underline">
                   <div className="flex items-center gap-2">
                     {React.createElement(CATEGORY_ICON_MAP[category] ?? Package, { className: "h-5 w-5 text-muted-foreground" })}
                     {PART_CATEGORIES[category as PartCategory].label}

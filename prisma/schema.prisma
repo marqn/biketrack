@@ -224,7 +224,8 @@ model Bike {
   slug         String?  @unique          // URL-friendly identyfikator dla strony publicznej
   images       String[] @default([])      // Vercel Blob URLs (do 3 zdjęć)
   imageUrl     String?  @db.Text         // TYMCZASOWO - stare base64, usunąć po migracji
-  hiddenMaintenanceItems String[] @default([]) // wartości MaintenanceType ukryte per rower
+  hiddenMaintenanceItems   String[] @default([]) // wartości MaintenanceType ukryte per rower
+  maintenanceIntervals     Json     @default("{}") // nadpisane interwały per typ: { "TIRE_PRESSURE": { "intervalKm": 400, "intervalDays": 21 } }
 
   user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   parts            BikePart[]

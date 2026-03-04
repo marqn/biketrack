@@ -4,7 +4,7 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import SealantButton from "./sealant-button";
 import KmForm from "./km-form";
-import { ServiceType, PartType } from "@/lib/generated/prisma";
+import { ServiceType, PartType, Prisma } from "@/lib/generated/prisma";
 import { DEFAULT_PARTS, EBIKE_PARTS, extractTubelessStatus } from "@/lib/default-parts";
 import { type PartsDisplayOrder } from "@/app/app/actions/parts-display-order";
 import { NotificationsList } from "@/components/notifications-list/NotificationsList";
@@ -80,11 +80,11 @@ export default async function AppPage() {
 
   // Fallback do pierwszego roweru jeśli wybrany nie istnieje lub brak cookie
   if (!bike) {
-    bike = await prisma.bike.findFirst({
+    bike = (await prisma.bike.findFirst({
       where: { userId: session.user.id },
       orderBy: { createdAt: "asc" },
       include: bikeInclude,
-    });
+    })) as typeof bike;
   }
 
   if (!bike) redirect("/onboarding");
@@ -159,7 +159,7 @@ export default async function AppPage() {
     <div className="space-y-6 lg:px-24 lg:space-6">
       {stravaAccount && <StravaSyncTrigger />}
 
-      <KmForm key={bike.id} bikeId={bike.id} initialKm={bike.totalKm} />
+      <KmForm key={bike.id} bikeId={bike.id} initialKm={bike.totalKm} hasStravaSync={!!stravaAccount} />
 
       <PartsAccordion
         bikeId={bike.id}
@@ -173,6 +173,7 @@ export default async function AppPage() {
           currentKm: bike.totalKm,
           lastLogs: lastMaintenanceLogs,
           hiddenItems: bike.hiddenMaintenanceItems,
+          customIntervals: (bike.maintenanceIntervals as Record<string, { intervalKm?: number; intervalDays?: number }>) ?? {},
           chainLubeData: {
             lastLubeKmInitial: lastLube?.kmAtTime,
             lubeEvents,

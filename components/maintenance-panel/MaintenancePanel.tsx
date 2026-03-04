@@ -16,9 +16,12 @@ import {
   EyeOff,
   CheckCircle2,
   ChevronDown,
+  Pencil,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import NumberStepper from "@/components/ui/number-stepper";
 import ColoredProgress from "@/components/ui/colored-progress";
 import {
   Collapsible,
@@ -30,9 +33,11 @@ import {
   computeMaintenanceStatus,
   type MaintenanceType,
   type MaintenanceStatus,
+  type MaintenanceItemConfig,
 } from "@/lib/maintenance-config";
 import { markMaintenanceDone } from "@/app/app/actions/maintenance/mark-maintenance-done";
 import { toggleMaintenanceVisibility } from "@/app/app/actions/maintenance/toggle-maintenance-visibility";
+import { updateMaintenanceInterval } from "@/app/app/actions/maintenance/update-maintenance-interval";
 import { MaintenanceType as PrismaMaintenanceType } from "@/lib/generated/prisma";
 import LubeButton from "@/app/app/lube-button";
 import { CHAIN_LUBE_INTERVAL_KM } from "@/lib/default-parts";
@@ -78,11 +83,14 @@ export interface MaintenanceLogEntry {
   createdAt: Date | string;
 }
 
+export type CustomIntervals = Record<string, { intervalKm?: number; intervalDays?: number }>;
+
 export interface MaintenancePanelProps {
   bikeId: string;
   currentKm: number;
   lastLogs: MaintenanceLogEntry[];
   hiddenItems: string[];
+  customIntervals?: CustomIntervals;
   /** Opcjonalna kolejność pozycji (z partsDisplayOrder.parts.maintenance) */
   itemOrder?: string[];
   /** Dane do sekcji smarowania łańcucha */
@@ -110,12 +118,132 @@ function formatStatusLabel(
   return parts.join(" / ") || `${daysAgo} dni temu`;
 }
 
+function mergeConfig(
+  config: MaintenanceItemConfig,
+  custom?: { intervalKm?: number; intervalDays?: number }
+): MaintenanceItemConfig {
+  if (!custom) return config;
+  return {
+    ...config,
+    ...(custom.intervalKm != null ? { intervalKm: custom.intervalKm } : {}),
+    ...(custom.intervalDays != null ? { intervalDays: custom.intervalDays } : {}),
+  };
+}
+
+function IntervalEditor({
+  bikeId,
+  type,
+  defaultIntervalKm,
+  defaultIntervalDays,
+  customKm,
+  customDays,
+}: {
+  bikeId: string;
+  type: MaintenanceType;
+  defaultIntervalKm?: number;
+  defaultIntervalDays?: number;
+  customKm?: number;
+  customDays?: number;
+}) {
+  const [open, setOpen] = React.useState(false);
+  const [kmVal, setKmVal] = React.useState(customKm ?? defaultIntervalKm ?? 0);
+  const [daysVal, setDaysVal] = React.useState(customDays ?? defaultIntervalDays ?? 0);
+  const [saving, startSave] = useTransition();
+
+  const effectiveKm = customKm ?? defaultIntervalKm;
+  const effectiveDays = customDays ?? defaultIntervalDays;
+
+  const label = [
+    effectiveKm ? `co ${effectiveKm} km` : null,
+    effectiveDays ? `${effectiveDays} dni` : null,
+  ]
+    .filter(Boolean)
+    .join(" / ");
+
+  function handleSave() {
+    const km = kmVal > 0 ? kmVal : null;
+    const days = daysVal > 0 ? daysVal : null;
+    startSave(async () => {
+      await updateMaintenanceInterval(bikeId, type, km, days);
+      setOpen(false);
+    });
+  }
+
+  function handleReset() {
+    setKmVal(defaultIntervalKm ?? 0);
+    setDaysVal(defaultIntervalDays ?? 0);
+    startSave(async () => {
+      await updateMaintenanceInterval(bikeId, type, null, null);
+      setOpen(false);
+    });
+  }
+
+  const hasCustom = customKm != null || customDays != null;
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors group"
+          title="Edytuj interwał"
+        >
+          {label || "—"}
+          <Pencil className="h-2.5 w-2.5 opacity-0 group-hover:opacity-60 transition-opacity" />
+          {hasCustom && (
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-500 inline-block" title="Zmodyfikowany interwał" />
+          )}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-72 p-3" align="end">
+        <p className="text-xs font-medium mb-2">Edytuj interwał</p>
+        <div className="space-y-3">
+          {defaultIntervalKm != null && (
+            <div>
+              <label className="text-xs text-muted-foreground block mb-1">Co ile km</label>
+              <NumberStepper
+                value={kmVal}
+                onChange={setKmVal}
+                steps={[10, 100]}
+                min={1}
+                disabled={saving}
+              />
+            </div>
+          )}
+          {defaultIntervalDays != null && (
+            <div>
+              <label className="text-xs text-muted-foreground block mb-1">Co ile dni</label>
+              <NumberStepper
+                value={daysVal}
+                onChange={setDaysVal}
+                steps={[1, 7]}
+                min={1}
+                disabled={saving}
+              />
+            </div>
+          )}
+          <div className="flex gap-1.5 pt-1">
+            <Button size="sm" className="h-7 text-xs flex-1" onClick={handleSave} disabled={saving}>
+              Zapisz
+            </Button>
+            {hasCustom && (
+              <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={handleReset} disabled={saving} title="Przywróć domyślne">
+                Reset
+              </Button>
+            )}
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 /** Zawartość panelu konserwacji — bez wrappera akordeonu */
 export default function MaintenancePanelContent({
   bikeId,
   currentKm,
   lastLogs,
   hiddenItems,
+  customIntervals = {},
   itemOrder,
   chainLubeData,
 }: MaintenancePanelProps) {
@@ -234,8 +362,10 @@ export default function MaintenancePanelContent({
         }
 
         const { config } = entry;
+        const custom = customIntervals[config.type];
+        const effectiveConfig = mergeConfig(config, custom);
         const lastLog = optimisticLogs.find((l) => l.type === config.type) ?? null;
-        const itemStatus = computeMaintenanceStatus(config, lastLog, currentKm);
+        const itemStatus = computeMaintenanceStatus(effectiveConfig, lastLog, currentKm);
         const Icon = ICON_MAP[config.icon] ?? Wrench;
 
         return (
@@ -254,7 +384,7 @@ export default function MaintenancePanelContent({
                   size="sm"
                   variant="outline"
                   className="h-7 px-2 text-xs"
-                  disabled={isPending}
+                  disabled={isPending || itemStatus.progressPercent === 0}
                   onClick={() => handleMarkDone(config.type as MaintenanceType)}
                 >
                   <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
@@ -280,19 +410,18 @@ export default function MaintenancePanelContent({
                   : formatStatusLabel(
                       itemStatus.daysAgo,
                       itemStatus.kmAgo,
-                      !!config.intervalKm,
-                      !!config.intervalDays
+                      !!effectiveConfig.intervalKm,
+                      !!effectiveConfig.intervalDays
                     )}
               </span>
-              {config.intervalKm && (
-                <span>
-                  co {config.intervalKm} km
-                  {config.intervalDays ? ` / ${config.intervalDays} dni` : ""}
-                </span>
-              )}
-              {!config.intervalKm && config.intervalDays && (
-                <span>co {config.intervalDays} dni</span>
-              )}
+              <IntervalEditor
+                bikeId={bikeId}
+                type={config.type as MaintenanceType}
+                defaultIntervalKm={config.intervalKm}
+                defaultIntervalDays={config.intervalDays}
+                customKm={custom?.intervalKm}
+                customDays={custom?.intervalDays}
+              />
             </div>
 
             <ColoredProgress value={itemStatus.progressPercent} />

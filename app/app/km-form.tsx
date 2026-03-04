@@ -4,19 +4,22 @@ import { useEffect, useOptimistic, useState, useTransition } from "react";
 import { updateBikeKm } from "./actions/update-bike-km";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import NumberStepper from "@/components/ui/number-stepper";
 import { useSession } from "next-auth/react";
 import { displayKm, inputToKm, distanceUnit, distanceRange } from "@/lib/units";
 import type { UnitPreference } from "@/lib/units";
+import { Pencil } from "lucide-react";
 
 type Props = {
   bikeId: string;
   initialKm: number;
+  hasStravaSync?: boolean;
 };
 
-export default function KmForm({ bikeId, initialKm }: Props) {
+export default function KmForm({ bikeId, initialKm, hasStravaSync }: Props) {
   const [isPending, startTransition] = useTransition();
+  const [open, setOpen] = useState(false);
   const { data: session } = useSession();
   const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
 
@@ -57,6 +60,8 @@ export default function KmForm({ bikeId, initialKm }: Props) {
           ? `Zmiana: ${displayKm(prevKm, unitPref)} → ${displayKm(newKmMetric, unitPref)} ${unit}`
           : undefined,
     });
+
+    setOpen(false);
   }
 
   const unit = distanceUnit(unitPref);
@@ -64,16 +69,21 @@ export default function KmForm({ bikeId, initialKm }: Props) {
   const hasChanged = inputToKm(inputKm, unitPref) !== optimisticKm;
 
   return (
-    <Card className="mt-4 mx-auto max-w-md">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm text-center">
-          🚲 Aktualny przebieg roweru
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <form action={action} className="flex flex-col gap-3 p-6 pt-0">
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <CollapsibleTrigger asChild>
+        <button className="w-full flex justify-between items-center px-3 py-2.5 rounded-lg border bg-card hover:bg-muted/50 transition-colors text-left">
+          <span className="text-sm font-medium">
+            🚲 Przebieg: {displayKm(optimisticKm, unitPref)} {unit}
+          </span>
+          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Pencil size={12} />
+            {open ? "Ukryj" : "Edytuj ręcznie"}
+          </span>
+        </button>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="overflow-hidden data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
+        <form action={action} className="flex flex-col gap-3 p-3 pt-2 border border-t-0 rounded-b-lg bg-card">
           <input type="hidden" name="bikeId" value={bikeId} />
-
           <NumberStepper
             incrementOnly
             name="newKm"
@@ -87,11 +97,13 @@ export default function KmForm({ bikeId, initialKm }: Props) {
           <Button disabled={isPending || !hasChanged} variant={hasChanged ? "default" : "outline"}>
             {isPending ? "Zapisuję..." : "💾 Zapisz"}
           </Button>
-          <span className="text-center">
-            Aktualnie zapisane: {displayKm(optimisticKm, unitPref)} {unit}
-          </span>
+          {hasStravaSync && (
+            <p className="text-xs text-muted-foreground text-center">
+              Przebieg aktualizuje się automatycznie z Strava
+            </p>
+          )}
         </form>
-      </CardContent>
-    </Card>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
