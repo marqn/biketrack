@@ -227,12 +227,12 @@ body {
 
 @layer components {
   [data-slot="tooltip-content"] {
-    background: oklch(53.319% 0.25972 262.653) !important;
-    color: oklch(0.96 0.01 264) !important;
+    background: oklch(0.62 0.24 264) !important;
+    color: oklch(0.98 0.01 264) !important;
   }
-  
+
   [data-slot="tooltip-content"] .size-2\.5 {
-    background: oklch(53.319% 0.25972 262.653) !important;
-    fill: oklch(53.319% 0.25972 262.653) !important;
+    background: oklch(0.62 0.24 264) !important;
+    fill: oklch(0.62 0.24 264) !important;
   }
 }

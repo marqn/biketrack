@@ -34,7 +34,7 @@ export function Footer() {
               >
                 Regulamin
               </Link>
-              <p className="text-center md:text-left">© {yearDisplay} MBike. Wszelkie prawa zastrzeżone.</p>
+              <p className="text-center md:text-left">© {yearDisplay} MBike.cc Wszelkie prawa zastrzeżone.</p>
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-1">

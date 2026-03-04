@@ -520,7 +520,7 @@ export function BikeHeader({
                     </Button>
                   </span>
                 </TooltipTrigger>
-                <TooltipContent>
+                <TooltipContent className="bg-primary text-primary-foreground">
                   {syncDate ? (
                     <p>Strava sync: {new Date(syncDate).toLocaleString("pl-PL")}</p>
                   ) : (
@@ -545,7 +545,7 @@ export function BikeHeader({
                     <Shield className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>
+                <TooltipContent className="bg-primary text-primary-foreground">
                   <p>Panel Admina</p>
                 </TooltipContent>
               </Tooltip>
@@ -564,7 +564,7 @@ export function BikeHeader({
                   <Home className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent className="bg-primary text-primary-foreground">
                 <p>Strona startowa</p>
               </TooltipContent>
             </Tooltip>
@@ -584,7 +584,7 @@ export function BikeHeader({
                   <History className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent className="bg-primary text-primary-foreground">
                 <p>Historia</p>
               </TooltipContent>
             </Tooltip>
@@ -604,7 +604,7 @@ export function BikeHeader({
                   <Warehouse className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent className="bg-primary text-primary-foreground">
                 <p>Garaż</p>
               </TooltipContent>
             </Tooltip>
@@ -626,7 +626,7 @@ export function BikeHeader({
                   <Package className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent className="bg-primary text-primary-foreground">
                 <p>Produkty</p>
               </TooltipContent>
             </Tooltip>
@@ -648,7 +648,7 @@ export function BikeHeader({
                   <Compass className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent className="bg-primary text-primary-foreground">
                 <p>Odkrywaj</p>
               </TooltipContent>
             </Tooltip>
@@ -676,7 +676,7 @@ export function BikeHeader({
                   )}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent className="bg-primary text-primary-foreground">
                 <p>Wiadomości</p>
               </TooltipContent>
             </Tooltip>

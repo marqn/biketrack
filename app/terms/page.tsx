@@ -142,7 +142,7 @@ export default function TermsPage() {
           </section>
 
           <p className="text-xs text-muted-foreground border-t pt-4">
-            © {new Date().getFullYear()} MBike. Wszelkie prawa zastrzeżone.
+            © {new Date().getFullYear()} MBike.cc Wszelkie prawa zastrzeżone.
           </p>
         </CardContent>
       </Card>
