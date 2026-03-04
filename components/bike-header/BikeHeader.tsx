@@ -280,7 +280,7 @@ export function BikeHeader({
           <div className="order-2 md:order-last shrink-0">
             <Skeleton className="h-9 w-9 rounded-full" />
           </div>
-          <div className="order-3 md:order-2 w-full md:w-auto flex items-center justify-center md:justify-normal gap-1 sm:gap-2 md:gap-4 shrink-0">
+          <div className="order-3 md:order-2 w-full md:w-auto flex items-center justify-center md:justify-normal gap-2 sm:gap-3 md:gap-4 shrink-0">
             {[...Array(6)].map((_, i) => (
               <Skeleton key={i} className="h-9 w-9 rounded-md" />
             ))}
@@ -471,7 +471,7 @@ export function BikeHeader({
         </div>
 
         {/* NAV BUTTONS - wiersz 2 wyśrodkowane na mobile, środek na desktop */}
-        <div className="order-3 md:order-2 w-full md:w-auto flex items-center justify-center md:justify-normal gap-1 sm:gap-2 md:gap-4 shrink-0">
+        <div className="order-3 md:order-2 w-full md:w-auto flex items-center justify-center md:justify-normal gap-3.5 sm:gap-4.5 md:gap-4 shrink-0">
           {hasStrava && (
             <TooltipProvider>
               <Tooltip>
