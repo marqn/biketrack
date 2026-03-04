@@ -119,7 +119,7 @@ export function BikeHeader({
   const pill = (isActive: boolean): React.CSSProperties | undefined =>
     isActive ? { viewTransitionName: "nav-pill" } : undefined;
   const { data: session } = useSession();
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme: theme, setTheme } = useTheme();
   const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
   const { activeDialog, openDialog, closeDialog } =
     useMultiDialog<DialogType>();
