@@ -13,6 +13,13 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 import NumberStepper from "@/components/ui/number-stepper";
 import {
   AlertDialog,
@@ -52,6 +59,7 @@ function WearEditor({
   const [saving, setSaving] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const unit = distanceUnit(unitPref);
+  const isMobile = useIsMobile();
 
   React.useEffect(() => {
     if (open) {
@@ -79,60 +87,81 @@ function WearEditor({
     }
   }
 
+  const trigger = (
+    <button
+      className="flex items-center gap-1 hover:text-foreground transition-colors group text-left"
+      title="Edytuj zużycie"
+      onClick={() => isMobile && setOpen(true)}
+    >
+      {expectedKm > 0 ? (
+        <>
+          Zużycie:{" "}
+          <span className="font-medium text-foreground">{formatDistance(wearKm, unitPref)}</span>
+          {" / "}{formatDistance(expectedKm, unitPref)}
+        </>
+      ) : (
+        <>
+          Przebieg:{" "}
+          <span className="font-medium text-foreground">{formatDistance(wearKm, unitPref)}</span>
+        </>
+      )}
+      <Pencil className="h-2.5 w-2.5 opacity-0 group-hover:opacity-60 transition-opacity shrink-0" />
+    </button>
+  );
+
+  const content = (
+    <div className="space-y-3">
+      <div>
+        <label className="text-xs text-muted-foreground block mb-1">Aktualne zużycie ({unit})</label>
+        <NumberStepper
+          value={wearVal}
+          onChange={setWearVal}
+          steps={[10, 100]}
+          min={0}
+          disabled={saving}
+        />
+      </div>
+      <div>
+        <label className="text-xs text-muted-foreground block mb-1">
+          Oczekiwana trwałość ({unit})
+        </label>
+        <NumberStepper
+          value={expectedVal}
+          onChange={setExpectedVal}
+          steps={[100, 1000]}
+          min={0}
+          disabled={saving}
+        />
+      </div>
+      {error && <p className="text-xs text-destructive">{error}</p>}
+      <Button size="sm" className="h-7 text-xs w-full" onClick={handleSave} disabled={saving}>
+        {saving ? "Zapisuję..." : "Zapisz"}
+      </Button>
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        {trigger}
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Edytuj zużycie</DialogTitle>
+            </DialogHeader>
+            {content}
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <button
-          className="flex items-center gap-1 hover:text-foreground transition-colors group text-left"
-          title="Edytuj zużycie"
-        >
-          {expectedKm > 0 ? (
-            <>
-              Zużycie:{" "}
-              <span className="font-medium text-foreground">{formatDistance(wearKm, unitPref)}</span>
-              {" / "}{formatDistance(expectedKm, unitPref)}
-            </>
-          ) : (
-            <>
-              Przebieg:{" "}
-              <span className="font-medium text-foreground">{formatDistance(wearKm, unitPref)}</span>
-            </>
-          )}
-          <Pencil className="h-2.5 w-2.5 opacity-0 group-hover:opacity-60 transition-opacity shrink-0" />
-        </button>
-      </PopoverTrigger>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       <PopoverContent className="w-72 p-3" align="start">
         <p className="text-xs font-medium mb-3">Edytuj zużycie</p>
-        <div className="space-y-3">
-          <div>
-            <label className="text-xs text-muted-foreground block mb-1">
-              Aktualne zużycie ({unit})
-            </label>
-            <NumberStepper
-              value={wearVal}
-              onChange={setWearVal}
-              steps={[10, 100]}
-              min={0}
-              disabled={saving}
-            />
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground block mb-1">
-              Oczekiwana trwałość ({unit})
-            </label>
-            <NumberStepper
-              value={expectedVal}
-              onChange={setExpectedVal}
-              steps={[100, 1000]}
-              min={0}
-              disabled={saving}
-            />
-          </div>
-          {error && <p className="text-xs text-destructive">{error}</p>}
-          <Button size="sm" className="h-7 text-xs w-full" onClick={handleSave} disabled={saving}>
-            {saving ? "Zapisuję..." : "Zapisz"}
-          </Button>
-        </div>
+        {content}
       </PopoverContent>
     </Popover>
   );
