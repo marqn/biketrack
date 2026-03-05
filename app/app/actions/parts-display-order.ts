@@ -30,18 +30,20 @@ export async function getPartsDisplayOrder(): Promise<PartsDisplayOrder | null> 
 
 export async function savePartsDisplayOrder(order: PartsDisplayOrder) {
   const userId = await getSessionUserId();
-  await prisma.user.update({
+  const result = await prisma.user.updateMany({
     where: { id: userId },
     data: { partsDisplayOrder: order as Record<string, unknown> },
   });
+  if (result.count === 0) throw new Error("Nie znaleziono użytkownika");
   revalidatePath("/app");
 }
 
 export async function resetPartsDisplayOrder() {
   const userId = await getSessionUserId();
-  await prisma.user.update({
+  const result = await prisma.user.updateMany({
     where: { id: userId },
     data: { partsDisplayOrder: null },
   });
+  if (result.count === 0) throw new Error("Nie znaleziono użytkownika");
   revalidatePath("/app");
 }

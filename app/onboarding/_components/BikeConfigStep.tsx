@@ -66,7 +66,7 @@ export default function BikeConfigStep({
             <ToggleGroupItem
               key={opt.value}
               value={opt.value}
-              className="h-14 text-sm rounded-xl text-center px-2 border border-border data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary"
+              className="h-auto min-h-14 py-2 text-sm rounded-xl text-center px-2 leading-tight whitespace-normal border border-border data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary"
             >
               {opt.label}
             </ToggleGroupItem>
