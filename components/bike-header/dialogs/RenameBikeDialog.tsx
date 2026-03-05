@@ -162,7 +162,7 @@ export function RenameBikeDialog({
           className="custom-scrollbar space-y-4 overflow-y-auto -mx-6 pl-6 pr-8"
           style={{ maxHeight: "calc(90vh - 200px)" }}
         >
-          <div className="flex gap-4 items-end">
+          <div className="flex flex-wrap gap-4 items-end">
             <div className="space-y-2">
               <Label htmlFor="bike-type">
                 Typ roweru <span className="text-destructive">*</span>
