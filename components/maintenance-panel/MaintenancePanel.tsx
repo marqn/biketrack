@@ -21,6 +21,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 import NumberStepper from "@/components/ui/number-stepper";
 import ColoredProgress from "@/components/ui/colored-progress";
 import {
@@ -179,59 +186,83 @@ function IntervalEditor({
   }
 
   const hasCustom = customKm != null || customDays != null;
+  const isMobile = useIsMobile();
+
+  const trigger = (
+    <button
+      className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors group"
+      title="Edytuj interwał"
+      onClick={() => isMobile && setOpen(true)}
+    >
+      {label || "—"}
+      <Pencil className="h-2.5 w-2.5 opacity-0 group-hover:opacity-60 transition-opacity" />
+      {hasCustom && (
+        <span className="h-1.5 w-1.5 rounded-full bg-blue-500 inline-block" title="Zmodyfikowany interwał" />
+      )}
+    </button>
+  );
+
+  const content = (
+    <div className="space-y-3">
+      {defaultIntervalKm != null && (
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1">Co ile km</label>
+          <NumberStepper
+            value={kmVal}
+            onChange={setKmVal}
+            steps={[10, 100]}
+            min={1}
+            disabled={saving}
+          />
+        </div>
+      )}
+      {defaultIntervalDays != null && (
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1">Co ile dni</label>
+          <NumberStepper
+            value={daysVal}
+            onChange={setDaysVal}
+            steps={[1, 7]}
+            min={1}
+            disabled={saving}
+          />
+        </div>
+      )}
+      <div className="flex gap-1.5 pt-1">
+        <Button size="sm" className="h-7 text-xs flex-1" onClick={handleSave} disabled={saving}>
+          Zapisz
+        </Button>
+        {hasCustom && (
+          <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={handleReset} disabled={saving} title="Przywróć domyślne">
+            Reset
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        {trigger}
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Edytuj interwał</DialogTitle>
+            </DialogHeader>
+            {content}
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <button
-          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors group"
-          title="Edytuj interwał"
-        >
-          {label || "—"}
-          <Pencil className="h-2.5 w-2.5 opacity-0 group-hover:opacity-60 transition-opacity" />
-          {hasCustom && (
-            <span className="h-1.5 w-1.5 rounded-full bg-blue-500 inline-block" title="Zmodyfikowany interwał" />
-          )}
-        </button>
-      </PopoverTrigger>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       <PopoverContent className="w-72 p-3" align="end">
         <p className="text-xs font-medium mb-2">Edytuj interwał</p>
-        <div className="space-y-3">
-          {defaultIntervalKm != null && (
-            <div>
-              <label className="text-xs text-muted-foreground block mb-1">Co ile km</label>
-              <NumberStepper
-                value={kmVal}
-                onChange={setKmVal}
-                steps={[10, 100]}
-                min={1}
-                disabled={saving}
-              />
-            </div>
-          )}
-          {defaultIntervalDays != null && (
-            <div>
-              <label className="text-xs text-muted-foreground block mb-1">Co ile dni</label>
-              <NumberStepper
-                value={daysVal}
-                onChange={setDaysVal}
-                steps={[1, 7]}
-                min={1}
-                disabled={saving}
-              />
-            </div>
-          )}
-          <div className="flex gap-1.5 pt-1">
-            <Button size="sm" className="h-7 text-xs flex-1" onClick={handleSave} disabled={saving}>
-              Zapisz
-            </Button>
-            {hasCustom && (
-              <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={handleReset} disabled={saving} title="Przywróć domyślne">
-                Reset
-              </Button>
-            )}
-          </div>
-        </div>
+        {content}
       </PopoverContent>
     </Popover>
   );
