@@ -62,9 +62,6 @@ export default function BlogPage() {
   return (
     <div className="space-y-6 lg:px-24">
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-full mb-4">
-          <Newspaper className="w-8 h-8 text-primary-foreground" />
-        </div>
         <h1 className="text-3xl font-bold mb-2">Aktualności</h1>
         <p className="text-muted-foreground">
           Co nowego w serwisie i dokąd zmierzamy

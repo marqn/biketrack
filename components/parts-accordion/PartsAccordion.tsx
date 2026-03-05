@@ -412,7 +412,7 @@ export default function PartsAccordion({
                             <PartCard
                               partId={item.existingPart?.id || ""}
                               partName={getPartNameForBike(item.partType, bikeType, item.existingPart?.partSpecificData)}
-                              expectedKm={item.expectedKm}
+                              expectedKm={item.existingPart?.expectedKm ?? item.expectedKm}
                               wearKm={item.existingPart?.wearKm || 0}
                               bikeId={bikeId}
                               partType={item.partType}

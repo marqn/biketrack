@@ -10,48 +10,36 @@ export function Footer() {
     currentYear > startYear ? `${startYear}-${currentYear}` : `${currentYear}`;
 
   return (
-    <footer className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-8 py-8">
-        {/* Bottom Section - Copyright */}
-        <div className="mt-8 pt-6 border-t">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
-            <div className="flex flex-col gap-2 items-center md:items-start">
-              <Link
-                href="/app/blog"
-                className="font-semibold text-foreground hover:underline"
-              >
-                Aktualności
-              </Link>
-              <Link
-                href="/app/contact"
-                className="font-semibold text-foreground hover:underline"
-              >
-                Kontakt
-              </Link>
-              <Link
-                href="/terms"
-                className="font-semibold text-foreground hover:underline"
-              >
-                Regulamin
-              </Link>
-              <p className="text-center md:text-left">© {yearDisplay} MBike.cc Wszelkie prawa zastrzeżone.</p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-1">
-                Created with{" "}
-                <Heart className="h-3 w-3 text-red-500 fill-red-500" /> by{" "}
-                <Link
-                  href="/app/contact"
-                  className="font-semibold text-foreground hover:underline"
-                >
+    <footer className="border-t bg-background">
+      <div className="container mx-auto px-6 py-6">
+        <div className="flex flex-col items-center gap-4 text-xs text-muted-foreground text-center">
+          {/* Links */}
+          <div className="flex items-center gap-4">
+            <Link href="/app/blog" className="font-medium text-foreground hover:underline">
+              Aktualności
+            </Link>
+            <Link href="/app/contact" className="font-medium text-foreground hover:underline">
+              Kontakt
+            </Link>
+            <Link href="/terms" className="font-medium text-foreground hover:underline">
+              Regulamin
+            </Link>
+          </div>
+
+          {/* Copyright + version */}
+          <div className="flex flex-col items-center gap-1">
+            <p>© {yearDisplay} MBike.cc — wszelkie prawa zastrzeżone.</p>
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1">
+                Created with <Heart className="h-3 w-3 text-red-500 fill-red-500" /> by{" "}
+                <Link href="/app/contact" className="font-medium text-foreground hover:underline">
                   Marqn
                 </Link>
-              </div>
-
-              <p className="flex items-center gap-1 justify-evenly">
+              </span>
+              <span className="flex items-center gap-1">
                 <Bike className="h-3 w-3 text-green-500" />
                 ver. 1.0.1
-              </p>
+              </span>
             </div>
           </div>
         </div>

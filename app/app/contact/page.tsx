@@ -43,9 +43,6 @@ export default function ContactPage() {
   return (
     <div className="space-y-6 lg:px-24">
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-full mb-4">
-          <Mail className="w-8 h-8 text-primary-foreground" />
-        </div>
         <h1 className="text-3xl font-bold mb-2">Kontakt</h1>
         <p className="text-muted-foreground">
           Masz pytanie, sugestię lub znalazłeś błąd? Napisz do mnie!
