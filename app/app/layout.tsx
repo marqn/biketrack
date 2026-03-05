@@ -56,7 +56,7 @@ export default async function RootLayout({
     });
 
     if (!user) {
-      redirect("/api/auth/signout?callbackUrl=/login");
+      redirect("/auth/signout");
     }
 
     if (user?.bikes?.[0]) {
