@@ -87,7 +87,7 @@ export default async function AppPage() {
     })) as typeof bike;
   }
 
-  if (!bike) redirect("/onboarding");
+  if (!bike) redirect("/api/auth/signout?callbackUrl=/");
 
   // Sprawdź czy user ma konto Strava (do auto-sync dystansów)
   const [stravaAccount, userData, maintenanceLogs] = await Promise.all([
