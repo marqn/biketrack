@@ -384,7 +384,7 @@ export default function MaintenancePanelContent({
                   size="sm"
                   variant="outline"
                   className="h-7 px-2 text-xs"
-                  disabled={isPending || itemStatus.progressPercent === 0}
+                  disabled={isPending || (itemStatus.progressPercent === 0 && itemStatus.status !== "never")}
                   onClick={() => handleMarkDone(config.type as MaintenanceType)}
                 >
                   <CheckCircle2 className="h-3.5 w-3.5 mr-1" />

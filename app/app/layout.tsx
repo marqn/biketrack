@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { BikeHeader } from "../../components/bike-header/BikeHeader";
 import { Footer } from "../../components/footer/Footer";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export default async function RootLayout({
   children,
@@ -53,6 +54,10 @@ export default async function RootLayout({
         },
       },
     });
+
+    if (!user) {
+      redirect("/api/auth/signout?callbackUrl=/login");
+    }
 
     if (user?.bikes?.[0]) {
       // Odczytaj wybrany rower z cookie

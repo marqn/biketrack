@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
 
@@ -23,10 +24,10 @@ export default function Error({
     reset();
   }
 
-  const isDbError =
-    error?.message?.includes("does not exist") ||
-    error?.message?.includes("PrismaClient") ||
-    error?.message?.includes("P2");
+  function handleSignOut() {
+    document.cookie = "selectedBikeId=; path=/; max-age=0";
+    signOut({ callbackUrl: "/login" });
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
@@ -36,18 +37,21 @@ export default function Error({
         </div>
         <h1 className="text-xl font-semibold">Coś poszło nie tak</h1>
         <p className="text-sm text-muted-foreground">
-          {isDbError
-            ? "Wystąpił problem z połączeniem z bazą danych. Spróbuj odświeżyć stronę — jeśli problem się powtarza, skontaktuj się z administratorem."
-            : "Wystąpił nieoczekiwany błąd. Spróbuj ponownie."}
+          Wystąpił nieoczekiwany błąd. Spróbuj ponownie lub zaloguj się ponownie.
         </p>
         {error?.digest && (
           <p className="text-xs text-muted-foreground/60">
             Kod błędu: {error.digest}
           </p>
         )}
-        <Button onClick={handleReset} variant="outline" size="sm">
-          Spróbuj ponownie
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleSignOut} size="sm">
+            Zaloguj się ponownie
+          </Button>
+          <Button onClick={handleReset} variant="outline" size="sm">
+            Spróbuj ponownie
+          </Button>
+        </div>
       </div>
     </div>
   );
