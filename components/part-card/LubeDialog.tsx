@@ -178,7 +178,10 @@ export default function LubeDialog({
         }
       }}
     >
-      <DialogContent className="max-h-[90vh] overflow-y-auto">
+      <DialogContent
+        className="max-h-[90vh] overflow-y-auto"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         {isSubmitting && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/70 backdrop-blur-sm">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">

@@ -7,9 +7,11 @@ import { PartProduct } from "@/lib/types";
 import {
   searchLubricantBrands,
   searchLubricantModels,
+  getPopularLubricantBrands,
 } from "@/app/app/actions/search-lubricants";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 
 interface LubricantProductAutocompleteProps {
   brand: string;
@@ -37,9 +39,15 @@ export default function LubricantProductAutocomplete({
   const [modelNotFound, setModelNotFound] = useState(false);
   const [selectedBrandIndex, setSelectedBrandIndex] = useState(-1);
   const [selectedModelIndex, setSelectedModelIndex] = useState(-1);
+  const [popularBrands, setPopularBrands] = useState<string[]>([]);
   const userChangedBrandRef = useRef(false);
   const brandInputRef = useRef<HTMLInputElement>(null);
   const modelInputRef = useRef<HTMLInputElement>(null);
+
+  // Pobierz popularne marki przy montowaniu
+  useEffect(() => {
+    getPopularLubricantBrands().then(setPopularBrands);
+  }, []);
 
   // Wyszukaj marki
   useEffect(() => {
@@ -258,6 +266,27 @@ export default function LubricantProductAutocomplete({
             </button>
           )}
         </div>
+
+        {/* Popularne marki jako badge'e */}
+        {!brand && popularBrands.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {popularBrands.map((brandName) => (
+              <Badge
+                key={brandName}
+                variant="secondary"
+                className="cursor-pointer hover:bg-secondary/80"
+                onClick={() => {
+                  userChangedBrandRef.current = true;
+                  onBrandChange(brandName);
+                  setShowBrandSuggestions(false);
+                  setTimeout(() => modelInputRef.current?.focus(), 0);
+                }}
+              >
+                {brandName}
+              </Badge>
+            ))}
+          </div>
+        )}
 
         {/* Dropdown marki */}
         {showBrandSuggestions && brandSuggestions.length > 0 && (

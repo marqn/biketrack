@@ -4,6 +4,19 @@ import { prisma } from "@/lib/prisma";
 import { PartType } from "@/lib/generated/prisma";
 import { PartProduct } from "@/lib/types";
 
+// Pobierz najpopularniejsze marki smarów
+export async function getPopularLubricantBrands(): Promise<string[]> {
+  const brands = await prisma.partProduct.groupBy({
+    by: ["brand"],
+    where: { type: PartType.LUBRICANT },
+    _count: { brand: true },
+    orderBy: { _count: { brand: "desc" } },
+    take: 5,
+  });
+
+  return brands.map((b) => b.brand);
+}
+
 // Wyszukaj marki smarów z PartProduct
 export async function searchLubricantBrands(query: string): Promise<string[]> {
   if (query.length < 1) return [];
