@@ -16,7 +16,7 @@ export async function updateUnitPreference(unit: "METRIC" | "IMPERIAL") {
     })
   } catch (e: any) {
     if (e?.code === "P2025") {
-      redirect("/login")
+      redirect("/auth/signout")
     }
     throw e
   }
