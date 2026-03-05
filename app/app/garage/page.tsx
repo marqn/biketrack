@@ -107,9 +107,6 @@ export default async function GaragePage() {
     <div className="container mx-auto px-4 py-8 pt-4">
       <div className="space-y-6 lg:px-24">
         <div className="text-center mb-2">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-blue-600 rounded-full mb-3">
-            <Warehouse className="w-7 h-7" />
-          </div>
           <h1 className="text-3xl font-bold mb-1">Garaż</h1>
           <p className="text-muted-foreground">
             {totalParts > 0

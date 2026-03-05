@@ -206,7 +206,7 @@ const BikePartsHistory: React.FC = () => {
           {/* Timeline icon with km */}
           <div className="absolute left-0 top-6 flex flex-col items-center">
             <div className="p-2.5 bg-cyan-600 rounded-full shadow-md">
-              {getCategoryIcon("service")}
+              {getCategoryIcon("service", "w-5 h-5 text-white")}
             </div>
             <span className="text-xs font-semibold text-cyan-600 mt-1">
               <Badge className="bg-cyan-600">
@@ -367,7 +367,7 @@ const BikePartsHistory: React.FC = () => {
         {/* Timeline icon with km */}
         <div className="absolute left-0 top-6 flex flex-col items-center">
           <div className="p-2.5 bg-blue-600 rounded-full shadow-md ">
-            {getCategoryIcon(part.partType || "")}
+            {getCategoryIcon(part.partType || "", "w-5 h-5 text-white")}
           </div>
           <span className="text-xs font-semibold text-blue-600 mt-1">
             <Badge className="bg-blue-600">
@@ -517,9 +517,6 @@ const BikePartsHistory: React.FC = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-600 rounded-full mb-4">
-            <Bike className="w-10 h-10 " />
-          </div>
           <h1 className="text-4xl font-bold  mb-2">Historia Serwisu</h1>
           {bike && (
             <p className=" text-lg">
