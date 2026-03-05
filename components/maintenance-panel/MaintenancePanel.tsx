@@ -340,6 +340,7 @@ export default function MaintenancePanelContent({
     <div className="space-y-3 py-1">
       {allVisibleEntries.map((entry) => {
         if (entry.kind === "chain_lube") {
+          const chainLubeIntervalKm = customIntervals["CHAIN_LUBE"]?.intervalKm ?? CHAIN_LUBE_INTERVAL_KM;
           return (
             <div key="CHAIN_LUBE" className="space-y-1.5 pb-3 border-b">
               <div className="flex items-center justify-between gap-2">
@@ -347,15 +348,19 @@ export default function MaintenancePanelContent({
                   <Droplets className="h-4 w-4 text-muted-foreground shrink-0" />
                   <span className="text-sm font-medium">Smarowanie łańcucha</span>
                 </div>
-                <span className="text-xs text-muted-foreground shrink-0">
-                  co {CHAIN_LUBE_INTERVAL_KM} km
-                </span>
+                <IntervalEditor
+                  bikeId={bikeId}
+                  type="CHAIN_LUBE"
+                  defaultIntervalKm={CHAIN_LUBE_INTERVAL_KM}
+                  customKm={customIntervals["CHAIN_LUBE"]?.intervalKm}
+                />
               </div>
               <LubeButton
                 bikeId={bikeId}
                 currentKm={currentKm}
                 lastLubeKmInitial={chainLubeData!.lastLubeKmInitial}
                 lubeEvents={chainLubeData!.lubeEvents}
+                lubeIntervalKm={chainLubeIntervalKm}
               />
             </div>
           );

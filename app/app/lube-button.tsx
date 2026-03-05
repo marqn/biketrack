@@ -23,6 +23,7 @@ interface LubeButtonProps {
   currentKm: number;
   lastLubeKmInitial?: number | null;
   lubeEvents?: LubeEvent[];
+  lubeIntervalKm?: number;
 }
 
 export default function LubeButton({
@@ -30,6 +31,7 @@ export default function LubeButton({
   currentKm,
   lastLubeKmInitial,
   lubeEvents = [],
+  lubeIntervalKm = CHAIN_LUBE_INTERVAL_KM,
 }: LubeButtonProps) {
   const [activeDialog, setActiveDialog] = useState<"lube" | "history" | null>(
     null
@@ -46,7 +48,7 @@ export default function LubeButton({
 
   const kmSinceLube = lastLubeKm !== null ? currentKm - lastLubeKm : currentKm;
   const progressPercent = Math.min(
-    (kmSinceLube / CHAIN_LUBE_INTERVAL_KM) * 100,
+    (kmSinceLube / lubeIntervalKm) * 100,
     100
   );
   const lastLubeEvent = lubeEvents[0]; // Już posortowane desc
@@ -100,8 +102,8 @@ export default function LubeButton({
       <div className="flex flex-col gap-2">
         <div className="flex justify-between items-center text-xs text-muted-foreground">
           <span>{formatDistance(kmSinceLube, unitPref)} od ostatniego smarowania</span>
-          {kmSinceLube > 0 && (
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            {kmSinceLube > 0 && (
               <Button
                 size="sm"
                 variant="outline"
@@ -111,19 +113,19 @@ export default function LubeButton({
               >
                 {isPending ? "Smarowanie..." : "💧 Smaruj"}
               </Button>
-              {lubeEvents.length > 0 && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setActiveDialog("history")}
-                  className="text-muted-foreground"
-                  disabled={isPending}
-                >
-                  <NotebookText className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          )}
+            )}
+            {lubeEvents.length > 0 && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setActiveDialog("history")}
+                className="text-muted-foreground"
+                disabled={isPending}
+              >
+                <NotebookText className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
         <ColoredProgress value={progressPercent} />
       </div>

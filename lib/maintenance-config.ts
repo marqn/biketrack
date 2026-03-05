@@ -6,7 +6,8 @@ export type MaintenanceType =
   | "CABLE_CHECK"
   | "SPOKE_CHECK"
   | "BOLT_CHECK"
-  | "TIRE_CONDITION";
+  | "TIRE_CONDITION"
+  | "CHAIN_LUBE";
 
 export type MaintenanceStatus = "ok" | "warning" | "overdue" | "never";
 

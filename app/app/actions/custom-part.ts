@@ -77,6 +77,26 @@ export async function updateCustomPart(
   revalidatePath("/app");
 }
 
+export async function updateCustomPartWear(
+  partId: string,
+  wearKm: number,
+  expectedKm: number,
+) {
+  const userId = await getSessionUserId();
+  const part = await verifyCustomPartOwnership(partId, userId);
+
+  await prisma.customPart.update({
+    where: { id: partId },
+    data: {
+      wearKm: Math.max(0, Math.round(wearKm)),
+      expectedKm: Math.max(0, Math.round(expectedKm)),
+    },
+  });
+
+  revalidatePath("/app");
+  revalidatePath(`/app/bikes/${part.bikeId}`);
+}
+
 export async function replaceCustomPart(
   partId: string,
   newData: { brand?: string; model?: string; installedAt?: Date },
