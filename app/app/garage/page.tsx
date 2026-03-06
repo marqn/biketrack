@@ -111,7 +111,7 @@ export default async function GaragePage() {
           <p className="text-muted-foreground">
             {totalParts > 0
               ? `${totalParts} ${totalParts === 1 ? "część" : "części"} na przechowaniu`
-              : "Przechowuj zdjęte części i instaluj je ponownie"}
+              : "Przechowuj zdjęte części i instaluj je ponownie. W wersji premium możesz wystawiać je na sprzedaż lub oddać innym rowerzystom!"}
           </p>
         </div>
 
