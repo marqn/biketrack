@@ -190,7 +190,7 @@ function IntervalEditor({
 
   const trigger = (
     <button
-      className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors group"
+      className="flex items-center gap-1 text-xs text-muted-foreground hover:text-blue-500 underline underline-offset-2 decoration-dotted hover:decoration-solid transition-colors cursor-pointer group"
       title="Edytuj interwał"
       onClick={() => isMobile && setOpen(true)}
     >
@@ -424,7 +424,7 @@ export default function MaintenancePanelContent({
                   onClick={() => handleMarkDone(config.type as MaintenanceType)}
                 >
                   <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
-                  Gotowe
+                  Wykonaj
                 </Button>
                 <Button
                   size="icon"
