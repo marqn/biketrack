@@ -209,6 +209,29 @@ export async function deleteLubeEvent(eventId: string | null) {
   revalidatePath("/app");
 }
 
+export async function setLastLubeKm(
+  bikeId: string,
+  kmAtLube: number,
+  lastEventId?: string | null
+) {
+  if (lastEventId) {
+    await prisma.serviceEvent.update({
+      where: { id: lastEventId },
+      data: { kmAtTime: kmAtLube },
+    });
+  } else {
+    await prisma.serviceEvent.create({
+      data: {
+        bikeId,
+        type: ServiceType.CHAIN_LUBE,
+        kmAtTime: kmAtLube,
+      },
+    });
+  }
+  revalidatePath(`/app/bikes/${bikeId}`);
+  revalidatePath("/app");
+}
+
 export async function updateLubeEvent(
   eventId: string,
   data: {

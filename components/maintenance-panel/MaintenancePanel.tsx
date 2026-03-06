@@ -47,6 +47,7 @@ import { toggleMaintenanceVisibility } from "@/app/app/actions/maintenance/toggl
 import { updateMaintenanceInterval } from "@/app/app/actions/maintenance/update-maintenance-interval";
 import { MaintenanceType as PrismaMaintenanceType } from "@/lib/generated/prisma";
 import LubeButton from "@/app/app/lube-button";
+import LubeKmEditor from "@/components/maintenance-panel/LubeKmEditor";
 import { CHAIN_LUBE_INTERVAL_KM } from "@/lib/default-parts";
 import { LubeEvent } from "@/lib/types";
 
@@ -375,10 +376,12 @@ export default function MaintenancePanelContent({
           return (
             <div key="CHAIN_LUBE" className="space-y-1.5 pb-3 border-b">
               <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 min-w-0">
-                  <Droplets className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <span className="text-sm font-medium">Smarowanie łańcucha</span>
-                </div>
+                <LubeKmEditor
+                  bikeId={bikeId}
+                  currentKm={currentKm}
+                  lastLubeKm={chainLubeData!.lastLubeKmInitial}
+                  lastEventId={chainLubeData!.lubeEvents?.[0]?.id}
+                />
                 <IntervalEditor
                   bikeId={bikeId}
                   type="CHAIN_LUBE"

@@ -59,13 +59,6 @@ export const MAINTENANCE_ITEMS: MaintenanceItemConfig[] = [
     warningThreshold: 0.75,
   },
   {
-    type: "CABLE_CHECK",
-    label: "Smarowanie linek",
-    icon: "Cable",
-    intervalKm: 1000,
-    warningThreshold: 0.75,
-  },
-  {
     type: "SPOKE_CHECK",
     label: "Naprężenie szprych",
     icon: "CircleDot",
