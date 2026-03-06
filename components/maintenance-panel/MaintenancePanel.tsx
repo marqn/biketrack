@@ -22,11 +22,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerFooter,
+  DrawerClose,
+} from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import NumberStepper from "@/components/ui/number-stepper";
 import ColoredProgress from "@/components/ui/colored-progress";
@@ -246,14 +248,19 @@ function IntervalEditor({
     return (
       <>
         {trigger}
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="max-w-sm">
-            <DialogHeader>
-              <DialogTitle>Edytuj interwał</DialogTitle>
-            </DialogHeader>
-            {content}
-          </DialogContent>
-        </Dialog>
+        <Drawer open={open} onOpenChange={setOpen}>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>Edytuj interwał</DrawerTitle>
+            </DrawerHeader>
+            <div className="px-4 pb-2">{content}</div>
+            <DrawerFooter>
+              <DrawerClose asChild>
+                <Button variant="outline">Zamknij</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
       </>
     );
   }
