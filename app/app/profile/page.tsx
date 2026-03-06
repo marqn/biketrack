@@ -12,7 +12,11 @@ import {
   Scale,
   Info,
   Ruler,
+  RefreshCw,
+  CheckCircle,
+  AlertTriangle,
 } from "lucide-react";
+import { useStravaSync } from "@/components/strava-sync-context";
 import NumberStepper from "@/components/ui/number-stepper";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ImageUploader } from "@/components/ui/image-uploader";
@@ -25,6 +29,7 @@ import {
   inputToKg,
   weightUnit,
   weightRange,
+  formatDistance,
 } from "@/lib/units";
 
 interface UserData {
@@ -69,6 +74,80 @@ interface Errors {
   currentPassword?: string;
   newPassword?: string;
   confirmPassword?: string;
+}
+
+function StravaProfileCard({ unitPreference }: { unitPreference: UnitPreference }) {
+  const { hasStrava, status, error, lastSyncTime, updates } = useStravaSync();
+
+  if (!hasStrava) return null;
+
+  return (
+    <div className="bg-card rounded-xl border p-6">
+      <h2 className="text-lg font-semibold mb-4">Połączone konta</h2>
+      <div className="flex items-start gap-4">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-orange-500/10">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-orange-500">
+            <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
+          </svg>
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="font-medium">Strava</span>
+            {status === "syncing" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-700 dark:bg-orange-950 dark:text-orange-400">
+                <RefreshCw className="h-3 w-3 animate-spin" />
+                Synchronizuje...
+              </span>
+            )}
+            {status === "success" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700 dark:bg-green-950 dark:text-green-400">
+                <CheckCircle className="h-3 w-3" />
+                Zsynchronizowano
+              </span>
+            )}
+            {status === "error" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2 py-0.5 text-xs text-destructive">
+                <AlertTriangle className="h-3 w-3" />
+                Błąd synchronizacji
+              </span>
+            )}
+            {status === "idle" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                Oczekuje na synchronizację
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Przebieg rowerów jest automatycznie synchronizowany ze Strava.
+          </p>
+          {status === "error" && error && (
+            <p className="mt-1.5 text-sm text-destructive">{error}</p>
+          )}
+          {lastSyncTime && (
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              Ostatnia synchronizacja: {new Date(lastSyncTime).toLocaleString("pl-PL")}
+            </p>
+          )}
+          {status === "success" && updates && updates.length > 0 && (
+            <ul className="mt-2 space-y-1">
+              {updates.map((u) => (
+                <li key={u.bikeName} className="text-sm text-muted-foreground">
+                  <span className="font-medium text-foreground">{u.bikeName}</span>
+                  {" "}+{formatDistance(u.diffKm, unitPreference)}
+                  <span className="ml-1 text-xs">
+                    ({formatDistance(u.oldKm, unitPreference)} → {formatDistance(u.newKm, unitPreference)})
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {status === "success" && (!updates || updates.length === 0) && (
+            <p className="mt-1.5 text-sm text-muted-foreground">Przebieg aktualny – brak zmian.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function ProfilePage() {
@@ -756,6 +835,9 @@ export default function ProfilePage() {
             </div>
           )}
         </div>
+
+        {/* Strava – połączone konta */}
+        <StravaProfileCard unitPreference={unitPreference} />
 
         {/* Password Section - tylko dla użytkowników z hasłem */}
         {hasPassword && (

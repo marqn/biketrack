@@ -10,7 +10,7 @@ import { type PartsDisplayOrder } from "@/app/app/actions/parts-display-order";
 import { NotificationsList } from "@/components/notifications-list/NotificationsList";
 import { ensureEmailMissingNotification } from "@/lib/nofifications/rules/emailMissing";
 import PartsAccordion from "@/components/parts-accordion/PartsAccordion";
-import { StravaSyncTrigger } from "@/components/strava-sync-trigger";
+import { StravaStatusBanner } from "@/components/strava-status-banner";
 import { cookies } from "next/headers";
 
 export default async function AppPage() {
@@ -157,7 +157,7 @@ export default async function AppPage() {
 
   return (
     <div className="space-y-6 lg:px-24 lg:space-6">
-      {stravaAccount && <StravaSyncTrigger />}
+      <StravaStatusBanner />
 
       <KmForm key={bike.id} bikeId={bike.id} initialKm={bike.totalKm} hasStravaSync={!!stravaAccount} />
 

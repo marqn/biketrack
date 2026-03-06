@@ -14,20 +14,20 @@ import {
   Pencil,
   Shield,
   Plus,
-  Check,
   Trash2,
   Lock,
   Compass,
-  RefreshCw,
-  X,
   Warehouse,
   Bike as BikeIcon,
   Sun,
   Moon,
+  RefreshCw,
+  CheckCircle,
+  AlertTriangle,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -57,8 +57,8 @@ import { signOut, useSession } from "next-auth/react";
 import { useNotifications } from "@/app/hooks/useNotifications";
 import { formatDistance } from "@/lib/units";
 import type { UnitPreference } from "@/lib/units";
-import { syncStravaDistances } from "@/app/app/actions/sync-strava-distances";
 import { toast } from "sonner";
+import { useStravaSync } from "@/components/strava-sync-context";
 import { useTheme } from "next-themes";
 import { deleteAccount } from "./actions/delete-account";
 import { deleteBike } from "./actions/delete-bike";
@@ -83,8 +83,6 @@ interface BikeHeaderProps {
     role?: string;
     plan?: "FREE" | "PREMIUM";
   };
-  lastStravaSync?: string | null;
-  hasStrava?: boolean;
 }
 
 export type DialogType =
@@ -100,8 +98,6 @@ export function BikeHeader({
   bike,
   bikes,
   user,
-  lastStravaSync,
-  hasStrava,
 }: BikeHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -127,57 +123,7 @@ export function BikeHeader({
   const [bikeToEdit, setBikeToEdit] = useState<Bike | null>(null);
   const { notifications: unreadNotifications } = useNotifications();
   const unreadCount = unreadNotifications.length;
-  const [isSyncing, startSync] = useTransition();
-  const [syncDate, setSyncDate] = useState(lastStravaSync);
-  const [hasSynced, setHasSynced] = useState(false);
-  const [showStrava, setShowStrava] = useState(true);
-  const [iconVisible, setIconVisible] = useState(false);
-
-  useEffect(() => {
-    setSyncDate(lastStravaSync);
-    setHasSynced(false);
-  }, [lastStravaSync]);
-
-  useEffect(() => {
-    if (!hasStrava || isSyncing) return;
-    // If already synced, show Strava icon statically without animation
-    if (syncDate) {
-      setShowStrava(true);
-      setIconVisible(true);
-      return;
-    }
-    // Start fade in
-    const fadeInTimeout = setTimeout(() => setIconVisible(true), 50);
-    const interval = setInterval(() => {
-      // Fade out
-      setIconVisible(false);
-      // After fade out, switch icon and fade in
-      setTimeout(() => {
-        setShowStrava((prev) => !prev);
-        setTimeout(() => setIconVisible(true), 50);
-      }, 500);
-    }, 3000);
-    return () => {
-      clearTimeout(fadeInTimeout);
-      clearInterval(interval);
-    };
-  }, [hasStrava, isSyncing, syncDate]);
-
-  const handleStravaSync = () => {
-    startSync(async () => {
-      const result = await syncStravaDistances(true);
-      if (result.synced > 0) {
-        router.refresh();
-        for (const update of result.updates) {
-          toast.success(`${update.bikeName}: +${formatDistance(update.diffKm, unitPref)}`, {
-            description: `Przebieg: ${formatDistance(update.oldKm, unitPref)} → ${formatDistance(update.newKm, unitPref)}`,
-          });
-        }
-      }
-      setSyncDate(new Date().toISOString());
-      setHasSynced(true);
-    });
-  };
+  const stravaSync = useStravaSync();
 
   const initials = user.name
     .split(" ")
@@ -487,50 +433,6 @@ export function BikeHeader({
 
         {/* NAV BUTTONS - wiersz 2 wyśrodkowane na mobile, środek na desktop */}
         <div className="order-3 md:order-2 w-full md:w-auto flex items-center justify-center md:justify-normal gap-3.5 sm:gap-4.5 md:gap-4 shrink-0">
-          {hasStrava && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="inline-flex">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="relative"
-                      onClick={handleStravaSync}
-                      disabled={isSyncing || hasSynced}
-                    >
-                      <span className="relative h-4 w-4">
-                        <RefreshCw
-                          className={`absolute inset-0 h-4 w-4 text-orange-500 transition-opacity duration-500 ${
-                            isSyncing ? "animate-spin opacity-100" : showStrava ? "opacity-0" : iconVisible ? "opacity-100" : "opacity-0"
-                          }`}
-                        />
-                        {!isSyncing && (
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            className={`absolute inset-0 h-4 w-4 text-orange-500 transition-opacity duration-500 ${
-                              showStrava && iconVisible ? "opacity-100" : "opacity-0"
-                            }`}
-                          >
-                            <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
-                          </svg>
-                        )}
-                      </span>
-                    </Button>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent className="bg-primary text-primary-foreground">
-                  {syncDate ? (
-                    <p>Strava sync: {new Date(syncDate).toLocaleString("pl-PL")}</p>
-                  ) : (
-                    <p>Strava: oczekuje na synchronizację</p>
-                  )}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-
           {user.role === "ADMIN" && (
             <TooltipProvider>
               <Tooltip>

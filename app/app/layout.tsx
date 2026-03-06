@@ -3,6 +3,7 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { BikeHeader } from "../../components/bike-header/BikeHeader";
 import { Footer } from "../../components/footer/Footer";
+import { StravaSyncProvider } from "../../components/strava-sync-context";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -14,6 +15,7 @@ export default async function RootLayout({
   const session = await getServerSession(authOptions);
 
   let headerProps = null;
+  let stravaProps = { hasStrava: false, lastStravaSync: null as string | null };
 
   if (session?.user?.id) {
     const user = await prisma.user.findUnique({
@@ -45,6 +47,7 @@ export default async function RootLayout({
             imageUrl: true,
             images: true,
             hiddenMaintenanceItems: true,
+            maintenanceIntervals: true,
           },
         },
         accounts: {
@@ -86,6 +89,7 @@ export default async function RootLayout({
         imageUrl: activeBike.imageUrl,
         images: activeBike.images,
         hiddenMaintenanceItems: activeBike.hiddenMaintenanceItems,
+        maintenanceIntervals: activeBike.maintenanceIntervals,
       };
 
       const headerBikes = user.bikes.map((b) => ({
@@ -106,10 +110,16 @@ export default async function RootLayout({
         imageUrl: b.imageUrl,
         images: b.images,
         hiddenMaintenanceItems: b.hiddenMaintenanceItems,
+        maintenanceIntervals: b.maintenanceIntervals,
       }));
 
       // Sprawdź czy premium jest aktywny
       const isPremium = user.plan === "PREMIUM" && user.planExpiresAt && user.planExpiresAt > new Date();
+
+      stravaProps = {
+        hasStrava: user.accounts.length > 0,
+        lastStravaSync: user.lastStravaSync?.toISOString() ?? null,
+      };
 
       headerProps = {
         bike: headerBike,
@@ -122,17 +132,20 @@ export default async function RootLayout({
           role: user.role,
           plan: isPremium ? "PREMIUM" as const : "FREE" as const,
         },
-        lastStravaSync: user.lastStravaSync?.toISOString() ?? null,
-        hasStrava: user.accounts.length > 0,
       };
     }
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {headerProps && <BikeHeader {...headerProps} />}
-      <main className="flex-1 container mx-auto px-2 pt-28 md:pt-24 pb-8">{children}</main>
-      <Footer />
-    </div>
+    <StravaSyncProvider
+      hasStrava={stravaProps.hasStrava}
+      lastStravaSync={stravaProps.lastStravaSync}
+    >
+      <div className="flex flex-col min-h-screen">
+        {headerProps && <BikeHeader {...headerProps} />}
+        <main className="flex-1 container mx-auto px-2 pt-28 md:pt-24 pb-8">{children}</main>
+        <Footer />
+      </div>
+    </StravaSyncProvider>
   );
 }
