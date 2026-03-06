@@ -77,7 +77,8 @@ function WearEditor({
 }) {
   const [open, setOpen] = React.useState(false);
   const [wearVal, setWearVal] = React.useState(displayKm(wearKm, unitPref));
-  const [expectedVal, setExpectedVal] = React.useState(displayKm(expectedKm, unitPref));
+  const [expectedVal, setExpectedVal] = React.useState(displayKm(Math.max(expectedKm, 1), unitPref));
+  const [mileageOnly, setMileageOnly] = React.useState(expectedKm === 0);
   const [saving, setSaving] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const unit = distanceUnit(unitPref);
@@ -86,7 +87,8 @@ function WearEditor({
   React.useEffect(() => {
     if (open) {
       setWearVal(displayKm(wearKm, unitPref));
-      setExpectedVal(displayKm(expectedKm, unitPref));
+      setExpectedVal(displayKm(Math.max(expectedKm, 1), unitPref));
+      setMileageOnly(expectedKm === 0);
       setError(null);
     }
   }, [open, wearKm, expectedKm, unitPref]);
@@ -98,7 +100,7 @@ function WearEditor({
       await updatePartWear(
         partId,
         Math.round(inputToKm(wearVal, unitPref)),
-        Math.round(inputToKm(expectedVal, unitPref)),
+        mileageOnly ? 0 : Math.round(inputToKm(expectedVal, unitPref)),
       );
       setOpen(false);
       onSaved();
@@ -115,11 +117,18 @@ function WearEditor({
       title="Edytuj zużycie"
       onClick={() => isMobile && setOpen(true)}
     >
-      <>
-        Zużycie:{" "}
-        <span className="font-medium text-foreground">{formatDistance(wearKm, unitPref)}</span>
-        {" / "}{formatDistance(expectedKm, unitPref)}
-      </>
+      {expectedKm > 0 ? (
+        <>
+          Zużycie:{" "}
+          <span className="font-medium text-foreground">{formatDistance(wearKm, unitPref)}</span>
+          {" / "}{formatDistance(expectedKm, unitPref)}
+        </>
+      ) : (
+        <>
+          Przebieg:{" "}
+          <span className="font-medium text-foreground">{formatDistance(wearKm, unitPref)}</span>
+        </>
+      )}
       <Pencil className="h-2.5 w-2.5 opacity-0 group-hover:opacity-60 transition-opacity shrink-0" />
     </button>
   );
@@ -136,18 +145,23 @@ function WearEditor({
           disabled={saving}
         />
       </div>
-      <div>
-        <label className="text-xs text-muted-foreground block mb-1">
-          Oczekiwana trwałość ({unit})
-        </label>
-        <NumberStepper
-          value={expectedVal}
-          onChange={setExpectedVal}
-          steps={[100, 1000]}
-          min={1}
-          disabled={saving}
-        />
-      </div>
+      {!mileageOnly && (
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1">
+            Oczekiwana trwałość ({unit})
+          </label>
+          <NumberStepper
+            value={expectedVal}
+            onChange={setExpectedVal}
+            steps={[100, 1000]}
+            min={1}
+            disabled={saving}
+          />
+        </div>
+      )}
+      <Button size="sm" variant="outline" className="h-7 text-xs w-full" onClick={() => setMileageOnly(!mileageOnly)} disabled={saving}>
+        {mileageOnly ? "↩ Przywróć trwałość i pasek postępu" : "Tylko przebieg (bez trwałości)"}
+      </Button>
       {error && <p className="text-xs text-destructive">{error}</p>}
       <Button size="sm" className="h-7 text-xs w-full" onClick={handleSave} disabled={saving}>
         {saving ? "Zapisuję..." : "Zapisz"}
@@ -226,7 +240,9 @@ export default function PartCard({
   const progressPercent =
     isTimeBased && timeBasedDate
       ? Math.min(Math.round((daysSinceInstall / timeIntervalDays) * 100), 100)
-      : Math.min(Math.round((wearKm / expectedKm) * 100), 100);
+      : expectedKm > 0
+        ? Math.min(Math.round((wearKm / expectedKm) * 100), 100)
+        : 0;
 
   // Określ czy jest to edit czy create
   const hasCurrentPart = !!(currentBrand && currentModel);
@@ -312,7 +328,7 @@ export default function PartCard({
         </CardHeader>
 
         <CardContent className="space-y-3">
-          <ColoredProgress value={progressPercent} />
+          {(isTimeBased || expectedKm > 0) && <ColoredProgress value={progressPercent} />}
 
           <div className="text-sm text-muted-foreground items-center flex justify-between">
             <span>

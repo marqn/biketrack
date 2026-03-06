@@ -25,7 +25,7 @@ export async function updatePartWear(
     where: { id: partId },
     data: {
       wearKm: Math.max(0, Math.round(wearKm)),
-      expectedKm: Math.max(1, Math.round(expectedKm)),
+      expectedKm: Math.max(0, Math.round(expectedKm)),
     },
   });
 
