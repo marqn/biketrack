@@ -17,6 +17,13 @@ import {
   CheckCircle2,
   ChevronDown,
   Pencil,
+  Plus,
+  Trash2,
+  Star,
+  Shield,
+  Zap,
+  Activity,
+  ListChecks,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +36,7 @@ import {
   DrawerFooter,
   DrawerClose,
 } from "@/components/ui/drawer";
+import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
 import NumberStepper from "@/components/ui/number-stepper";
 import ColoredProgress from "@/components/ui/colored-progress";
@@ -47,6 +55,10 @@ import {
 import { markMaintenanceDone } from "@/app/app/actions/maintenance/mark-maintenance-done";
 import { toggleMaintenanceVisibility } from "@/app/app/actions/maintenance/toggle-maintenance-visibility";
 import { updateMaintenanceInterval } from "@/app/app/actions/maintenance/update-maintenance-interval";
+import { addCustomTask } from "@/app/app/actions/maintenance/add-custom-task";
+import { deleteCustomTask } from "@/app/app/actions/maintenance/delete-custom-task";
+import { markCustomTaskDone } from "@/app/app/actions/maintenance/mark-custom-task-done";
+import { updateCustomTaskInterval } from "@/app/app/actions/maintenance/update-custom-task-interval";
 import { MaintenanceType as PrismaMaintenanceType } from "@/lib/generated/prisma";
 import LubeButton from "@/app/app/lube-button";
 import LubeKmEditor from "@/components/maintenance-panel/LubeKmEditor";
@@ -62,7 +74,25 @@ const ICON_MAP: Record<string, React.ElementType> = {
   CircleDot,
   Wrench,
   CircleAlert,
+  Star,
+  Shield,
+  Zap,
+  Activity,
+  ListChecks,
 };
+
+const CUSTOM_TASK_ICONS: { name: string; Icon: React.ElementType }[] = [
+  { name: "Wrench", Icon: Wrench },
+  { name: "Settings2", Icon: Settings2 },
+  { name: "Droplets", Icon: Droplets },
+  { name: "Gauge", Icon: Gauge },
+  { name: "Star", Icon: Star },
+  { name: "Shield", Icon: Shield },
+  { name: "Zap", Icon: Zap },
+  { name: "Activity", Icon: Activity },
+  { name: "ListChecks", Icon: ListChecks },
+  { name: "CircleAlert", Icon: CircleAlert },
+];
 
 const STATUS_BADGE: Record<MaintenanceStatus, React.ReactNode> = {
   ok: (
@@ -93,6 +123,15 @@ export interface MaintenanceLogEntry {
   createdAt: Date | string;
 }
 
+export interface CustomTask {
+  id: string;
+  name: string;
+  icon: string;
+  intervalKm: number | null;
+  intervalDays: number | null;
+  lastLog: { kmAtTime: number; createdAt: Date | string } | null;
+}
+
 export type CustomIntervals = Record<string, { intervalKm?: number; intervalDays?: number }>;
 
 export interface MaintenancePanelProps {
@@ -108,6 +147,7 @@ export interface MaintenancePanelProps {
     lastLubeKmInitial?: number | null;
     lubeEvents?: LubeEvent[];
   };
+  customTasks?: CustomTask[];
 }
 
 function formatStatusLabel(
@@ -276,6 +316,211 @@ function IntervalEditor({
   );
 }
 
+function CustomIntervalEditor({
+  taskId,
+  intervalKm,
+  intervalDays,
+}: {
+  taskId: string;
+  intervalKm: number | null;
+  intervalDays: number | null;
+}) {
+  const [open, setOpen] = React.useState(false);
+  const [kmVal, setKmVal] = React.useState(intervalKm ?? 0);
+  const [daysVal, setDaysVal] = React.useState(intervalDays ?? 0);
+  const [saving, startSave] = useTransition();
+  const isMobile = useIsMobile();
+
+  const label = [
+    intervalKm ? `co ${intervalKm} km` : null,
+    intervalDays ? `${intervalDays} dni` : null,
+  ]
+    .filter(Boolean)
+    .join(" / ");
+
+  function handleSave() {
+    startSave(async () => {
+      await updateCustomTaskInterval(taskId, kmVal > 0 ? kmVal : null, daysVal > 0 ? daysVal : null);
+      setOpen(false);
+    });
+  }
+
+  const trigger = (
+    <button
+      className="flex items-center gap-1 text-xs text-muted-foreground hover:text-blue-500 underline underline-offset-2 decoration-dotted hover:decoration-solid transition-colors cursor-pointer group"
+      title="Edytuj interwał"
+      onClick={() => isMobile && setOpen(true)}
+    >
+      {label || "brak interwału"}
+      <Pencil className="h-2.5 w-2.5 opacity-0 group-hover:opacity-60 transition-opacity" />
+    </button>
+  );
+
+  const content = (
+    <div className="space-y-3">
+      <div>
+        <label className="text-xs text-muted-foreground block mb-1">Co ile km (0 = brak)</label>
+        <NumberStepper value={kmVal} onChange={setKmVal} steps={[10, 100]} min={0} disabled={saving} />
+      </div>
+      <div>
+        <label className="text-xs text-muted-foreground block mb-1">Co ile dni (0 = brak)</label>
+        <NumberStepper value={daysVal} onChange={setDaysVal} steps={[1, 7]} min={0} disabled={saving} />
+      </div>
+      <Button size="sm" className="h-7 text-xs w-full" onClick={handleSave} disabled={saving}>
+        Zapisz
+      </Button>
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        {trigger}
+        <Drawer open={open} onOpenChange={setOpen}>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>Edytuj interwał</DrawerTitle>
+            </DrawerHeader>
+            <div className="px-4 pb-2">{content}</div>
+            <DrawerFooter>
+              <DrawerClose asChild>
+                <Button variant="outline">Zamknij</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      </>
+    );
+  }
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+      <PopoverContent className="w-72 p-3" align="end">
+        <p className="text-xs font-medium mb-2">Edytuj interwał</p>
+        {content}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function AddCustomTaskButton({ bikeId }: { bikeId: string }) {
+  const [open, setOpen] = React.useState(false);
+  const [name, setName] = React.useState("");
+  const [icon, setIcon] = React.useState("Wrench");
+  const [kmVal, setKmVal] = React.useState(0);
+  const [daysVal, setDaysVal] = React.useState(0);
+  const [saving, startSave] = useTransition();
+  const isMobile = useIsMobile();
+
+  function handleSubmit() {
+    if (!name.trim()) return;
+    startSave(async () => {
+      await addCustomTask(bikeId, name.trim(), icon, kmVal > 0 ? kmVal : null, daysVal > 0 ? daysVal : null);
+      setName("");
+      setIcon("Wrench");
+      setKmVal(0);
+      setDaysVal(0);
+      setOpen(false);
+    });
+  }
+
+  const trigger = (
+    <Button
+      size="sm"
+      variant="ghost"
+      className="h-7 text-xs text-muted-foreground w-full justify-start gap-1.5 px-1"
+      onClick={() => setOpen(true)}
+    >
+      <Plus className="h-3.5 w-3.5" />
+      Dodaj własną czynność
+    </Button>
+  );
+
+  const content = (
+    <div className="space-y-3">
+      <div>
+        <label className="text-xs text-muted-foreground block mb-1">Nazwa czynności</label>
+        <Input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="np. Smarowanie linek"
+          className="h-8 text-sm"
+          maxLength={60}
+          disabled={saving}
+        />
+      </div>
+      <div>
+        <label className="text-xs text-muted-foreground block mb-2">Ikona</label>
+        <div className="grid grid-cols-5 gap-1.5">
+          {CUSTOM_TASK_ICONS.map(({ name: iconName, Icon }) => (
+            <button
+              key={iconName}
+              type="button"
+              onClick={() => setIcon(iconName)}
+              className={`flex items-center justify-center h-8 w-8 rounded border transition-colors ${
+                icon === iconName
+                  ? "border-primary bg-primary/10"
+                  : "border-border hover:border-muted-foreground"
+              }`}
+              title={iconName}
+            >
+              <Icon className="h-4 w-4" />
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <label className="text-xs text-muted-foreground block mb-1">Co ile km (0 = brak)</label>
+        <NumberStepper value={kmVal} onChange={setKmVal} steps={[10, 100]} min={0} disabled={saving} />
+      </div>
+      <div>
+        <label className="text-xs text-muted-foreground block mb-1">Co ile dni (0 = brak)</label>
+        <NumberStepper value={daysVal} onChange={setDaysVal} steps={[1, 7]} min={0} disabled={saving} />
+      </div>
+      <Button
+        size="sm"
+        className="h-8 text-xs w-full"
+        onClick={handleSubmit}
+        disabled={saving || !name.trim()}
+      >
+        Dodaj
+      </Button>
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        {trigger}
+        <Drawer open={open} onOpenChange={setOpen}>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>Dodaj własną czynność</DrawerTitle>
+            </DrawerHeader>
+            <div className="px-4 pb-2">{content}</div>
+            <DrawerFooter>
+              <DrawerClose asChild>
+                <Button variant="outline">Anuluj</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      </>
+    );
+  }
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+      <PopoverContent className="w-80 p-3" align="start">
+        <p className="text-xs font-medium mb-3">Dodaj własną czynność</p>
+        {content}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 /** Zawartość panelu konserwacji — bez wrappera akordeonu */
 export default function MaintenancePanelContent({
   bikeId,
@@ -285,6 +530,7 @@ export default function MaintenancePanelContent({
   customIntervals = {},
   itemOrder,
   chainLubeData,
+  customTasks = [],
 }: MaintenancePanelProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -297,10 +543,25 @@ export default function MaintenancePanelContent({
     }
   );
 
+  const [optimisticCustomLogs, addOptimisticCustomLog] = useOptimistic(
+    customTasks,
+    (state, { taskId, kmAtTime }: { taskId: string; kmAtTime: number }) =>
+      state.map((t) =>
+        t.id === taskId
+          ? { ...t, lastLog: { kmAtTime, createdAt: new Date() } }
+          : t
+      )
+  );
+
   const [optimisticHidden, updateOptimisticHidden] = useOptimistic(
     hiddenItems,
     (state, { type, hidden }: { type: string; hidden: boolean }) =>
       hidden ? [...state, type] : state.filter((t) => t !== type)
+  );
+
+  const [optimisticCustomTasks, removeOptimisticCustomTask] = useOptimistic(
+    optimisticCustomLogs,
+    (state, taskId: string) => state.filter((t) => t.id !== taskId)
   );
 
   function handleMarkDone(type: MaintenanceType) {
@@ -319,9 +580,26 @@ export default function MaintenancePanelContent({
     });
   }
 
+  function handleMarkCustomDone(taskId: string) {
+    startTransition(async () => {
+      addOptimisticCustomLog({ taskId, kmAtTime: currentKm });
+      await markCustomTaskDone(taskId, bikeId, currentKm);
+      router.refresh();
+    });
+  }
+
+  function handleDeleteCustomTask(taskId: string) {
+    startTransition(async () => {
+      removeOptimisticCustomTask(taskId);
+      await deleteCustomTask(taskId);
+      router.refresh();
+    });
+  }
+
   type VisibleEntry =
     | { kind: "chain_lube" }
-    | { kind: "maintenance"; config: (typeof MAINTENANCE_ITEMS)[number] };
+    | { kind: "maintenance"; config: (typeof MAINTENANCE_ITEMS)[number] }
+    | { kind: "custom"; task: CustomTask };
 
   // Zunifikowana lista widocznych pozycji (konserwacja + smarowanie) z respektowaniem itemOrder
   const allVisibleEntries = React.useMemo((): VisibleEntry[] => {
@@ -333,6 +611,9 @@ export default function MaintenancePanelContent({
       for (const config of MAINTENANCE_ITEMS) {
         if (!optimisticHidden.includes(config.type))
           result.push({ kind: "maintenance", config });
+      }
+      for (const task of optimisticCustomTasks) {
+        result.push({ kind: "custom", task });
       }
       return result;
     }
@@ -361,8 +642,12 @@ export default function MaintenancePanelContent({
     if (chainLubeData && !itemOrder.includes("CHAIN_LUBE")) {
       result.unshift({ kind: "chain_lube" });
     }
+    // Custom tasks zawsze na końcu
+    for (const task of optimisticCustomTasks) {
+      result.push({ kind: "custom", task });
+    }
     return result;
-  }, [itemOrder, chainLubeData, optimisticHidden]);
+  }, [itemOrder, chainLubeData, optimisticHidden, optimisticCustomTasks]);
 
   const hiddenItemConfigs = React.useMemo(() => {
     const sorted = itemOrder?.length
@@ -403,6 +688,79 @@ export default function MaintenancePanelContent({
                 lubeEvents={chainLubeData!.lubeEvents}
                 lubeIntervalKm={chainLubeIntervalKm}
               />
+            </div>
+          );
+        }
+
+        if (entry.kind === "custom") {
+          const { task } = entry;
+          const customConfig: MaintenanceItemConfig = {
+            type: "TIRE_PRESSURE", // placeholder — computeMaintenanceStatus nie używa type
+            label: task.name,
+            icon: task.icon,
+            intervalKm: task.intervalKm ?? undefined,
+            intervalDays: task.intervalDays ?? undefined,
+            warningThreshold: 0.75,
+          };
+          const itemStatus = computeMaintenanceStatus(customConfig, task.lastLog, currentKm);
+          const Icon = ICON_MAP[task.icon] ?? Wrench;
+
+          return (
+            <div
+              key={task.id}
+              className="space-y-1.5 pb-3 border-b last:border-b-0 last:pb-0"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="text-sm font-medium truncate">{task.name}</span>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {(task.intervalKm || task.intervalDays) ? STATUS_BADGE[itemStatus.status] : null}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-2 text-xs"
+                    disabled={isPending}
+                    onClick={() => handleMarkCustomDone(task.id)}
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
+                    Wykonaj
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                    disabled={isPending}
+                    onClick={() => handleDeleteCustomTask(task.id)}
+                    title="Usuń czynność"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>
+                  {itemStatus.status === "never" && itemStatus.kmAgo === null
+                    ? "Nigdy nie wykonano"
+                    : formatStatusLabel(
+                        itemStatus.daysAgo,
+                        itemStatus.kmAgo,
+                        !!customConfig.intervalKm,
+                        !!customConfig.intervalDays
+                      )}
+                </span>
+                <CustomIntervalEditor
+                  taskId={task.id}
+                  intervalKm={task.intervalKm}
+                  intervalDays={task.intervalDays}
+                />
+              </div>
+
+              {(task.intervalKm || task.intervalDays) && (
+                <ColoredProgress value={itemStatus.progressPercent} />
+              )}
             </div>
           );
         }
@@ -513,6 +871,10 @@ export default function MaintenancePanelContent({
           </CollapsibleContent>
         </Collapsible>
       )}
+
+      <div className="pt-1 border-t">
+        <AddCustomTaskButton bikeId={bikeId} />
+      </div>
     </div>
   );
 }

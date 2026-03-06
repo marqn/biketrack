@@ -97,7 +97,7 @@ export default async function AppPage({
   if (!bike) redirect("/api/auth/signout?callbackUrl=/");
 
   // Sprawdź czy user ma konto Strava (do auto-sync dystansów)
-  const [stravaAccount, userData, maintenanceLogs] = await Promise.all([
+  const [stravaAccount, userData, maintenanceLogs, customTasks] = await Promise.all([
     prisma.account.findFirst({
       where: { userId: session.user.id, provider: "strava" },
       select: { id: true },
@@ -109,6 +109,16 @@ export default async function AppPage({
     prisma.maintenanceLog.findMany({
       where: { bikeId: bike.id },
       orderBy: { createdAt: "desc" },
+    }),
+    prisma.customMaintenanceTask.findMany({
+      where: { bikeId: bike.id },
+      include: {
+        logs: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
+      orderBy: { createdAt: "asc" },
     }),
   ]);
 
@@ -185,6 +195,17 @@ export default async function AppPage({
             lastLubeKmInitial: lastLube?.kmAtTime,
             lubeEvents,
           },
+          customTasks: customTasks.map((t) => {
+            const taskWithLogs = t as typeof t & { logs: { kmAtTime: number; createdAt: Date }[] };
+            return {
+              id: t.id,
+              name: t.name,
+              icon: t.icon,
+              intervalKm: t.intervalKm,
+              intervalDays: t.intervalDays,
+              lastLog: taskWithLogs.logs[0] ?? null,
+            };
+          }),
         }}
         tireFrontChildren={
           extractTubelessStatus(existingParts).front ? (

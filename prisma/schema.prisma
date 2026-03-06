@@ -209,6 +209,35 @@ model MaintenanceLog {
   @@index([bikeId, type, createdAt])
 }
 
+model CustomMaintenanceTask {
+  id           String   @id @default(cuid())
+  bikeId       String
+  name         String
+  icon         String   @default("Wrench")
+  intervalKm   Int?
+  intervalDays Int?
+  createdAt    DateTime @default(now())
+
+  bike Bike                   @relation(fields: [bikeId], references: [id], onDelete: Cascade)
+  logs CustomMaintenanceLog[]
+
+  @@index([bikeId])
+}
+
+model CustomMaintenanceLog {
+  id        String   @id @default(cuid())
+  taskId    String
+  bikeId    String
+  kmAtTime  Int
+  notes     String?
+  createdAt DateTime @default(now())
+
+  task CustomMaintenanceTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  bike Bike                  @relation(fields: [bikeId], references: [id], onDelete: Cascade)
+
+  @@index([taskId, createdAt])
+}
+
 model Bike {
   id           String   @id @default(cuid())
   userId       String
@@ -234,7 +263,9 @@ model Bike {
   partReplacements PartReplacement[]
   comments         BikeComment[]
   likes            BikeLike[]
-  maintenanceLogs  MaintenanceLog[]
+  maintenanceLogs        MaintenanceLog[]
+  customMaintenanceTasks CustomMaintenanceTask[]
+  customMaintenanceLogs  CustomMaintenanceLog[]
 
   createdAt DateTime @default(now())
 
