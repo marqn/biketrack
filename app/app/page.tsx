@@ -11,9 +11,16 @@ import { NotificationsList } from "@/components/notifications-list/Notifications
 import { ensureEmailMissingNotification } from "@/lib/nofifications/rules/emailMissing";
 import PartsAccordion from "@/components/parts-accordion/PartsAccordion";
 import { StravaStatusBanner } from "@/components/strava-status-banner";
+import { StravaOnboardingDialog } from "@/components/strava-onboarding-dialog";
 import { cookies } from "next/headers";
 
-export default async function AppPage() {
+export default async function AppPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ stravaSync?: string }>;
+}) {
+  const params = await searchParams;
+  const showStravaDialog = params.stravaSync === "done";
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
 
@@ -200,6 +207,7 @@ export default async function AppPage() {
           ) : undefined
         }
       />
+      {showStravaDialog && <StravaOnboardingDialog />}
     </div>
   );
 }

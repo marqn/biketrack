@@ -161,5 +161,15 @@ export async function createBike({
     });
   }
 
+  // Jeśli rower pochodzi ze Strava – oznacz sync jako wykonany,
+  // żeby StravaSyncProvider nie uruchamiał synchronizacji ponownie
+  if (stravaGearId) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastStravaSync: new Date() },
+    });
+    redirect("/app?stravaSync=done");
+  }
+
   redirect("/app");
 }
