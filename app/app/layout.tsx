@@ -18,45 +18,52 @@ export default async function RootLayout({
   let stravaProps = { hasStrava: false, lastStravaSync: null as string | null };
 
   if (session?.user?.id) {
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        image: true,
-        role: true,
-        plan: true,
-        planExpiresAt: true,
-        lastStravaSync: true,
-        bikes: {
-          select: {
-            id: true,
-            type: true,
-            stravaGearId: true,
-            brand: true,
-            model: true,
-            year: true,
-            description: true,
-            isElectric: true,
-            totalKm: true,
-            userId: true,
-            createdAt: true,
-            isPublic: true,
-            slug: true,
-            imageUrl: true,
-            images: true,
-            hiddenMaintenanceItems: true,
-            maintenanceIntervals: true,
+    let user;
+    try {
+      user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          role: true,
+          plan: true,
+          planExpiresAt: true,
+          lastStravaSync: true,
+          bikes: {
+            select: {
+              id: true,
+              type: true,
+              stravaGearId: true,
+              brand: true,
+              model: true,
+              year: true,
+              description: true,
+              isElectric: true,
+              totalKm: true,
+              userId: true,
+              createdAt: true,
+              isPublic: true,
+              slug: true,
+              imageUrl: true,
+              images: true,
+              hiddenMaintenanceItems: true,
+              maintenanceIntervals: true,
+            },
+          },
+          accounts: {
+            where: { provider: "strava" },
+            select: { id: true },
+            take: 1,
           },
         },
-        accounts: {
-          where: { provider: "strava" },
-          select: { id: true },
-          take: 1,
-        },
-      },
-    });
+      });
+    } catch {
+      // Błąd schematu DB (np. brakująca kolumna po deploy przed db push)
+      // Nie wylogowuj — pozwól error boundary obsłużyć błąd
+      throw new Error("DB_SCHEMA_MISMATCH");
+    }
 
     if (!user) {
       redirect("/auth/signout");

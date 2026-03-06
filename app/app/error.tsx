@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
-import Link from "next/link";
 
 export default function Error({
   error,
@@ -30,10 +29,7 @@ export default function Error({
     signOut({ callbackUrl: "/login" });
   }
 
-  const isDbError =
-    error?.message?.includes("does not exist") ||
-    error?.message?.includes("PrismaClient") ||
-    error?.message?.includes("P2");
+  const isSchemaMismatch = error?.message === "DB_SCHEMA_MISMATCH";
 
   return (
     <div className="flex flex-1 items-center justify-center p-8">
@@ -43,9 +39,9 @@ export default function Error({
         </div>
         <h1 className="text-xl font-semibold">Coś poszło nie tak</h1>
         <p className="text-sm text-muted-foreground">
-          {isDbError
-            ? "Wystąpił problem z połączeniem z bazą danych. Zaloguj się ponownie, aby kontynuować."
-            : "Wystąpił nieoczekiwany błąd. Spróbuj ponownie."}
+          {isSchemaMismatch
+            ? "Trwa aktualizacja bazy danych. Odśwież stronę za chwilę."
+            : "Wystąpił nieoczekiwany błąd. Spróbuj ponownie lub zaloguj się ponownie."}
         </p>
         {error?.digest && (
           <p className="text-xs text-muted-foreground/60">
@@ -53,24 +49,13 @@ export default function Error({
           </p>
         )}
         <div className="flex gap-2">
-          {isDbError ? (
-            <>
-              <Button onClick={handleSignOut} size="sm">
-                Zaloguj się ponownie
-              </Button>
-              <Button onClick={handleReset} variant="outline" size="sm">
-                Spróbuj ponownie
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button onClick={handleReset} variant="outline" size="sm">
-                Spróbuj ponownie
-              </Button>
-              <Button asChild size="sm">
-                <Link href="/app">Strona główna</Link>
-              </Button>
-            </>
+          <Button onClick={handleReset} variant="outline" size="sm">
+            Spróbuj ponownie
+          </Button>
+          {!isSchemaMismatch && (
+            <Button onClick={handleSignOut} size="sm">
+              Zaloguj się ponownie
+            </Button>
           )}
         </div>
       </div>
