@@ -11,6 +11,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerFooter,
+} from "@/components/ui/drawer";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -137,6 +145,7 @@ export default function PartDetailsDialog({
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   const displayImage = selectedProduct?.officialImageUrl || null;
 
@@ -542,33 +551,25 @@ export default function PartDetailsDialog({
     }
   }
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh]">
-        <DialogHeader className="shrink-0">
-          <DialogTitle className="py-2">
-            {mode === "view"
-              ? "Szczegóły"
-              : mode === "edit"
-                ? "Edytuj szczegóły"
-                : mode === "replace"
-                  ? "Wymień"
-                  : "Dodaj szczegóły"}
-            : {partName}
-          </DialogTitle>
-          <DialogDescription>
-            {mode === "view"
-              ? "Zdjęcie i opinia (marka i model tylko do odczytu)"
-              : mode === "replace"
-                ? "Podaj szczegóły nowej części"
-                : "Określ model części oraz jej parametry użytkowe"}
-          </DialogDescription>
-        </DialogHeader>
+  const title = mode === "view"
+    ? "Szczegóły"
+    : mode === "edit"
+      ? "Edytuj szczegóły"
+      : mode === "replace"
+        ? "Wymień"
+        : "Dodaj szczegóły";
 
-        <div
-          className="custom-scrollbar space-y-6 overflow-y-auto -mx-6 pl-6 pr-8"
-          style={{ maxHeight: "calc(90vh - 200px)" }}
-        >
+  const description = mode === "view"
+    ? "Zdjęcie i opinia (marka i model tylko do odczytu)"
+    : mode === "replace"
+      ? "Podaj szczegóły nowej części"
+      : "Określ model części oraz jej parametry użytkowe";
+
+  const formContent = (
+    <div
+      className="custom-scrollbar space-y-6 overflow-y-auto px-4 md:px-0 md:-mx-6 md:pl-6 md:pr-8 pb-4"
+      style={{ maxHeight: isMobile ? "calc(85vh - 160px)" : "calc(90vh - 200px)" }}
+    >
 
           {/* === Tryb podglądu: marka/model/data tylko do odczytu === */}
           {mode === "view" && (
@@ -791,17 +792,47 @@ export default function PartDetailsDialog({
               />
             </div>
           )}
-        </div>
+    </div>
+  );
 
-        <DialogFooter className="shrink-0">
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Anuluj
-          </Button>
-          <Button onClick={handleSave} disabled={isPending}>
-            {isPending ? "Zapisuję..." : mode === "view" ? "Zapisz opinię" : "Zapisz"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+  const footerButtons = (
+    <>
+      <Button variant="ghost" onClick={() => onOpenChange(false)}>
+        Anuluj
+      </Button>
+      <Button onClick={handleSave} disabled={isPending}>
+        {isPending ? "Zapisuję..." : mode === "view" ? "Zapisz opinię" : "Zapisz"}
+      </Button>
+    </>
+  );
+
+  return (
+    <>
+      <Dialog open={!isMobile && open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl max-h-[90vh]">
+          <DialogHeader className="shrink-0">
+            <DialogTitle className="py-2">{title}: {partName}</DialogTitle>
+            <DialogDescription>{description}</DialogDescription>
+          </DialogHeader>
+          {formContent}
+          <DialogFooter className="shrink-0">
+            {footerButtons}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Drawer open={isMobile && open} onOpenChange={onOpenChange}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{title}: {partName}</DrawerTitle>
+            <p className="text-sm text-muted-foreground">{description}</p>
+          </DrawerHeader>
+          {formContent}
+          <DrawerFooter>
+            {footerButtons}
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    </>
   );
 }
