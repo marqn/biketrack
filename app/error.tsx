@@ -29,6 +29,8 @@ export default function Error({
     signOut({ callbackUrl: "/login" });
   }
 
+  const isSchemaMismatch = error?.message === "DB_SCHEMA_MISMATCH";
+
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <div className="flex max-w-md flex-col items-center gap-4 text-center">
@@ -37,7 +39,9 @@ export default function Error({
         </div>
         <h1 className="text-xl font-semibold">Coś poszło nie tak</h1>
         <p className="text-sm text-muted-foreground">
-          Wystąpił nieoczekiwany błąd. Spróbuj ponownie lub zaloguj się ponownie.
+          {isSchemaMismatch
+            ? "Trwa aktualizacja bazy danych. Odśwież stronę za chwilę."
+            : "Wystąpił nieoczekiwany błąd. Spróbuj ponownie lub zaloguj się ponownie."}
         </p>
         {error?.digest && (
           <p className="text-xs text-muted-foreground/60">
@@ -45,12 +49,14 @@ export default function Error({
           </p>
         )}
         <div className="flex gap-2">
-          <Button onClick={handleSignOut} size="sm">
-            Zaloguj się ponownie
-          </Button>
           <Button onClick={handleReset} variant="outline" size="sm">
             Spróbuj ponownie
           </Button>
+          {!isSchemaMismatch && (
+            <Button onClick={handleSignOut} size="sm">
+              Zaloguj się ponownie
+            </Button>
+          )}
         </div>
       </div>
     </div>

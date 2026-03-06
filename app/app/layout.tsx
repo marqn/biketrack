@@ -18,7 +18,8 @@ export default async function RootLayout({
   let stravaProps = { hasStrava: false, lastStravaSync: null as string | null };
 
   if (session?.user?.id) {
-    let user;
+    let user = null;
+    let dbSchemaError = false;
     try {
       user = await prisma.user.findUnique({
         where: { id: session.user.id },
@@ -61,11 +62,13 @@ export default async function RootLayout({
       });
     } catch {
       // Błąd schematu DB (np. brakująca kolumna po deploy przed db push)
-      // Nie wylogowuj — pozwól error boundary obsłużyć błąd
-      throw new Error("DB_SCHEMA_MISMATCH");
+      // Nie rzucaj i nie wylogowuj — renderuj bez danych headera,
+      // strona sama złapie błąd przez swój error boundary
+      dbSchemaError = true;
     }
 
-    if (!user) {
+    // Wyloguj tylko gdy DB działa poprawnie ale user nie istnieje
+    if (!dbSchemaError && !user) {
       redirect("/auth/signout");
     }
 
