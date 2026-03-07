@@ -655,17 +655,30 @@ export default function PartDetailsDialog({
           {mode !== "view" && <div className="space-y-4">
             <h3 className="text-base font-semibold">Data montażu</h3>
             {isMobile ? (
-              <input
-                type="date"
-                value={installedAt}
-                max={format(new Date(), "yyyy-MM-dd")}
-                onChange={(e) => setInstalledAt(e.target.value)}
-                className={cn(
-                  "w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors",
-                  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                  !installedAt && "text-muted-foreground",
-                )}
-              />
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !installedAt && "text-muted-foreground",
+                  )}
+                  onClick={() => document.getElementById("installedAtInput")?.click()}
+                  type="button"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {installedAt
+                    ? format(new Date(installedAt), "d MMMM yyyy", { locale: pl })
+                    : "Wybierz datę"}
+                </Button>
+                <input
+                  id="installedAtInput"
+                  type="date"
+                  value={installedAt}
+                  max={format(new Date(), "yyyy-MM-dd")}
+                  onChange={(e) => setInstalledAt(e.target.value)}
+                  className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                />
+              </div>
             ) : (
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
