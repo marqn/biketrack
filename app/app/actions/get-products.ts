@@ -80,14 +80,19 @@ export async function getProducts({
         totalInstallations: true,
         averageKmLifespan: true,
         createdAt: true,
+        reviews: {
+          where: { images: { isEmpty: false } },
+          select: { images: true },
+          take: 1,
+        },
       },
     }),
     prisma.partProduct.count({ where }),
   ]);
 
-  const products = rawProducts.map(({ images, ...rest }) => ({
+  const products = rawProducts.map(({ images, reviews, ...rest }) => ({
     ...rest,
-    imageUrl: images[0] || null,
+    imageUrl: images[0] || reviews[0]?.images[0] || null,
   }));
 
   return {
