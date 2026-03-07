@@ -94,7 +94,7 @@ export interface PartReplacement {
   createdAt?: Date | string;
   partType?: string;
   product?: {
-    officialImageUrl: string | null;
+    images: string[];
   } | null;
 }
 
@@ -182,7 +182,6 @@ export interface PartProduct {
   brand: string;
   model: string;
   description: string | null;
-  officialImageUrl: string | null;
   officialPrice: unknown; // Prisma Decimal type
   averageRating: number | null;
   totalReviews: number;

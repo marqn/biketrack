@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/lib/generated/prisma";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Warehouse } from "lucide-react";
@@ -18,21 +19,13 @@ export default async function GaragePage() {
 
   const userId = session.user.id;
 
-  const [storedParts, customStoredParts, user] = await Promise.all([
-    prisma.storedPart.findMany({
-      where: { userId },
-      include: {
-        product: {
-          select: {
-            id: true,
-            officialImageUrl: true,
-            averageRating: true,
-            totalReviews: true,
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    }),
+  const storedParts = await prisma.storedPart.findMany({
+    where: { userId },
+    include: { product: true },
+    orderBy: { createdAt: "desc" },
+  }) as Prisma.StoredPartGetPayload<{ include: { product: true } }>[];
+
+  const [customStoredParts, user] = await Promise.all([
     prisma.customStoredPart.findMany({
       where: { userId, inGarage: true },
       orderBy: { createdAt: "desc" },
@@ -81,7 +74,7 @@ export default async function GaragePage() {
     notes: p.notes,
     removedAt: p.removedAt,
     fromBikeName: p.fromBikeId ? (bikeMap.get(p.fromBikeId) ?? null) : null,
-    productImageUrl: p.product?.officialImageUrl ?? null,
+    productImageUrl: p.product?.images[0] ?? null,
     productId: p.product?.id ?? null,
     averageRating: p.product?.averageRating ?? null,
     totalReviews: p.product?.totalReviews ?? 0,

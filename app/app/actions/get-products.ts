@@ -74,34 +74,20 @@ export async function getProducts({
         type: true,
         brand: true,
         model: true,
-        officialImageUrl: true,
         images: true,
         averageRating: true,
         totalReviews: true,
         totalInstallations: true,
         averageKmLifespan: true,
         createdAt: true,
-        // Pobierz pierwsze zdjęcie z powiązanych części użytkowników
-        bikeParts: {
-          where: { images: { isEmpty: false } },
-          select: { images: true },
-          take: 1,
-        },
-        // Pobierz pierwsze zdjęcie z recenzji
-        reviews: {
-          where: { images: { isEmpty: false } },
-          select: { images: true },
-          take: 1,
-        },
       },
     }),
     prisma.partProduct.count({ where }),
   ]);
 
-  // Użyj officialImageUrl, zdjęcia produktu (admin), zdjęcia z części użytkowników lub zdjęcia z recenzji
-  const products = rawProducts.map(({ bikeParts, reviews, officialImageUrl, images, ...rest }) => ({
+  const products = rawProducts.map(({ images, ...rest }) => ({
     ...rest,
-    imageUrl: officialImageUrl || images[0] || bikeParts[0]?.images[0] || reviews[0]?.images[0] || null,
+    imageUrl: images[0] || null,
   }));
 
   return {

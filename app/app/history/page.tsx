@@ -380,10 +380,10 @@ const BikePartsHistory: React.FC = () => {
           <CardHeader>
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                {part.product?.officialImageUrl && (
+                {part.product?.images[0] && (
                   <div className="relative w-12 h-12 shrink-0 rounded-lg overflow-hidden border">
                     <Image
-                      src={part.product.officialImageUrl}
+                      src={part.product.images[0]}
                       alt={`${part.brand} ${part.model}`}
                       fill
                       sizes="48px"

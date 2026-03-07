@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -142,12 +141,10 @@ export default function PartDetailsDialog({
   const [unknownProduct, setUnknownProduct] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isLoadingReview, setIsLoadingReview] = useState(false);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const router = useRouter();
   const isMobile = useIsMobile();
 
-  const displayImage = selectedProduct?.officialImageUrl || null;
 
   useEffect(() => {
     async function initDialog() {
@@ -639,57 +636,18 @@ export default function PartDetailsDialog({
           {!unknownProduct && selectedProduct && (
             <div className="space-y-4">
               <h3 className="text-base font-semibold">Zdjęcie</h3>
-              {displayImage ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => setLightboxOpen(true)}
-                    className="relative w-24 h-24 rounded-lg border overflow-hidden bg-muted/50 cursor-pointer hover:ring-2 hover:ring-primary transition-all"
-                  >
-                    <Image
-                      key={displayImage}
-                      src={displayImage}
-                      alt="Zdjęcie części"
-                      fill
-                      sizes="96px"
-                      className="object-cover"
-                    />
-                  </button>
-                  {lightboxOpen && (
-                    <div
-                      className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
-                      onClick={() => setLightboxOpen(false)}
-                    >
-                      <img
-                        src={displayImage}
-                        alt="Zdjęcie części"
-                        className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Ten produkt nie ma jeszcze zdjęcia. Możesz je dodać.
-                  </p>
-                  <ImageUploader
-                    images={[]}
-                    maxImages={1}
-                    entityType="product"
-                    entityId={selectedProduct.id}
-                    onImagesChange={(urls) => {
-                      if (urls[0]) {
-                        setSelectedProduct({
-                          ...selectedProduct,
-                          officialImageUrl: urls[0],
-                        });
-                      }
-                    }}
-                  />
-                </div>
-              )}
+              <ImageUploader
+                images={selectedProduct.images || []}
+                maxImages={3}
+                entityType="product"
+                entityId={selectedProduct.id}
+                onImagesChange={(urls) => {
+                  setSelectedProduct({
+                    ...selectedProduct,
+                    images: urls,
+                  });
+                }}
+              />
             </div>
           )}
 

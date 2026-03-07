@@ -406,10 +406,9 @@ model PartProduct {
   model String
 
   // Metadane produktu (opcjonalne - rozbudowa w przyszłości)
-  description      String?  @db.Text
-  officialImageUrl String?
-  officialPrice    Decimal? @db.Decimal(10, 2)
-  images           String[] @default([]) // Vercel Blob URLs (do 3 zdjęć)
+  description   String?  @db.Text
+  officialPrice Decimal? @db.Decimal(10, 2)
+  images        String[] @default([]) // Vercel Blob URLs (do 3 zdjęć)
 
   // Agregowane statystyki (denormalizowane dla wydajności)
   averageRating      Float? @default(0)

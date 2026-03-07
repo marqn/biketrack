@@ -69,7 +69,7 @@ export async function loadPart(
           data: {
             description: raw.description || existing.description,
             specifications: toJsonValue(raw.specifications) ?? existing.specifications,
-            officialImageUrl: raw.imageUrl || existing.officialImageUrl,
+            images: raw.imageUrl ? (existing.images.includes(raw.imageUrl) ? existing.images : [raw.imageUrl, ...existing.images]) : existing.images,
             officialPrice: raw.price?.value ?? existing.officialPrice,
           },
         })
@@ -87,7 +87,7 @@ export async function loadPart(
           model,
           description: raw.description,
           specifications: toJsonValue(raw.specifications),
-          officialImageUrl: raw.imageUrl,
+          images: raw.imageUrl ? [raw.imageUrl] : [],
           officialPrice: raw.price?.value,
         },
       })

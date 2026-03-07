@@ -61,13 +61,13 @@ export async function POST(request: Request): Promise<NextResponse> {
         } else if (type === "product") {
           const product = await prisma.partProduct.findUnique({
             where: { id: entityId },
-            select: { officialImageUrl: true },
+            select: { images: true },
           });
           if (!product) {
             throw new Error("Produkt nie istnieje");
           }
-          if (product.officialImageUrl) {
-            throw new Error("Produkt ma już zdjęcie");
+          if (product.images.length >= 3) {
+            throw new Error("Maksymalnie 3 zdjęcia");
           }
         } else if (type === "review") {
           // Dla recenzji sprawdzamy tylko czy produkt istnieje

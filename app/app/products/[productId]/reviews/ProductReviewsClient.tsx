@@ -111,10 +111,10 @@ export function ProductReviewsClient({
         <CardHeader>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             <div className="flex items-start gap-4">
-              {(product.officialImageUrl || product.images?.[0] || communityImages[0]) ? (
+              {(product.images?.[0] || communityImages[0]) ? (
                 <div className="relative w-20 h-20 shrink-0 rounded-lg overflow-hidden border bg-muted">
                   <Image
-                    src={(product.officialImageUrl || product.images?.[0] || communityImages[0])!}
+                    src={(product.images?.[0] || communityImages[0])!}
                     alt={`${product.brand} ${product.model}`}
                     fill
                     sizes="80px"

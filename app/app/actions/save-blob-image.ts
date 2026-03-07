@@ -83,19 +83,19 @@ export async function saveBlobImage(
     } else if (entityType === "product") {
       const product = await prisma.partProduct.findUnique({
         where: { id: entityId },
-        select: { officialImageUrl: true },
+        select: { images: true },
       });
       if (!product) {
         return { success: false, error: "Produkt nie istnieje" };
       }
-      if (product.officialImageUrl) {
-        return { success: false, error: "Produkt ma już zdjęcie" };
+      if (product.images.length >= 3) {
+        return { success: false, error: "Maksymalnie 3 zdjęcia" };
       }
 
       await prisma.partProduct.update({
         where: { id: entityId },
         data: {
-          officialImageUrl: blobUrl,
+          images: { push: blobUrl },
         },
       });
     } else if (entityType === "review") {

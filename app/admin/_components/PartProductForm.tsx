@@ -84,7 +84,7 @@ interface PartProductFormProps {
     brand: string;
     model: string;
     specifications?: Record<string, unknown> | null;
-    officialImageUrl?: string | null;
+    images?: string[];
     officialPrice?: string | number | null;
     averageRating?: number | null;
     totalReviews?: number | null;
@@ -121,7 +121,7 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
   const [totalInstallations, setTotalInstallations] = useState<string>(
     initialData?.totalInstallations?.toString() || "0"
   );
-  const [officialImageUrl, setOfficialImageUrl] = useState<string | null>(initialData?.officialImageUrl || null);
+  const [productImages, setProductImages] = useState<string[]>(initialData?.images || []);
   const [copied, setCopied] = useState(false);
 
   function handlePartTypeChange(newType: PartType) {
@@ -526,11 +526,11 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
             <div className="space-y-2">
               <Label>Zdjęcie produktu</Label>
               <ImageUploader
-                images={officialImageUrl ? [officialImageUrl] : []}
-                maxImages={1}
+                images={productImages}
+                maxImages={3}
                 entityType="product"
                 entityId={initialData.id}
-                onImagesChange={(urls) => setOfficialImageUrl(urls[0] || null)}
+                onImagesChange={(urls) => setProductImages(urls)}
               />
             </div>
           )}

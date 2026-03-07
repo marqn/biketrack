@@ -62,7 +62,7 @@ type ExistingPart = {
   wearKm: number;
   expectedKm: number;
   isInstalled?: boolean;
-  product?: { brand: string; model: string } | null;
+  product?: { id: string; brand: string; model: string; images: string[] } | null;
   replacements: PartReplacement[];
   createdAt?: Date | string;
   installedAt?: Date | string | null;

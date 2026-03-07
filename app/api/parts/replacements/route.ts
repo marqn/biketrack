@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
           createdAt: true,
           product: {
             select: {
-              officialImageUrl: true,
+              images: true,
             },
           },
         },
@@ -154,7 +154,7 @@ export async function GET(request: NextRequest) {
           createdAt: true,
           product: {
             select: {
-              officialImageUrl: true,
+              images: true,
             },
           },
         },
