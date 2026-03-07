@@ -40,6 +40,7 @@ export default async function ProductReviewsPage({
       page,
       sortBy,
       bikeTypeFilter,
+      currentUserId: session.user.id,
     }),
     getUserProductReview(productId),
   ]);

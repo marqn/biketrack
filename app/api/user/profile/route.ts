@@ -13,20 +13,25 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        image: true,
-        weight: true,
-        password: true, // Sprawdzamy czy ma hasło
-        bio: true,
-        profileSlug: true,
-        unitPreference: true,
-      }
-    });
+    const [user, reputation] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          weight: true,
+          password: true,
+          bio: true,
+          profileSlug: true,
+          unitPreference: true,
+        }
+      }),
+      prisma.commentLike.count({
+        where: { comment: { userId: session.user.id, isHidden: false } },
+      }),
+    ]);
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -44,6 +49,7 @@ export async function GET() {
         bio: user.bio,
         profileSlug: user.profileSlug,
         unitPreference: user.unitPreference,
+        reputation,
       }
     });
   } catch (error) {

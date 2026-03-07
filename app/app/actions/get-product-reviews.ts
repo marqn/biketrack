@@ -11,6 +11,7 @@ export interface GetProductReviewsParams {
   pageSize?: number;
   sortBy?: ReviewSortBy;
   bikeTypeFilter?: BikeType;
+  currentUserId?: string;
 }
 
 export interface ReviewWithUser {
@@ -24,6 +25,8 @@ export interface ReviewWithUser {
   bikeType: BikeType;
   verified: boolean;
   createdAt: Date;
+  likeCount: number;
+  isLikedByCurrentUser: boolean;
   user: {
     id: string;
     name: string | null;
@@ -61,6 +64,7 @@ export async function getProductReviews({
   pageSize = 10,
   sortBy = "newest",
   bikeTypeFilter,
+  currentUserId,
 }: GetProductReviewsParams): Promise<GetProductReviewsResult> {
   const orderBy: Prisma.PartReviewOrderByWithRelationInput = {
     highest_rated: { rating: "desc" },
@@ -126,27 +130,19 @@ export async function getProductReviews({
         specifications: true,
       },
     }),
-    // Pobierz zdjęcia użytkowników z części powiązanych z tym produktem
     prisma.bikePart.findMany({
-      where: {
-        productId,
-        images: { isEmpty: false },
-      },
+      where: { productId, images: { isEmpty: false } },
       select: { images: true },
       take: 9,
     }),
-    // Pobierz zdjęcia z recenzji
     prisma.partReview.findMany({
-      where: {
-        productId,
-        images: { isEmpty: false },
-      },
+      where: { productId, images: { isEmpty: false } },
       select: { images: true },
       take: 9,
     }),
   ]);
 
-  // Deduplikacja po userId — preferujemy recenzję samodzielną (partId: null, serviceEventId: null)
+  // Deduplikacja po userId
   const seenUsers = new Set<string>();
   const reviews: typeof allReviews = [];
   for (const review of allReviews) {
@@ -156,15 +152,46 @@ export async function getProductReviews({
     if (reviews.length >= pageSize) break;
   }
 
-  // Wyciągamy partId/serviceEventId z wyników (nie są częścią ReviewWithUser)
-  const reviewsClean = reviews.map(({ partId: _p, serviceEventId: _s, ...r }) => r);
+  const reviewIds = reviews.map((r) => r.id);
+
+  // Like counts i lajki usera — dwa zapytania dla wszystkich recenzji na stronie
+  const [likeCounts, userLikes] = await Promise.all([
+    reviewIds.length > 0
+      ? prisma.reviewLike.groupBy({
+          by: ["reviewId"],
+          where: { reviewId: { in: reviewIds } },
+          _count: { reviewId: true },
+        })
+      : ([] as Array<{ reviewId: string; _count: { reviewId: number } }>),
+    currentUserId && reviewIds.length > 0
+      ? prisma.reviewLike.findMany({
+          where: { reviewId: { in: reviewIds }, userId: currentUserId },
+          select: { reviewId: true },
+        })
+      : ([] as Array<{ reviewId: string }>),
+  ]);
+
+  const likeCountMap = new Map(
+    (likeCounts as Array<{ reviewId: string; _count: { reviewId: number } }>).map(
+      (l) => [l.reviewId, l._count.reviewId]
+    )
+  );
+  const userLikedIds = new Set(userLikes.map((l) => l.reviewId));
+
+  // Wyciągamy partId/serviceEventId z wyników
+  const reviewsClean: ReviewWithUser[] = reviews.map(
+    ({ partId: _p, serviceEventId: _s, ...r }) => ({
+      ...r,
+      likeCount: likeCountMap.get(r.id) ?? 0,
+      isLikedByCurrentUser: userLikedIds.has(r.id),
+    })
+  );
 
   const communityImages = [
     ...partsWithImages.flatMap((p) => p.images),
     ...reviewsWithImages.flatMap((r) => r.images),
   ].slice(0, 9);
 
-  // totalCount może lekko zawyżać liczbę gdy są duplikaty, ale to rzadki przypadek
   return {
     reviews: reviewsClean,
     totalCount: totalCountRaw,

@@ -22,20 +22,26 @@ export type CommentData = {
   type: "GENERAL" | "SUGGESTION" | "QUESTION";
   createdAt: string;
   isOptimistic?: boolean;
+  likeCount: number;
+  isLikedByCurrentUser: boolean;
   user: {
     id: string;
     name: string | null;
     image: string | null;
+    reputation?: number;
   };
   replies: Array<{
     id: string;
     content: string;
     type: "GENERAL" | "SUGGESTION" | "QUESTION";
     createdAt: string;
+    likeCount: number;
+    isLikedByCurrentUser: boolean;
     user: {
       id: string;
       name: string | null;
       image: string | null;
+      reputation?: number;
     };
   }>;
   _count: { reports: number };
@@ -72,7 +78,7 @@ export function BikeCommentSection({
   const loadComments = async (pageNum: number) => {
     setIsLoading(true);
     try {
-      const result = await getComments({ bikeId, page: pageNum, pageSize: 10 });
+      const result = await getComments({ bikeId, page: pageNum, pageSize: 10, currentUserId });
       if (result.success && result.comments) {
         if (pageNum === 1) {
           setComments(result.comments);
@@ -106,6 +112,8 @@ export function BikeCommentSection({
           type,
           createdAt: new Date().toISOString(),
           isOptimistic: true,
+          likeCount: 0,
+          isLikedByCurrentUser: false,
           user: {
             id: currentUserId ?? "",
             name: session?.user?.name ?? "Ty",

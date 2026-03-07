@@ -31,6 +31,7 @@ import {
   weightRange,
   formatDistance,
 } from "@/lib/units";
+import { ReputationBadge, REPUTATION_TIERS } from "@/components/discover/ReputationBadge";
 
 interface UserData {
   id: string;
@@ -41,6 +42,7 @@ interface UserData {
   bio: string | null;
   profileSlug: string | null;
   unitPreference: UnitPreference;
+  reputation: number;
 }
 
 interface FormData {
@@ -194,7 +196,7 @@ export default function ProfilePage() {
         const data = await response.json();
 
         if (data.user) {
-          setUser(data.user);
+          setUser({ ...data.user, reputation: data.user.reputation ?? 0 });
           setHasPassword(!!data.user.password);
           const pref: UnitPreference = data.user.unitPreference ?? "METRIC";
           setUnitPreference(pref);
@@ -834,6 +836,32 @@ export default function ProfilePage() {
               </p>
             </div>
           )}
+        </div>
+
+        {/* Reputacja */}
+        <div className="bg-card rounded-xl border p-6 mb-6">
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-lg font-semibold">Reputacja społeczności</h2>
+            <ReputationBadge points={user.reputation} showPoints />
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Punkty reputacji zdobywasz, gdy inni użytkownicy polubią Twoje opinie o częściach.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {REPUTATION_TIERS.filter((t) => t.minPoints > 0).map((tier) => (
+              <div
+                key={tier.label}
+                className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm ${
+                  user.reputation >= tier.minPoints ? "opacity-100" : "opacity-40"
+                }`}
+              >
+                <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-xs font-medium ${tier.className}`}>
+                  {tier.label}
+                </span>
+                <span className="text-muted-foreground">{tier.minPoints}+ pkt</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Strava – połączone konta */}

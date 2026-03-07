@@ -3,6 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin } from "lucide-react";
 import { BikeCard } from "./BikeCard";
+import { ReputationBadge, REPUTATION_TIERS } from "./ReputationBadge";
 import { BikeType } from "@/lib/generated/prisma";
 
 interface UserPublicProfileProps {
@@ -10,6 +11,7 @@ interface UserPublicProfileProps {
     name: string | null;
     image: string | null;
     bio: string | null;
+    reputation: number;
   };
   bikes: Array<{
     slug: string | null;
@@ -64,6 +66,30 @@ export function UserPublicProfile({ user, bikes }: UserPublicProfileProps) {
             </span>{" "}
             km łącznie
           </div>
+          <div className="flex items-center gap-2">
+            <ReputationBadge points={user.reputation} showPoints />
+            {user.reputation === 0 && (
+              <span className="text-xs text-muted-foreground">0 pkt reputacji</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Reputacja - legenda */}
+      <div className="bg-card rounded-xl border p-6">
+        <h2 className="text-sm font-semibold mb-1">Reputacja społeczności</h2>
+        <p className="text-xs text-muted-foreground mb-3">
+          Punkty reputacji zdobywane są, gdy inni użytkownicy polubią Twoje opinie o częściach.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {REPUTATION_TIERS.filter((t) => t.minPoints > 0).map((tier) => (
+            <div key={tier.label} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-xs font-medium ${tier.className}`}>
+                {tier.label}
+              </span>
+              <span>{tier.minPoints}+ pkt</span>
+            </div>
+          ))}
         </div>
       </div>
 

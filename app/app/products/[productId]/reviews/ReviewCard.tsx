@@ -9,6 +9,7 @@ import { ReviewWithUser } from "@/app/app/actions/get-product-reviews";
 import { useSession } from "next-auth/react";
 import { formatDistance } from "@/lib/units";
 import type { UnitPreference } from "@/lib/units";
+import { ReviewLikeButton } from "./ReviewLikeButton";
 
 interface ReviewCardProps {
   review: ReviewWithUser;
@@ -125,6 +126,16 @@ export function ReviewCard({ review, isCurrentUser }: ReviewCardProps) {
             ))}
           </div>
         )}
+
+        {/* Lajk */}
+        <div className="flex justify-end pt-1">
+          <ReviewLikeButton
+            reviewId={review.id}
+            initialLikeCount={review.likeCount}
+            initialIsLiked={review.isLikedByCurrentUser}
+            isAuthor={isCurrentUser}
+          />
+        </div>
       </CardContent>
     </Card>
   );

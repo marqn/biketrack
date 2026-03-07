@@ -48,6 +48,8 @@ model User {
   bikeComments   BikeComment[]
   commentReports CommentReport[]
   bikeLikes      BikeLike[]
+  commentLikes   CommentLike[]
+  reviewLikes    ReviewLike[]
   storedParts       StoredPart[]
   customStoredParts CustomStoredPart[]
 
@@ -464,6 +466,7 @@ model PartReview {
   part         BikePart?     @relation(fields: [partId], references: [id], onDelete: Cascade)
   serviceEvent ServiceEvent? @relation(fields: [serviceEventId], references: [id], onDelete: Cascade)
   product      PartProduct   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  likes        ReviewLike[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -617,6 +620,7 @@ model BikeComment {
   parent  BikeComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies BikeComment[] @relation("CommentReplies")
   reports CommentReport[]
+  likes   CommentLike[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -654,4 +658,38 @@ model CommentReport {
 
   @@unique([commentId, userId]) // Jedno zgłoszenie per użytkownik per komentarz
   @@index([status])
+}
+
+// ========== Polubienia komentarzy ==========
+
+model CommentLike {
+  id        String @id @default(cuid())
+  commentId String
+  userId    String
+
+  comment BikeComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([commentId, userId])
+  @@index([commentId])
+  @@index([userId])
+}
+
+// ========== Polubienia opinii o produktach ==========
+
+model ReviewLike {
+  id       String @id @default(cuid())
+  reviewId String
+  userId   String
+
+  review PartReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([reviewId, userId])
+  @@index([reviewId])
+  @@index([userId])
 }

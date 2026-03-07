@@ -8,6 +8,8 @@ import { Flag, Lightbulb, HelpCircle, MessageSquare, Reply, Trash2 } from "lucid
 import { deleteComment } from "@/app/app/actions/comments/delete-comment";
 import { CommentForm } from "./CommentForm";
 import { ReportCommentDialog } from "./ReportCommentDialog";
+import { CommentLikeButton } from "./CommentLikeButton";
+import { ReputationBadge } from "./ReputationBadge";
 import type { CommentData } from "./BikeCommentSection";
 
 const TYPE_CONFIG = {
@@ -82,6 +84,7 @@ export function CommentCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm font-medium">{comment.user.name ?? "Użytkownik"}</span>
+            <ReputationBadge points={comment.user.reputation ?? 0} />
             {!isReply && comment.type !== "GENERAL" && (
               <Badge variant={config.variant} className="text-xs gap-1">
                 <TypeIcon className="h-3 w-3" />
@@ -99,6 +102,13 @@ export function CommentCard({
           {/* Akcje — ukryte dla optimistic */}
           {!comment.isOptimistic && (
             <div className="flex items-center gap-1 mt-2">
+              <CommentLikeButton
+                commentId={comment.id}
+                initialLikeCount={comment.likeCount}
+                initialIsLiked={comment.isLikedByCurrentUser}
+                isLoggedIn={isLoggedIn}
+                isAuthor={isAuthor}
+              />
               {isLoggedIn && !isReply && (
                 <Button
                   variant="ghost"
@@ -155,7 +165,7 @@ export function CommentCard({
               {comment.replies.map((reply) => (
                 <CommentCard
                   key={reply.id}
-                  comment={{ ...reply, replies: [], _count: { reports: 0 } }}
+                  comment={{ ...reply, replies: [], _count: { reports: 0 }, likeCount: reply.likeCount, isLikedByCurrentUser: reply.isLikedByCurrentUser }}
                   bikeId={bikeId}
                   currentUserId={currentUserId}
                   isLoggedIn={isLoggedIn}

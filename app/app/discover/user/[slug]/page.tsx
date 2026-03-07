@@ -41,11 +41,20 @@ export default async function UserPublicPage({ params }: UserPublicPageProps) {
     notFound();
   }
 
+  const reputation = await prisma.commentLike.count({
+    where: {
+      comment: {
+        user: { profileSlug: slug },
+        isHidden: false,
+      },
+    },
+  });
+
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-4xl mx-auto">
         <BackButton />
-        <UserPublicProfile user={user} bikes={user.bikes} />
+        <UserPublicProfile user={{ ...user, reputation }} bikes={user.bikes} />
       </div>
     </div>
   );
