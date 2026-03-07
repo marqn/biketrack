@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { displayKm, distanceUnit } from "@/lib/units";
 import type { UnitPreference } from "@/lib/units";
@@ -69,8 +69,23 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId, likeC
   const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
   const [imageOpen, setImageOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const touchStartX = useRef<number | null>(null);
 
   const allImages = bike.images?.length ? bike.images : bike.imageUrl ? [bike.imageUrl] : [];
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) setCurrentImageIndex((i) => (i + 1) % allImages.length);
+      else setCurrentImageIndex((i) => (i - 1 + allImages.length) % allImages.length);
+    }
+    touchStartX.current = null;
+  };
   const hasImages = allImages.length > 0;
   const hasMultipleImages = allImages.length > 1;
 
@@ -99,6 +114,8 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId, likeC
             className="relative w-full h-64 bg-muted cursor-pointer group"
             style={{ viewTransitionName: `bike-image-${bike.slug}` }}
             onClick={() => setImageOpen(true)}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
           >
             {allImages[currentImageIndex].startsWith("data:") ? (
               <img src={allImages[currentImageIndex]} alt={bikeTitle} className="w-full h-full object-cover" />
@@ -161,6 +178,8 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId, likeC
               <div
                 className="fixed inset-0 z-50 flex items-center justify-center p-4"
                 onClick={() => setImageOpen(false)}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
               >
                 <button
                   onClick={() => setImageOpen(false)}
