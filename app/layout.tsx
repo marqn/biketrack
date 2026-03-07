@@ -1,5 +1,5 @@
 import type React from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "@/components/ui/sonner";
@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   description:
     "Aplikacja do śledzenia stanu komponentów i historii serwisów rowerowych",
   generator: "v0.app",
+};
+
+export const viewport: Viewport = {
+  interactiveWidget: "resizes-content",
 };
 
 export default function RootLayout({
