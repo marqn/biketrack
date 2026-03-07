@@ -204,8 +204,11 @@ const BikePartsHistory: React.FC = () => {
       return (
         <div key={item.id} className="relative pl-20">
           {/* Timeline icon with km */}
-          <div className="absolute left-0 top-6 flex flex-col items-center">
-            <div className="p-2.5 bg-cyan-600 rounded-full shadow-md">
+          <div className="absolute left-0 top-2 flex flex-col items-center w-20">
+            <Badge className="bg-cyan-600 text-[10px] px-2 py-1.5 text-center whitespace-nowrap justify-center">
+              {new Date(service.createdAt).toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" })}
+            </Badge>
+            <div className="p-2.5 bg-cyan-600 rounded-full shadow-md mt-1">
               {getCategoryIcon("service", "w-5 h-5 text-white")}
             </div>
             <span className="text-xs font-semibold text-cyan-600 mt-1">
@@ -217,8 +220,8 @@ const BikePartsHistory: React.FC = () => {
 
           <Card className="hover:shadow-lg transition-shadow duration-300 border-l-4 border-l-cyan-500">
             <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
                   {service.lubricantBrand ? (
                     <>
                       <CardTitle className="text-xl mb-1">
@@ -236,7 +239,7 @@ const BikePartsHistory: React.FC = () => {
                     </CardTitle>
                   )}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-1 shrink-0">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -258,13 +261,6 @@ const BikePartsHistory: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center gap-2 ">
-                  <Calendar className="w-4 h-4 " />
-                  <span className="text-sm font-medium">Data serwisu:</span>
-                  <span className="text-sm">
-                    {formatDate(service.createdAt)}
-                  </span>
-                </div>
                 {service.lubricantBrand && (
                   <div className="flex items-center gap-2 ">
                     <SERVICE_ICON />
@@ -293,8 +289,11 @@ const BikePartsHistory: React.FC = () => {
       const custom = item.data as CustomPartReplacement;
       return (
         <div key={item.id} className="relative pl-20">
-          <div className="absolute left-0 top-6 flex flex-col items-center">
-            <div className="p-2.5 bg-green-600 rounded-full shadow-md">
+          <div className="absolute left-0 top-2 flex flex-col items-center w-20">
+            <Badge className="bg-green-600 text-[10px] px-2 py-1.5 text-center whitespace-nowrap justify-center">
+              {new Date(custom.removedAt ?? custom.createdAt ?? "").toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" })}
+            </Badge>
+            <div className="p-2.5 bg-green-600 rounded-full shadow-md mt-1">
               <Wrench className="w-4 h-4 text-white" />
             </div>
             <span className="text-xs font-semibold text-green-600 mt-1">
@@ -306,8 +305,8 @@ const BikePartsHistory: React.FC = () => {
 
           <Card className="hover:shadow-lg transition-shadow duration-300 border-l-4 border-l-green-500">
             <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
                   <CardTitle className="text-xl mb-1">
                     {custom.brand && custom.model
                       ? `${custom.brand} ${custom.model}`
@@ -317,7 +316,7 @@ const BikePartsHistory: React.FC = () => {
                     {custom.name} — Twoja część
                   </CardDescription>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-1 shrink-0">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -365,8 +364,13 @@ const BikePartsHistory: React.FC = () => {
     return (
       <div key={item.id} className="relative pl-20">
         {/* Timeline icon with km */}
-        <div className="absolute left-0 top-6 flex flex-col items-center">
-          <div className="p-2.5 bg-blue-600 rounded-full shadow-md ">
+        <div className="absolute left-0 top-2 flex flex-col items-center w-20">
+          {part.createdAt && (
+            <Badge className="bg-blue-600 text-[10px] px-2 py-1.5 text-center whitespace-nowrap justify-center">
+              {new Date(part.createdAt).toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" })}
+            </Badge>
+          )}
+          <div className="p-2.5 bg-blue-600 rounded-full shadow-md mt-1">
             {getCategoryIcon(part.partType || "", "w-5 h-5 text-white")}
           </div>
           <span className="text-xs font-semibold text-blue-600 mt-1">
@@ -378,8 +382,8 @@ const BikePartsHistory: React.FC = () => {
 
         <Card className="hover:shadow-lg transition-shadow duration-300">
           <CardHeader>
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
                 {part.product?.images[0] && (
                   <div className="relative w-12 h-12 shrink-0 rounded-lg overflow-hidden border">
                     <Image
@@ -391,7 +395,7 @@ const BikePartsHistory: React.FC = () => {
                     />
                   </div>
                 )}
-                <div>
+                <div className="min-w-0">
                   <CardTitle className="text-xl mb-1">
                     {part.brand && part.model
                       ? `${part.brand} ${part.model}`
@@ -402,7 +406,7 @@ const BikePartsHistory: React.FC = () => {
                   </CardDescription>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-1 shrink-0">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -424,11 +428,6 @@ const BikePartsHistory: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center gap-2 ">
-                <Calendar className="w-4 h-4 " />
-                <span className="text-sm font-medium">Data wymiany:</span>
-                <span className="text-sm">{formatDate(part.createdAt ?? "")}</span>
-              </div>
               <div className="flex items-center gap-2 ">
                 <Wrench className="w-4 h-4 " />
                 <span className="text-sm font-medium">Zużycie części:</span>
