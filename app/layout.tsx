@@ -17,10 +17,19 @@ export const metadata: Metadata = {
   description:
     "Aplikacja do śledzenia stanu komponentów i historii serwisów rowerowych",
   generator: "v0.app",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "MBike",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export const viewport: Viewport = {
   interactiveWidget: "resizes-content",
+  themeColor: "#000000",
 };
 
 export default function RootLayout({

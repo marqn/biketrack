@@ -135,7 +135,11 @@ export function RenameBikeDialog({
       setIsPublic(bike.isPublic ?? false);
       setVisibilitySlug(bike.slug ?? null);
       setBikeImages(
-        bike.images?.length ? bike.images : bike.imageUrl ? [bike.imageUrl] : [],
+        bike.images?.length
+          ? bike.images
+          : bike.imageUrl
+            ? [bike.imageUrl]
+            : [],
       );
     }
     onOpenChange(open);
@@ -286,10 +290,14 @@ export function RenameBikeDialog({
             )}
             {isPublic && visibilitySlug && !visibilityLoading && (
               <p className="text-xs text-green-600 flex items-center gap-1">
-                Rower jest publiczny: <Link
+                Rower jest publiczny:{" "}
+                <Link
                   className="text-xs text-blue-600"
                   href={`/app/discover/bike/${visibilitySlug}`}
-                  onClick={(e) => { e.stopPropagation(); onOpenChange(false); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenChange(false);
+                  }}
                 >
                   /app/discover/bike/{visibilitySlug}
                 </Link>
@@ -297,13 +305,19 @@ export function RenameBikeDialog({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigator.clipboard.writeText(`${window.location.origin}/app/discover/bike/${visibilitySlug}`);
+                    navigator.clipboard.writeText(
+                      `${window.location.origin}/app/discover/bike/${visibilitySlug}`,
+                    );
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                   }}
                   className="text-muted-foreground hover:text-foreground cursor-pointer"
                 >
-                  {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
+                  {copied ? (
+                    <Check className="size-3" />
+                  ) : (
+                    <Copy className="size-3" />
+                  )}
                 </button>
               </p>
             )}
