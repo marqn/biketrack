@@ -101,19 +101,26 @@ export function BikeHeader({
 }: BikeHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
 
   const navigate = (href: string) => {
-    if (!("startViewTransition" in document)) {
-      router.push(href);
-      return;
-    }
-    (document as any).startViewTransition(() => router.push(href));
+    setPendingHref(href);
+    router.push(href);
+  };
+
+  useEffect(() => {
+    setPendingHref(null);
+  }, [pathname]);
+
+  const isActive = (href: string, exact = false) => {
+    const current = pendingHref ?? pathname;
+    return exact ? current === href : !!current?.startsWith(href);
   };
 
   // Nadaje view-transition-name aktywnej ikonie nawigacyjnej,
   // dzięki czemu "pill" ślizga się między przyciskami podczas nawigacji.
-  const pill = (isActive: boolean): React.CSSProperties | undefined =>
-    isActive ? { viewTransitionName: "nav-pill" } : undefined;
+  const pill = (active: boolean): React.CSSProperties | undefined =>
+    active ? { viewTransitionName: "nav-pill" } : undefined;
   const { data: session } = useSession();
   const { resolvedTheme: theme, setTheme } = useTheme();
   const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
@@ -439,7 +446,7 @@ export function BikeHeader({
                 <TooltipTrigger asChild>
                   <Button
                     variant={
-                      pathname?.startsWith("/admin") ? "default" : "destructive"
+                      isActive("/admin") ? "default" : "destructive"
                     }
                     size="icon"
                     onClick={() => router.push("/admin/bikes")}
@@ -458,9 +465,9 @@ export function BikeHeader({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant={pathname === "/app" ? "default" : "outline"}
+                  variant={isActive("/app", true) ? "default" : "outline"}
                   size="icon"
-                  style={pill(pathname === "/app")}
+                  style={pill(isActive("/app", true))}
                   onClick={() => navigate("/app")}
                 >
                   <Home className="h-4 w-4" />
@@ -476,11 +483,9 @@ export function BikeHeader({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant={
-                    pathname?.startsWith("/app/history") ? "default" : "outline"
-                  }
+                  variant={isActive("/app/history") ? "default" : "outline"}
                   size="icon"
-                  style={pill(!!pathname?.startsWith("/app/history"))}
+                  style={pill(isActive("/app/history"))}
                   onClick={() => navigate("/app/history")}
                 >
                   <History className="h-4 w-4" />
@@ -496,11 +501,9 @@ export function BikeHeader({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant={
-                    pathname?.startsWith("/app/garage") ? "default" : "outline"
-                  }
+                  variant={isActive("/app/garage") ? "default" : "outline"}
                   size="icon"
-                  style={pill(!!pathname?.startsWith("/app/garage"))}
+                  style={pill(isActive("/app/garage"))}
                   onClick={() => navigate("/app/garage")}
                 >
                   <Warehouse className="h-4 w-4" />
@@ -516,13 +519,9 @@ export function BikeHeader({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant={
-                    pathname?.startsWith("/app/products")
-                      ? "default"
-                      : "outline"
-                  }
+                  variant={isActive("/app/products") ? "default" : "outline"}
                   size="icon"
-                  style={pill(!!pathname?.startsWith("/app/products"))}
+                  style={pill(isActive("/app/products"))}
                   onClick={() => navigate("/app/products")}
                 >
                   <Package className="h-4 w-4" />
@@ -538,13 +537,9 @@ export function BikeHeader({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant={
-                    pathname?.startsWith("/app/discover")
-                      ? "default"
-                      : "outline"
-                  }
+                  variant={isActive("/app/discover") ? "default" : "outline"}
                   size="icon"
-                  style={pill(!!pathname?.startsWith("/app/discover"))}
+                  style={pill(isActive("/app/discover"))}
                   onClick={() => navigate("/app/discover")}
                 >
                   <Compass className="h-4 w-4" />
@@ -560,13 +555,9 @@ export function BikeHeader({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant={
-                    pathname?.startsWith("/app/messages")
-                      ? "default"
-                      : "outline"
-                  }
+                  variant={isActive("/app/messages") ? "default" : "outline"}
                   size="icon"
-                  style={pill(!!pathname?.startsWith("/app/messages"))}
+                  style={pill(isActive("/app/messages"))}
                   className="relative"
                   onClick={() => navigate("/app/messages")}
                 >
