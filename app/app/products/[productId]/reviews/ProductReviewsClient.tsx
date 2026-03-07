@@ -109,7 +109,7 @@ export function ProductReviewsClient({
       {/* Product Header */}
       <Card>
         <CardHeader>
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             <div className="flex items-start gap-4">
               {(product.officialImageUrl || product.images?.[0] || communityImages[0]) ? (
                 <div className="relative w-20 h-20 shrink-0 rounded-lg overflow-hidden border bg-muted">
@@ -136,7 +136,7 @@ export function ProductReviewsClient({
                 </p>
               </div>
             </div>
-            <Button onClick={() => setShowAddDialog(true)}>
+            <Button onClick={() => setShowAddDialog(true)} className="w-full sm:w-auto shrink-0">
               <Plus className="w-4 h-4 mr-2" />
               {userReview ? "Edytuj opinie" : "Dodaj opinie"}
             </Button>

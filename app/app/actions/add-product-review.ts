@@ -37,7 +37,11 @@ export async function addProductReview(data: AddProductReviewInput) {
     where: { userId: session.user.id },
   });
 
-  // Szukamy istniejącej opinii użytkownika o tym produkcie (bez powiązania z częścią)
+  const imageUrls = (data.images || []).filter(
+    (url) => url.startsWith("https://") && url.includes(".public.blob.vercel-storage.com")
+  ).slice(0, 3);
+
+  // Szukamy istniejącej samodzielnej opinii (bez powiązania z częścią/serwisem)
   const existingReview = await prisma.partReview.findFirst({
     where: {
       userId: session.user.id,
@@ -46,10 +50,6 @@ export async function addProductReview(data: AddProductReviewInput) {
       serviceEventId: null,
     },
   });
-
-  const imageUrls = (data.images || []).filter(
-    (url) => url.startsWith("https://") && url.includes(".public.blob.vercel-storage.com")
-  ).slice(0, 3);
 
   if (existingReview) {
     await prisma.partReview.update({
