@@ -37,9 +37,9 @@ export function ReviewCard({ review, isCurrentUser }: ReviewCardProps) {
   return (
     <Card className={isCurrentUser ? "border-primary/50" : ""}>
       <CardHeader className="pb-2">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <Avatar className={`h-10 w-10 ${isPremium ? "ring-2 ring-blue-500" : ""}`}>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+          <div className="flex items-center gap-3 min-w-0">
+            <Avatar className={`h-10 w-10 shrink-0 ${isPremium ? "ring-2 ring-blue-500" : ""}`}>
               <AvatarImage src={review.user.image || undefined} />
               <AvatarFallback>{initials}</AvatarFallback>
               {isPremium && (
@@ -48,8 +48,8 @@ export function ReviewCard({ review, isCurrentUser }: ReviewCardProps) {
                 </AvatarBadge>
               )}
             </Avatar>
-            <div>
-              <div className="flex items-center gap-2">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-medium">
                   {review.user.name || "Uzytkownik"}
                 </span>
@@ -74,7 +74,7 @@ export function ReviewCard({ review, isCurrentUser }: ReviewCardProps) {
           </div>
 
           {/* Star Rating Display */}
-          <div className="flex gap-0.5 text-lg">
+          <div className="flex gap-0.5 text-lg shrink-0">
             {[1, 2, 3, 4, 5].map((star) => (
               <span
                 key={star}

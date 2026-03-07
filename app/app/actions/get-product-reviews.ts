@@ -74,33 +74,41 @@ export async function getProductReviews({
     ...(bikeTypeFilter && { bikeType: bikeTypeFilter }),
   };
 
-  const [reviews, totalCount, product, partsWithImages, reviewsWithImages] = await Promise.all([
+  const reviewSelect = {
+    id: true,
+    rating: true,
+    reviewText: true,
+    pros: true,
+    cons: true,
+    images: true,
+    kmUsed: true,
+    bikeType: true,
+    verified: true,
+    createdAt: true,
+    partId: true,
+    serviceEventId: true,
+    user: {
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        plan: true,
+        planExpiresAt: true,
+      },
+    },
+  } as const;
+
+  // Pobieramy więcej recenzji, żeby po deduplikacji po userId uzyskać pełną stronę
+  const fetchLimit = pageSize * 3;
+  const fetchOffset = (page - 1) * pageSize;
+
+  const [allReviews, totalCountRaw, product, partsWithImages, reviewsWithImages] = await Promise.all([
     prisma.partReview.findMany({
       where,
       orderBy,
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      select: {
-        id: true,
-        rating: true,
-        reviewText: true,
-        pros: true,
-        cons: true,
-        images: true,
-        kmUsed: true,
-        bikeType: true,
-        verified: true,
-        createdAt: true,
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-            plan: true,
-            planExpiresAt: true,
-          },
-        },
-      },
+      skip: fetchOffset,
+      take: fetchLimit,
+      select: reviewSelect,
     }),
     prisma.partReview.count({ where }),
     prisma.partProduct.findUnique({
@@ -138,15 +146,29 @@ export async function getProductReviews({
     }),
   ]);
 
+  // Deduplikacja po userId — preferujemy recenzję samodzielną (partId: null, serviceEventId: null)
+  const seenUsers = new Set<string>();
+  const reviews: typeof allReviews = [];
+  for (const review of allReviews) {
+    if (seenUsers.has(review.user.id)) continue;
+    seenUsers.add(review.user.id);
+    reviews.push(review);
+    if (reviews.length >= pageSize) break;
+  }
+
+  // Wyciągamy partId/serviceEventId z wyników (nie są częścią ReviewWithUser)
+  const reviewsClean = reviews.map(({ partId: _p, serviceEventId: _s, ...r }) => r);
+
   const communityImages = [
     ...partsWithImages.flatMap((p) => p.images),
     ...reviewsWithImages.flatMap((r) => r.images),
   ].slice(0, 9);
 
+  // totalCount może lekko zawyżać liczbę gdy są duplikaty, ale to rzadki przypadek
   return {
-    reviews,
-    totalCount,
-    totalPages: Math.ceil(totalCount / pageSize),
+    reviews: reviewsClean,
+    totalCount: totalCountRaw,
+    totalPages: Math.ceil(totalCountRaw / pageSize),
     currentPage: page,
     product,
     communityImages,

@@ -41,15 +41,14 @@ export async function addProductReview(data: AddProductReviewInput) {
     (url) => url.startsWith("https://") && url.includes(".public.blob.vercel-storage.com")
   ).slice(0, 3);
 
-  // Szukamy istniejącej samodzielnej opinii (bez powiązania z częścią/serwisem)
-  const existingReview = await prisma.partReview.findFirst({
-    where: {
-      userId: session.user.id,
-      productId: data.productId,
-      partId: null,
-      serviceEventId: null,
-    },
-  });
+  // Szukamy istniejącej opinii — najpierw samodzielna, potem jakakolwiek (z serwisu)
+  const existingReview =
+    (await prisma.partReview.findFirst({
+      where: { userId: session.user.id, productId: data.productId, partId: null, serviceEventId: null },
+    })) ??
+    (await prisma.partReview.findFirst({
+      where: { userId: session.user.id, productId: data.productId },
+    }));
 
   if (existingReview) {
     await prisma.partReview.update({
