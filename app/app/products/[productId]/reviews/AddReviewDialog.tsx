@@ -49,6 +49,7 @@ interface AddReviewDialogProps {
   onOpenChange: (open: boolean) => void;
   productId: string;
   existingReview: ExistingReview | null;
+  defaultBikeType?: BikeType;
 }
 
 export function AddReviewDialog({
@@ -56,6 +57,7 @@ export function AddReviewDialog({
   onOpenChange,
   productId,
   existingReview,
+  defaultBikeType = BikeType.ROAD,
 }: AddReviewDialogProps) {
   const [rating, setRating] = useState(existingReview?.rating || 0);
   const [hoveredRating, setHoveredRating] = useState(0);
@@ -63,7 +65,7 @@ export function AddReviewDialog({
     existingReview?.reviewText || ""
   );
   const [bikeType, setBikeType] = useState<BikeType>(
-    existingReview?.bikeType || BikeType.ROAD
+    existingReview?.bikeType || defaultBikeType
   );
   const [images, setImages] = useState<string[]>(
     existingReview?.images || []
@@ -85,7 +87,7 @@ export function AddReviewDialog({
       } else {
         setRating(0);
         setReviewText("");
-        setBikeType(BikeType.ROAD);
+        setBikeType(defaultBikeType);
         setImages([]);
       }
       setError(null);

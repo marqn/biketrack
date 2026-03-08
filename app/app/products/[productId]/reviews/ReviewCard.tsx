@@ -1,9 +1,21 @@
 "use client";
 
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Crown, ThumbsUp, ThumbsDown } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { CheckCircle, Crown, ThumbsUp, ThumbsDown, Pencil, Trash2, Flag } from "lucide-react";
 import { bikeTypeLabels } from "@/lib/types";
 import { ReviewWithUser } from "@/app/app/actions/get-product-reviews";
 import { useSession } from "next-auth/react";
@@ -11,18 +23,26 @@ import { formatDistance } from "@/lib/units";
 import type { UnitPreference } from "@/lib/units";
 import { ReviewLikeButton } from "./ReviewLikeButton";
 import { getReputationTier } from "@/components/discover/ReputationBadge";
+import { deleteProductReview } from "@/app/app/actions/delete-product-review";
+import { ReportReviewDialog } from "./ReportReviewDialog";
+import { useTransition, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface ReviewCardProps {
   review: ReviewWithUser;
   isCurrentUser: boolean;
+  onEdit?: () => void;
 }
 
-export function ReviewCard({ review, isCurrentUser }: ReviewCardProps) {
+export function ReviewCard({ review, isCurrentUser, onEdit }: ReviewCardProps) {
   const { data: session } = useSession();
   const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
   const isPremium = review.user.plan === "PREMIUM" && review.user.planExpiresAt && new Date(review.user.planExpiresAt) > new Date();
   const reputationTier = getReputationTier(review.user.reputation ?? 0);
   const avatarRingClass = reputationTier.borderClass || (isPremium ? "ring-2 ring-blue-500" : "");
+  const [isPending, startTransition] = useTransition();
+  const [showReportDialog, setShowReportDialog] = useState(false);
+  const router = useRouter();
 
   const initials =
     review.user.name
@@ -37,6 +57,13 @@ export function ReviewCard({ review, isCurrentUser }: ReviewCardProps) {
     month: "short",
     year: "numeric",
   });
+
+  function handleDelete() {
+    startTransition(async () => {
+      await deleteProductReview(review.id);
+      router.refresh();
+    });
+  }
 
   return (
     <Card className={isCurrentUser ? "border-primary/50" : ""}>
@@ -130,8 +157,64 @@ export function ReviewCard({ review, isCurrentUser }: ReviewCardProps) {
           </div>
         )}
 
-        {/* Lajk */}
-        <div className="flex justify-end pt-1">
+        {/* Akcje */}
+        <div className="flex items-center justify-between pt-1">
+          {isCurrentUser ? (
+            <div className="flex items-center gap-1">
+              {onEdit && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onEdit}
+                  disabled={isPending}
+                  className="h-8 px-2 text-muted-foreground hover:text-foreground"
+                >
+                  <Pencil className="w-3.5 h-3.5 mr-1.5" />
+                  Edytuj
+                </Button>
+              )}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={isPending}
+                    className="h-8 px-2 text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                    Usuń
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Usunąć opinię?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Tej operacji nie można cofnąć. Opinia zostanie trwale usunięta.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Anuluj</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDelete}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Usuń
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowReportDialog(true)}
+              className="h-8 px-2 text-muted-foreground hover:text-foreground"
+            >
+              <Flag className="w-3.5 h-3.5 mr-1.5" />
+              Zgłoś
+            </Button>
+          )}
           <ReviewLikeButton
             reviewId={review.id}
             initialLikeCount={review.likeCount}
@@ -140,6 +223,12 @@ export function ReviewCard({ review, isCurrentUser }: ReviewCardProps) {
           />
         </div>
       </CardContent>
+
+      <ReportReviewDialog
+        open={showReportDialog}
+        onOpenChange={setShowReportDialog}
+        reviewId={review.id}
+      />
     </Card>
   );
 }

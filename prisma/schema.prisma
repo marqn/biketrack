@@ -48,6 +48,7 @@ model User {
   partReviews    PartReview[]
   bikeComments   BikeComment[]
   commentReports CommentReport[]
+  reviewReports  ReviewReport[]
   bikeLikes      BikeLike[]
   commentLikes   CommentLike[]
   reviewLikes    ReviewLike[]
@@ -468,6 +469,7 @@ model PartReview {
   serviceEvent ServiceEvent? @relation(fields: [serviceEventId], references: [id], onDelete: Cascade)
   product      PartProduct   @relation(fields: [productId], references: [id], onDelete: Cascade)
   likes        ReviewLike[]
+  reports      ReviewReport[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -658,6 +660,23 @@ model CommentReport {
   createdAt DateTime @default(now())
 
   @@unique([commentId, userId]) // Jedno zgłoszenie per użytkownik per komentarz
+  @@index([status])
+}
+
+model ReviewReport {
+  id       String       @id @default(cuid())
+  reviewId String
+  userId   String
+  reason   ReportReason
+  details  String?      @db.Text
+  status   ReportStatus @default(PENDING)
+
+  review PartReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([reviewId, userId])
   @@index([status])
 }
 

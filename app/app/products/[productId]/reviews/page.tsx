@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { redirect, notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import {
   getProductReviews,
@@ -7,6 +8,7 @@ import {
 } from "@/app/app/actions/get-product-reviews";
 import { getUserProductReview } from "@/app/app/actions/add-product-review";
 import { BikeType } from "@/lib/generated/prisma";
+import { prisma } from "@/lib/prisma";
 import { ProductReviewsClient } from "./ProductReviewsClient";
 
 interface PageProps {
@@ -34,7 +36,10 @@ export default async function ProductReviewsPage({
   const sortBy = searchParamsResolved.sort || "newest";
   const bikeTypeFilter = searchParamsResolved.bikeType;
 
-  const [result, userReview] = await Promise.all([
+  const cookieStore = await cookies();
+  const selectedBikeId = cookieStore.get("selectedBikeId")?.value;
+
+  const [result, userReview, activeBike] = await Promise.all([
     getProductReviews({
       productId,
       page,
@@ -43,6 +48,9 @@ export default async function ProductReviewsPage({
       currentUserId: session.user.id,
     }),
     getUserProductReview(productId),
+    selectedBikeId
+      ? prisma.bike.findFirst({ where: { id: selectedBikeId, userId: session.user.id }, select: { type: true } })
+      : prisma.bike.findFirst({ where: { userId: session.user.id }, select: { type: true } }),
   ]);
 
   if (!result.product) {
@@ -60,6 +68,7 @@ export default async function ProductReviewsPage({
         sortBy={sortBy}
         bikeTypeFilter={bikeTypeFilter}
         userReview={userReview}
+        defaultBikeType={activeBike?.type ?? BikeType.ROAD}
         userId={session.user.id}
         communityImages={result.communityImages}
       />

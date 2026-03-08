@@ -24,7 +24,7 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
-import { Star, Users, Route, Plus, ArrowLeft, Package, ImageIcon, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, Users, Route, Plus, Pencil, ArrowLeft, Package, ImageIcon, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Watermark } from "@/components/ui/watermark";
 import { BikeType } from "@/lib/generated/prisma";
 import { bikeTypeLabels } from "@/lib/types";
@@ -55,6 +55,7 @@ interface ProductReviewsClientProps {
     bikeType: BikeType;
     images: string[];
   } | null;
+  defaultBikeType: BikeType;
   userId: string;
   communityImages?: string[];
 }
@@ -68,6 +69,7 @@ export function ProductReviewsClient({
   sortBy,
   bikeTypeFilter,
   userReview,
+  defaultBikeType,
   userId,
   communityImages = [],
 }: ProductReviewsClientProps) {
@@ -137,8 +139,8 @@ export function ProductReviewsClient({
               </div>
             </div>
             <Button onClick={() => setShowAddDialog(true)} className="w-full sm:w-auto shrink-0">
-              <Plus className="w-4 h-4 mr-2" />
-              {userReview ? "Edytuj opinie" : "Dodaj opinie"}
+              {userReview ? <Pencil className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
+              {userReview ? "Edytuj opinię" : "Dodaj opinię"}
             </Button>
           </div>
         </CardHeader>
@@ -302,6 +304,7 @@ export function ProductReviewsClient({
               key={review.id}
               review={review}
               isCurrentUser={review.user.id === userId}
+              onEdit={review.user.id === userId ? () => setShowAddDialog(true) : undefined}
             />
           ))
         )}
@@ -363,6 +366,7 @@ export function ProductReviewsClient({
         onOpenChange={setShowAddDialog}
         productId={product.id}
         existingReview={userReview}
+        defaultBikeType={defaultBikeType}
       />
     </div>
   );

@@ -108,23 +108,25 @@ export async function getUserProductReview(productId: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
 
-  const review = await prisma.partReview.findFirst({
-    where: {
-      userId: session.user.id,
-      productId,
-      partId: null,
-      serviceEventId: null,
-    },
-    select: {
-      id: true,
-      rating: true,
-      reviewText: true,
-      pros: true,
-      cons: true,
-      bikeType: true,
-      images: true,
-    },
-  });
+  const select = {
+    id: true,
+    rating: true,
+    reviewText: true,
+    pros: true,
+    cons: true,
+    bikeType: true,
+    images: true,
+  };
+
+  const review =
+    (await prisma.partReview.findFirst({
+      where: { userId: session.user.id, productId, partId: null, serviceEventId: null },
+      select,
+    })) ??
+    (await prisma.partReview.findFirst({
+      where: { userId: session.user.id, productId },
+      select,
+    }));
 
   return review;
 }
