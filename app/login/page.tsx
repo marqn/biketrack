@@ -67,7 +67,7 @@ export default function Page() {
         } else if (result?.error) {
           setError("Nieprawidłowy email lub hasło");
         } else if (result?.ok) {
-          window.location.href = "/";
+          router.push("/");
         }
       } else {
         if (password !== confirmPassword) {
@@ -350,6 +350,52 @@ export default function Page() {
               </svg>
               {isLogin ? "Zaloguj" : "Zarejestruj się"} przez Strava
             </Button>
+
+            <div className="relative group">
+              <Button
+                disabled
+                className="w-full bg-[#003087] hover:bg-[#003087] opacity-60 cursor-not-allowed"
+                type="button"
+              >
+                {isLogin ? "Zaloguj" : "Zarejestruj się"} przez
+                <span className="ml-2 flex items-center gap-1.5">
+                  <svg width="14" height="16" viewBox="0 0 14 16" fill="white">
+                    <polygon points="7,0 14,16 0,16"/>
+                  </svg>
+                  <span className="text-lg font-bold tracking-widest">GARMIN</span>
+                </span>
+                <span className="ml-2 text-xs bg-white/20 px-1.5 py-0.5 rounded-full">wkrótce</span>
+              </Button>
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10 pointer-events-none">
+                <div className="bg-gray-900 text-white text-xs rounded-md px-3 py-1.5 whitespace-nowrap shadow-lg">
+                  Logowanie przez Garmin będzie dostępne wkrótce
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                </div>
+              </div>
+            </div>
+
+            <div className="relative group">
+              <Button
+                disabled
+                className="w-full bg-black hover:bg-black opacity-60 cursor-not-allowed overflow-hidden"
+                type="button"
+              >
+                {isLogin ? "Zaloguj" : "Zarejestruj się"} przez
+                <img
+                  src="https://cdn.brandfetch.io/idVt4YJjKy/w/179/h/179/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1766951234837"
+                  alt="Wahoo"
+                  className="ml-2 h-8 w-20 object-contain"
+                  style={{ mixBlendMode: "screen" }}
+                />
+                <span className="ml-2 text-xs bg-white/20 px-1.5 py-0.5 rounded-full">wkrótce</span>
+              </Button>
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10 pointer-events-none">
+                <div className="bg-gray-900 text-white text-xs rounded-md px-3 py-1.5 whitespace-nowrap shadow-lg">
+                  Logowanie przez Wahoo będzie dostępne wkrótce
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                </div>
+              </div>
+            </div>
               </>
             )}
           </form>

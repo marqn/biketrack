@@ -38,7 +38,7 @@ export function Footer() {
               </span>
               <span className="flex items-center gap-1">
                 <Bike className="h-3 w-3 text-green-500" />
-                ver. 1.5.1
+                ver. 1.5.2
               </span>
             </div>
           </div>
