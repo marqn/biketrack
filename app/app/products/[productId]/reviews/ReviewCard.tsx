@@ -4,6 +4,8 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -90,10 +92,33 @@ export function ReviewCard({ review, isCurrentUser, onEdit }: ReviewCardProps) {
                   </Badge>
                 )}
                 {review.verified && (
-                  <Badge variant="secondary" className="text-xs">
-                    <CheckCircle className="w-3 h-3 mr-1" />
-                    Zweryfikowany
-                  </Badge>
+                  <>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge variant="secondary" className="text-xs cursor-default hidden md:inline-flex">
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Zweryfikowany
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Użytkownik faktycznie używał tego produktu — recenzja pochodzi z zainstalowanej części lub zdarzenia serwisowego.
+                      </TooltipContent>
+                    </Tooltip>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Badge variant="secondary" className="text-xs cursor-pointer md:hidden">
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Zweryfikowany
+                        </Badge>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="text-xs max-w-64 px-3 py-2 border-0"
+                        style={{ background: "oklch(0.62 0.24 264)", color: "oklch(0.98 0.01 264)" }}
+                      >
+                        Użytkownik faktycznie używał tego produktu — recenzja pochodzi z zainstalowanej części lub zdarzenia serwisowego.
+                      </PopoverContent>
+                    </Popover>
+                  </>
                 )}
               </div>
               <div className="text-sm text-muted-foreground">
