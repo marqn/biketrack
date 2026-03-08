@@ -75,6 +75,10 @@ export const authOptions: AuthOptions = {
           throw new Error("Nieprawidłowy email lub hasło");
         }
 
+        if (!user.emailVerified) {
+          throw new Error("EMAIL_NOT_VERIFIED");
+        }
+
         return {
           id: user.id,
           email: user.email,
@@ -185,7 +189,7 @@ export const authOptions: AuthOptions = {
       if (account?.provider !== "credentials" && user?.email) {
         const existingUser = await prisma.user.findUnique({
           where: { email: user.email },
-          select: { id: true, email: true, image: true }, // Dodaj image
+          select: { id: true, email: true, image: true, emailVerified: true },
         });
 
         if (existingUser) {
@@ -228,11 +232,19 @@ export const authOptions: AuthOptions = {
           if (!existingUser.image && user.image) {
             await prisma.user.update({
               where: { id: existingUser.id },
-              data: { 
-                image: user.image.length > 500 
-                  ? user.image.substring(0, 500) 
-                  : user.image 
+              data: {
+                image: user.image.length > 500
+                  ? user.image.substring(0, 500)
+                  : user.image
               },
+            });
+          }
+
+          // ✅ OAuth = zweryfikowany email - ustaw emailVerified jeśli jeszcze nie ustawione
+          if (!existingUser.emailVerified) {
+            await prisma.user.update({
+              where: { id: existingUser.id },
+              data: { emailVerified: new Date() },
             });
           }
         }

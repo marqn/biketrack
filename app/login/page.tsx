@@ -25,6 +25,9 @@ export default function Page() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [pendingVerificationEmail, setPendingVerificationEmail] = useState("");
+  const [resendState, setResendState] = useState<"idle" | "loading" | "sent" | "error">("idle");
 
   // Usuń #_=_ z URL po przekierowaniu z Facebooka
   useEffect(() => {
@@ -58,12 +61,21 @@ export default function Page() {
           redirect: false,
         });
 
-        if (result?.error) {
+        if (result?.error === "EMAIL_NOT_VERIFIED") {
+          setPendingVerificationEmail(email);
+          setError("Konto nie zostało jeszcze aktywowane. Sprawdź skrzynkę email lub wyślij nowy link.");
+        } else if (result?.error) {
           setError("Nieprawidłowy email lub hasło");
         } else if (result?.ok) {
           window.location.href = "/";
         }
       } else {
+        if (password !== confirmPassword) {
+          setError("Hasła nie są identyczne");
+          setIsLoading(false);
+          return;
+        }
+
         const response = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -75,9 +87,11 @@ export default function Page() {
         if (!response.ok) {
           setError(data.error || "Wystąpił błąd podczas rejestracji");
         } else {
-          setSuccess("Konto utworzone! Możesz się teraz zalogować.");
+          setPendingVerificationEmail(email);
+          setSuccess("Konto utworzone! Sprawdź skrzynkę e-mail i kliknij link aktywacyjny.");
           setIsLogin(true);
           setPassword("");
+          setConfirmPassword("");
           setName("");
         }
       }
@@ -123,9 +137,38 @@ export default function Page() {
           )}
 
           {error && (
-            <Alert variant="destructive" className="mb-4">
+            <Alert variant="destructive" className="mb-2">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
+          )}
+
+          {pendingVerificationEmail && error?.includes("aktywowane") && (
+            <div className="mb-4 text-center">
+              {resendState === "sent" ? (
+                <p className="text-sm text-green-700">Nowy link weryfikacyjny został wysłany.</p>
+              ) : (
+                <button
+                  type="button"
+                  disabled={resendState === "loading"}
+                  onClick={async () => {
+                    setResendState("loading");
+                    try {
+                      const res = await fetch("/api/auth/resend-verification", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email: pendingVerificationEmail }),
+                      });
+                      setResendState(res.ok ? "sent" : "error");
+                    } catch {
+                      setResendState("error");
+                    }
+                  }}
+                  className="text-sm text-primary hover:underline disabled:opacity-50"
+                >
+                  {resendState === "loading" ? "Wysyłanie..." : "Wyślij link ponownie"}
+                </button>
+              )}
+            </div>
           )}
 
           {success && (
@@ -178,6 +221,20 @@ export default function Page() {
               )}
             </div>
 
+            {!isLogin && (
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Powtórz hasło</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  minLength={8}
+                />
+              </div>
+            )}
+
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading
                 ? "Proszę czekać..."
@@ -185,32 +242,47 @@ export default function Page() {
                   ? "Zaloguj się"
                   : "Utwórz konto"}
             </Button>
-            <div className="text-center mt-4">
-              <button
+            {isLogin ? (
+              <div className="text-center mt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsLogin(false);
+                    setError("");
+                    setSuccess("");
+                  }}
+                  className="text-sm text-primary hover:underline"
+                >
+                  Nie masz konta? Zarejestruj się
+                </button>
+              </div>
+            ) : (
+              <Button
                 type="button"
+                variant="outline"
+                className="w-full mt-4"
                 onClick={() => {
-                  setIsLogin(!isLogin);
+                  setIsLogin(true);
                   setError("");
                   setSuccess("");
                 }}
-                className="text-sm text-primary hover:underline"
               >
-                {isLogin
-                  ? "Nie masz konta? Zarejestruj się"
-                  : "Masz już konto? Zaloguj się"}
-              </button>
-            </div>
+                Powrót do logowania
+              </Button>
+            )}
 
-            <div className="relative my-4">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Lub
-                </span>
-              </div>
-            </div>
+            {isLogin && (
+              <>
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                      Lub
+                    </span>
+                  </div>
+                </div>
 
             <Button
               onClick={(e) => {
@@ -261,7 +333,7 @@ export default function Page() {
                 e.preventDefault();
                 signIn("strava", { callbackUrl: "/" });
               }}
-              className="w-full bg-orange-500 hover:bg-orange-600"
+              className="w-full bg-[#FC4C02] hover:bg-[#e04400]"
               type="button"
             >
               <svg
@@ -272,12 +344,14 @@ export default function Page() {
                 className="mr-2"
               >
                 <path
-                  d="M13.11 4L6.39 18h3.88l2.84-5.54L16 18h3.88L13.11 4z"
+                  d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.627l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"
                   fill="white"
                 />
               </svg>
               {isLogin ? "Zaloguj" : "Zarejestruj się"} przez Strava
             </Button>
+              </>
+            )}
           </form>
         </CardContent>
       </Card>

@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import crypto from "crypto";
+import { sendVerificationEmail } from "@/lib/email/send-verification-email";
 
 const registerSchema = z.object({
   email: z.string().email("Nieprawidłowy format email"),
@@ -36,10 +38,25 @@ export async function POST(req: Request) {
       },
     });
 
+    // Generuj token weryfikacyjny i zapisz go
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
+
+    await prisma.emailVerificationToken.create({
+      data: { userId: user.id, token, expiresAt },
+    });
+
+    // Wysyłamy email po transakcji - jeśli się nie uda, user może użyć resend
+    try {
+      await sendVerificationEmail(email, token);
+    } catch (emailError) {
+      console.error("Błąd wysyłania emaila weryfikacyjnego:", emailError);
+    }
+
     return NextResponse.json(
-      { 
-        message: "Konto zostało utworzone",
-        user: { id: user.id, email: user.email, name: user.name }
+      {
+        message: "Konto zostało utworzone. Sprawdź email, aby je aktywować.",
+        requiresVerification: true,
       },
       { status: 201 }
     );

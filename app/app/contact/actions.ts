@@ -1,6 +1,8 @@
 "use server";
 
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendContactMessage(formData: { name: string; message: string }) {
   const { name, message } = formData;
@@ -13,19 +15,16 @@ export async function sendContactMessage(formData: { name: string; message: stri
     return { success: false, error: "Wiadomość jest za długa (max 2000 znaków)." };
   }
 
-  if (!process.env.EMAIL_SERVER) {
+  if (!process.env.RESEND_API_KEY) {
     console.error("Błąd wysyłania maila");
     return { success: false, error: "Nie udało się wysłać wiadomości. Spróbuj ponownie później." };
   }
 
   try {
-    const transporter = nodemailer.createTransport(process.env.EMAIL_SERVER);
-
-    await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
-      to: "marqn@icloud.com",
+    await resend.emails.send({
+      from: process.env.EMAIL_FROM ?? "Bike App <noreply@mbike.cc>",
+      to: ["marqn@icloud.com"],
       subject: `Kontakt od: ${name}`,
-      text: `Imię: ${name}\n\nWiadomość:\n${message}`,
       html: `
         <h2>Nowa wiadomość z formularza kontaktowego</h2>
         <p><strong>Imię:</strong> ${name}</p>
