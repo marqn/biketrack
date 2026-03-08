@@ -27,20 +27,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "To konto jest już zweryfikowane." });
     }
 
-    // Rate limiting: maks 1 email co 5 minut
-    const recentToken = await prisma.emailVerificationToken.findFirst({
-      where: {
-        userId: user.id,
-        createdAt: { gte: new Date(Date.now() - 5 * 60 * 1000) },
-      },
-    });
-
-    if (recentToken) {
-      return NextResponse.json(
-        { error: "Poczekaj 5 minut przed ponownym wysłaniem." },
-        { status: 429 }
-      );
-    }
+    // TODO: rate limiting wyłączone tymczasowo - włączyć po potwierdzeniu działania emaili
+    // const recentToken = await prisma.emailVerificationToken.findFirst({
+    //   where: {
+    //     userId: user.id,
+    //     createdAt: { gte: new Date(Date.now() - 5 * 60 * 1000) },
+    //   },
+    // });
+    // if (recentToken) {
+    //   return NextResponse.json(
+    //     { error: "Poczekaj 5 minut przed ponownym wysłaniem." },
+    //     { status: 429 }
+    //   );
+    // }
 
     // Usuń stare tokeny, wygeneruj nowy
     await prisma.emailVerificationToken.deleteMany({ where: { userId: user.id } });
