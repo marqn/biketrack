@@ -2,8 +2,6 @@
 
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function sendContactMessage(formData: { name: string; message: string }) {
   const { name, message } = formData;
 
@@ -21,6 +19,7 @@ export async function sendContactMessage(formData: { name: string; message: stri
   }
 
   try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
     await resend.emails.send({
       from: process.env.EMAIL_FROM ?? "Bike App <noreply@mbike.cc>",
       to: ["marqn@icloud.com"],

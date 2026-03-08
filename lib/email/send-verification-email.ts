@@ -1,11 +1,10 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function sendVerificationEmail(
   email: string,
   token: string
 ): Promise<void> {
+  const resend = new Resend(process.env.RESEND_API_KEY);
   const verifyUrl = `${process.env.NEXTAUTH_URL}/api/auth/verify-email?token=${token}`;
 
   await resend.emails.send({
