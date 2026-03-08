@@ -21,6 +21,7 @@ export type CommentData = {
   content: string;
   type: "GENERAL" | "SUGGESTION" | "QUESTION";
   createdAt: string;
+  updatedAt: string;
   isOptimistic?: boolean;
   likeCount: number;
   isLikedByCurrentUser: boolean;
@@ -35,6 +36,7 @@ export type CommentData = {
     content: string;
     type: "GENERAL" | "SUGGESTION" | "QUESTION";
     createdAt: string;
+    updatedAt: string;
     likeCount: number;
     isLikedByCurrentUser: boolean;
     user: {

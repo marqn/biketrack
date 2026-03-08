@@ -56,6 +56,10 @@ export interface InstallPartInput {
   // Zachowaj starą część w garażu przy wymianie
   saveToGarage?: boolean;
 
+  // Ocena starej części przy wymianie
+  oldPartRating?: number;
+  oldPartReviewText?: string;
+
   // @deprecated - użyj mode: "replace" zamiast tego
   isReplacement?: boolean;
 }
@@ -126,6 +130,43 @@ export async function installPart(data: InstallPartInput) {
         },
       });
     }
+  }
+
+  // Zapisz ocenę starej części przed wymianą (jeśli podano)
+  if (mode === "replace" && data.oldPartRating && part.productId) {
+    const session = await getServerSession(authOptions);
+    const userId = session?.user?.id || part.bike.userId;
+    const existingReview = await prisma.partReview.findUnique({
+      where: { userId_partId: { userId, partId: data.partId } },
+    });
+    if (existingReview) {
+      await prisma.partReview.update({
+        where: { id: existingReview.id },
+        data: {
+          rating: data.oldPartRating,
+          reviewText: data.oldPartReviewText,
+          kmAtReview: part.bike.totalKm,
+          kmUsed: part.wearKm,
+        },
+      });
+    } else {
+      await prisma.partReview.create({
+        data: {
+          userId,
+          partId: data.partId,
+          productId: part.productId,
+          rating: data.oldPartRating,
+          reviewText: data.oldPartReviewText,
+          pros: [],
+          cons: [],
+          kmAtReview: part.bike.totalKm,
+          kmUsed: part.wearKm,
+          bikeType: part.bike.type,
+          verified: true,
+        },
+      });
+    }
+    await updateProductStats(part.productId);
   }
 
   // Jeśli nie wybrano produktu, utwórz nowy (upsert)

@@ -4,8 +4,10 @@ import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Flag, Lightbulb, HelpCircle, MessageSquare, Reply, Trash2 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Flag, Lightbulb, HelpCircle, MessageSquare, Reply, Trash2, Pencil } from "lucide-react";
 import { deleteComment } from "@/app/app/actions/comments/delete-comment";
+import { editComment } from "@/app/app/actions/comments/edit-comment";
 import { CommentForm } from "./CommentForm";
 import { ReportCommentDialog } from "./ReportCommentDialog";
 import { CommentLikeButton } from "./CommentLikeButton";
@@ -17,6 +19,12 @@ const TYPE_CONFIG = {
   SUGGESTION: { label: "Sugestia", icon: Lightbulb, variant: "default" as const },
   QUESTION: { label: "Pytanie", icon: HelpCircle, variant: "outline" as const },
 };
+
+const COMMENT_TYPES = [
+  { value: "GENERAL", label: "Komentarz", icon: MessageSquare },
+  { value: "SUGGESTION", label: "Sugestia", icon: Lightbulb },
+  { value: "QUESTION", label: "Pytanie", icon: HelpCircle },
+] as const;
 
 interface CommentCardProps {
   comment: CommentData;
@@ -40,6 +48,11 @@ export function CommentCard({
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [editContent, setEditContent] = useState(comment.content);
+  const [editType, setEditType] = useState<"GENERAL" | "SUGGESTION" | "QUESTION">(comment.type);
+  const [isSaving, setIsSaving] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
 
   const isAuthor = currentUserId === comment.user.id;
   const config = TYPE_CONFIG[comment.type] || TYPE_CONFIG.GENERAL;
@@ -55,6 +68,8 @@ export function CommentCard({
       .toUpperCase() ?? "?";
 
   const timeAgo = formatTimeAgo(comment.createdAt);
+  const wasEdited =
+    new Date(comment.updatedAt).getTime() - new Date(comment.createdAt).getTime() > 5000;
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -68,6 +83,31 @@ export function CommentCard({
   const handleReplyAdded = () => {
     setShowReplyForm(false);
     (onReplyAdded ?? onCommentUpdated)();
+  };
+
+  const handleEditOpen = () => {
+    setEditContent(comment.content);
+    setEditType(comment.type);
+    setEditError(null);
+    setShowEditForm(true);
+  };
+
+  const handleEditSave = async () => {
+    if (!editContent.trim()) return;
+    setIsSaving(true);
+    setEditError(null);
+    const result = await editComment({
+      commentId: comment.id,
+      content: editContent.trim(),
+      type: isReply ? undefined : editType,
+    });
+    setIsSaving(false);
+    if (result.success) {
+      setShowEditForm(false);
+      onCommentUpdated();
+    } else {
+      setEditError(result.error ?? "Wystąpił błąd");
+    }
   };
 
   return (
@@ -94,15 +134,74 @@ export function CommentCard({
               </Badge>
             )}
             <span className="text-xs text-muted-foreground">{timeAgo}</span>
+            {wasEdited && (
+              <span className="text-xs text-muted-foreground italic">(edytowano)</span>
+            )}
             {comment.isOptimistic && (
               <span className="text-xs text-muted-foreground italic">wysyłanie...</span>
             )}
           </div>
 
-          <p className="text-sm mt-1 whitespace-pre-wrap wrap-break-word">{comment.content}</p>
+          {/* Formularz edycji inline */}
+          {showEditForm ? (
+            <div className="mt-2 space-y-2">
+              {!isReply && (
+                <div className="flex gap-2">
+                  {COMMENT_TYPES.map((t) => {
+                    const Icon = t.icon;
+                    return (
+                      <button
+                        key={t.value}
+                        onClick={() => setEditType(t.value)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                          editType === t.value
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-muted-foreground hover:bg-muted/80"
+                        }`}
+                      >
+                        <Icon className="h-3 w-3" />
+                        {t.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+              <Textarea
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                rows={3}
+                maxLength={2000}
+                disabled={isSaving}
+                autoFocus
+              />
+              {editError && <p className="text-sm text-destructive">{editError}</p>}
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">{editContent.length}/2000</span>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowEditForm(false)}
+                    disabled={isSaving}
+                  >
+                    Anuluj
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleEditSave}
+                    disabled={!editContent.trim() || isSaving}
+                  >
+                    {isSaving ? "Zapisywanie..." : "Zapisz"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm mt-1 whitespace-pre-wrap wrap-break-word">{comment.content}</p>
+          )}
 
-          {/* Akcje — ukryte dla optimistic */}
-          {!comment.isOptimistic && (
+          {/* Akcje — ukryte dla optimistic i podczas edycji */}
+          {!comment.isOptimistic && !showEditForm && (
             <div className="flex items-center gap-1 mt-2">
               <CommentLikeButton
                 commentId={comment.id}
@@ -134,16 +233,27 @@ export function CommentCard({
                 </Button>
               )}
               {isAuthor && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                >
-                  <Trash2 className="h-3 w-3 mr-1" />
-                  {isDeleting ? "Usuwanie..." : "Usuń"}
-                </Button>
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-xs text-muted-foreground"
+                    onClick={handleEditOpen}
+                  >
+                    <Pencil className="h-3 w-3 mr-1" />
+                    Edytuj
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                  >
+                    <Trash2 className="h-3 w-3 mr-1" />
+                    {isDeleting ? "Usuwanie..." : "Usuń"}
+                  </Button>
+                </>
               )}
             </div>
           )}

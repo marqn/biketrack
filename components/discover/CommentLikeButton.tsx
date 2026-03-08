@@ -1,7 +1,7 @@
 "use client";
 
-import { useOptimistic, useTransition } from "react";
-import { Heart } from "lucide-react";
+import { useOptimistic, useTransition, useState } from "react";
+import { ThumbsUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toggleCommentLike } from "@/app/app/actions/likes/toggle-comment-like";
 import { cn } from "@/lib/utils";
@@ -22,8 +22,9 @@ export function CommentLikeButton({
   isAuthor,
 }: CommentLikeButtonProps) {
   const [isPending, startTransition] = useTransition();
+  const [actual, setActual] = useState({ liked: initialIsLiked, count: initialLikeCount });
   const [optimistic, addOptimistic] = useOptimistic(
-    { liked: initialIsLiked, count: initialLikeCount },
+    actual,
     (state) => ({
       liked: !state.liked,
       count: state.liked ? state.count - 1 : state.count + 1,
@@ -36,7 +37,10 @@ export function CommentLikeButton({
     if (!canLike) return;
     startTransition(async () => {
       addOptimistic(undefined as never);
-      await toggleCommentLike(commentId);
+      const result = await toggleCommentLike(commentId);
+      if (result.success) {
+        setActual({ liked: result.liked, count: result.likeCount });
+      }
     });
   };
 
@@ -55,12 +59,12 @@ export function CommentLikeButton({
       className={cn(
         "h-7 px-2 text-xs gap-1",
         optimistic.liked
-          ? "text-red-500 hover:text-red-600"
+          ? "text-blue-500 hover:text-blue-600"
           : "text-muted-foreground hover:text-foreground"
       )}
       title={title}
     >
-      <Heart className={cn("h-3 w-3", optimistic.liked && "fill-current")} />
+      <ThumbsUp className={cn("h-3 w-3", optimistic.liked && "fill-current")} />
       {optimistic.count > 0 && <span>{optimistic.count}</span>}
     </Button>
   );

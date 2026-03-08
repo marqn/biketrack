@@ -34,7 +34,12 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import { CalendarIcon } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "@/components/ui/collapsible";
+import { CalendarIcon, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -139,6 +144,9 @@ export default function PartDetailsDialog({
     Record<string, unknown>
   >(getDefaultSpecificData(partType) as Record<string, unknown>);
   const [unknownProduct, setUnknownProduct] = useState(false);
+  const [oldPartRating, setOldPartRating] = useState(0);
+  const [oldPartHoveredRating, setOldPartHoveredRating] = useState(0);
+  const [oldPartReviewText, setOldPartReviewText] = useState("");
   const [isPending, startTransition] = useTransition();
   const [isLoadingReview, setIsLoadingReview] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -252,8 +260,8 @@ export default function PartDetailsDialog({
         );
         setRating(0);
         setReviewText(initialNotes || "");
-      } else {
-        // Tryb create i replace - wyczyść wszystko
+      } else if (mode === "replace" && currentPart?.product) {
+        // Tryb wymiany - załaduj ocenę starej części, wyczyść pola nowej
         setSelectedProduct(null);
         setBrand("");
         setModel("");
@@ -265,8 +273,43 @@ export default function PartDetailsDialog({
         );
         setRating(0);
         setReviewText("");
+        // Załaduj istniejącą ocenę starej części
+        if (currentPart.product.id) {
+          setIsLoadingReview(true);
+          try {
+            const review = await getUserPartReview(currentPart.product.id);
+            if (review) {
+              setOldPartRating(review.rating);
+              setOldPartReviewText(review.reviewText || "");
+            } else {
+              setOldPartRating(0);
+              setOldPartReviewText("");
+            }
+          } finally {
+            setIsLoadingReview(false);
+          }
+        } else {
+          setOldPartRating(0);
+          setOldPartReviewText("");
+        }
+      } else {
+        // Tryb create - wyczyść wszystko
+        setSelectedProduct(null);
+        setBrand("");
+        setModel("");
+        setUnknownProduct(false);
+        const today = new Date();
+        setInstalledAt(format(today, "yyyy-MM-dd"));
+        setPartSpecificData(
+          getDefaultSpecificData(partType) as Record<string, unknown>,
+        );
+        setRating(0);
+        setReviewText("");
+        setOldPartRating(0);
+        setOldPartReviewText("");
       }
       setHoveredRating(0);
+      setOldPartHoveredRating(0);
     }
 
     if (open) {
@@ -333,6 +376,8 @@ export default function PartDetailsDialog({
             mode,
             unknownProduct,
             saveToGarage: mode === "replace" ? true : undefined,
+            oldPartRating: mode === "replace" && oldPartRating > 0 ? oldPartRating : undefined,
+            oldPartReviewText: mode === "replace" ? oldPartReviewText.trim() || undefined : undefined,
           });
         }
         onOpenChange(false);
@@ -559,7 +604,7 @@ export default function PartDetailsDialog({
   const description = mode === "view"
     ? "Zdjęcie i opinia (marka i model tylko do odczytu)"
     : mode === "replace"
-      ? "Podaj szczegóły nowej części"
+      ? "Oceń wymienianą część i podaj dane nowej"
       : "Określ model części oraz jej parametry użytkowe";
 
   const formContent = (
@@ -580,7 +625,58 @@ export default function PartDetailsDialog({
                     {format(new Date(installedAt), "d MMMM yyyy", { locale: pl })}
                   </p>
                 )}
+                {currentPart?.wearKm != null && currentPart.wearKm > 0 && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Przejechała: <span className="font-medium text-foreground">{currentPart.wearKm.toLocaleString("pl-PL")} km</span>
+                  </p>
+                )}
               </div>
+            </div>
+          )}
+
+          {/* === Ocena wymienianej (starej) części === */}
+          {mode === "replace" && currentPart?.product && (
+            <div className="space-y-3 rounded-md border border-muted bg-muted/20 p-4">
+              <div>
+                <h3 className="text-base font-semibold">
+                  Ocena wymienianej części
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {currentPart.product.brand} {currentPart.product.model}
+                  {currentPart.wearKm != null && currentPart.wearKm > 0 && (
+                    <> · {currentPart.wearKm.toLocaleString("pl-PL")} km</>
+                  )}
+                  {isLoadingReview && (
+                    <span className="ml-2 text-xs">Ładowanie...</span>
+                  )}
+                </p>
+              </div>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setOldPartRating(star)}
+                    onMouseEnter={() => setOldPartHoveredRating(star)}
+                    onMouseLeave={() => setOldPartHoveredRating(0)}
+                    className="text-2xl transition-colors focus:outline-none"
+                  >
+                    {star <= (oldPartHoveredRating || oldPartRating) ? (
+                      <span className="text-yellow-500">★</span>
+                    ) : (
+                      <span className="text-muted-foreground">☆</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+              {oldPartRating > 0 && (
+                <Textarea
+                  placeholder="Co sądzisz o tej części po tym czasie?"
+                  value={oldPartReviewText}
+                  onChange={(e) => setOldPartReviewText(e.target.value)}
+                  rows={2}
+                />
+              )}
             </div>
           )}
 
@@ -739,43 +835,81 @@ export default function PartDetailsDialog({
             );
           })()}
           {/* === Opinia === */}
-          {!unknownProduct && (
-            <div className="space-y-4">
-              <h3 className="text-base font-semibold">
-                Opinia (opcjonalnie)
-                {isLoadingReview && (
-                  <span className="ml-2 text-xs text-muted-foreground">
-                    Ładowanie...
-                  </span>
-                )}
-              </h3>
-
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => setRating(star)}
-                    onMouseEnter={() => setHoveredRating(star)}
-                    onMouseLeave={() => setHoveredRating(0)}
-                    className="text-2xl transition-colors focus:outline-none"
-                  >
-                    {star <= (hoveredRating || rating) ? (
-                      <span className="text-yellow-500">★</span>
-                    ) : (
-                      <span className="text-muted-foreground">☆</span>
-                    )}
-                  </button>
-                ))}
+          {!unknownProduct && mode !== "replace" && (
+            mode === "create" ? (
+              <Collapsible>
+                <CollapsibleTrigger className="flex w-full items-center justify-between text-base font-semibold hover:text-foreground/80 transition-colors">
+                  <span>Znasz już tę część? Dodaj ocenę od razu</span>
+                  <ChevronDown className="h-4 w-4 transition-transform duration-200 in-data-[state=open]:rotate-180" />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="space-y-4 pt-3">
+                  <p className="text-sm text-muted-foreground">
+                    Jeśli montowałeś/aś tę część wcześniej i masz o niej zdanie — możesz dodać ocenę teraz.
+                  </p>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setRating(star)}
+                        onMouseEnter={() => setHoveredRating(star)}
+                        onMouseLeave={() => setHoveredRating(0)}
+                        className="text-2xl transition-colors focus:outline-none"
+                      >
+                        {star <= (hoveredRating || rating) ? (
+                          <span className="text-yellow-500">★</span>
+                        ) : (
+                          <span className="text-muted-foreground">☆</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  {rating > 0 && (
+                    <Textarea
+                      placeholder="Twoje wrażenia, trwałość, awaryjność…"
+                      value={reviewText}
+                      onChange={(e) => setReviewText(e.target.value)}
+                      rows={3}
+                    />
+                  )}
+                </CollapsibleContent>
+              </Collapsible>
+            ) : (
+              <div className="space-y-4">
+                <h3 className="text-base font-semibold">
+                  Opinia (opcjonalnie)
+                  {isLoadingReview && (
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      Ładowanie...
+                    </span>
+                  )}
+                </h3>
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRating(star)}
+                      onMouseEnter={() => setHoveredRating(star)}
+                      onMouseLeave={() => setHoveredRating(0)}
+                      className="text-2xl transition-colors focus:outline-none"
+                    >
+                      {star <= (hoveredRating || rating) ? (
+                        <span className="text-yellow-500">★</span>
+                      ) : (
+                        <span className="text-muted-foreground">☆</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+                <Textarea
+                  placeholder="Twoje wrażenia, trwałość, awaryjność…"
+                  value={reviewText}
+                  onChange={(e) => setReviewText(e.target.value)}
+                  rows={3}
+                />
               </div>
-
-              <Textarea
-                placeholder="Twoje wrażenia, trwałość, awaryjność…"
-                value={reviewText}
-                onChange={(e) => setReviewText(e.target.value)}
-                rows={3}
-              />
-            </div>
+            )
           )}
     </div>
   );
