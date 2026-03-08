@@ -3,7 +3,7 @@
 import { del } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 import { revalidatePath } from "next/cache";
 
 export async function deleteBlobImage(

@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 import { revalidatePath } from "next/cache";
 
 function generateSlug(brand?: string | null, model?: string | null, id?: string): string {

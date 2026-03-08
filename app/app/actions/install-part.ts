@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 import { PartType, Prisma } from "@/lib/generated/prisma";
 
 // Pomocnicza funkcja do normalizacji typu części do "kanonicznego" typu

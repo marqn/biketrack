@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { BikeType, PartType } from "@/lib/generated/prisma";
 import { DEFAULT_PARTS, EBIKE_PARTS, getDefaultIsInstalled, type BrakeType } from "@/lib/default-parts";
 import { getDefaultSpecificData } from "@/lib/part-specific-data";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 
 // Normalizacja tekstu do Title Case (np. "trek" -> "Trek", "CANNONDALE" -> "Cannondale")
 function toTitleCase(str: string): string {

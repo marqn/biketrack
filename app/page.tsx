@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "./api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 import Link from "next/link";
 import { getTopProducts } from "./app/actions/get-top-products";
 import { getLandingStats } from "./app/actions/get-landing-stats";

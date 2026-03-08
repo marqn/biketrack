@@ -3,7 +3,7 @@
 import { del } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 export async function saveBlobImage(
   entityType: "bike" | "part" | "avatar" | "review" | "product" | "bikeproduct",
   entityId: string,
