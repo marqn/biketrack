@@ -33,6 +33,7 @@ export interface ReviewWithUser {
     image: string | null;
     plan: "FREE" | "PREMIUM";
     planExpiresAt: Date | null;
+    reputation: number;
   };
 }
 
@@ -98,6 +99,7 @@ export async function getProductReviews({
         image: true,
         plan: true,
         planExpiresAt: true,
+        reputationBonus: true,
       },
     },
   } as const;
@@ -178,12 +180,31 @@ export async function getProductReviews({
   );
   const userLikedIds = new Set(userLikes.map((l) => l.reviewId));
 
+  // Reputacja autorów recenzji
+  const authorIds = [...new Set(reviews.map((r) => r.user.id))];
+  const reputationMap = new Map<string, number>();
+  if (authorIds.length > 0) {
+    const rawCounts = await prisma.$queryRaw<Array<{ userId: string; count: bigint }>>`
+      SELECT bc."userId", COUNT(cl.id) as count
+      FROM "BikeComment" bc
+      LEFT JOIN "CommentLike" cl ON cl."commentId" = bc.id
+      WHERE bc."userId" = ANY(${authorIds}::text[])
+        AND bc."isHidden" = false
+      GROUP BY bc."userId"
+    `;
+    rawCounts.forEach((r) => reputationMap.set(r.userId, Number(r.count)));
+  }
+
   // Wyciągamy partId/serviceEventId z wyników
   const reviewsClean: ReviewWithUser[] = reviews.map(
     ({ partId: _p, serviceEventId: _s, ...r }) => ({
       ...r,
       likeCount: likeCountMap.get(r.id) ?? 0,
       isLikedByCurrentUser: userLikedIds.has(r.id),
+      user: {
+        ...r.user,
+        reputation: (reputationMap.get(r.user.id) ?? 0) + (r.user.reputationBonus ?? 0),
+      },
     })
   );
 

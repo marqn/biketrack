@@ -88,17 +88,32 @@ export async function getComments({
 
     const reputationMap = new Map<string, number>();
     if (authorIds.length > 0) {
-      const reputations = await prisma.$queryRaw<Array<{ userId: string; count: bigint }>>(
-        Prisma.sql`
-          SELECT bc."userId", COUNT(cl.id) as count
-          FROM "BikeComment" bc
-          LEFT JOIN "CommentLike" cl ON cl."commentId" = bc.id
-          WHERE bc."userId" = ANY(${authorIds}::text[])
-            AND bc."isHidden" = false
-          GROUP BY bc."userId"
-        `
+      const [reputations, bonuses] = await Promise.all([
+        prisma.$queryRaw<Array<{ userId: string; count: bigint }>>(
+          Prisma.sql`
+            SELECT bc."userId", COUNT(cl.id) as count
+            FROM "BikeComment" bc
+            LEFT JOIN "CommentLike" cl ON cl."commentId" = bc.id
+            WHERE bc."userId" = ANY(${authorIds}::text[])
+              AND bc."isHidden" = false
+            GROUP BY bc."userId"
+          `
+        ),
+        prisma.user.findMany({
+          where: { id: { in: authorIds } },
+          select: { id: true, reputationBonus: true },
+        }),
+      ]);
+      const bonusMap = new Map(bonuses.map((u) => [u.id, u.reputationBonus]));
+      reputations.forEach((r) =>
+        reputationMap.set(r.userId, Number(r.count) + (bonusMap.get(r.userId) ?? 0))
       );
-      reputations.forEach((r) => reputationMap.set(r.userId, Number(r.count)));
+      // Autorzy bez komentarzy mogą mieć tylko bonus
+      bonuses.forEach((u) => {
+        if (!reputationMap.has(u.id) && u.reputationBonus > 0) {
+          reputationMap.set(u.id, u.reputationBonus);
+        }
+      });
     }
 
     const totalPages = Math.ceil(totalCount / pageSize);

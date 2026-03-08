@@ -10,6 +10,7 @@ import { useSession } from "next-auth/react";
 import { formatDistance } from "@/lib/units";
 import type { UnitPreference } from "@/lib/units";
 import { ReviewLikeButton } from "./ReviewLikeButton";
+import { getReputationTier } from "@/components/discover/ReputationBadge";
 
 interface ReviewCardProps {
   review: ReviewWithUser;
@@ -20,6 +21,8 @@ export function ReviewCard({ review, isCurrentUser }: ReviewCardProps) {
   const { data: session } = useSession();
   const unitPref: UnitPreference = session?.user?.unitPreference ?? "METRIC";
   const isPremium = review.user.plan === "PREMIUM" && review.user.planExpiresAt && new Date(review.user.planExpiresAt) > new Date();
+  const reputationTier = getReputationTier(review.user.reputation ?? 0);
+  const avatarRingClass = reputationTier.borderClass || (isPremium ? "ring-2 ring-blue-500" : "");
 
   const initials =
     review.user.name
@@ -40,7 +43,7 @@ export function ReviewCard({ review, isCurrentUser }: ReviewCardProps) {
       <CardHeader className="pb-2">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
           <div className="flex items-center gap-3 min-w-0">
-            <Avatar className={`h-10 w-10 shrink-0 ${isPremium ? "ring-2 ring-blue-500" : ""}`}>
+            <Avatar className={`h-10 w-10 shrink-0 ${avatarRingClass}`}>
               <AvatarImage src={review.user.image || undefined} />
               <AvatarFallback>{initials}</AvatarFallback>
               {isPremium && (
@@ -51,8 +54,8 @@ export function ReviewCard({ review, isCurrentUser }: ReviewCardProps) {
             </Avatar>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-medium">
-                  {review.user.name || "Uzytkownik"}
+                <span className={`font-medium ${reputationTier.className ? `rounded px-1.5 py-0.5 ${reputationTier.className}` : ""}`}>
+                  {review.user.name || "Użytkownik"}
                 </span>
                 {isCurrentUser && (
                   <Badge variant="outline" className="text-xs">

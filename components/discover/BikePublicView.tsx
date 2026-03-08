@@ -18,6 +18,7 @@ import { BikePublicParts } from "./BikePublicParts";
 import { BikeCommentSection } from "./BikeCommentSection";
 import { LikeButton } from "./LikeButton";
 import Link from "next/link";
+import { getReputationTier } from "@/components/discover/ReputationBadge";
 
 interface BikePublicViewProps {
   bike: {
@@ -37,6 +38,7 @@ interface BikePublicViewProps {
       name: string | null;
       image: string | null;
       profileSlug: string | null;
+      reputation?: number;
     };
     parts: Array<{
       id: string;
@@ -92,6 +94,8 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId, likeC
   const bikeTitle = bike.brand || bike.model
     ? `${bike.brand ?? ""} ${bike.model ?? ""}`.trim()
     : bikeTypeLabels[bike.type];
+
+  const ownerReputationTier = getReputationTier(bike.user.reputation ?? 0);
 
   const initials = bike.user.name
     ?.split(" ")
@@ -274,19 +278,19 @@ export function BikePublicView({ bike, isOwner, isLoggedIn, currentUserId, likeC
                 href={`/app/discover/user/${bike.user.profileSlug}`}
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity"
               >
-                <Avatar className="h-8 w-8">
+                <Avatar className={`h-8 w-8 ${ownerReputationTier.borderClass}`}>
                   <AvatarImage src={bike.user.image ?? undefined} />
                   <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
-                <span className="text-sm font-medium">{bike.user.name ?? "Użytkownik"}</span>
+                <span className={`text-sm font-medium ${ownerReputationTier.className ? `rounded px-1.5 py-0.5 ${ownerReputationTier.className}` : ""}`}>{bike.user.name ?? "Użytkownik"}</span>
               </Link>
             ) : (
               <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8">
+                <Avatar className={`h-8 w-8 ${ownerReputationTier.borderClass}`}>
                   <AvatarImage src={bike.user.image ?? undefined} />
                   <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
-                <span className="text-sm font-medium">{bike.user.name ?? "Użytkownik"}</span>
+                <span className={`text-sm font-medium ${ownerReputationTier.className ? `rounded px-1.5 py-0.5 ${ownerReputationTier.className}` : ""}`}>{bike.user.name ?? "Użytkownik"}</span>
               </div>
             )}
             <div className="ml-auto flex items-center gap-2">

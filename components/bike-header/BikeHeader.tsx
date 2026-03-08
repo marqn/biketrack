@@ -71,6 +71,7 @@ import {
   AddBikeDialog,
 } from "./dialogs";
 import { useMultiDialog } from "@/lib/hooks/useDialog";
+import { getReputationTier } from "@/components/discover/ReputationBadge";
 
 interface BikeHeaderProps {
   bike: Bike;
@@ -82,6 +83,7 @@ interface BikeHeaderProps {
     image?: string | null;
     role?: string;
     plan?: "FREE" | "PREMIUM";
+    reputation?: number;
   };
 }
 
@@ -141,6 +143,8 @@ export function BikeHeader({
 
   const isPremium = user.plan === "PREMIUM";
   const canAddBike = isPremium && bikes.length < 10;
+  const reputationTier = getReputationTier(user.reputation ?? 0);
+  const avatarRingClass = reputationTier.borderClass || (isPremium ? "ring-2 ring-blue-500" : "");
   const hasMultipleBikes = bikes.length > 1;
 
   const handleUpdateBike = async (data: {
@@ -370,9 +374,7 @@ export function BikeHeader({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="p-0">
-                <Avatar
-                  className={`h-9 w-9 ${user.plan === "PREMIUM" ? "ring-2 ring-blue-500" : ""}`}
-                >
+                <Avatar className={`h-9 w-9 ${avatarRingClass}`}>
                   <AvatarImage src={user.image ?? undefined} />
                   <AvatarFallback>{initials}</AvatarFallback>
                   {user.plan === "PREMIUM" && (

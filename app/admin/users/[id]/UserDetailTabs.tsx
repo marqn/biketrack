@@ -38,6 +38,14 @@ const COMMENT_TYPE_LABELS: Record<string, string> = {
   QUESTION: "Pytanie",
 };
 
+const REPUTATION_TIERS = [
+  { label: "Nowicjusz", points: 0 },
+  { label: "Rowerzysta", points: 5 },
+  { label: "Pasjonat", points: 25 },
+  { label: "Ekspert", points: 100 },
+  { label: "Legenda", points: 500 },
+];
+
 type UserData = {
   id: string;
   name: string | null;
@@ -50,6 +58,7 @@ type UserData = {
   bio: string | null;
   profileSlug: string | null;
   lastStravaSync: string | null;
+  reputationBonus: number;
   createdAt: string;
   _count: {
     bikes: number;
@@ -106,6 +115,7 @@ export function UserDetailTabs({ user, bikes, comments }: UserDetailTabsProps) {
   const [weight, setWeight] = useState(user.weight?.toString() || "");
   const [bio, setBio] = useState(user.bio || "");
   const [profileSlug, setProfileSlug] = useState(user.profileSlug || "");
+  const [reputationBonus, setReputationBonus] = useState(user.reputationBonus);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -119,6 +129,7 @@ export function UserDetailTabs({ user, bikes, comments }: UserDetailTabsProps) {
         weight: weight ? parseInt(weight, 10) : null,
         bio: bio || null,
         profileSlug: profileSlug || null,
+        reputationBonus,
       });
       router.refresh();
     });
@@ -257,6 +268,39 @@ export function UserDetailTabs({ user, bikes, comments }: UserDetailTabsProps) {
                       max={200}
                     />
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Bonus reputacji (testowy)</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      min={0}
+                      value={reputationBonus}
+                      onChange={(e) => setReputationBonus(Math.max(0, parseInt(e.target.value, 10) || 0))}
+                      className="w-24"
+                    />
+                    <span className="text-xs text-muted-foreground">Szybko ustaw próg:</span>
+                    <div className="flex gap-1">
+                      {REPUTATION_TIERS.map((tier) => (
+                        <button
+                          key={tier.points}
+                          type="button"
+                          onClick={() => setReputationBonus(tier.points)}
+                          className={`px-2 py-0.5 text-xs rounded border transition-colors ${
+                            reputationBonus === tier.points
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : "bg-background border-border hover:bg-muted"
+                          }`}
+                        >
+                          {tier.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Dodawane do prawdziwej reputacji z lajków. Nie jest widoczne dla użytkownika.
+                  </p>
                 </div>
 
                 <div className="space-y-2">

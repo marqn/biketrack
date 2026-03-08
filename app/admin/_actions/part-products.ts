@@ -91,27 +91,37 @@ export async function updatePartProduct(
     averageKmLifespan?: number | null;
     totalInstallations?: number | null;
   }
-) {
+): Promise<{ success: true } | { success: false; error: string }> {
   await requireAdmin();
 
-  const product = await prisma.partProduct.update({
-    where: { id },
-    data: {
-      type: data.type,
-      brand: data.brand?.trim().toUpperCase(),
-      model: data.model?.trim(),
-      specifications: (data.specifications as Prisma.InputJsonValue) ?? undefined,
-      officialPrice: data.officialPrice,
-      averageRating: data.averageRating,
-      totalReviews: data.totalReviews ?? undefined,
-      averageKmLifespan: data.averageKmLifespan ?? undefined,
-      totalInstallations: data.totalInstallations ?? undefined,
-    },
-  });
+  try {
+    await prisma.partProduct.update({
+      where: { id },
+      data: {
+        type: data.type,
+        brand: data.brand?.trim(),
+        model: data.model?.trim(),
+        specifications: (data.specifications as Prisma.InputJsonValue) ?? undefined,
+        officialPrice: data.officialPrice,
+        averageRating: data.averageRating,
+        totalReviews: data.totalReviews ?? undefined,
+        averageKmLifespan: data.averageKmLifespan ?? undefined,
+        totalInstallations: data.totalInstallations ?? undefined,
+      },
+    });
+  } catch (e: unknown) {
+    if (
+      e instanceof Prisma.PrismaClientKnownRequestError &&
+      e.code === "P2002"
+    ) {
+      return { success: false, error: "Produkt z takim typem, marką i modelem już istnieje." };
+    }
+    throw e;
+  }
 
   revalidatePath("/admin/parts");
   revalidatePath(`/admin/parts/${id}`);
-  return product;
+  return { success: true };
 }
 
 export async function deletePartProduct(id: string) {

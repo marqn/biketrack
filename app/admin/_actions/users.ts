@@ -76,6 +76,7 @@ export async function getUser(id: string) {
       bio: true,
       profileSlug: true,
       lastStravaSync: true,
+      reputationBonus: true,
       createdAt: true,
       _count: {
         select: {
@@ -150,6 +151,7 @@ export async function updateUser(
     weight?: number | null;
     bio?: string | null;
     profileSlug?: string | null;
+    reputationBonus?: number;
   }
 ) {
   await requireAdmin();
@@ -165,6 +167,7 @@ export async function updateUser(
       weight: data.weight,
       bio: data.bio?.trim() || null,
       profileSlug: data.profileSlug?.trim() || null,
+      reputationBonus: data.reputationBonus ?? 0,
     },
   });
 

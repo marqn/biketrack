@@ -3,7 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin } from "lucide-react";
 import { BikeCard } from "./BikeCard";
-import { ReputationBadge, REPUTATION_TIERS } from "./ReputationBadge";
+import { ReputationBadge, REPUTATION_TIERS, getReputationTier } from "./ReputationBadge";
 import { BikeType } from "@/lib/generated/prisma";
 
 interface UserPublicProfileProps {
@@ -35,6 +35,8 @@ export function UserPublicProfile({ user, bikes }: UserPublicProfileProps) {
     .slice(0, 2)
     .toUpperCase() ?? "?";
 
+  const reputationTier = getReputationTier(user.reputation);
+
   const totalKm = bikes.reduce((sum, b) => sum + b.totalKm, 0);
 
   return (
@@ -42,7 +44,7 @@ export function UserPublicProfile({ user, bikes }: UserPublicProfileProps) {
       {/* Profil */}
       <div className="bg-card rounded-xl border p-6">
         <div className="flex items-center gap-4">
-          <Avatar className="h-16 w-16">
+          <Avatar className={`h-16 w-16 ${reputationTier.borderClass}`}>
             <AvatarImage src={user.image ?? undefined} />
             <AvatarFallback className="text-xl">{initials}</AvatarFallback>
           </Avatar>
@@ -67,7 +69,7 @@ export function UserPublicProfile({ user, bikes }: UserPublicProfileProps) {
             km łącznie
           </div>
           <div className="flex items-center gap-2">
-            <ReputationBadge points={user.reputation} showPoints />
+            <ReputationBadge points={user.reputation} />
             {user.reputation === 0 && (
               <span className="text-xs text-muted-foreground">0 pkt reputacji</span>
             )}

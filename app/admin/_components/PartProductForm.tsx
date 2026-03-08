@@ -123,6 +123,7 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
   );
   const [productImages, setProductImages] = useState<string[]>(initialData?.images || []);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function handlePartTypeChange(newType: PartType) {
     setPartType(newType);
@@ -133,6 +134,7 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
 
     startTransition(async () => {
       const data = {
@@ -148,7 +150,11 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
       };
 
       if (initialData) {
-        await updatePartProduct(initialData.id, data);
+        const result = await updatePartProduct(initialData.id, data);
+        if (!result.success) {
+          setError(result.error);
+          return;
+        }
       } else {
         await createPartProduct(data);
       }
@@ -589,6 +595,10 @@ export function PartProductForm({ initialData }: PartProductFormProps) {
                 </div>
               </div>
             </div>
+          )}
+
+          {error && (
+            <p className="text-sm text-destructive">{error}</p>
           )}
 
           <div className="flex gap-2 pt-4">

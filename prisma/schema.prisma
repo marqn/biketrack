@@ -40,6 +40,7 @@ model User {
   lastStravaSync     DateTime?          // Ostatnia synchronizacja dystansów ze Strava
   partsDisplayOrder  Json?              // Kolejność kategorii i części w akordeonach
   unitPreference     UnitPreference     @default(METRIC) // Preferowany system jednostek
+  reputationBonus    Int                @default(0)       // Bonus reputacji ustawiany przez admina (do testów)
   accounts       Account[]
   sessions       Session[]
   bikes          Bike[]

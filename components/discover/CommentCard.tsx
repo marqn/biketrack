@@ -9,7 +9,7 @@ import { deleteComment } from "@/app/app/actions/comments/delete-comment";
 import { CommentForm } from "./CommentForm";
 import { ReportCommentDialog } from "./ReportCommentDialog";
 import { CommentLikeButton } from "./CommentLikeButton";
-import { ReputationBadge } from "./ReputationBadge";
+import { getReputationTier } from "./ReputationBadge";
 import type { CommentData } from "./BikeCommentSection";
 
 const TYPE_CONFIG = {
@@ -44,6 +44,7 @@ export function CommentCard({
   const isAuthor = currentUserId === comment.user.id;
   const config = TYPE_CONFIG[comment.type] || TYPE_CONFIG.GENERAL;
   const TypeIcon = config.icon;
+  const reputationTier = getReputationTier(comment.user.reputation ?? 0);
 
   const initials =
     comment.user.name
@@ -76,15 +77,16 @@ export function CommentCard({
       }`}
     >
       <div className="flex gap-3">
-        <Avatar className="h-8 w-8 shrink-0">
+        <Avatar className={`h-8 w-8 shrink-0 ${reputationTier.borderClass}`}>
           <AvatarImage src={comment.user.image ?? undefined} />
           <AvatarFallback className="text-xs">{initials}</AvatarFallback>
         </Avatar>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-medium">{comment.user.name ?? "Użytkownik"}</span>
-            <ReputationBadge points={comment.user.reputation ?? 0} />
+            <span className={`text-sm font-medium ${reputationTier.className ? `rounded px-1.5 py-0.5 ${reputationTier.className}` : ""}`}>
+              {comment.user.name ?? "Użytkownik"}
+            </span>
             {!isReply && comment.type !== "GENERAL" && (
               <Badge variant={config.variant} className="text-xs gap-1">
                 <TypeIcon className="h-3 w-3" />

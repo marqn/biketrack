@@ -16,6 +16,7 @@ export default async function UserPublicPage({ params }: UserPublicPageProps) {
       name: true,
       image: true,
       bio: true,
+      reputationBonus: true,
       bikes: {
         where: { isPublic: true },
         select: {
@@ -41,7 +42,7 @@ export default async function UserPublicPage({ params }: UserPublicPageProps) {
     notFound();
   }
 
-  const reputation = await prisma.commentLike.count({
+  const reputationBase = await prisma.commentLike.count({
     where: {
       comment: {
         user: { profileSlug: slug },
@@ -49,6 +50,7 @@ export default async function UserPublicPage({ params }: UserPublicPageProps) {
       },
     },
   });
+  const reputation = reputationBase + user.reputationBonus;
 
   return (
     <div className="min-h-screen py-8 px-4">

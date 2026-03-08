@@ -31,7 +31,8 @@ import {
   weightRange,
   formatDistance,
 } from "@/lib/units";
-import { ReputationBadge, REPUTATION_TIERS } from "@/components/discover/ReputationBadge";
+import { ReputationBadge, REPUTATION_TIERS, getReputationTier } from "@/components/discover/ReputationBadge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface UserData {
   id: string;
@@ -842,25 +843,41 @@ export default function ProfilePage() {
         <div className="bg-card rounded-xl border p-6 mb-6">
           <div className="flex items-center justify-between mb-1">
             <h2 className="text-lg font-semibold">Reputacja społeczności</h2>
-            <ReputationBadge points={user.reputation} showPoints />
           </div>
           <p className="text-sm text-muted-foreground mb-4">
             Punkty reputacji zdobywasz, gdy inni użytkownicy polubią Twoje opinie o częściach.
           </p>
-          <div className="flex flex-wrap gap-3">
-            {REPUTATION_TIERS.filter((t) => t.minPoints > 0).map((tier) => (
-              <div
-                key={tier.label}
-                className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm ${
-                  user.reputation >= tier.minPoints ? "opacity-100" : "opacity-40"
-                }`}
-              >
-                <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-xs font-medium ${tier.className}`}>
-                  {tier.label}
-                </span>
-                <span className="text-muted-foreground">{tier.minPoints}+ pkt</span>
-              </div>
-            ))}
+
+          {/* Poziomy z podglądem avatara */}
+          <div className="space-y-2">
+            {REPUTATION_TIERS.map((tier) => {
+              const isActive = user.reputation >= tier.minPoints;
+              const isCurrent = getReputationTier(user.reputation).label === tier.label;
+              const initials = user.name?.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase() ?? "?";
+              return (
+                <div
+                  key={tier.label}
+                  className={`flex items-center gap-3 rounded-lg border px-3 py-2 transition-opacity ${
+                    isActive ? "opacity-100" : "opacity-35"
+                  } ${isCurrent ? "border-primary/50 bg-primary/5" : ""}`}
+                >
+                  {/* Podgląd avatara */}
+                  <Avatar className={`h-7 w-7 shrink-0 ${tier.borderClass}`}>
+                    <AvatarImage src={user.image ?? undefined} />
+                    <AvatarFallback className="text-[10px]">{initials}</AvatarFallback>
+                  </Avatar>
+                  {/* Podgląd nazwy */}
+                  <span className={`text-sm font-medium ${tier.className ? `rounded px-1.5 py-0.5 ${tier.className}` : ""}`}>
+                    {user.name ?? "Użytkownik"}
+                  </span>
+                  <div className="ml-auto flex items-center gap-2 text-sm text-muted-foreground">
+                    <span className={`font-medium ${isCurrent ? "text-foreground" : ""}`}>{tier.label}</span>
+                    {tier.minPoints > 0 && <span>· {tier.minPoints}+ pkt</span>}
+                    {tier.minPoints === 0 && <span>· start</span>}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 

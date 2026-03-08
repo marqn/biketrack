@@ -32,6 +32,7 @@ export default async function RootLayout({
           plan: true,
           planExpiresAt: true,
           lastStravaSync: true,
+          reputationBonus: true,
           bikes: {
             select: {
               id: true,
@@ -131,6 +132,10 @@ export default async function RootLayout({
         lastStravaSync: user.lastStravaSync?.toISOString() ?? null,
       };
 
+      const reputationBase = await prisma.commentLike.count({
+        where: { comment: { userId: user.id, isHidden: false } },
+      });
+
       headerProps = {
         bike: headerBike,
         bikes: headerBikes,
@@ -141,6 +146,7 @@ export default async function RootLayout({
           image: user.image,
           role: user.role,
           plan: isPremium ? "PREMIUM" as const : "FREE" as const,
+          reputation: reputationBase + (user.reputationBonus ?? 0),
         },
       };
     }

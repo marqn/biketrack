@@ -13,7 +13,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const [user, reputation] = await Promise.all([
+    const [user, reputationBase] = await Promise.all([
       prisma.user.findUnique({
         where: { id: session.user.id },
         select: {
@@ -26,12 +26,14 @@ export async function GET() {
           bio: true,
           profileSlug: true,
           unitPreference: true,
+          reputationBonus: true,
         }
       }),
       prisma.commentLike.count({
         where: { comment: { userId: session.user.id, isHidden: false } },
       }),
     ]);
+    const reputation = reputationBase + (user?.reputationBonus ?? 0);
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
